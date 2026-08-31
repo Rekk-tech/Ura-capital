@@ -1,0 +1,47 @@
+{
+  "name": "aura-capital",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Aura Capital — AI-assisted financial learning and investment simulation platform",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "dev:web": "npm run dev --workspace=@aura/web",
+    "dev:api": "npm run dev --workspace=@aura/api",
+    "start:api": "npm run start --workspace=@aura/api",
+    "clean": "tsc -b --clean && rimraf apps/web/dist apps/api/dist packages/shared/dist",
+    "build": "npm run build:shared && npm run build:api && npm run build:web",
+    "build:shared": "npm run build --workspace=@aura/shared",
+    "build:api": "npm run build --workspace=@aura/api",
+    "build:web": "npm run build --workspace=@aura/web",
+    "typecheck": "npm run build:shared && npm run typecheck:workspaces",
+    "typecheck:workspaces": "npm run typecheck --workspaces --if-present",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
+    "test": "npm run test --workspaces --if-present",
+    "test:unit": "npm run test:unit --workspaces --if-present",
+    "test:integration": "npm run test:integration --workspaces --if-present",
+    "test:db": "npm run test:db --workspace=@aura/api",
+    "test:redis": "npm run test:redis --workspace=@aura/api",
+    "test:e2e": "npm run test:e2e --workspace=@aura/web --if-present",
+    "guard:persistence": "npm run guard:persistence --workspace=@aura/api",
+    "guard:migration": "npm run guard:migration --workspace=@aura/api",
+    "guard:migrations": "npm run guard:migrations --workspace=@aura/api",
+    "guard:boundary": "npm run guard:boundary --workspace=@aura/api"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.20.0",
+    "@types/node": "^22.13.4",
+    "eslint": "^9.20.1",
+    "globals": "^15.15.0",
+    "prettier": "^3.5.1",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.24.0"
+  }
+}

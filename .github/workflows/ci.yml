@@ -1,0 +1,96 @@
+name: Aura Capital CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  validate:
+    name: Lint, Typecheck, Build, and Test
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgrespassword
+          POSTGRES_DB: aura_capital_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      NODE_ENV: test
+      PORT: 4000
+      HOST: localhost
+      JWT_SECRET: ci-test-jwt-secret-with-at-least-32-characters-length
+      AUTH_ACCESS_TOKEN_SECRET: ci-test-jwt-secret-with-at-least-32-characters-length
+      AUTH_REFRESH_TOKEN_SECRET: ci-test-jwt-secret-with-at-least-32-characters-length
+      AUTH_ACCESS_TOKEN_ISSUER: aura-capital
+      AUTH_ACCESS_TOKEN_AUDIENCE: aura-client
+      DATABASE_URL: postgresql://postgres:postgrespassword@localhost:5432/aura_capital_test
+      TEST_DATABASE_URL: postgresql://postgres:postgrespassword@localhost:5432/aura_capital_test
+      REDIS_URL: redis://localhost:6379
+      AUTH_RATE_LIMIT_ENABLED: "true"
+      AUTH_RATE_LIMIT_KEY_SECRET: ci-test-rate-limit-key-secret-at-least-32-chars
+      AUTH_TRUST_PROXY: "false"
+      CORS_ORIGIN: http://localhost:5173
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Lint
+        run: npm run lint
+
+      - name: Run Typecheck
+        run: npm run typecheck
+
+      - name: Run Build
+        run: npm run build
+
+      - name: Run Migration Safety Guard
+        run: npm run guard:migrations
+
+      - name: Apply Database Migrations (Isolated Test Database)
+        run: npx prisma migrate deploy --schema=apps/api/prisma/schema.prisma
+
+      - name: Verify Database Migration Status
+        run: npx prisma migrate status --schema=apps/api/prisma/schema.prisma
+
+      - name: Run Standard Test Suites
+        run: npm run test
+
+      - name: Run PostgreSQL Database Constraints Test Suite
+        run: npm run test:db
+
+      - name: Run Redis Rate Limit Test Suite
+        run: npm run test:redis
+
+      - name: Run Persistence Boundary Guard
+        run: npm run guard:persistence
