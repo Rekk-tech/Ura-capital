@@ -13,6 +13,9 @@ import {
   RefreshResponseSchema,
 } from "../schemas/index.js";
 
+export * from "./product-audit.types.js";
+export * from "./seed.types.js";
+
 export type HealthStatus = z.infer<typeof HealthStatusSchema>;
 export type ErrorEnvelope = z.infer<typeof ErrorEnvelopeSchema>;
 export type EnvConfig = z.infer<typeof EnvConfigSchema>;

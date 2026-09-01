@@ -266,4 +266,15 @@ describe("Log Sanitization & Database Error Safety (Unit / Logging)", () => {
 
     consoleSpy.mockRestore();
   });
+
+  it("verifies seed error diagnostics sanitize DATABASE_URL, REDIS_URL, passwords, and tokens (FEAT-017 / DEF-007)", () => {
+    const rawError = "Failed to connect to postgresql://postgres:SecretDevPass123!@localhost:5432/aura_capital_dev with redis://:RedisSecret123@localhost:6379/0 token=rawSecretToken123";
+    const sanitized = sanitizeLogString(rawError);
+
+    expect(sanitized).not.toContain("SecretDevPass123!");
+    expect(sanitized).not.toContain("RedisSecret123");
+    expect(sanitized).not.toContain("rawSecretToken123");
+    expect(sanitized).not.toContain("postgresql://");
+    expect(sanitized).not.toContain("redis://");
+  });
 });
