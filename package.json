@@ -32,7 +32,11 @@
     "guard:persistence": "npm run guard:persistence --workspace=@aura/api",
     "guard:migration": "npm run guard:migration --workspace=@aura/api",
     "guard:migrations": "npm run guard:migrations --workspace=@aura/api",
-    "guard:boundary": "npm run guard:boundary --workspace=@aura/api"
+    "guard:boundary": "npm run guard:boundary --workspace=@aura/api",
+    "guard:audit-governance": "npm run guard:audit-governance --workspace=@aura/api",
+    "guard:seed-safety": "npm run guard:seed-safety --workspace=@aura/api",
+    "seed:dev": "npm run seed:dev --workspace=@aura/api",
+    "seed:test": "npm run seed:test --workspace=@aura/api"
   },
   "devDependencies": {
     "@eslint/js": "^9.20.0",

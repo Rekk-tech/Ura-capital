@@ -63,7 +63,7 @@ Phase 3 does not own:
 | FEAT-013 | Shared Repository & Transaction Pattern | Implementation | FEAT-012 |
 | FEAT-014 | Core Domain Constraint Baseline | Implementation | FEAT-013 |
 | FEAT-015 | Redis Health & Transient State Boundary | Implementation | FEAT-012 |
-| FEAT-016 | Audit Log Persistence Extension Strategy | Implementation | FEAT-013, FEAT-014 |
+| FEAT-016 | Product Audit Abstraction & Governance | Implementation | FEAT-013, FEAT-014 |
 | FEAT-017 | Development Seed & Test Data Strategy | Implementation | FEAT-012, FEAT-014 |
 | FEAT-018 | Phase 3 Data Foundation Integration Gate | Final validation gate | FEAT-011 through FEAT-017 |
 
@@ -298,11 +298,11 @@ Security/Data-Integrity Risks:
 
 - Redis key leakage or accidental durable reliance can weaken recovery and privacy.
 
-### FEAT-016 - Audit Log Persistence Extension Strategy
+### FEAT-016 - Product Audit Abstraction & Governance
 
 Goal:
 
-Define how future product-domain audit events extend the existing PostgreSQL audit foundation without corrupting FEAT-009 semantics.
+Define how future product-domain audit events use a shared audit abstraction and governance model without corrupting FEAT-009 semantics.
 
 Scope:
 
@@ -457,7 +457,7 @@ Recommended order:
 3. FEAT-013 - Shared Repository & Transaction Pattern
 4. FEAT-014 - Core Domain Constraint Baseline
 5. FEAT-015 - Redis Health & Transient State Boundary
-6. FEAT-016 - Audit Log Persistence Extension Strategy
+6. FEAT-016 - Product Audit Abstraction & Governance
 7. FEAT-017 - Development Seed & Test Data Strategy
 8. FEAT-018 - Phase 3 Data Foundation Integration Gate
 
@@ -504,9 +504,12 @@ Human has already approved:
 5. FEAT-017 dev/test seed-user allowance with no default ADMIN credentials.
 6. No global Phase 3 soft-delete convention.
 
-Remaining decision before FEAT-011 implementation:
+Current governance state after FEAT-017 Human Final Gate:
 
-- Human approval of the FEAT-011 spec package.
+- FEAT-016 is DONE / QA PASS / Human Final Gate APPROVED.
+- FEAT-017 is DONE / QA PASS / Human Final Gate APPROVED.
+- FEAT-018 is UNBLOCKED FOR PLANNING; implementation remains NOT_STARTED.
+- Phase 4 remains blocked until Phase 3 receives PASS or Human-approved CONDITIONAL PASS.
 
 ## 9. Readiness
 
