@@ -1,4 +1,4 @@
-# Aura Capital ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Greenfield Rebuild Progress Tracker
+# Aura Capital - Greenfield Rebuild Progress Tracker
 
 ## 1. Strategy
 
@@ -46,7 +46,7 @@ Production readiness      NOT_STARTED
 
 ---
 
-# Phase 0 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Rebuild Definition
+# Phase 0 - Rebuild Definition
 
 ## Goal
 
@@ -98,7 +98,7 @@ Notes:
 
 ---
 
-# Phase 1 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Engineering Foundation
+# Phase 1 - Engineering Foundation
 
 ## Goal
 
@@ -492,7 +492,9 @@ Phase 3 Completion State:
 - FEAT-017 is DONE / QA PASS / Human Final Gate APPROVED.
 - FEAT-018 is DONE / QA PASS / Human Final Gate APPROVED.
 - Phase 3 is DONE / QA PASS / Human Final Gate APPROVED.
-- Phase 4 is UNBLOCKED FOR PLANNING; implementation remains NOT_STARTED.
+- Phase 4 is IN_PROGRESS / PLANNING; implementation remains NOT_STARTED.
+- FEAT-019 is APPROVED FOR IMPLEMENTATION; implementation remains NOT_STARTED.
+- FEAT-020 through FEAT-030 remain BLOCKED by approved Phase 4 dependency order.
 
 Feature Decomposition:
 
@@ -727,7 +729,7 @@ Human Final Gate: APPROVED
 Ready for QA: COMPLETED - Human Final Gate APPROVED
 FEAT-018: DONE - QA PASS; Human Final Gate APPROVED
 Phase 3: DONE - QA PASS; Human Final Gate APPROVED
-Phase 4: UNBLOCKED FOR PLANNING / Implementation NOT_STARTED
+Phase 4: IN_PROGRESS / PLANNING; Implementation NOT_STARTED
 ```
 
 FEAT-018 Governance Fields:
@@ -764,7 +766,7 @@ Blocking Issues: NONE
 Ready for QA: COMPLETED - Human Final Gate APPROVED
 Human Final Gate: APPROVED
 Phase 3: DONE - QA PASS; Human Final Gate APPROVED
-Phase 4: UNBLOCKED FOR PLANNING / Implementation NOT_STARTED
+Phase 4: IN_PROGRESS / PLANNING; Implementation NOT_STARTED
 ```
 
 Human Approved Phase 3 Decisions:
@@ -799,7 +801,7 @@ Artifacts:
 
 ---
 
-# Phase 4 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Academy
+# Phase 4 - Academy
 
 ## Goal
 
@@ -827,24 +829,100 @@ Rebuild education features on the new architecture.
 Status:
 
 ```text
-UNBLOCKED FOR PLANNING
+IN_PROGRESS
 ```
 
 Planning:
 
 ```text
-UNBLOCKED
+IN_PROGRESS
 ```
 
 Implementation:
 
 ```text
-NOT_STARTED
+IN_PROGRESS
 ```
+
+Phase 4 Planning & Implementation State:
+
+```text
+Phase 3: DONE / QA PASS / Human Final Gate APPROVED
+Phase 4: IN_PROGRESS
+Implementation: IN_PROGRESS
+FEAT-019: IMPLEMENTED / READY FOR QA (Human Final Gate: NOT APPROVED)
+FEAT-020: BLOCKED by FEAT-019
+FEAT-021: BLOCKED by FEAT-020
+FEAT-022: BLOCKED by FEAT-019 / FEAT-020
+FEAT-023: BLOCKED by FEAT-019 / FEAT-020
+FEAT-024: BLOCKED by FEAT-023
+FEAT-025: BLOCKED by FEAT-024
+FEAT-026: BLOCKED by FEAT-020 / FEAT-024 / FEAT-025
+FEAT-027: BLOCKED by FEAT-025 / FEAT-026
+FEAT-028: BLOCKED by FEAT-020 through FEAT-027
+FEAT-029: BLOCKED by FEAT-025 / FEAT-027 and Human product-audit decision
+FEAT-030: BLOCKED by FEAT-019 through FEAT-029 as applicable
+Phase 5: BLOCKED
+```
+
+Feature Decomposition:
+
+- FEAT-019: Academy Domain Schema & Persistence Foundation - `IMPLEMENTED / READY FOR QA` (Human Final Gate: `NOT APPROVED`)
+- FEAT-020: Course & Lesson Read Model APIs - `BLOCKED`
+- FEAT-021: Academy Learner Course/Lesson UI - `BLOCKED`
+- FEAT-022: Flashcards Domain & Review Flow - `BLOCKED`
+- FEAT-023: Quiz Definition & Safe Projection - `BLOCKED`
+- FEAT-024: Quiz Attempt Lifecycle - `BLOCKED`
+- FEAT-025: Server-Side Quiz Evaluation & Secure Submission - `BLOCKED`
+- FEAT-026: Academy Progression & Completion Tracking - `BLOCKED`
+- FEAT-027: XP & Idempotent Reward Ledger - `BLOCKED`
+- FEAT-028: Academy Authorization & Ownership Hardening - `BLOCKED`
+- FEAT-029: Academy Product Audit Decision & Integration - `BLOCKED`
+- FEAT-030: Phase 4 Academy Integration Gate - `BLOCKED`
+
+FEAT-019 Governance Fields:
+
+```text
+Lifecycle State: IMPLEMENTED
+Planning Status: HUMAN APPROVED
+Implementation: COMPLETE
+Ready for QA: READY
+Spec Package: HUMAN APPROVED
+Feature Type: Academy domain schema & persistence foundation implementation feature
+Scope Boundaries: Zero learner APIs, zero UI, zero quiz evaluation, zero progress mutation, zero XP reward granting, zero durable Redis keys
+Domain Models: 12 canonical models (AcademyCourse, AcademyLesson, AcademyFlashcard, AcademyQuiz, AcademyQuizQuestion, AcademyQuizOption, AcademyQuizAttempt, AcademyQuizAnswer, AcademyUserCourseProgress, AcademyUserLessonProgress, AcademyUserXp, AcademyRewardLedger)
+Migration: 20260903000000_feat019_academy_foundation (Forward-only, non-destructive, zero seed data)
+Uniqueness & Indexes: Course slug, lesson composite, ordering scopes, partial unique index (WHERE is_correct = true), reward idempotency, progress facts
+Constraints: Total XP non-negative (CHECK total_xp >= 0), max 1 correct option per question
+Delete Policy: RESTRICT / NO ACTION on parent entities and User learning history
+Repositories: IAcademyCourseRepository, IAcademyQuizRepository, IAcademyProgressRepository, IAcademyRewardRepository
+Unit of Work: Dual container binding (root PrismaClient & Prisma.TransactionClient with PrismaTransactionRunner)
+Fresh DB Validation: PASS - aura_capital_test_feat019_fresh (4 migrations applied cleanly)
+Upgrade DB Validation: PASS - aura_capital_test_feat019_upgrade (100% Phase 2/3 rows preserved, 116 new constraints, 42 new indexes)
+Static Validation: PASS - clean, lint (0 errors), prisma validate, typecheck (3 workspaces), build (3 packages)
+Standard Validation: PASS - 53 files / 486 tests (0 skips)
+Unit Validation: PASS - 33 files / 349 tests (0 skips)
+Live DB Validation: PASS - 12 files / 72 tests in PostgreSQL aura_capital_test_feat019_fresh (0 skips)
+Live Redis Validation: PASS - 5 files / 50 tests in Redis localhost:6379 (0 skips)
+Persistence Guard: PASS - 14 tests, zero violations
+Migration Guard: PASS - 4 migrations, 0 blocking risks
+Static Boundary Guard: PASS - controllers=6, services=10, repositories=6; 21 unit tests
+Audit Governance Guard: PASS - zero premature product audit schemas/APIs
+Seed Safety Guard: PASS - zero unsafe seed scripts, credentials, or default admin backdoors
+Blocking Issues: NONE
+Human Final Gate: NOT APPROVED
+FEAT-020 through FEAT-030: BLOCKED
+```
+
+Artifacts:
+
+- `docs/phase-4-feature-decomposition.md`
+- `.specify/specs/FEAT-019/`
+- `reports/implementation/phase-4/FEAT-019.md`
 
 ---
 
-# Phase 5 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Simulation Engine
+# Phase 5 - Simulation Engine
 
 ## Goal
 
@@ -896,7 +974,7 @@ TODO
 
 ---
 
-# Phase 6 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Community
+# Phase 6 - Community
 
 ## Goal
 
@@ -925,7 +1003,7 @@ TODO
 
 ---
 
-# Phase 7 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Subscription / Premium
+# Phase 7 - Subscription / Premium
 
 ## Goal
 
@@ -955,7 +1033,7 @@ TODO
 
 ---
 
-# Phase 8 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Aura Intelligence
+# Phase 8 - Aura Intelligence
 
 ## Goal
 
@@ -998,7 +1076,7 @@ TODO
 
 ---
 
-# Phase 9 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â UI Integration & Product Polish
+# Phase 9 - UI Integration & Product Polish
 
 ## Goal
 
@@ -1035,7 +1113,7 @@ TODO
 
 ---
 
-# Phase 10 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Production Hardening
+# Phase 10 - Production Hardening
 
 ## Goal
 
@@ -1078,7 +1156,7 @@ TODO
 # QA Task Template
 
 ```md
-## TASK-ID ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Task Name
+## TASK-ID - Task Name
 
 Status: IN_REVIEW
 
@@ -1121,4 +1199,3 @@ PASS
 ```
 
 A `CONDITIONAL PASS` allows progression only when explicitly approved by QA with tracked follow-up items.
-
