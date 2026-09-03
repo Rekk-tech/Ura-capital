@@ -1,11 +1,17 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { PrismaClient } from "@prisma/client";
-import { assertSafeTestDatabase, sanitizeDiagnosticMessage } from "../helpers/test-db-guard.js";
+import { assertSafeTestDatabase, sanitizeDiagnosticMessage, cleanAllTestTables } from "../helpers/test-db-guard.js";
 import { RegistrationService } from "../../src/modules/auth/registration.service.js";
 import { LoginService } from "../../src/modules/auth/login.service.js";
 import { AuthorizationService } from "../../src/modules/auth/authorization.service.js";
 import { PrismaRoleRepository } from "../../src/modules/auth/role.repository.js";
 import { PrismaUserRepository } from "../../src/modules/users/user.repository.js";
+import { passwordHashingService } from "../../src/modules/auth/password-hashing.service.js";
+import { accessTokenService } from "../../src/modules/auth/access-token.service.js";
+import { AuditService } from "../../src/modules/auth/audit.service.js";
+import { RefreshTokenService } from "../../src/modules/auth/refresh-token.service.js";
+import { createRepositoryContainer } from "../../src/infrastructure/database/repository-factory.js";
+import { PrismaTransactionRunner } from "../../src/infrastructure/database/transaction-runner.js";
 import { seedCanonicalRoles, assignRoleToExistingUser } from "../../src/modules/auth/role.seed.js";
 import { ROLES } from "../../src/modules/auth/authorization.constants.js";
 
@@ -21,6 +27,7 @@ describe("RBAC PostgreSQL Database Integration & Persistence (Integration)", () 
   let regService: RegistrationService;
   let loginService: LoginService;
   let authService: AuthorizationService;
+  let txRunner: PrismaTransactionRunner;
 
   beforeAll(async () => {
     assertSafeTestDatabase(testDbUrl, "test");
@@ -37,18 +44,20 @@ describe("RBAC PostgreSQL Database Integration & Persistence (Integration)", () 
       await prisma.$connect();
 
       // Clean up previous test artifacts
-      await prisma.userRole.deleteMany();
-      await prisma.credential.deleteMany();
-      await prisma.refreshSession.deleteMany();
-      await prisma.authSecurityAuditRecord.deleteMany();
-      await prisma.role.deleteMany();
-      await prisma.user.deleteMany();
+      await cleanAllTestTables(prisma);
+
+      const repos = createRepositoryContainer(prisma);
+      const auditService = new AuditService(repos.auditRepo);
+      txRunner = new PrismaTransactionRunner(prisma);
+      const refreshService = new RefreshTokenService(undefined, repos.sessionRepo, repos.userRepo, accessTokenService, auditService);
 
       roleRepo = new PrismaRoleRepository(prisma);
       userRepo = new PrismaUserRepository(prisma);
-      regService = new RegistrationService();
-      loginService = new LoginService();
+      regService = new RegistrationService(repos.userRepo, txRunner, passwordHashingService);
+      loginService = new LoginService(repos.userRepo, repos.credentialRepo, passwordHashingService, accessTokenService, refreshService, auditService);
       authService = new AuthorizationService(roleRepo);
+
+      await seedCanonicalRoles(roleRepo);
     } catch (err: unknown) {
       const errorMessage = sanitizeDiagnosticMessage(err instanceof Error ? err.message : String(err));
       throw new Error(
@@ -60,12 +69,7 @@ describe("RBAC PostgreSQL Database Integration & Persistence (Integration)", () 
   afterAll(async () => {
     if (prisma) {
       try {
-        await prisma.userRole.deleteMany();
-        await prisma.credential.deleteMany();
-        await prisma.refreshSession.deleteMany();
-        await prisma.authSecurityAuditRecord.deleteMany();
-        await prisma.role.deleteMany();
-        await prisma.user.deleteMany();
+        await cleanAllTestTables(prisma);
       } catch {
         // Ignore cleanup error on teardown
       } finally {
@@ -118,13 +122,13 @@ describe("RBAC PostgreSQL Database Integration & Persistence (Integration)", () 
     const regResult = await regService.register({ email, password, displayName: "Provisioning User" });
 
     // 1. Assign USER role
-    await assignRoleToExistingUser({ userId: regResult.user.id, roleCode: ROLES.USER }, userRepo, roleRepo);
+    await assignRoleToExistingUser({ userId: regResult.user.id, roleCode: ROLES.USER }, userRepo, roleRepo, txRunner);
 
     const roles1 = await authService.getUserRoles(regResult.user.id);
     expect(roles1).toEqual(["USER"]);
 
     // 2. Operational provisioning repeated (idempotent helper)
-    await assignRoleToExistingUser({ userId: regResult.user.id, roleCode: ROLES.USER }, userRepo, roleRepo);
+    await assignRoleToExistingUser({ userId: regResult.user.id, roleCode: ROLES.USER }, userRepo, roleRepo, txRunner);
     const roles2 = await authService.getUserRoles(regResult.user.id);
     expect(roles2).toEqual(["USER"]);
 
@@ -147,8 +151,8 @@ describe("RBAC PostgreSQL Database Integration & Persistence (Integration)", () 
     const regResult = await regService.register({ email, password, displayName: "Multi Role User" });
 
     // Assign USER first, then ADMIN
-    await assignRoleToExistingUser({ userId: regResult.user.id, roleCode: ROLES.USER }, userRepo, roleRepo);
-    await assignRoleToExistingUser({ userId: regResult.user.id, roleCode: ROLES.ADMIN }, userRepo, roleRepo);
+    await assignRoleToExistingUser({ userId: regResult.user.id, roleCode: ROLES.USER }, userRepo, roleRepo, txRunner);
+    await assignRoleToExistingUser({ userId: regResult.user.id, roleCode: ROLES.ADMIN }, userRepo, roleRepo, txRunner);
 
     const roles = await authService.getUserRoles(regResult.user.id);
     expect(roles).toEqual(["ADMIN", "USER"]); // Lexical ascending order
@@ -174,7 +178,7 @@ describe("RBAC PostgreSQL Database Integration & Persistence (Integration)", () 
     expect(authService.hasRole(context1, ROLES.ADMIN)).toBe(false);
 
     // 3. Dynamically assign ADMIN role in PostgreSQL
-    await assignRoleToExistingUser({ userId: regResult.user.id, roleCode: ROLES.ADMIN }, userRepo, roleRepo);
+    await assignRoleToExistingUser({ userId: regResult.user.id, roleCode: ROLES.ADMIN }, userRepo, roleRepo, txRunner);
 
     // 4. Using the exact same user identity (simulating next request with same valid token)
     const context2 = await authService.buildAuthorizationContext({

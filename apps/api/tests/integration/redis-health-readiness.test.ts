@@ -157,7 +157,7 @@ describe("FEAT-015 Redis Health & Transient State Boundary (Integration)", () =>
   describe("Transient Key TTL & Expiry Policy", () => {
     it("enforces positive TTL on all transient rate-limit keys and expires naturally", async () => {
       const store = new RateLimitStore(primaryRedis);
-      const expiringKey = `${TEST_NS}ttl_test:ephemeral`;
+      const expiringKey = `${TEST_NS}ttl_test:ephemeral_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
       // Increment with short 2-second TTL
       await store.increment(expiringKey, 2);
@@ -167,11 +167,19 @@ describe("FEAT-015 Redis Health & Transient State Boundary (Integration)", () =>
       expect(initialTtl).toBeGreaterThan(0);
       expect(initialTtl).toBeLessThanOrEqual(2);
 
-      // Wait for expiration
-      await new Promise((resolve) => setTimeout(resolve, 2200));
+      // Deterministically wait/poll for natural expiration with bounded timeout
+      let expired = false;
+      const startTime = Date.now();
+      while (Date.now() - startTime < 5000) {
+        const count = await store.getCount(expiringKey);
+        if (count === 0) {
+          expired = true;
+          break;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
 
-      const expiredCount = await store.getCount(expiringKey);
-      expect(expiredCount).toBe(0);
+      expect(expired).toBe(true);
 
       const finalTtl = await primaryRedis.ttl(expiringKey);
       expect(finalTtl).toBe(-2); // Key does not exist

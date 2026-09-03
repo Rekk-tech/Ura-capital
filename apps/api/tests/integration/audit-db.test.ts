@@ -24,7 +24,7 @@ import { accessTokenService } from "../../src/modules/auth/access-token.service.
 import { ROLES } from "../../src/modules/auth/authorization.constants.js";
 import { AppError } from "../../src/shared/errors/error-envelope.js";
 import { ERROR_CODES, HTTP_STATUS } from "@aura/shared";
-import { transactionRunner } from "../../src/infrastructure/database/transaction-runner.js";
+import { transactionRunner, PrismaTransactionRunner } from "../../src/infrastructure/database/transaction-runner.js";
 
 const dbUrl =
   process.env.TEST_DATABASE_URL ||
@@ -333,7 +333,7 @@ describe("FEAT-009 Database-Backed Audit Persistence & Failure Injection (Postgr
     const sentinelRawToken = "SENTINEL_RAW_REFRESH_TOKEN_ABCDEFGHIJKLMN_123456789";
     const sentinelJwt = "SENTINEL_RAW_JWT_BEARER_TOKEN_HEADER_XYZ";
 
-    const regService = new RegistrationService(prisma, undefined, passwordHashingService);
+    const regService = new RegistrationService(userRepo, new PrismaTransactionRunner(prisma), passwordHashingService);
     const regResult = await regService.register({
       email: sentinelEmail,
       password: sentinelPassword,

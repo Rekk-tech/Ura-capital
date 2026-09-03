@@ -850,8 +850,8 @@ Phase 4 Planning & Implementation State:
 Phase 3: DONE / QA PASS / Human Final Gate APPROVED
 Phase 4: IN_PROGRESS
 Implementation: IN_PROGRESS
-FEAT-019: IMPLEMENTED / READY FOR QA (Human Final Gate: NOT APPROVED)
-FEAT-020: BLOCKED by FEAT-019
+FEAT-019: DONE (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED)
+FEAT-020: UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED)
 FEAT-021: BLOCKED by FEAT-020
 FEAT-022: BLOCKED by FEAT-019 / FEAT-020
 FEAT-023: BLOCKED by FEAT-019 / FEAT-020
@@ -867,8 +867,8 @@ Phase 5: BLOCKED
 
 Feature Decomposition:
 
-- FEAT-019: Academy Domain Schema & Persistence Foundation - `IMPLEMENTED / READY FOR QA` (Human Final Gate: `NOT APPROVED`)
-- FEAT-020: Course & Lesson Read Model APIs - `BLOCKED`
+- FEAT-019: Academy Domain Schema & Persistence Foundation - `DONE` (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED)
+- FEAT-020: Course & Lesson Read Model APIs - `UNBLOCKED FOR PLANNING` (Implementation: `NOT_STARTED`)
 - FEAT-021: Academy Learner Course/Lesson UI - `BLOCKED`
 - FEAT-022: Flashcards Domain & Review Flow - `BLOCKED`
 - FEAT-023: Quiz Definition & Safe Projection - `BLOCKED`
@@ -883,35 +883,42 @@ Feature Decomposition:
 FEAT-019 Governance Fields:
 
 ```text
-Lifecycle State: IMPLEMENTED
+Lifecycle State: DONE
 Planning Status: HUMAN APPROVED
 Implementation: COMPLETE
-Ready for QA: READY
+QA Iteration 1: FAIL (DEF-001 through DEF-006 identified by Codex QA)
+Rework Iteration 1: COMPLETE (DEF-001 through DEF-006 resolved and verified)
+QA Iteration 2: FAIL (DEF-007 through DEF-011 identified by Codex QA)
+Rework Iteration 2: COMPLETE (DEF-007 through DEF-011 resolved and verified)
+QA Iteration 3: Emergency QA Execution — Antigravity (Evidence Status: NO BLOCKER OBSERVED)
+Human Dual Review: APPROVED
+Latest QA: QA PASS — Emergency QA Ownership Transfer (Human Dual Review APPROVED)
+Human Final Gate: APPROVED
 Spec Package: HUMAN APPROVED
 Feature Type: Academy domain schema & persistence foundation implementation feature
 Scope Boundaries: Zero learner APIs, zero UI, zero quiz evaluation, zero progress mutation, zero XP reward granting, zero durable Redis keys
 Domain Models: 12 canonical models (AcademyCourse, AcademyLesson, AcademyFlashcard, AcademyQuiz, AcademyQuizQuestion, AcademyQuizOption, AcademyQuizAttempt, AcademyQuizAnswer, AcademyUserCourseProgress, AcademyUserLessonProgress, AcademyUserXp, AcademyRewardLedger)
 Migration: 20260903000000_feat019_academy_foundation (Forward-only, non-destructive, zero seed data)
-Uniqueness & Indexes: Course slug, lesson composite, ordering scopes, partial unique index (WHERE is_correct = true), reward idempotency, progress facts
-Constraints: Total XP non-negative (CHECK total_xp >= 0), max 1 correct option per question
+Uniqueness & Indexes: Course slug, lesson composite, ordering scopes, partial unique index, reward idempotency, progress facts, composite attempt/question unique keys for same-quiz integrity
+Constraints & Triggers: Total XP non-negative (CHECK total_xp >= 0), exactly 1 correct option per single-choice question (deferred constraint triggers trg_academy_quiz_options_exactly_one_correct / trg_academy_quiz_questions_has_correct_option + partial unique index), closed-set CHECK constraints across all 10 domain status/type columns, progress completedAt CHECK constraints, same-quiz composite foreign keys (attempt_id, quiz_id), (question_id, quiz_id), (selected_option_id, question_id)
 Delete Policy: RESTRICT / NO ACTION on parent entities and User learning history
-Repositories: IAcademyCourseRepository, IAcademyQuizRepository, IAcademyProgressRepository, IAcademyRewardRepository
+Repositories: IAcademyCourseRepository, IAcademyQuizRepository, IAcademyProgressRepository, IAcademyRewardRepository (with atomic createQuestionWithOptions UoW)
 Unit of Work: Dual container binding (root PrismaClient & Prisma.TransactionClient with PrismaTransactionRunner)
-Fresh DB Validation: PASS - aura_capital_test_feat019_fresh (4 migrations applied cleanly)
-Upgrade DB Validation: PASS - aura_capital_test_feat019_upgrade (100% Phase 2/3 rows preserved, 116 new constraints, 42 new indexes)
+Fresh DB Validation: PASS - aura_capital_test_feat019_rework2_fresh (4 migrations applied cleanly)
+Upgrade DB Validation: PASS - aura_capital_test_feat019_rework2_upgrade (100% Phase 2/3 rows preserved, 131 new constraints/triggers, 47 new indexes)
 Static Validation: PASS - clean, lint (0 errors), prisma validate, typecheck (3 workspaces), build (3 packages)
-Standard Validation: PASS - 53 files / 486 tests (0 skips)
-Unit Validation: PASS - 33 files / 349 tests (0 skips)
-Live DB Validation: PASS - 12 files / 72 tests in PostgreSQL aura_capital_test_feat019_fresh (0 skips)
+Standard Validation: PASS - 53 files / 487 tests (0 skips)
+Unit Validation: PASS - 33 files / 350 tests (0 skips)
+Live DB Validation: PASS - 12 files / 89 tests in PostgreSQL aura_capital_test_feat019_rework2_fresh (0 skips)
 Live Redis Validation: PASS - 5 files / 50 tests in Redis localhost:6379 (0 skips)
 Persistence Guard: PASS - 14 tests, zero violations
 Migration Guard: PASS - 4 migrations, 0 blocking risks
-Static Boundary Guard: PASS - controllers=6, services=10, repositories=6; 21 unit tests
+Static Boundary Guard: PASS - controllers=6, services=10, repositories=6
 Audit Governance Guard: PASS - zero premature product audit schemas/APIs
 Seed Safety Guard: PASS - zero unsafe seed scripts, credentials, or default admin backdoors
 Blocking Issues: NONE
-Human Final Gate: NOT APPROVED
-FEAT-020 through FEAT-030: BLOCKED
+FEAT-020: UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED)
+FEAT-021 through FEAT-030: BLOCKED
 ```
 
 Artifacts:
@@ -919,6 +926,8 @@ Artifacts:
 - `docs/phase-4-feature-decomposition.md`
 - `.specify/specs/FEAT-019/`
 - `reports/implementation/phase-4/FEAT-019.md`
+- `reports/qa/phase-4/FEAT-019-QA.md`
+- `reports/qa/phase-4/FEAT-019-QA3-TEMP-EVIDENCE.md`
 
 ---
 

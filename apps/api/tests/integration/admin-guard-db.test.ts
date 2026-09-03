@@ -1,12 +1,18 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import request from "supertest";
 import { PrismaClient } from "@prisma/client";
-import { assertSafeTestDatabase, sanitizeDiagnosticMessage } from "../helpers/test-db-guard.js";
+import { assertSafeTestDatabase, sanitizeDiagnosticMessage, cleanAllTestTables } from "../helpers/test-db-guard.js";
 import { createApp } from "../../src/server.js";
 import { RegistrationService } from "../../src/modules/auth/registration.service.js";
 import { LoginService } from "../../src/modules/auth/login.service.js";
 import { PrismaRoleRepository } from "../../src/modules/auth/role.repository.js";
 import { PrismaUserRepository } from "../../src/modules/users/user.repository.js";
+import { passwordHashingService } from "../../src/modules/auth/password-hashing.service.js";
+import { accessTokenService } from "../../src/modules/auth/access-token.service.js";
+import { AuditService } from "../../src/modules/auth/audit.service.js";
+import { RefreshTokenService } from "../../src/modules/auth/refresh-token.service.js";
+import { createRepositoryContainer } from "../../src/infrastructure/database/repository-factory.js";
+import { PrismaTransactionRunner } from "../../src/infrastructure/database/transaction-runner.js";
 import { seedCanonicalRoles, assignRoleToExistingUser } from "../../src/modules/auth/role.seed.js";
 import { ROLES } from "../../src/modules/auth/authorization.constants.js";
 import { HTTP_STATUS } from "@aura/shared";
@@ -39,17 +45,17 @@ describe("Admin Authorization Guard PostgreSQL Integration & Immediacy (Integrat
       await prisma.$connect();
 
       // Clean up previous test artifacts
-      await prisma.userRole.deleteMany();
-      await prisma.credential.deleteMany();
-      await prisma.refreshSession.deleteMany();
-      await prisma.authSecurityAuditRecord.deleteMany();
-      await prisma.role.deleteMany();
-      await prisma.user.deleteMany();
+      await cleanAllTestTables(prisma);
+
+      const repos = createRepositoryContainer(prisma);
+      const auditService = new AuditService(repos.auditRepo);
+      const txRunner = new PrismaTransactionRunner(prisma);
+      const refreshService = new RefreshTokenService(undefined, repos.sessionRepo, repos.userRepo, accessTokenService, auditService);
 
       roleRepo = new PrismaRoleRepository(prisma);
       userRepo = new PrismaUserRepository(prisma);
-      regService = new RegistrationService(prisma);
-      loginService = new LoginService(prisma);
+      regService = new RegistrationService(repos.userRepo, txRunner, passwordHashingService);
+      loginService = new LoginService(repos.userRepo, repos.credentialRepo, passwordHashingService, accessTokenService, refreshService, auditService);
 
       // Seed canonical roles
       await seedCanonicalRoles(roleRepo);
@@ -64,12 +70,7 @@ describe("Admin Authorization Guard PostgreSQL Integration & Immediacy (Integrat
   afterAll(async () => {
     if (prisma) {
       try {
-        await prisma.userRole.deleteMany();
-        await prisma.credential.deleteMany();
-        await prisma.refreshSession.deleteMany();
-        await prisma.authSecurityAuditRecord.deleteMany();
-        await prisma.role.deleteMany();
-        await prisma.user.deleteMany();
+        await cleanAllTestTables(prisma);
       } catch {
         // Ignore cleanup error on teardown
       } finally {

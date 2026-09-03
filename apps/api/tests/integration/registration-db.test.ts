@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { PrismaClient } from "@prisma/client";
-import { assertSafeTestDatabase, sanitizeDiagnosticMessage } from "../helpers/test-db-guard.js";
+import { assertSafeTestDatabase, sanitizeDiagnosticMessage, cleanAllTestTables } from "../helpers/test-db-guard.js";
 import {
   RegistrationService,
 } from "../../src/modules/auth/registration.service.js";
@@ -17,6 +17,7 @@ import {
 } from "../../src/modules/auth/credential.repository.js";
 import { AppError } from "../../src/shared/errors/error-envelope.js";
 import { ERROR_CODES, HTTP_STATUS } from "@aura/shared";
+import { PrismaTransactionRunner } from "../../src/infrastructure/database/transaction-runner.js";
 
 describe("Registration PostgreSQL Database Constraints & Persistence (Integration)", () => {
   const testDbUrl =
@@ -43,14 +44,13 @@ describe("Registration PostgreSQL Database Constraints & Persistence (Integratio
       await prisma.$connect();
 
       // Clean up previous test artifacts
-      await prisma.userRole.deleteMany();
-      await prisma.credential.deleteMany();
-      await prisma.refreshSession.deleteMany();
-      await prisma.authSecurityAuditRecord.deleteMany();
-      await prisma.role.deleteMany();
-      await prisma.user.deleteMany();
+      await cleanAllTestTables(prisma);
 
-      service = new RegistrationService();
+      service = new RegistrationService(
+        new PrismaUserRepository(prisma),
+        new PrismaTransactionRunner(prisma),
+        passwordHashingService,
+      );
     } catch (err: unknown) {
       const errorMessage = sanitizeDiagnosticMessage(err instanceof Error ? err.message : String(err));
       throw new Error(
@@ -62,14 +62,9 @@ describe("Registration PostgreSQL Database Constraints & Persistence (Integratio
   afterAll(async () => {
     if (prisma) {
       try {
-        await prisma.userRole.deleteMany();
-        await prisma.credential.deleteMany();
-        await prisma.refreshSession.deleteMany();
-        await prisma.authSecurityAuditRecord.deleteMany();
-        await prisma.role.deleteMany();
-        await prisma.user.deleteMany();
+        await cleanAllTestTables(prisma);
       } catch {
-        // Ignore cleanup errors during teardown
+        // Ignore cleanup error on teardown
       } finally {
         await prisma.$disconnect();
       }

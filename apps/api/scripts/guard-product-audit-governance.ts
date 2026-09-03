@@ -66,10 +66,9 @@ export function evaluateProductAuditGovernance(inputs: GovernanceGuardEvaluation
       const modelBody = match[2];
       const normalizedModel = modelName.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-      // Check prohibited domain roots
+      // Check prohibited domain roots (unapproved future domains or premature product audit)
       const prohibitedDomainRoots = [
         "ai",
-        "academy",
         "simulation",
         "community",
         "subscription",
@@ -142,7 +141,6 @@ export function evaluateProductAuditGovernance(inputs: GovernanceGuardEvaluation
           "businessaudit",
           "productauditevent",
           "productauditrecord",
-          "academy",
           "simulation",
           "community",
           "subscription",

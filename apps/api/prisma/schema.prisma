@@ -24,6 +24,13 @@ model User {
   refreshSessions RefreshSession[]
   auditRecords    AuthSecurityAuditRecord[]
 
+  // Phase 4 Academy relations
+  quizAttempts        AcademyQuizAttempt[]
+  courseProgress      AcademyUserCourseProgress[]
+  lessonProgress      AcademyUserLessonProgress[]
+  xp                  AcademyUserXp?
+  rewards             AcademyRewardLedger[]
+
   @@map("users")
 }
 
@@ -120,3 +127,245 @@ model AuthSecurityAuditRecord {
   @@index([createdAt])
   @@map("auth_security_audit_records")
 }
+
+// ============================================================================
+// Phase 4: Academy Domain Persistence Foundation (FEAT-019)
+// ============================================================================
+
+model AcademyCourse {
+  id          String   @id @default(uuid())
+  slug        String   @unique
+  title       String
+  description String?
+  level       String   @default("BEGINNER")
+  status      String   @default("DRAFT") // DRAFT, PUBLISHED, ARCHIVED
+  order       Int      @default(0)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  lessons      AcademyLesson[]
+  userProgress AcademyUserCourseProgress[]
+
+  @@map("academy_courses")
+}
+
+model AcademyLesson {
+  id        String   @id @default(uuid())
+  courseId  String   @map("course_id")
+  title     String
+  slug      String
+  content   String?
+  order     Int
+  status    String   @default("DRAFT") // DRAFT, PUBLISHED, ARCHIVED
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  course       AcademyCourse               @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  flashcards   AcademyFlashcard[]
+  quizzes      AcademyQuiz[]
+  userProgress AcademyUserLessonProgress[]
+
+  @@unique([courseId, order])
+  @@unique([courseId, slug])
+  @@index([courseId])
+  @@map("academy_lessons")
+}
+
+model AcademyFlashcard {
+  id        String   @id @default(uuid())
+  lessonId  String   @map("lesson_id")
+  front     String
+  back      String
+  order     Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  lesson AcademyLesson @relation(fields: [lessonId], references: [id], onDelete: Restrict)
+
+  @@unique([lessonId, order])
+  @@index([lessonId])
+  @@map("academy_flashcards")
+}
+
+model AcademyQuiz {
+  id           String   @id @default(uuid())
+  lessonId     String   @map("lesson_id")
+  title        String
+  description  String?
+  status       String   @default("DRAFT") // DRAFT, PUBLISHED, ARCHIVED
+  order        Int      @default(0)
+  passingScore Int      @default(80) @map("passing_score")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  lesson    AcademyLesson         @relation(fields: [lessonId], references: [id], onDelete: Restrict)
+  questions AcademyQuizQuestion[]
+  attempts  AcademyQuizAttempt[]
+
+  @@unique([lessonId, order])
+  @@index([lessonId])
+  @@map("academy_quizzes")
+}
+
+model AcademyQuizQuestion {
+  id          String   @id @default(uuid())
+  quizId      String   @map("quiz_id")
+  prompt      String
+  explanation String?
+  type        String   @default("SINGLE_CHOICE")
+  order       Int
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  quiz    AcademyQuiz         @relation(fields: [quizId], references: [id], onDelete: Restrict)
+  options AcademyQuizOption[]
+  answers AcademyQuizAnswer[]
+
+  @@unique([quizId, order])
+  @@unique([id, quizId])
+  @@index([quizId])
+  @@map("academy_quiz_questions")
+}
+
+model AcademyQuizOption {
+  id         String   @id @default(uuid())
+  questionId String   @map("question_id")
+  text       String
+  isCorrect  Boolean  @default(false) @map("is_correct")
+  order      Int
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  question          AcademyQuizQuestion @relation(fields: [questionId], references: [id], onDelete: Restrict)
+  selectedInAnswers AcademyQuizAnswer[]
+
+  @@unique([questionId, order])
+  @@unique([id, questionId])
+  @@index([questionId])
+  @@map("academy_quiz_options")
+}
+
+model AcademyQuizAttempt {
+  id                  String    @id @default(uuid())
+  userId              String    @map("user_id")
+  quizId              String    @map("quiz_id")
+  attemptNumber       Int       @default(1) @map("attempt_number")
+  status              String    @default("CREATED") // CREATED, IN_PROGRESS, SUBMITTED, GRADED
+  score               Int?
+  passed              Boolean?
+  quizTitleSnapshot   String    @map("quiz_title_snapshot")
+  quizVersionSnapshot String?   @map("quiz_version_snapshot")
+  startedAt           DateTime  @default(now()) @map("started_at")
+  submittedAt         DateTime? @map("submitted_at")
+  gradedAt            DateTime? @map("graded_at")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  user    User                @relation(fields: [userId], references: [id], onDelete: Restrict)
+  quiz    AcademyQuiz         @relation(fields: [quizId], references: [id], onDelete: Restrict)
+  answers AcademyQuizAnswer[]
+
+  @@unique([quizId, userId, attemptNumber])
+  @@unique([id, quizId])
+  @@index([userId])
+  @@index([quizId])
+  @@index([status])
+  @@map("academy_quiz_attempts")
+}
+
+model AcademyQuizAnswer {
+  id                         String   @id @default(uuid())
+  attemptId                  String   @map("attempt_id")
+  quizId                     String   @map("quiz_id")
+  questionId                 String   @map("question_id")
+  selectedOptionId           String?  @map("selected_option_id")
+  isCorrect                  Boolean? @map("is_correct")
+  questionPromptSnapshot     String   @map("question_prompt_snapshot")
+  selectedOptionTextSnapshot String?  @map("selected_option_text_snapshot")
+  correctOptionIdSnapshot    String?  @map("correct_option_id_snapshot")
+  correctOptionTextSnapshot  String?  @map("correct_option_text_snapshot")
+  createdAt                  DateTime @default(now()) @map("created_at")
+  updatedAt                  DateTime @updatedAt @map("updated_at")
+
+  attempt        AcademyQuizAttempt  @relation(fields: [attemptId, quizId], references: [id, quizId], onDelete: Restrict)
+  question       AcademyQuizQuestion @relation(fields: [questionId, quizId], references: [id, quizId], onDelete: Restrict)
+  selectedOption AcademyQuizOption?  @relation(fields: [selectedOptionId, questionId], references: [id, questionId], onDelete: Restrict)
+
+  @@unique([attemptId, questionId])
+  @@index([attemptId])
+  @@index([questionId])
+  @@index([quizId])
+  @@map("academy_quiz_answers")
+}
+
+model AcademyUserCourseProgress {
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  courseId    String    @map("course_id")
+  status      String    @default("NOT_STARTED") // NOT_STARTED, IN_PROGRESS, COMPLETED
+  startedAt   DateTime  @default(now()) @map("started_at")
+  completedAt DateTime? @map("completed_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  user   User          @relation(fields: [userId], references: [id], onDelete: Restrict)
+  course AcademyCourse @relation(fields: [courseId], references: [id], onDelete: Restrict)
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+  @@map("academy_user_course_progress")
+}
+
+model AcademyUserLessonProgress {
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  lessonId    String    @map("lesson_id")
+  status      String    @default("NOT_STARTED") // NOT_STARTED, IN_PROGRESS, COMPLETED
+  startedAt   DateTime  @default(now()) @map("started_at")
+  completedAt DateTime? @map("completed_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  user   User          @relation(fields: [userId], references: [id], onDelete: Restrict)
+  lesson AcademyLesson @relation(fields: [lessonId], references: [id], onDelete: Restrict)
+
+  @@unique([userId, lessonId])
+  @@index([userId])
+  @@index([lessonId])
+  @@map("academy_user_lesson_progress")
+}
+
+model AcademyUserXp {
+  id        String   @id @default(uuid())
+  userId    String   @unique @map("user_id")
+  totalXp   Int      @default(0) @map("total_xp")
+  level     Int      @default(1)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@map("academy_user_xp")
+}
+
+model AcademyRewardLedger {
+  id             String   @id @default(uuid())
+  userId         String   @map("user_id")
+  sourceType     String   @map("source_type")
+  sourceId       String   @map("source_id")
+  rewardType     String   @map("reward_type")
+  amount         Int
+  idempotencyKey String?  @unique @map("idempotency_key")
+  status         String   @default("APPLIED") // PENDING, APPLIED, REVERSED
+  metadata       Json?
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@unique([userId, sourceType, sourceId, rewardType])
+  @@index([userId])
+  @@index([sourceType, sourceId])
+  @@map("academy_reward_ledger")
+}
+

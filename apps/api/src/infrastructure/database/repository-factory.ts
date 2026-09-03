@@ -20,6 +20,16 @@ import {
   type IAuditRepository,
   PrismaAuditRepository,
 } from "../../modules/auth/audit.repository.js";
+import {
+  type IAcademyCourseRepository,
+  type IAcademyQuizRepository,
+  type IAcademyProgressRepository,
+  type IAcademyRewardRepository,
+  PrismaAcademyCourseRepository,
+  PrismaAcademyQuizRepository,
+  PrismaAcademyProgressRepository,
+  PrismaAcademyRewardRepository,
+} from "../../modules/academy/academy.repository.js";
 
 /**
  * Shared container representing all domain repository instances bound to a specific
@@ -31,6 +41,10 @@ export interface IRepositoryContainer {
   readonly roleRepo: IRoleRepository;
   readonly refreshSessionRepo: IRefreshSessionRepository;
   readonly auditRepo: IAuditRepository;
+  readonly academyCourseRepo: IAcademyCourseRepository;
+  readonly academyQuizRepo: IAcademyQuizRepository;
+  readonly academyProgressRepo: IAcademyProgressRepository;
+  readonly academyRewardRepo: IAcademyRewardRepository;
 }
 
 /**
@@ -47,6 +61,10 @@ export function createRepositoryContainer(
     roleRepo: new PrismaRoleRepository(client),
     refreshSessionRepo: new PrismaRefreshSessionRepository(client),
     auditRepo: new PrismaAuditRepository(client),
+    academyCourseRepo: new PrismaAcademyCourseRepository(client),
+    academyQuizRepo: new PrismaAcademyQuizRepository(client),
+    academyProgressRepo: new PrismaAcademyProgressRepository(client),
+    academyRewardRepo: new PrismaAcademyRewardRepository(client),
   };
 }
 
@@ -60,4 +78,8 @@ export const credentialRepository = rootRepositoryContainer.credentialRepo;
 export const roleRepository = rootRepositoryContainer.roleRepo;
 export const refreshSessionRepository = rootRepositoryContainer.refreshSessionRepo;
 export const auditRepository = rootRepositoryContainer.auditRepo;
+export const academyCourseRepository = rootRepositoryContainer.academyCourseRepo;
+export const academyQuizRepository = rootRepositoryContainer.academyQuizRepo;
+export const academyProgressRepository = rootRepositoryContainer.academyProgressRepo;
+export const academyRewardRepository = rootRepositoryContainer.academyRewardRepo;
 

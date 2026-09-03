@@ -81,10 +81,10 @@ describe("FEAT-016 Product Audit Governance & Abstraction Unit Tests", () => {
       expect(probeLowercase.passed).toBe(false);
       expect(probeLowercase.violations.some((v) => v.includes("productauditlog"))).toBe(true);
 
-      // 5. Probed domain model Academy
-      const probeAcademy = evaluateProductAuditGovernance({
+      // 5. Probed unapproved future domain model Simulation
+      const probeSimulation = evaluateProductAuditGovernance({
         schemaContent: `
-          model Academy {
+          model Simulation {
             id String @id
           }
           model AuthSecurityAuditRecord {
@@ -93,8 +93,8 @@ describe("FEAT-016 Product Audit Governance & Abstraction Unit Tests", () => {
           }
         `,
       });
-      expect(probeAcademy.passed).toBe(false);
-      expect(probeAcademy.violations.some((v) => v.includes("Academy"))).toBe(true);
+      expect(probeSimulation.passed).toBe(false);
+      expect(probeSimulation.violations.some((v) => v.includes("Simulation"))).toBe(true);
     });
 
     it("proves guard catches AuthSecurityAuditRecord repurposing with product-domain fields", () => {
@@ -128,12 +128,12 @@ describe("FEAT-016 Product Audit Governance & Abstraction Unit Tests", () => {
       expect(probe2.passed).toBe(false);
       expect(probe2.violations.some((v) => v.includes("productAuditEvents"))).toBe(true);
 
-      // 3. Domain table "academy_courses"
+      // 3. Unapproved domain table "simulation_trades"
       const probe3 = evaluateProductAuditGovernance({
-        migrationSqls: [{ name: "20260901_test", sql: 'CREATE TABLE "academy_courses" (id UUID PRIMARY KEY);' }],
+        migrationSqls: [{ name: "20260901_test", sql: 'CREATE TABLE "simulation_trades" (id UUID PRIMARY KEY);' }],
       });
       expect(probe3.passed).toBe(false);
-      expect(probe3.violations.some((v) => v.includes("academy_courses"))).toBe(true);
+      expect(probe3.violations.some((v) => v.includes("simulation_trades"))).toBe(true);
     });
 
     it("proves guard catches injected product audit routes (with and without /api prefix) and controllers/services/pages", () => {

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { PrismaClient, Prisma } from "@prisma/client";
-import { assertSafeTestDatabase, sanitizeDiagnosticMessage } from "../helpers/test-db-guard.js";
+import { assertSafeTestDatabase, sanitizeDiagnosticMessage, cleanAllTestTables } from "../helpers/test-db-guard.js";
 import { PrismaUserRepository } from "../../src/modules/users/user.repository.js";
 import { PrismaCredentialRepository } from "../../src/modules/auth/credential.repository.js";
 import { PrismaRoleRepository } from "../../src/modules/auth/role.repository.js";
@@ -31,12 +31,7 @@ describe("PostgreSQL Real Database Constraints (Integration)", () => {
       await prisma.$connect();
 
       // Clean up previous test artifacts before test suite begins
-      await prisma.userRole.deleteMany();
-      await prisma.credential.deleteMany();
-      await prisma.refreshSession.deleteMany();
-      await prisma.authSecurityAuditRecord.deleteMany();
-      await prisma.role.deleteMany();
-      await prisma.user.deleteMany();
+      await cleanAllTestTables(prisma);
     } catch (err: unknown) {
       const errorMessage = sanitizeDiagnosticMessage(err instanceof Error ? err.message : String(err));
       throw new Error(
@@ -48,12 +43,7 @@ describe("PostgreSQL Real Database Constraints (Integration)", () => {
   afterAll(async () => {
     if (prisma) {
       try {
-        await prisma.userRole.deleteMany();
-        await prisma.credential.deleteMany();
-        await prisma.refreshSession.deleteMany();
-        await prisma.authSecurityAuditRecord.deleteMany();
-        await prisma.role.deleteMany();
-        await prisma.user.deleteMany();
+        await cleanAllTestTables(prisma);
       } catch {
         // Ignore cleanup error on teardown
       } finally {

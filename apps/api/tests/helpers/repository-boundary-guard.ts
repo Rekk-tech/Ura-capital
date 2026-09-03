@@ -32,6 +32,18 @@ const KNOWN_PRISMA_MODELS = new Set([
   "userRole",
   "refreshSession",
   "authSecurityAuditRecord",
+  "academyCourse",
+  "academyLesson",
+  "academyFlashcard",
+  "academyQuiz",
+  "academyQuizQuestion",
+  "academyQuizOption",
+  "academyQuizAttempt",
+  "academyQuizAnswer",
+  "academyUserCourseProgress",
+  "academyUserLessonProgress",
+  "academyUserXp",
+  "academyRewardLedger",
 ]);
 
 const KNOWN_PRISMA_ACTIONS = new Set([

@@ -1,9 +1,14 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { PrismaClient } from "@prisma/client";
-import { assertSafeTestDatabase, sanitizeDiagnosticMessage } from "../helpers/test-db-guard.js";
+import { assertSafeTestDatabase, sanitizeDiagnosticMessage, cleanAllTestTables } from "../helpers/test-db-guard.js";
 import { RegistrationService } from "../../src/modules/auth/registration.service.js";
 import { LoginService } from "../../src/modules/auth/login.service.js";
+import { passwordHashingService } from "../../src/modules/auth/password-hashing.service.js";
 import { accessTokenService } from "../../src/modules/auth/access-token.service.js";
+import { AuditService } from "../../src/modules/auth/audit.service.js";
+import { RefreshTokenService } from "../../src/modules/auth/refresh-token.service.js";
+import { createRepositoryContainer } from "../../src/infrastructure/database/repository-factory.js";
+import { PrismaTransactionRunner } from "../../src/infrastructure/database/transaction-runner.js";
 import { AppError } from "../../src/shared/errors/error-envelope.js";
 import { ERROR_CODES, HTTP_STATUS } from "@aura/shared";
 
@@ -32,15 +37,15 @@ describe("Login PostgreSQL Real Database Integration (Integration)", () => {
       await prisma.$connect();
 
       // Clean up previous test artifacts
-      await prisma.userRole.deleteMany();
-      await prisma.credential.deleteMany();
-      await prisma.refreshSession.deleteMany();
-      await prisma.authSecurityAuditRecord.deleteMany();
-      await prisma.role.deleteMany();
-      await prisma.user.deleteMany();
+      await cleanAllTestTables(prisma);
 
-      regService = new RegistrationService();
-      loginService = new LoginService();
+      const repos = createRepositoryContainer(prisma);
+      const auditService = new AuditService(repos.auditRepo);
+      const txRunner = new PrismaTransactionRunner(prisma);
+      const refreshService = new RefreshTokenService(undefined, repos.sessionRepo, repos.userRepo, accessTokenService, auditService);
+
+      regService = new RegistrationService(repos.userRepo, txRunner, passwordHashingService);
+      loginService = new LoginService(repos.userRepo, repos.credentialRepo, passwordHashingService, accessTokenService, refreshService, auditService);
     } catch (err: unknown) {
       const errorMessage = sanitizeDiagnosticMessage(err instanceof Error ? err.message : String(err));
       throw new Error(
@@ -52,12 +57,7 @@ describe("Login PostgreSQL Real Database Integration (Integration)", () => {
   afterAll(async () => {
     if (prisma) {
       try {
-        await prisma.userRole.deleteMany();
-        await prisma.credential.deleteMany();
-        await prisma.refreshSession.deleteMany();
-        await prisma.authSecurityAuditRecord.deleteMany();
-        await prisma.role.deleteMany();
-        await prisma.user.deleteMany();
+        await cleanAllTestTables(prisma);
       } catch {
         // Ignore cleanup error on teardown
       } finally {

@@ -53,12 +53,13 @@ describe("FEAT-012 PostgreSQL Migration Reproducibility & Schema Governance (Int
         }>
       >`SELECT migration_name, finished_at, applied_steps_count FROM _prisma_migrations ORDER BY migration_name ASC;`;
 
-      expect(appliedMigrations.length).toBeGreaterThanOrEqual(3);
+      expect(appliedMigrations.length).toBeGreaterThanOrEqual(4);
 
       const migrationNames = appliedMigrations.map((m) => m.migration_name);
       expect(migrationNames).toContain("20260825000000_init_identity");
       expect(migrationNames).toContain("20260825000001_feat005_refresh_session_rotation");
       expect(migrationNames).toContain("20260827000000_feat009_audit_events");
+      expect(migrationNames).toContain("20260903000000_feat019_academy_foundation");
 
       for (const m of appliedMigrations) {
         expect(m.finished_at).not.toBeNull();
@@ -88,8 +89,8 @@ describe("FEAT-012 PostgreSQL Migration Reproducibility & Schema Governance (Int
     it("verifies clean applied migration state against PostgreSQL _prisma_migrations", async () => {
       const result = await verifyAppliedMigrationIntegrity(prisma, migrationsDir);
       expect(result.integrityPass).toBe(true);
-      expect(result.appliedCount).toBe(3);
-      expect(result.verifiedCount).toBe(3);
+      expect(result.appliedCount).toBe(4);
+      expect(result.verifiedCount).toBe(4);
     });
 
     it("detects drift and throws error when an already-applied migration file is modified", async () => {

@@ -110,3 +110,49 @@ export function assertSafeTestDatabase(
     );
   }
 }
+
+export interface TestCleanupClient {
+  academyRewardLedger?: { deleteMany: () => Promise<unknown> };
+  academyUserXp?: { deleteMany: () => Promise<unknown> };
+  academyUserLessonProgress?: { deleteMany: () => Promise<unknown> };
+  academyUserCourseProgress?: { deleteMany: () => Promise<unknown> };
+  academyQuizAnswer?: { deleteMany: () => Promise<unknown> };
+  academyQuizAttempt?: { deleteMany: () => Promise<unknown> };
+  academyQuizOption?: { deleteMany: () => Promise<unknown> };
+  academyQuizQuestion?: { deleteMany: () => Promise<unknown> };
+  academyQuiz?: { deleteMany: () => Promise<unknown> };
+  academyFlashcard?: { deleteMany: () => Promise<unknown> };
+  academyLesson?: { deleteMany: () => Promise<unknown> };
+  academyCourse?: { deleteMany: () => Promise<unknown> };
+  userRole?: { deleteMany: () => Promise<unknown> };
+  credential?: { deleteMany: () => Promise<unknown> };
+  refreshSession?: { deleteMany: () => Promise<unknown> };
+  authSecurityAuditRecord?: { deleteMany: () => Promise<unknown> };
+  role?: { deleteMany: () => Promise<unknown> };
+  user?: { deleteMany: () => Promise<unknown> };
+}
+
+export async function cleanAllTestTables(prisma: TestCleanupClient | null | undefined): Promise<void> {
+  if (!prisma) return;
+  // Phase 4 Academy tables (in reverse dependency order)
+  if (prisma.academyRewardLedger) await prisma.academyRewardLedger.deleteMany().catch(() => {});
+  if (prisma.academyUserXp) await prisma.academyUserXp.deleteMany().catch(() => {});
+  if (prisma.academyUserLessonProgress) await prisma.academyUserLessonProgress.deleteMany().catch(() => {});
+  if (prisma.academyUserCourseProgress) await prisma.academyUserCourseProgress.deleteMany().catch(() => {});
+  if (prisma.academyQuizAnswer) await prisma.academyQuizAnswer.deleteMany().catch(() => {});
+  if (prisma.academyQuizAttempt) await prisma.academyQuizAttempt.deleteMany().catch(() => {});
+  if (prisma.academyQuizOption) await prisma.academyQuizOption.deleteMany().catch(() => {});
+  if (prisma.academyQuizQuestion) await prisma.academyQuizQuestion.deleteMany().catch(() => {});
+  if (prisma.academyQuiz) await prisma.academyQuiz.deleteMany().catch(() => {});
+  if (prisma.academyFlashcard) await prisma.academyFlashcard.deleteMany().catch(() => {});
+  if (prisma.academyLesson) await prisma.academyLesson.deleteMany().catch(() => {});
+  if (prisma.academyCourse) await prisma.academyCourse.deleteMany().catch(() => {});
+
+  // Phase 2/3 Identity tables
+  if (prisma.userRole) await prisma.userRole.deleteMany().catch(() => {});
+  if (prisma.credential) await prisma.credential.deleteMany().catch(() => {});
+  if (prisma.refreshSession) await prisma.refreshSession.deleteMany().catch(() => {});
+  if (prisma.authSecurityAuditRecord) await prisma.authSecurityAuditRecord.deleteMany().catch(() => {});
+  if (prisma.role) await prisma.role.deleteMany().catch(() => {});
+  if (prisma.user) await prisma.user.deleteMany().catch(() => {});
+}

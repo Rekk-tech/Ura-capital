@@ -97,7 +97,7 @@ describe("FEAT-017 Seed Safety & Governance Guard Unit Tests", () => {
     it("proves guard rejects premature product-domain schemas in Prisma schema", () => {
       const probeSchema = evaluateSeedSafety({
         schemaContent: `
-          model AcademyCourse {
+          model SimulationTrade {
             id String @id
           }
           model User {
@@ -106,7 +106,7 @@ describe("FEAT-017 Seed Safety & Governance Guard Unit Tests", () => {
         `,
       });
       expect(probeSchema.passed).toBe(false);
-      expect(probeSchema.violations.some((v) => v.includes("AcademyCourse"))).toBe(true);
+      expect(probeSchema.violations.some((v) => v.includes("SimulationTrade"))).toBe(true);
     });
 
     it("proves guard rejects public grant-admin and role assignment routes (/grant-admin, /api/admin/users/grant)", () => {
