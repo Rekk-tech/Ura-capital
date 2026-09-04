@@ -5,9 +5,17 @@
 **Owner**: Codex Planner / Architect / QA Governance  
 **Date**: 2026-09-03
 
-**Current Feature State**: FEAT-019 DONE (Human Final Gate APPROVED); FEAT-020 IMPLEMENTED / READY FOR QA (Human Final Gate: NOT APPROVED); FEAT-021 through FEAT-030 BLOCKED by dependency order.
+**Current Feature State**:
+- FEAT-019: DONE (Human Final Gate APPROVED)
+- FEAT-020: DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED)
+- FEAT-021: DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED)
+- FEAT-022: UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED)
+- FEAT-023+: BLOCKED according to dependency graph
+- Phase 4: IN_PROGRESS
+- Phase 5: BLOCKED
 
-*(Historical Note: FEAT-019 planning, implementation rework 1/2, QA iteration 1/2/3, and Human Dual Review are complete; FEAT-020 implementation is complete and awaiting QA).*
+
+*(HISTORICAL SNAPSHOT: Prior to FEAT-020 Human Final Gate approval, FEAT-020 was IMPLEMENTED / READY FOR QA and FEAT-021 through FEAT-030 were BLOCKED by dependency order).*
 
 ## 1. Phase Goal
 
@@ -177,8 +185,8 @@ Human decision required:
 | --- | --- | --- | --- |
 | FEAT-019 | Academy Domain Schema & Persistence Foundation | Implementation | DONE (Human Final Gate APPROVED) |
 | FEAT-020 | Course & Lesson Read Model APIs | Implementation | DONE (Human Final Gate APPROVED) |
-| FEAT-021 | Academy Learner Course/Lesson UI | Implementation | UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED) |
-| FEAT-022 | Flashcards Domain & Review Flow | Implementation | FEAT-019, FEAT-020 |
+| FEAT-021 | Academy Learner Course/Lesson UI | Implementation | DONE (Human Final Gate APPROVED) |
+| FEAT-022 | Flashcards Domain & Review Flow | Implementation | UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED) |
 | FEAT-023 | Quiz Definition & Safe Projection | Implementation | FEAT-019, FEAT-020 |
 | FEAT-024 | Quiz Attempt Lifecycle | Implementation | FEAT-019, FEAT-023 |
 | FEAT-025 | Server-Side Quiz Evaluation & Secure Submission | Implementation | FEAT-024 |

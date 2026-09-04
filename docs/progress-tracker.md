@@ -493,7 +493,7 @@ Phase 3 Completion State:
 - FEAT-018 is DONE / QA PASS / Human Final Gate APPROVED.
 - Phase 3 is DONE / QA PASS / Human Final Gate APPROVED.
 - HISTORICAL SNAPSHOT (at Phase 3 completion): Phase 4 was IN_PROGRESS / PLANNING; FEAT-019 was APPROVED FOR IMPLEMENTATION; FEAT-020 through FEAT-030 remained BLOCKED.
-- CURRENT CANONICAL STATE: Phase 4 is IN_PROGRESS; FEAT-019 is DONE (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED); FEAT-020 is DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED); FEAT-021 is UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED); FEAT-022 through FEAT-030 are BLOCKED by dependency order; Phase 5 is BLOCKED.
+- CURRENT CANONICAL STATE: Phase 4 is IN_PROGRESS; FEAT-019 is DONE (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED); FEAT-020 is DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED); FEAT-021 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-022 is UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED); FEAT-023 through FEAT-030 are BLOCKED by dependency order; Phase 5 is BLOCKED.
 
 Feature Decomposition:
 
@@ -851,8 +851,8 @@ Phase 4: IN_PROGRESS
 Implementation: IN_PROGRESS
 FEAT-019: DONE (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED)
 FEAT-020: DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED)
-FEAT-021: UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED)
-FEAT-022: BLOCKED by FEAT-019 / FEAT-020
+FEAT-021: DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED)
+FEAT-022: UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED)
 FEAT-023: BLOCKED by FEAT-019 / FEAT-020
 FEAT-024: BLOCKED by FEAT-023
 FEAT-025: BLOCKED by FEAT-024
@@ -868,8 +868,8 @@ Feature Decomposition:
 
 - FEAT-019: Academy Domain Schema & Persistence Foundation - `DONE` (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED)
 - FEAT-020: Course & Lesson Read Model APIs - `DONE` (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED)
-- FEAT-021: Academy Learner Course/Lesson UI - `UNBLOCKED FOR PLANNING` (Implementation: `NOT_STARTED`)
-- FEAT-022: Flashcards Domain & Review Flow - `BLOCKED`
+- FEAT-021: Academy Learner Course/Lesson UI - `DONE` (QA PASS — QA Iteration 2, Human Final Gate APPROVED)
+- FEAT-022: Flashcards Domain & Review Flow - `UNBLOCKED FOR PLANNING` (Implementation: `NOT_STARTED`)
 - FEAT-023: Quiz Definition & Safe Projection - `BLOCKED`
 - FEAT-024: Quiz Attempt Lifecycle - `BLOCKED`
 - FEAT-025: Server-Side Quiz Evaluation & Secure Submission - `BLOCKED`
@@ -960,9 +960,48 @@ Validation:
   - Static Boundary Guard: PASS (controllers=7, services=11, repositories=6)
   - Product Audit Governance Guard: PASS
   - Seed Safety Guard: PASS
-Implementation Report: reports/implementation/phase-4/FEAT-020.md
-QA Report: reports/qa/phase-4/FEAT-020-QA.md
-Next Action: FEAT-021 unblocked for planning (implementation NOT_STARTED)
+Next Action: FEAT-021 implemented and ready for independent QA
+```
+
+FEAT-021 Governance Fields:
+
+```text
+Lifecycle State: DONE
+Implementation: COMPLETED
+Implementation Owner: Antigravity
+QA Status: PASS — QA Iteration 2
+Human Final Gate: APPROVED
+Planning Status: APPROVED
+Planning Owner: Antigravity — Temporary Planning Ownership Transfer
+Human Planning Approval: APPROVED
+Feature Type: Learner-facing Web UI implementation
+Scope Boundaries: Course catalog, course detail, and lesson detail UI in apps/web consuming FEAT-020 APIs; zero UI for quizzes/flashcards/progress/XP; zero backend changes; zero schema changes
+Spec Package: .specify/specs/FEAT-021/
+Tasks: 12 implementation tasks completed
+Acceptance Criteria: 17 deterministic criteria (AC-001..AC-017) PASS
+Defects:
+  - DEF-021-01 (P1 Open Redirect Security Defect): FIXED / VERIFIED
+  - DEF-021-02 (P2 Accessibility Heading Hierarchy Defect): FIXED / VERIFIED
+Evidence Gap:
+  - GAP-021-01 (Client-Side Logout Query Cache Invalidation): OPEN / NON-BLOCKING
+Validation (Latest QA Iteration 2):
+  - Clean: PASS
+  - Lint: PASS (0 errors, 0 warnings)
+  - Prisma Schema Validation: PASS
+  - Typecheck: PASS
+  - Monorepo Build: PASS (Vite web bundle + API/shared tsc)
+  - Monorepo Test: PASS (62 files, 602 tests)
+  - Unit Test: PASS (41 files, 456 tests)
+  - Database Test: PASS (13 files, 113 tests)
+  - Redis Test: PASS (5 files, 50 tests)
+  - Static Boundary Guard: PASS (controllers=7, services=11, repositories=6)
+  - Migration Guard: PASS (4 migrations, 0 blocking risks)
+  - Persistence Guard: PASS (14 tests)
+  - Product Audit Governance Guard: PASS
+  - Seed Safety Guard: PASS
+Implementation Report: reports/implementation/phase-4/FEAT-021.md
+QA Report: reports/qa/phase-4/FEAT-021-QA.md
+Next Action: FEAT-022 unblocked for planning (implementation NOT_STARTED)
 ```
 
 Artifacts:
@@ -970,11 +1009,14 @@ Artifacts:
 - `docs/phase-4-feature-decomposition.md`
 - `.specify/specs/FEAT-019/`
 - `.specify/specs/FEAT-020/`
+- `.specify/specs/FEAT-021/`
 - `reports/implementation/phase-4/FEAT-019.md`
 - `reports/implementation/phase-4/FEAT-020.md`
+- `reports/implementation/phase-4/FEAT-021.md`
 - `reports/qa/phase-4/FEAT-019-QA.md`
 - `reports/qa/phase-4/FEAT-019-QA3-TEMP-EVIDENCE.md`
 - `reports/qa/phase-4/FEAT-020-QA.md`
+- `reports/qa/phase-4/FEAT-021-QA.md`
 
 ---
 
