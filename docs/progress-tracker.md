@@ -492,9 +492,8 @@ Phase 3 Completion State:
 - FEAT-017 is DONE / QA PASS / Human Final Gate APPROVED.
 - FEAT-018 is DONE / QA PASS / Human Final Gate APPROVED.
 - Phase 3 is DONE / QA PASS / Human Final Gate APPROVED.
-- Phase 4 is IN_PROGRESS / PLANNING; implementation remains NOT_STARTED.
-- FEAT-019 is APPROVED FOR IMPLEMENTATION; implementation remains NOT_STARTED.
-- FEAT-020 through FEAT-030 remain BLOCKED by approved Phase 4 dependency order.
+- HISTORICAL SNAPSHOT (at Phase 3 completion): Phase 4 was IN_PROGRESS / PLANNING; FEAT-019 was APPROVED FOR IMPLEMENTATION; FEAT-020 through FEAT-030 remained BLOCKED.
+- CURRENT CANONICAL STATE: Phase 4 is IN_PROGRESS; FEAT-019 is DONE (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED); FEAT-020 is DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED); FEAT-021 is UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED); FEAT-022 through FEAT-030 are BLOCKED by dependency order; Phase 5 is BLOCKED.
 
 Feature Decomposition:
 
@@ -729,7 +728,7 @@ Human Final Gate: APPROVED
 Ready for QA: COMPLETED - Human Final Gate APPROVED
 FEAT-018: DONE - QA PASS; Human Final Gate APPROVED
 Phase 3: DONE - QA PASS; Human Final Gate APPROVED
-Phase 4: IN_PROGRESS / PLANNING; Implementation NOT_STARTED
+Phase 4: IN_PROGRESS (HISTORICAL SNAPSHOT at Phase 3 completion: PLANNING / Implementation NOT_STARTED)
 ```
 
 FEAT-018 Governance Fields:
@@ -766,7 +765,7 @@ Blocking Issues: NONE
 Ready for QA: COMPLETED - Human Final Gate APPROVED
 Human Final Gate: APPROVED
 Phase 3: DONE - QA PASS; Human Final Gate APPROVED
-Phase 4: IN_PROGRESS / PLANNING; Implementation NOT_STARTED
+Phase 4: IN_PROGRESS (HISTORICAL SNAPSHOT at Phase 3 completion: PLANNING / Implementation NOT_STARTED)
 ```
 
 Human Approved Phase 3 Decisions:
@@ -851,8 +850,8 @@ Phase 3: DONE / QA PASS / Human Final Gate APPROVED
 Phase 4: IN_PROGRESS
 Implementation: IN_PROGRESS
 FEAT-019: DONE (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED)
-FEAT-020: UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED)
-FEAT-021: BLOCKED by FEAT-020
+FEAT-020: DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED)
+FEAT-021: UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED)
 FEAT-022: BLOCKED by FEAT-019 / FEAT-020
 FEAT-023: BLOCKED by FEAT-019 / FEAT-020
 FEAT-024: BLOCKED by FEAT-023
@@ -868,8 +867,8 @@ Phase 5: BLOCKED
 Feature Decomposition:
 
 - FEAT-019: Academy Domain Schema & Persistence Foundation - `DONE` (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED)
-- FEAT-020: Course & Lesson Read Model APIs - `UNBLOCKED FOR PLANNING` (Implementation: `NOT_STARTED`)
-- FEAT-021: Academy Learner Course/Lesson UI - `BLOCKED`
+- FEAT-020: Course & Lesson Read Model APIs - `DONE` (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED)
+- FEAT-021: Academy Learner Course/Lesson UI - `UNBLOCKED FOR PLANNING` (Implementation: `NOT_STARTED`)
 - FEAT-022: Flashcards Domain & Review Flow - `BLOCKED`
 - FEAT-023: Quiz Definition & Safe Projection - `BLOCKED`
 - FEAT-024: Quiz Attempt Lifecycle - `BLOCKED`
@@ -917,17 +916,65 @@ Static Boundary Guard: PASS - controllers=6, services=10, repositories=6
 Audit Governance Guard: PASS - zero premature product audit schemas/APIs
 Seed Safety Guard: PASS - zero unsafe seed scripts, credentials, or default admin backdoors
 Blocking Issues: NONE
-FEAT-020: UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED)
-FEAT-021 through FEAT-030: BLOCKED
+FEAT-020: DONE (Human Final Gate APPROVED)
+FEAT-021: UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED)
+FEAT-022 through FEAT-030: BLOCKED
+```
+
+FEAT-020 Governance Fields:
+
+```text
+Lifecycle State: DONE
+Implementation: COMPLETE
+Planning Status: HUMAN APPROVED
+Human Planning Approval: APPROVED
+QA Status: PASS — Antigravity QA with Human Dual Review
+Human Dual Review: APPROVED
+Human Final Gate: APPROVED
+QA Independence Note: Antigravity was both implementation owner and QA executor; Human Dual Review applied as compensating governance control.
+Planning Owner: Antigravity — Temporary Planning Ownership Transfer
+Implementation Owner: Antigravity
+QA Executor: Antigravity (QA Iteration 1)
+Spec Package: HUMAN APPROVED (.specify/specs/FEAT-020/)
+Human Planning Decision (Auth): APPROVED (Courses & Course Detail = PUBLIC; Lesson Detail = AUTHENTICATED)
+Feature Type: Course and lesson read model API implementation feature
+Scope Boundaries: Read-only course and lesson APIs; zero UI; zero flashcard review; zero quiz projection; zero progress mutation; zero XP/rewards; zero schema changes; zero Redis authority/cache
+Endpoints Implemented:
+  - GET /api/academy/courses (Public, paginated, PUBLISHED only)
+  - GET /api/academy/courses/:slug (Public, course outline with PUBLISHED lesson summaries)
+  - GET /api/academy/courses/:courseSlug/lessons/:lessonSlug (Authenticated, PUBLISHED only, cross-course ownership check)
+DTOs & Projections: Whitelist-only safe learner DTOs; zero internal metadata or raw Prisma leaks
+Layering: Controller -> Service -> Repository -> PostgreSQL (Boundary Guard compliant)
+Audit Policy: Zero product audit records for ordinary read traffic
+Redis Policy: ZERO Redis usage / state
+Tasks: 7 implementation tasks completed in dependency order
+Acceptance Criteria: 16 deterministic criteria (AC-001..AC-016) mapped and passing
+Validation:
+  - Clean, lint (0 errors/warnings), prisma validate, typecheck, build PASS
+  - Standard test suite: PASS (56 test files, 519 tests, 0 skips)
+  - Unit test suite: PASS (35 test files, 373 tests, 0 skips)
+  - Live PostgreSQL DB test suite: PASS (13 test files, 113 tests, 0 skips)
+  - Redis test suite: PASS (5 test files, 50 tests, 0 skips)
+  - Persistence Guard: PASS (14 tests)
+  - Migration Guard: PASS (4 migrations, 0 blocking risks)
+  - Static Boundary Guard: PASS (controllers=7, services=11, repositories=6)
+  - Product Audit Governance Guard: PASS
+  - Seed Safety Guard: PASS
+Implementation Report: reports/implementation/phase-4/FEAT-020.md
+QA Report: reports/qa/phase-4/FEAT-020-QA.md
+Next Action: FEAT-021 unblocked for planning (implementation NOT_STARTED)
 ```
 
 Artifacts:
 
 - `docs/phase-4-feature-decomposition.md`
 - `.specify/specs/FEAT-019/`
+- `.specify/specs/FEAT-020/`
 - `reports/implementation/phase-4/FEAT-019.md`
+- `reports/implementation/phase-4/FEAT-020.md`
 - `reports/qa/phase-4/FEAT-019-QA.md`
 - `reports/qa/phase-4/FEAT-019-QA3-TEMP-EVIDENCE.md`
+- `reports/qa/phase-4/FEAT-020-QA.md`
 
 ---
 

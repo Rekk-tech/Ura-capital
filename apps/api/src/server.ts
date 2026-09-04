@@ -9,6 +9,7 @@ import { errorHandlerMiddleware } from "./middleware/error-handler.js";
 import { healthRouter } from "./modules/health/health.route.js";
 import { authRouter } from "./modules/auth/auth.route.js";
 import { adminRouter } from "./modules/admin/admin.route.js";
+import { academyRouter } from "./modules/academy/academy.routes.js";
 import { AppError } from "./shared/errors/error-envelope.js";
 import { ERROR_CODES, HTTP_STATUS } from "@aura/shared";
 
@@ -34,6 +35,7 @@ export function createApp(): Express {
   app.use(healthRouter);
   app.use(authRouter);
   app.use(adminRouter);
+  app.use(academyRouter);
 
   // 404 Fallback
   app.use((req, _res, next) => {

@@ -5,9 +5,9 @@
 **Owner**: Codex Planner / Architect / QA Governance  
 **Date**: 2026-09-03
 
-**Current Feature State**: FEAT-019 DONE (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED); FEAT-020 UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED).
+**Current Feature State**: FEAT-019 DONE (Human Final Gate APPROVED); FEAT-020 IMPLEMENTED / READY FOR QA (Human Final Gate: NOT APPROVED); FEAT-021 through FEAT-030 BLOCKED by dependency order.
 
-*(Historical Note: FEAT-019 planning, implementation rework 1/2, QA iteration 1/2/3, and Human Dual Review are complete).*
+*(Historical Note: FEAT-019 planning, implementation rework 1/2, QA iteration 1/2/3, and Human Dual Review are complete; FEAT-020 implementation is complete and awaiting QA).*
 
 ## 1. Phase Goal
 
@@ -60,8 +60,8 @@ Planned entities and relationships:
 | --- | --- | --- |
 | Course | Published learning unit grouping lessons | Unique slug; status enum; ordered lessons |
 | Lesson | Course content unit | Belongs to Course; unique order within course; optional quiz |
-| Flashcard | Review prompt/answer linked to lesson/course | Belongs to lesson or course; safe front/back projection |
-| Quiz | Assessment definition | Belongs to lesson or course; status enum |
+| Flashcard | Review prompt/answer linked to lesson | Belongs to Lesson; unique order within lesson; safe front/back projection |
+| Quiz | Assessment definition | Belongs to Lesson; unique order within lesson; status enum |
 | QuizQuestion | Server-owned question definition | Belongs to quiz; stable order within quiz |
 | QuizOption | Multiple-choice option or answer representation | Belongs to question; correct flag/answer representation server-only |
 | QuizAttempt | User-scoped attempt lifecycle | Belongs to user and quiz; status enum; immutable after grading |
@@ -176,8 +176,8 @@ Human decision required:
 | ID | Title | Type | Dependencies |
 | --- | --- | --- | --- |
 | FEAT-019 | Academy Domain Schema & Persistence Foundation | Implementation | DONE (Human Final Gate APPROVED) |
-| FEAT-020 | Course & Lesson Read Model APIs | Implementation | UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED) |
-| FEAT-021 | Academy Learner Course/Lesson UI | Implementation | FEAT-020 |
+| FEAT-020 | Course & Lesson Read Model APIs | Implementation | DONE (Human Final Gate APPROVED) |
+| FEAT-021 | Academy Learner Course/Lesson UI | Implementation | UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED) |
 | FEAT-022 | Flashcards Domain & Review Flow | Implementation | FEAT-019, FEAT-020 |
 | FEAT-023 | Quiz Definition & Safe Projection | Implementation | FEAT-019, FEAT-020 |
 | FEAT-024 | Quiz Attempt Lifecycle | Implementation | FEAT-019, FEAT-023 |
@@ -212,7 +212,7 @@ Excluded: CMS authoring, progress mutation, quiz answer projection, XP.
 
 QA Gate: Auth/public boundary verified, no unsafe fields, PostgreSQL-backed read tests, repository boundary guard.
 
-Human Decisions: Decide whether public course catalog is allowed before login or requires authentication.
+Human Decisions: Authentication/access model: RESOLVED / HUMAN APPROVED (Catalog & Outline: Public; Lesson Detail: Authenticated).
 
 ### FEAT-021 - Academy Learner Course/Lesson UI
 
@@ -363,12 +363,11 @@ PASS requires:
 ## 15. Human Decisions Required
 
 1. Confirm Phase 4 default boundary: learner-facing Academy only, no CMS/admin authoring.
-2. Decide whether course catalog is public or authenticated-only.
-3. Decide production content ingestion approach.
-4. Decide quiz question types and scoring/pass policy before FEAT-023/FEAT-025.
-5. Decide whether flashcard review state persists in Phase 4.
-6. Decide whether Academy activates concrete product audit persistence in FEAT-029.
-7. Decide whether admin read-only support visibility is included in FEAT-028 or deferred.
+2. Decide production content ingestion approach.
+3. Decide quiz question types and scoring/pass policy before FEAT-023/FEAT-025.
+4. Decide whether flashcard review state persists in Phase 4.
+5. Decide whether Academy activates concrete product audit persistence in FEAT-029.
+6. Decide whether admin read-only support visibility is included in FEAT-028 or deferred.
 
 ## 16. Readiness
 

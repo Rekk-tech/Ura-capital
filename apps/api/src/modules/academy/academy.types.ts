@@ -117,3 +117,10 @@ export interface RecordRewardInput {
   status?: RewardLedgerStatus;
   metadata?: Record<string, unknown> | null;
 }
+
+export interface ListPublishedCoursesParams {
+  skip: number;
+  take: number;
+  level?: string;
+}
+

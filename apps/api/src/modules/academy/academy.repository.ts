@@ -27,6 +27,7 @@ import type {
   UpsertCourseProgressInput,
   UpsertLessonProgressInput,
   RecordRewardInput,
+  ListPublishedCoursesParams,
 } from "./academy.types.js";
 
 type DbClient = PrismaClient | Prisma.TransactionClient;
@@ -49,6 +50,17 @@ export interface IAcademyCourseRepository {
   listLessonsByCourse(courseId: string): Promise<AcademyLesson[]>;
   createFlashcard(data: CreateFlashcardInput): Promise<AcademyFlashcard>;
   listFlashcardsByLesson(lessonId: string): Promise<AcademyFlashcard[]>;
+  listPublishedCourses(params: ListPublishedCoursesParams): Promise<{
+    courses: Array<AcademyCourse & { _count: { lessons: number } }>;
+    total: number;
+  }>;
+  findPublishedCourseBySlug(slug: string): Promise<
+    (AcademyCourse & { lessons: Array<Pick<AcademyLesson, "slug" | "title" | "order">> }) | null
+  >;
+  findPublishedLessonByCourseAndSlug(
+    courseSlug: string,
+    lessonSlug: string,
+  ): Promise<(AcademyLesson & { course: Pick<AcademyCourse, "slug"> }) | null>;
 }
 
 export class PrismaAcademyCourseRepository implements IAcademyCourseRepository {
@@ -141,6 +153,72 @@ export class PrismaAcademyCourseRepository implements IAcademyCourseRepository {
     return this.prisma.academyFlashcard.findMany({
       where: { lessonId },
       orderBy: { order: "asc" },
+    });
+  }
+
+  async listPublishedCourses(params: ListPublishedCoursesParams): Promise<{
+    courses: Array<AcademyCourse & { _count: { lessons: number } }>;
+    total: number;
+  }> {
+    const where: Prisma.AcademyCourseWhereInput = {
+      status: "PUBLISHED",
+      ...(params.level ? { level: params.level } : {}),
+    };
+
+    const [courses, total] = await Promise.all([
+      this.prisma.academyCourse.findMany({
+        where,
+        skip: params.skip,
+        take: params.take,
+        orderBy: [{ order: "asc" }, { title: "asc" }, { id: "asc" }],
+        include: {
+          _count: {
+            select: { lessons: { where: { status: "PUBLISHED" } } },
+          },
+        },
+      }),
+      this.prisma.academyCourse.count({ where }),
+    ]);
+
+    return { courses, total };
+  }
+
+  async findPublishedCourseBySlug(slug: string): Promise<
+    (AcademyCourse & { lessons: Array<Pick<AcademyLesson, "slug" | "title" | "order">> }) | null
+  > {
+    return this.prisma.academyCourse.findFirst({
+      where: {
+        slug,
+        status: "PUBLISHED",
+      },
+      include: {
+        lessons: {
+          where: { status: "PUBLISHED" },
+          select: { slug: true, title: true, order: true },
+          orderBy: [{ order: "asc" }, { title: "asc" }, { id: "asc" }],
+        },
+      },
+    });
+  }
+
+  async findPublishedLessonByCourseAndSlug(
+    courseSlug: string,
+    lessonSlug: string,
+  ): Promise<(AcademyLesson & { course: Pick<AcademyCourse, "slug"> }) | null> {
+    return this.prisma.academyLesson.findFirst({
+      where: {
+        slug: lessonSlug,
+        status: "PUBLISHED",
+        course: {
+          slug: courseSlug,
+          status: "PUBLISHED",
+        },
+      },
+      include: {
+        course: {
+          select: { slug: true },
+        },
+      },
     });
   }
 }

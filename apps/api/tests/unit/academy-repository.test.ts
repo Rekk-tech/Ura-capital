@@ -305,4 +305,129 @@ describe("FEAT-019 Academy Repositories & Factory Unit Tests", () => {
       expect(xp.totalXp).toBe(100);
     });
   });
+
+  describe("FEAT-020 Course & Lesson Read Operations", () => {
+    it("listPublishedCourses applies PUBLISHED filter, pagination, and includes lesson count", async () => {
+      const mockFindMany = vi.fn().mockResolvedValue([
+        {
+          id: "c-1",
+          slug: "course-1",
+          title: "Course 1",
+          description: "Desc 1",
+          level: "BEGINNER",
+          status: "PUBLISHED",
+          order: 1,
+          _count: { lessons: 3 },
+        },
+      ]);
+      const mockCount = vi.fn().mockResolvedValue(1);
+
+      const mockPrisma = {
+        academyCourse: {
+          findMany: mockFindMany,
+          count: mockCount,
+        },
+      } as unknown as PrismaClient;
+
+      const repo = new PrismaAcademyCourseRepository(mockPrisma);
+      const result = await repo.listPublishedCourses({ skip: 0, take: 20, level: "BEGINNER" });
+
+      expect(mockFindMany).toHaveBeenCalledWith({
+        where: { status: "PUBLISHED", level: "BEGINNER" },
+        skip: 0,
+        take: 20,
+        orderBy: [{ order: "asc" }, { title: "asc" }, { id: "asc" }],
+        include: {
+          _count: {
+            select: { lessons: { where: { status: "PUBLISHED" } } },
+          },
+        },
+      });
+      expect(mockCount).toHaveBeenCalledWith({
+        where: { status: "PUBLISHED", level: "BEGINNER" },
+      });
+      expect(result.courses).toHaveLength(1);
+      expect(result.total).toBe(1);
+      expect(result.courses[0]._count.lessons).toBe(3);
+    });
+
+    it("findPublishedCourseBySlug applies slug + PUBLISHED filter and orders lessons", async () => {
+      const mockFindFirst = vi.fn().mockResolvedValue({
+        id: "c-1",
+        slug: "intro-finance",
+        title: "Intro Finance",
+        description: "Desc",
+        level: "BEGINNER",
+        status: "PUBLISHED",
+        order: 1,
+        lessons: [
+          { slug: "lesson-1", title: "Lesson 1", order: 1 },
+          { slug: "lesson-2", title: "Lesson 2", order: 2 },
+        ],
+      });
+
+      const mockPrisma = {
+        academyCourse: {
+          findFirst: mockFindFirst,
+        },
+      } as unknown as PrismaClient;
+
+      const repo = new PrismaAcademyCourseRepository(mockPrisma);
+      const result = await repo.findPublishedCourseBySlug("intro-finance");
+
+      expect(mockFindFirst).toHaveBeenCalledWith({
+        where: { slug: "intro-finance", status: "PUBLISHED" },
+        include: {
+          lessons: {
+            where: { status: "PUBLISHED" },
+            select: { slug: true, title: true, order: true },
+            orderBy: [{ order: "asc" }, { title: "asc" }, { id: "asc" }],
+          },
+        },
+      });
+      expect(result).not.toBeNull();
+      expect(result?.lessons).toHaveLength(2);
+    });
+
+    it("findPublishedLessonByCourseAndSlug joins course and enforces published status", async () => {
+      const mockFindFirst = vi.fn().mockResolvedValue({
+        id: "l-1",
+        courseId: "c-1",
+        slug: "lesson-1",
+        title: "Lesson 1",
+        content: "Content text",
+        order: 1,
+        status: "PUBLISHED",
+        course: { slug: "intro-finance" },
+      });
+
+      const mockPrisma = {
+        academyLesson: {
+          findFirst: mockFindFirst,
+        },
+      } as unknown as PrismaClient;
+
+      const repo = new PrismaAcademyCourseRepository(mockPrisma);
+      const result = await repo.findPublishedLessonByCourseAndSlug("intro-finance", "lesson-1");
+
+      expect(mockFindFirst).toHaveBeenCalledWith({
+        where: {
+          slug: "lesson-1",
+          status: "PUBLISHED",
+          course: {
+            slug: "intro-finance",
+            status: "PUBLISHED",
+          },
+        },
+        include: {
+          course: {
+            select: { slug: true },
+          },
+        },
+      });
+      expect(result?.content).toBe("Content text");
+      expect(result?.course.slug).toBe("intro-finance");
+    });
+  });
 });
+
