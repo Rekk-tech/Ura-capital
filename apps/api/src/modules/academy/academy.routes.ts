@@ -32,6 +32,18 @@ export function createAcademyRouter(controller?: AcademyCourseController): Route
     (req, res, next) => ctrl.getLesson(req, res, next),
   );
 
+  // 4. Lesson Flashcards (Authenticated)
+  router.get(
+    "/api/academy/courses/:courseSlug/lessons/:lessonSlug/flashcards",
+    authenticate,
+    (req, res, next) => ctrl.getFlashcards(req, res, next),
+  );
+  router.get(
+    "/academy/courses/:courseSlug/lessons/:lessonSlug/flashcards",
+    authenticate,
+    (req, res, next) => ctrl.getFlashcards(req, res, next),
+  );
+
   return router;
 }
 

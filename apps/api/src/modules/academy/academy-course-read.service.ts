@@ -6,9 +6,11 @@ import {
   type CourseCatalogResponse,
   type CourseDetailResponse,
   type LessonDetailResponse,
+  type LessonFlashcardsResponse,
   toCourseSummaryDto,
   toCourseDetailDto,
   toLessonDetailDto,
+  toFlashcardItemDto,
 } from "./academy.dto.js";
 
 export class AcademyCourseReadService {
@@ -60,6 +62,24 @@ export class AcademyCourseReadService {
 
     return {
       data: toLessonDetailDto(lesson),
+    };
+  }
+
+  async getPublishedFlashcards(courseSlug: string, lessonSlug: string): Promise<LessonFlashcardsResponse> {
+    const result = await this.courseRepo.findPublishedFlashcardsByLesson(courseSlug, lessonSlug);
+
+    if (!result) {
+      throw new AppError("Lesson not found", ERROR_CODES.NOT_FOUND, HTTP_STATUS.NOT_FOUND);
+    }
+
+    return {
+      data: {
+        courseSlug,
+        lessonSlug,
+        lessonTitle: result.lessonTitle,
+        flashcards: result.flashcards.map(toFlashcardItemDto),
+        totalCount: result.flashcards.length,
+      },
     };
   }
 }

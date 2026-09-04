@@ -46,3 +46,30 @@ export function useLessonQuery(courseSlug: string | undefined, lessonSlug: strin
     },
   });
 }
+
+export function useFlashcardsQuery(
+  courseSlug: string | undefined,
+  lessonSlug: string | undefined,
+  accessToken?: string
+) {
+  return useQuery({
+    queryKey: ["academy", "flashcards", courseSlug, lessonSlug],
+    queryFn: () => {
+      if (!courseSlug || !lessonSlug) throw new Error("Course and lesson slugs are required");
+      return academyApi.getLessonFlashcards(courseSlug, lessonSlug, accessToken);
+    },
+    enabled: Boolean(courseSlug && lessonSlug),
+    staleTime: 1000 * 60 * 2, // 2 minutes
+    gcTime: 1000 * 60 * 10,
+    retry: (failureCount, error: unknown) => {
+      if (error instanceof AcademyApiError && (error.status === 401 || error.status === 404)) {
+        return false;
+      }
+      if (typeof process !== "undefined" && process.env?.NODE_ENV === "test") {
+        return false;
+      }
+      return failureCount < 2;
+    },
+  });
+}
+

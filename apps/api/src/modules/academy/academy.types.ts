@@ -124,3 +124,10 @@ export interface ListPublishedCoursesParams {
   level?: string;
 }
 
+export type {
+  FlashcardItemDto,
+  LessonFlashcardsResponseDto,
+  LessonFlashcardsResponse,
+} from "./academy.dto.js";
+
+

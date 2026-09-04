@@ -118,3 +118,34 @@ export function toLessonDetailDto(entity: {
     order: entity.order,
   };
 }
+
+export interface FlashcardItemDto {
+  front: string;
+  back: string;
+  order: number;
+}
+
+export interface LessonFlashcardsResponseDto {
+  courseSlug: string;
+  lessonSlug: string;
+  lessonTitle: string;
+  flashcards: FlashcardItemDto[];
+  totalCount: number;
+}
+
+export interface LessonFlashcardsResponse {
+  data: LessonFlashcardsResponseDto;
+}
+
+export function toFlashcardItemDto(entity: {
+  front: string;
+  back: string;
+  order: number;
+}): FlashcardItemDto {
+  return {
+    front: entity.front,
+    back: entity.back,
+    order: entity.order,
+  };
+}
+

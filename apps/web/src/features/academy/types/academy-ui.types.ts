@@ -73,3 +73,27 @@ export class AcademyApiError extends Error {
     this.code = code;
   }
 }
+
+export interface FlashcardItemDto {
+  front: string;
+  back: string;
+  order: number;
+}
+
+export interface LessonFlashcardsResponseDto {
+  courseSlug: string;
+  lessonSlug: string;
+  lessonTitle: string;
+  flashcards: FlashcardItemDto[];
+  totalCount: number;
+}
+
+export type FlashcardReviewState =
+  | "LOADING"
+  | "EMPTY"
+  | "ERROR"
+  | "AUTH_REQUIRED"
+  | "NOT_FOUND"
+  | "READY_FRONT"
+  | "REVEALED";
+

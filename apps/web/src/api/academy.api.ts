@@ -4,6 +4,7 @@ import {
   CourseDetailDto,
   CourseSummaryDto,
   LessonDetailDto,
+  LessonFlashcardsResponseDto,
   ListCoursesParams,
   PaginationMeta,
 } from "../features/academy/types/academy-ui.types";
@@ -12,6 +13,7 @@ export interface IAcademyApiClient {
   listCourses(params?: ListCoursesParams): Promise<{ data: CourseSummaryDto[]; pagination: PaginationMeta }>;
   getCourseBySlug(slug: string): Promise<{ data: CourseDetailDto }>;
   getLessonBySlug(courseSlug: string, lessonSlug: string, accessToken?: string): Promise<{ data: LessonDetailDto }>;
+  getLessonFlashcards(courseSlug: string, lessonSlug: string, accessToken?: string): Promise<{ data: LessonFlashcardsResponseDto }>;
 }
 
 export class AcademyApiClient implements IAcademyApiClient {
@@ -86,6 +88,33 @@ export class AcademyApiClient implements IAcademyApiClient {
     }
 
     return (await res.json()) as { data: LessonDetailDto };
+  }
+
+  async getLessonFlashcards(
+    courseSlug: string,
+    lessonSlug: string,
+    accessToken?: string
+  ): Promise<{ data: LessonFlashcardsResponseDto }> {
+    const url = `${this.baseUrl}/courses/${encodeURIComponent(courseSlug)}/lessons/${encodeURIComponent(lessonSlug)}/flashcards`;
+
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+    };
+
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers,
+    });
+
+    if (!res.ok) {
+      await this.handleError(res);
+    }
+
+    return (await res.json()) as { data: LessonFlashcardsResponseDto };
   }
 
   private async handleError(res: Response): Promise<never> {

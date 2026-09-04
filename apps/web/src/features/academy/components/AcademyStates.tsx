@@ -133,14 +133,16 @@ export const NotFoundState: React.FC<NotFoundStateProps> = ({
 interface AuthRequiredCardProps {
   courseSlug?: string;
   lessonSlug?: string;
+  returnPath?: string;
 }
 
-export const AuthRequiredCard: React.FC<AuthRequiredCardProps> = ({ courseSlug, lessonSlug }) => {
+export const AuthRequiredCard: React.FC<AuthRequiredCardProps> = ({ courseSlug, lessonSlug, returnPath }) => {
   const location = useLocation();
   const currentPath =
-    courseSlug && lessonSlug
+    returnPath ??
+    (courseSlug && lessonSlug
       ? `/academy/courses/${courseSlug}/lessons/${lessonSlug}`
-      : location.pathname + location.search;
+      : location.pathname + location.search);
 
   const loginUrl = buildAuthRedirectUrl("/login", currentPath);
   const registerUrl = buildAuthRedirectUrl("/register", currentPath);
@@ -167,3 +169,29 @@ export const AuthRequiredCard: React.FC<AuthRequiredCardProps> = ({ courseSlug, 
     </div>
   );
 };
+
+export const FlashcardLoadingSkeleton: React.FC = () => (
+  <div className="flashcard-review-skeleton" aria-busy="true" aria-label="Loading flashcards" data-testid="flashcard-loading-skeleton">
+    <div role="status" className="sr-only">
+      Loading flashcards...
+    </div>
+    <div className="skeleton-toolbar" style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem" }}>
+      <div className="skeleton-line skeleton-pill" style={{ width: "120px", height: "24px" }} />
+      <div className="skeleton-line skeleton-pill" style={{ width: "80px", height: "24px" }} />
+    </div>
+    <div className="skeleton-card-surface" style={{ padding: "2rem", borderRadius: "0.75rem", background: "var(--card-bg, rgba(255,255,255,0.03))", minHeight: "260px" }}>
+      <div className="skeleton-line skeleton-badge" style={{ width: "70px", height: "20px", marginBottom: "1.5rem" }} />
+      <div className="skeleton-line skeleton-title" style={{ width: "70%", height: "24px", marginBottom: "1rem" }} />
+      <div className="skeleton-line skeleton-desc" style={{ width: "90%", height: "16px", marginBottom: "0.5rem" }} />
+      <div className="skeleton-line skeleton-desc" style={{ width: "50%", height: "16px", marginBottom: "2rem" }} />
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <div className="skeleton-line" style={{ width: "160px", height: "42px", borderRadius: "0.5rem" }} />
+      </div>
+    </div>
+    <div className="skeleton-footer" style={{ display: "flex", justifyContent: "space-between", marginTop: "1.5rem" }}>
+      <div className="skeleton-line" style={{ width: "110px", height: "40px", borderRadius: "0.5rem" }} />
+      <div className="skeleton-line" style={{ width: "110px", height: "40px", borderRadius: "0.5rem" }} />
+    </div>
+  </div>
+);
+

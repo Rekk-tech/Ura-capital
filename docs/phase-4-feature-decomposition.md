@@ -9,8 +9,9 @@
 - FEAT-019: DONE (Human Final Gate APPROVED)
 - FEAT-020: DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED)
 - FEAT-021: DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED)
-- FEAT-022: UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED)
-- FEAT-023+: BLOCKED according to dependency graph
+- FEAT-022: DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED)
+- FEAT-023: UNBLOCKED FOR PLANNING (Dependencies FEAT-019 & FEAT-020 satisfied; implementation NOT_STARTED)
+- FEAT-024+: BLOCKED according to dependency graph
 - Phase 4: IN_PROGRESS
 - Phase 5: BLOCKED
 
@@ -186,8 +187,8 @@ Human decision required:
 | FEAT-019 | Academy Domain Schema & Persistence Foundation | Implementation | DONE (Human Final Gate APPROVED) |
 | FEAT-020 | Course & Lesson Read Model APIs | Implementation | DONE (Human Final Gate APPROVED) |
 | FEAT-021 | Academy Learner Course/Lesson UI | Implementation | DONE (Human Final Gate APPROVED) |
-| FEAT-022 | Flashcards Domain & Review Flow | Implementation | UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED) |
-| FEAT-023 | Quiz Definition & Safe Projection | Implementation | FEAT-019, FEAT-020 |
+| FEAT-022 | Flashcards Domain & Review Flow | Implementation | DONE (Human Final Gate APPROVED) |
+| FEAT-023 | Quiz Definition & Safe Projection | Implementation | UNBLOCKED FOR PLANNING (FEAT-019, FEAT-020 satisfied; Implementation: NOT_STARTED) |
 | FEAT-024 | Quiz Attempt Lifecycle | Implementation | FEAT-019, FEAT-023 |
 | FEAT-025 | Server-Side Quiz Evaluation & Secure Submission | Implementation | FEAT-024 |
 | FEAT-026 | Academy Progression & Completion Tracking | Implementation | FEAT-020, FEAT-024, FEAT-025 |
@@ -244,7 +245,7 @@ Excluded: Spaced repetition algorithm unless separately approved, XP rewards.
 
 QA Gate: Safe answer reveal semantics, ownership/progress boundary if persistence added, no Redis durable state.
 
-Human Decisions: Whether flashcard review state persists in Phase 4.
+Human Decisions: RESOLVED / HUMAN APPROVED — Flashcard review state persistence: DEFERRED; Phase 4 FEAT-022 behavior: TRANSIENT CLIENT-SIDE REVIEW SESSION ONLY. Answer secrecy level: OPTION A — UI REVEAL ONLY (APPROVED). No durable per-user flashcard review state, no spaced repetition, no XP, no progress mutation, no Redis durable authority.
 
 ### FEAT-023 - Quiz Definition & Safe Projection
 
@@ -373,7 +374,7 @@ PASS requires:
 1. Confirm Phase 4 default boundary: learner-facing Academy only, no CMS/admin authoring.
 2. Decide production content ingestion approach.
 3. Decide quiz question types and scoring/pass policy before FEAT-023/FEAT-025.
-4. Decide whether flashcard review state persists in Phase 4.
+4. [RESOLVED] Decide whether flashcard review state persists in Phase 4: DEFERRED (Phase 4 FEAT-022 behavior: TRANSIENT CLIENT-SIDE REVIEW SESSION ONLY; Option A UI reveal only approved).
 5. Decide whether Academy activates concrete product audit persistence in FEAT-029.
 6. Decide whether admin read-only support visibility is included in FEAT-028 or deferred.
 

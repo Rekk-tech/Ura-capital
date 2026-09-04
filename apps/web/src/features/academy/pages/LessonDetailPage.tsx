@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams, Link } from "react-router-dom";
-import { ChevronRight, ArrowLeft, ArrowRight, BookOpen } from "lucide-react";
+import { ChevronRight, ArrowLeft, ArrowRight, BookOpen, Layers } from "lucide-react";
 import { useLessonQuery, useCourseQuery } from "../hooks/use-academy";
 import { LessonContent } from "../components/LessonContent";
 import { LessonDetailSkeleton, AuthRequiredCard, NotFoundState, ErrorState } from "../components/AcademyStates";
@@ -102,9 +102,22 @@ export const LessonDetailPage: React.FC = () => {
       {/* Centered Reading Column */}
       <article className="lesson-reading-column" aria-labelledby="lesson-main-heading">
         <header className="lesson-header">
-          <div className="lesson-position-badge">
-            <BookOpen size={14} aria-hidden="true" className="pill-icon" />
-            <span>{positionLabel}</span>
+          <div className="lesson-header-meta" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+            <div className="lesson-position-badge">
+              <BookOpen size={14} aria-hidden="true" className="pill-icon" />
+              <span>{positionLabel}</span>
+            </div>
+            {courseSlug && lessonSlug && (
+              <Link
+                to={`/academy/courses/${encodeURIComponent(courseSlug)}/lessons/${encodeURIComponent(lessonSlug)}/flashcards`}
+                className="btn btn-outline lesson-flashcards-link"
+                aria-label="Study Flashcards for this lesson"
+                data-testid="study-flashcards-button"
+              >
+                <Layers size={14} aria-hidden="true" style={{ marginRight: "0.4rem", display: "inline" }} />
+                Study Flashcards
+              </Link>
+            )}
           </div>
 
           <h1 id="lesson-main-heading" className="lesson-main-title">

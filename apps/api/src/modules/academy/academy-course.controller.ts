@@ -54,4 +54,22 @@ export class AcademyCourseController {
       next(error);
     }
   }
+
+  async getFlashcards(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const parsed = lessonSlugParamSchema.safeParse(req.params);
+      if (!parsed.success) {
+        throw parsed.error;
+      }
+
+      const result = await this.service.getPublishedFlashcards(
+        parsed.data.courseSlug,
+        parsed.data.lessonSlug,
+      );
+      res.status(HTTP_STATUS.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
+

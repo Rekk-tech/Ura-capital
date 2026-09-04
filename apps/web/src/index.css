@@ -1066,6 +1066,335 @@ a {
   flex-wrap: wrap;
 }
 
+/* ==========================================================================
+   FEAT-022: Flashcards Domain & Review Flow Styles
+   ========================================================================== */
+
+.flashcard-page-header {
+  margin-bottom: 2rem;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.flashcard-page-header-top {
+  margin-bottom: 0.75rem;
+}
+
+.flashcard-back-link {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.flashcard-back-link:hover {
+  color: var(--accent-primary);
+}
+
+.flashcard-page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  line-height: 1.25;
+}
+
+.flashcard-page-subtitle {
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+/* Flashcard Review Container */
+.flashcard-review-container {
+  max-width: 720px;
+  margin: 0 auto 3rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Flashcard Toolbar */
+.flashcard-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flashcard-position-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.flashcard-toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.flashcard-toolbar-btn:hover {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border-color: var(--border-active);
+}
+
+/* Flashcard Card Surface */
+.flashcard-card-surface {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.flashcard-card-surface:hover {
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+/* Card Faces */
+.flashcard-front-section {
+  padding: 2.25rem 2rem;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+}
+
+.flashcard-back-section {
+  padding: 2.25rem 2rem;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  background: rgba(6, 182, 212, 0.04);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.flashcard-face-badge {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-sm);
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--accent-primary);
+  margin-bottom: 1.25rem;
+}
+
+.flashcard-back-badge {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--status-success);
+}
+
+.flashcard-content-prose {
+  font-size: 1.15rem;
+  line-height: 1.7;
+  color: var(--text-primary);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.flashcard-content-prose p:not(:last-child) {
+  margin-bottom: 1rem;
+}
+
+.flashcard-content-prose code {
+  background: var(--bg-surface);
+  padding: 0.2rem 0.4rem;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  border: 1px solid var(--border-subtle);
+}
+
+.flashcard-content-prose pre {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.flashcard-content-prose pre code {
+  background: transparent;
+  padding: 0;
+  border: none;
+}
+
+/* Reveal Prompt */
+.flashcard-reveal-prompt {
+  padding: 2rem;
+  text-align: center;
+  background: rgba(18, 24, 36, 0.6);
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.flashcard-reveal-btn {
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+}
+
+.flashcard-shortcut-hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.flashcard-shortcut-hint kbd,
+.flashcard-keyboard-guide kbd {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 0.15rem 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* Navigation Bar */
+.flashcard-navigation-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.flashcard-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+}
+
+/* Keyboard Guide */
+.flashcard-keyboard-guide {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  padding-top: 0.5rem;
+}
+
+/* Completion Card */
+.flashcard-deck-completed {
+  max-width: 580px;
+  margin: 2rem auto 3rem auto;
+}
+
+.flashcard-completion-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 3rem 2rem;
+  text-align: center;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+.flashcard-completion-icon {
+  width: 56px;
+  height: 56px;
+  color: var(--status-success);
+  margin: 0 auto 1.25rem auto;
+}
+
+.flashcard-completion-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+}
+
+.flashcard-completion-desc {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.flashcard-restart-btn {
+  padding: 0.75rem 2rem;
+}
+
+/* Empty State */
+.flashcard-empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  max-width: 600px;
+  margin: 2rem auto;
+}
+
+/* Lesson CTA Link */
+.lesson-flashcards-link {
+  font-size: 0.85rem;
+  padding: 0.4rem 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+}
+
+/* Reduced Motion Baseline */
+@media (prefers-reduced-motion: reduce) {
+  .flashcard-card-surface,
+  .flashcard-toolbar-btn,
+  .flashcard-back-link {
+    transition: none !important;
+  }
+}
+
+/* Responsive Narrow Screens */
+@media (max-width: 640px) {
+  .flashcard-front-section,
+  .flashcard-back-section {
+    padding: 1.5rem 1.25rem;
+    min-height: 140px;
+  }
+
+  .flashcard-page-title {
+    font-size: 1.5rem;
+  }
+
+  .flashcard-navigation-bar {
+    flex-direction: row;
+  }
+
+  .flashcard-nav-btn {
+    flex: 1;
+    padding: 0.65rem 1rem;
+    font-size: 0.875rem;
+  }
+}
+
 /* Footer */
 .footer {
   text-align: center;

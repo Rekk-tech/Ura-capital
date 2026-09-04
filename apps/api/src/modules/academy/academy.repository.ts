@@ -61,6 +61,13 @@ export interface IAcademyCourseRepository {
     courseSlug: string,
     lessonSlug: string,
   ): Promise<(AcademyLesson & { course: Pick<AcademyCourse, "slug"> }) | null>;
+  findPublishedFlashcardsByLesson(
+    courseSlug: string,
+    lessonSlug: string,
+  ): Promise<{
+    lessonTitle: string;
+    flashcards: Array<Pick<AcademyFlashcard, "front" | "back" | "order">>;
+  } | null>;
 }
 
 export class PrismaAcademyCourseRepository implements IAcademyCourseRepository {
@@ -220,6 +227,45 @@ export class PrismaAcademyCourseRepository implements IAcademyCourseRepository {
         },
       },
     });
+  }
+
+  async findPublishedFlashcardsByLesson(
+    courseSlug: string,
+    lessonSlug: string,
+  ): Promise<{
+    lessonTitle: string;
+    flashcards: Array<Pick<AcademyFlashcard, "front" | "back" | "order">>;
+  } | null> {
+    const lesson = await this.prisma.academyLesson.findFirst({
+      where: {
+        slug: lessonSlug,
+        status: "PUBLISHED",
+        course: {
+          slug: courseSlug,
+          status: "PUBLISHED",
+        },
+      },
+      select: {
+        title: true,
+        flashcards: {
+          select: {
+            front: true,
+            back: true,
+            order: true,
+          },
+          orderBy: { order: "asc" },
+        },
+      },
+    });
+
+    if (!lesson) {
+      return null;
+    }
+
+    return {
+      lessonTitle: lesson.title,
+      flashcards: lesson.flashcards,
+    };
   }
 }
 
