@@ -47,7 +47,7 @@ jobs:
       DATABASE_URL: postgresql://postgres:postgrespassword@localhost:5432/aura_capital_test
       TEST_DATABASE_URL: postgresql://postgres:postgrespassword@localhost:5432/aura_capital_test
       REDIS_URL: redis://localhost:6379
-      AUTH_RATE_LIMIT_ENABLED: "true"
+      AUTH_RATE_LIMIT_ENABLED: "false"
       AUTH_RATE_LIMIT_KEY_SECRET: ci-test-rate-limit-key-secret-at-least-32-chars
       AUTH_TRUST_PROXY: "false"
       CORS_ORIGIN: http://localhost:5173
@@ -93,6 +93,8 @@ jobs:
         run: npm run test:db
 
       - name: Run Redis Rate Limit Test Suite
+        env:
+          AUTH_RATE_LIMIT_ENABLED: "true"
         run: npm run test:redis
 
       - name: Run Persistence Boundary Guard
