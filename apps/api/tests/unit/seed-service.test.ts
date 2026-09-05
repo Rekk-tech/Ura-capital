@@ -390,6 +390,7 @@ describe("FEAT-017 Seed Service & Orchestration Unit Tests", () => {
       await expect(
         seedDevelopmentData(mockPrisma, "ValidPassword123!", {
           nodeEnv: "development",
+          isCi: false,
           databaseUrl: "postgresql://postgres:postgrespassword@localhost:5432/aura_capital_dev",
         }),
       ).rejects.toThrow("Simulated DB connection failure during user insert");
