@@ -9,7 +9,7 @@
     "build": "prisma generate && tsc -b",
     "clean": "tsc -b --clean && rimraf dist",
     "start": "node dist/server.js",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "prisma generate && tsc --noEmit",
     "test": "vitest run tests/unit tests/integration/health.test.ts tests/integration/logging.test.ts tests/integration/production-smoke.test.ts tests/integration/identity-schema.test.ts tests/integration/registration.test.ts tests/integration/login.test.ts tests/integration/auth-middleware.test.ts tests/integration/refresh.test.ts tests/integration/logout.test.ts tests/integration/rbac.test.ts tests/integration/admin-guard.test.ts tests/integration/audit-auth.test.ts tests/integration/audit-session.test.ts tests/integration/audit-authorization.test.ts tests/integration/rate-limit-login.test.ts tests/integration/rate-limit-register.test.ts tests/integration/rate-limit-refresh.test.ts tests/integration/rate-limit-redis.test.ts tests/integration/redis-health-readiness.test.ts tests/integration/academy-routes.test.ts",
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
