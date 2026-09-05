@@ -91,12 +91,15 @@ jobs:
           npm run test 2>&1 | tee test.log || (echo "### Test Failures" >> $GITHUB_STEP_SUMMARY && echo '```' >> $GITHUB_STEP_SUMMARY && cat test.log >> $GITHUB_STEP_SUMMARY && echo '```' >> $GITHUB_STEP_SUMMARY && exit 1)
 
       - name: Run PostgreSQL Database Constraints Test Suite
-        run: npm run test:db
+        run: |
+          npm run test:db 2>&1 | tee db-test.log || (echo "### DB Test Failures" >> $GITHUB_STEP_SUMMARY && echo '```' >> $GITHUB_STEP_SUMMARY && cat db-test.log >> $GITHUB_STEP_SUMMARY && echo '```' >> $GITHUB_STEP_SUMMARY && exit 1)
 
       - name: Run Redis Rate Limit Test Suite
         env:
           AUTH_RATE_LIMIT_ENABLED: "true"
-        run: npm run test:redis
+        run: |
+          npm run test:redis 2>&1 | tee redis-test.log || (echo "### Redis Test Failures" >> $GITHUB_STEP_SUMMARY && echo '```' >> $GITHUB_STEP_SUMMARY && cat redis-test.log >> $GITHUB_STEP_SUMMARY && echo '```' >> $GITHUB_STEP_SUMMARY && exit 1)
 
       - name: Run Persistence Boundary Guard
-        run: npm run guard:persistence
+        run: |
+          npm run guard:persistence 2>&1 | tee guard.log || (echo "### Guard Failures" >> $GITHUB_STEP_SUMMARY && echo '```' >> $GITHUB_STEP_SUMMARY && cat guard.log >> $GITHUB_STEP_SUMMARY && echo '```' >> $GITHUB_STEP_SUMMARY && exit 1)
