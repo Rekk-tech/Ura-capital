@@ -44,6 +44,7 @@ describe("FEAT-017 Live Seed Integration & PostgreSQL Authority", () => {
     // 1. Initial dev seed run
     const result1 = await seedDevelopmentData(prisma, "ValidDevPassword123!", {
       nodeEnv: "development",
+      isCi: false,
       databaseUrl: "postgresql://postgres:postgrespassword@localhost:5432/aura_capital_dev",
     });
     expect(result1.seededUsers).toBe(2);
@@ -51,6 +52,7 @@ describe("FEAT-017 Live Seed Integration & PostgreSQL Authority", () => {
     // 2. Immediate rerun (must not create duplicate users or throw unique constraint error)
     const result2 = await seedDevelopmentData(prisma, "ValidDevPassword123!", {
       nodeEnv: "development",
+      isCi: false,
       databaseUrl: "postgresql://postgres:postgrespassword@localhost:5432/aura_capital_dev",
     });
     expect(result2.seededUsers).toBe(2);

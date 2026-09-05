@@ -97,6 +97,30 @@ describe("FEAT-017 Seed Service & Orchestration Unit Tests", () => {
 
       expect(mockPrisma.$transaction).not.toHaveBeenCalled();
     });
+
+    it("throws SeedEnvironmentViolationError when isCi is true for development seed", async () => {
+      const mockPrisma = {
+        $transaction: vi.fn(),
+      } as unknown as PrismaClient;
+
+      expect(() =>
+        assertSeedEnvironmentSafe("development", "ValidPassword123!", {
+          nodeEnv: "development",
+          isCi: true,
+          databaseUrl: "postgresql://postgres:postgrespassword@localhost:5432/aura_capital_dev",
+        }),
+      ).toThrow(SeedEnvironmentViolationError);
+
+      await expect(
+        seedDevelopmentData(mockPrisma, "ValidPassword123!", {
+          nodeEnv: "development",
+          isCi: true,
+          databaseUrl: "postgresql://postgres:postgrespassword@localhost:5432/aura_capital_dev",
+        }),
+      ).rejects.toThrow(SeedEnvironmentViolationError);
+
+      expect(mockPrisma.$transaction).not.toHaveBeenCalled();
+    });
   });
 
   describe("Development Seed Execution", () => {

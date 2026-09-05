@@ -88,18 +88,62 @@ jobs:
 
       - name: Run Standard Test Suites
         run: |
-          npm run test 2>&1 | tee test.log || (echo "### Test Failures" >> $GITHUB_STEP_SUMMARY && echo '```' >> $GITHUB_STEP_SUMMARY && cat test.log >> $GITHUB_STEP_SUMMARY && echo '```' >> $GITHUB_STEP_SUMMARY && exit 1)
+          set -o pipefail
+
+          if ! npm run test 2>&1 | tee test.log; then
+            {
+              echo "### Standard Test Failures"
+              echo '```text'
+              cat test.log
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+
+            exit 1
+          fi
 
       - name: Run PostgreSQL Database Constraints Test Suite
         run: |
-          npm run test:db 2>&1 | tee db-test.log || (echo "### DB Test Failures" >> $GITHUB_STEP_SUMMARY && echo '```' >> $GITHUB_STEP_SUMMARY && cat db-test.log >> $GITHUB_STEP_SUMMARY && echo '```' >> $GITHUB_STEP_SUMMARY && exit 1)
+          set -o pipefail
+
+          if ! npm run test:db 2>&1 | tee db-test.log; then
+            {
+              echo "### PostgreSQL DB Test Failures"
+              echo '```text'
+              cat db-test.log
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+
+            exit 1
+          fi
 
       - name: Run Redis Rate Limit Test Suite
         env:
           AUTH_RATE_LIMIT_ENABLED: "true"
         run: |
-          npm run test:redis 2>&1 | tee redis-test.log || (echo "### Redis Test Failures" >> $GITHUB_STEP_SUMMARY && echo '```' >> $GITHUB_STEP_SUMMARY && cat redis-test.log >> $GITHUB_STEP_SUMMARY && echo '```' >> $GITHUB_STEP_SUMMARY && exit 1)
+          set -o pipefail
+
+          if ! npm run test:redis 2>&1 | tee redis-test.log; then
+            {
+              echo "### Redis Test Failures"
+              echo '```text'
+              cat redis-test.log
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+
+            exit 1
+          fi
 
       - name: Run Persistence Boundary Guard
         run: |
-          npm run guard:persistence 2>&1 | tee guard.log || (echo "### Guard Failures" >> $GITHUB_STEP_SUMMARY && echo '```' >> $GITHUB_STEP_SUMMARY && cat guard.log >> $GITHUB_STEP_SUMMARY && echo '```' >> $GITHUB_STEP_SUMMARY && exit 1)
+          set -o pipefail
+
+          if ! npm run guard:persistence 2>&1 | tee guard.log; then
+            {
+              echo "### Persistence Guard Failures"
+              echo '```text'
+              cat guard.log
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+
+            exit 1
+          fi
