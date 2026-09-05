@@ -87,7 +87,8 @@ jobs:
         run: npx prisma migrate status --schema=apps/api/prisma/schema.prisma
 
       - name: Run Standard Test Suites
-        run: npm run test
+        run: |
+          npm run test 2>&1 | tee test.log || (echo "### Test Failures" >> $GITHUB_STEP_SUMMARY && echo '```' >> $GITHUB_STEP_SUMMARY && cat test.log >> $GITHUB_STEP_SUMMARY && echo '```' >> $GITHUB_STEP_SUMMARY && exit 1)
 
       - name: Run PostgreSQL Database Constraints Test Suite
         run: npm run test:db
