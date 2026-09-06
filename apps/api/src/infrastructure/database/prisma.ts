@@ -7,11 +7,16 @@ let prismaInstance: PrismaClient | null = null;
 export function getPrismaClient(): PrismaClient {
   if (!prismaInstance) {
     const env = getEnv();
+    const dbUrl =
+      (env.NODE_ENV === "test" || process.env.NODE_ENV === "test" || process.env.VITEST) &&
+      process.env.TEST_DATABASE_URL
+        ? process.env.TEST_DATABASE_URL
+        : env.DATABASE_URL;
 
     prismaInstance = new PrismaClient({
       datasources: {
         db: {
-          url: env.DATABASE_URL,
+          url: dbUrl,
         },
       },
       log:

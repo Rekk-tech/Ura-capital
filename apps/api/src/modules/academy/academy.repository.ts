@@ -1,18 +1,18 @@
-import type {
-  PrismaClient,
+import {
+  type PrismaClient,
   Prisma,
-  AcademyCourse,
-  AcademyLesson,
-  AcademyFlashcard,
-  AcademyQuiz,
-  AcademyQuizQuestion,
-  AcademyQuizOption,
-  AcademyQuizAttempt,
-  AcademyQuizAnswer,
-  AcademyUserCourseProgress,
-  AcademyUserLessonProgress,
-  AcademyUserXp,
-  AcademyRewardLedger,
+  type AcademyCourse,
+  type AcademyLesson,
+  type AcademyFlashcard,
+  type AcademyQuiz,
+  type AcademyQuizQuestion,
+  type AcademyQuizOption,
+  type AcademyQuizAttempt,
+  type AcademyQuizAnswer,
+  type AcademyUserCourseProgress,
+  type AcademyUserLessonProgress,
+  type AcademyUserXp,
+  type AcademyRewardLedger,
 } from "@prisma/client";
 import type {
   CreateCourseInput,
@@ -29,7 +29,11 @@ import type {
   RecordRewardInput,
   ListPublishedCoursesParams,
   PublishedQuizRecord,
+  AcademyQuizAttemptWithAnswers,
+  StartAttemptRepoResult,
+  UpsertDraftAnswerInput,
 } from "./academy.types.js";
+import { getPrismaClient } from "../../infrastructure/database/prisma.js";
 
 type DbClient = PrismaClient | Prisma.TransactionClient;
 
@@ -72,7 +76,15 @@ export interface IAcademyCourseRepository {
 }
 
 export class PrismaAcademyCourseRepository implements IAcademyCourseRepository {
-  constructor(private readonly prisma: DbClient) {}
+  private readonly client?: DbClient;
+
+  constructor(prisma?: DbClient) {
+    this.client = prisma;
+  }
+
+  private get prisma(): DbClient {
+    return this.client ?? getPrismaClient();
+  }
 
   async createCourse(data: CreateCourseInput): Promise<AcademyCourse> {
     return this.prisma.academyCourse.create({
@@ -303,10 +315,46 @@ export interface IAcademyQuizRepository {
     courseSlug: string,
     lessonSlug: string,
   ): Promise<PublishedQuizRecord | null>;
+  findActiveAttempt(
+    userId: string,
+    quizId: string,
+  ): Promise<AcademyQuizAttemptWithAnswers | null>;
+  startAttemptWithLock(
+    userId: string,
+    quizId: string,
+    quizTitleSnapshot: string,
+  ): Promise<StartAttemptRepoResult>;
+  findAttemptWithAnswersById(
+    attemptId: string,
+    userId?: string,
+  ): Promise<AcademyQuizAttemptWithAnswers | null>;
+  upsertDraftAnswer(data: UpsertDraftAnswerInput): Promise<AcademyQuizAnswer>;
+  findQuestionWithQuiz(questionId: string): Promise<
+    | (AcademyQuizQuestion & {
+        quiz: Pick<AcademyQuiz, "id" | "status">;
+      })
+    | null
+  >;
+  findOptionWithQuestion(optionId: string): Promise<
+    | (AcademyQuizOption & {
+        question: Pick<AcademyQuizQuestion, "id" | "quizId" | "prompt" | "type">;
+      })
+    | null
+  >;
+  verifyPublishedHierarchyByQuizId(quizId: string): Promise<boolean>;
 }
 
+
 export class PrismaAcademyQuizRepository implements IAcademyQuizRepository {
-  constructor(private readonly prisma: DbClient) {}
+  private readonly client?: DbClient;
+
+  constructor(prisma?: DbClient) {
+    this.client = prisma;
+  }
+
+  private get prisma(): DbClient {
+    return this.client ?? getPrismaClient();
+  }
 
   async createQuiz(data: CreateQuizInput): Promise<AcademyQuiz> {
     return this.prisma.academyQuiz.create({
@@ -534,7 +582,197 @@ export class PrismaAcademyQuizRepository implements IAcademyQuizRepository {
 
     return quiz as PublishedQuizRecord | null;
   }
+
+  async findActiveAttempt(
+    userId: string,
+    quizId: string,
+  ): Promise<AcademyQuizAttemptWithAnswers | null> {
+    return this.prisma.academyQuizAttempt.findFirst({
+      where: {
+        userId,
+        quizId,
+        status: "IN_PROGRESS",
+      },
+      include: {
+        answers: {
+          orderBy: { createdAt: "asc" },
+        },
+      },
+    });
+  }
+
+  async startAttemptWithLock(
+    userId: string,
+    quizId: string,
+    quizTitleSnapshot: string,
+  ): Promise<StartAttemptRepoResult> {
+    // 1. Transaction-scoped advisory lock on (userId, quizId)
+    await this.prisma.$executeRaw(
+      Prisma.sql`SELECT pg_advisory_xact_lock(hashtext('quiz_attempt:' || ${userId} || ':' || ${quizId}));`,
+    );
+
+    // 2. Query existing active attempt
+    const existing = await this.findActiveAttempt(userId, quizId);
+    if (existing) {
+      return {
+        attempt: existing,
+        created: false,
+      };
+    }
+
+    // 3. Compute next attemptNumber for exact user+quiz
+    const maxAgg = await this.prisma.academyQuizAttempt.aggregate({
+      where: { userId, quizId },
+      _max: { attemptNumber: true },
+    });
+    const nextAttemptNumber = (maxAgg._max.attemptNumber ?? 0) + 1;
+
+    // 4. Insert IN_PROGRESS attempt
+    try {
+      const createdAttempt = await this.prisma.academyQuizAttempt.create({
+        data: {
+          userId,
+          quizId,
+          attemptNumber: nextAttemptNumber,
+          quizTitleSnapshot,
+          status: "IN_PROGRESS",
+        },
+        include: {
+          answers: {
+            orderBy: { createdAt: "asc" },
+          },
+        },
+      });
+
+      return {
+        attempt: createdAttempt,
+        created: true,
+      };
+    } catch (err: unknown) {
+      // Targeted P2002 race recovery check
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
+        try {
+          const active = await this.findActiveAttempt(userId, quizId);
+          if (active) {
+            return {
+              attempt: active,
+              created: false,
+            };
+          }
+        } catch {
+          // Transaction aborted; allow error to bubble up for root client recovery
+        }
+      }
+      throw err;
+    }
+  }
+
+  async findAttemptWithAnswersById(
+    attemptId: string,
+    userId?: string,
+  ): Promise<AcademyQuizAttemptWithAnswers | null> {
+    return this.prisma.academyQuizAttempt.findFirst({
+      where: {
+        id: attemptId,
+        ...(userId ? { userId } : {}),
+      },
+      include: {
+        answers: {
+          orderBy: { createdAt: "asc" },
+        },
+      },
+    });
+  }
+
+  async upsertDraftAnswer(
+    data: UpsertDraftAnswerInput,
+  ): Promise<AcademyQuizAnswer> {
+    return this.prisma.academyQuizAnswer.upsert({
+      where: {
+        attemptId_questionId: {
+          attemptId: data.attemptId,
+          questionId: data.questionId,
+        },
+      },
+      create: {
+        attemptId: data.attemptId,
+        quizId: data.quizId,
+        questionId: data.questionId,
+        selectedOptionId: data.selectedOptionId,
+        questionPromptSnapshot: data.questionPromptSnapshot,
+        selectedOptionTextSnapshot: data.selectedOptionTextSnapshot,
+        isCorrect: null,
+        correctOptionIdSnapshot: null,
+        correctOptionTextSnapshot: null,
+      },
+      update: {
+        selectedOptionId: data.selectedOptionId,
+        selectedOptionTextSnapshot: data.selectedOptionTextSnapshot,
+        isCorrect: null,
+        correctOptionIdSnapshot: null,
+        correctOptionTextSnapshot: null,
+      },
+    });
+  }
+
+  async findQuestionWithQuiz(questionId: string): Promise<
+    | (AcademyQuizQuestion & {
+        quiz: Pick<AcademyQuiz, "id" | "status">;
+      })
+    | null
+  > {
+    return this.prisma.academyQuizQuestion.findUnique({
+      where: { id: questionId },
+      include: {
+        quiz: {
+          select: {
+            id: true,
+            status: true,
+          },
+        },
+      },
+    });
+  }
+
+  async findOptionWithQuestion(optionId: string): Promise<
+    | (AcademyQuizOption & {
+        question: Pick<AcademyQuizQuestion, "id" | "quizId" | "prompt" | "type">;
+      })
+    | null
+  > {
+    return this.prisma.academyQuizOption.findUnique({
+      where: { id: optionId },
+      include: {
+        question: {
+          select: {
+            id: true,
+            quizId: true,
+            prompt: true,
+            type: true,
+          },
+        },
+      },
+    });
+  }
+
+  async verifyPublishedHierarchyByQuizId(quizId: string): Promise<boolean> {
+    const quiz = await this.prisma.academyQuiz.findFirst({
+      where: {
+        id: quizId,
+        status: "PUBLISHED",
+        lesson: {
+          status: "PUBLISHED",
+          course: {
+            status: "PUBLISHED",
+          },
+        },
+      },
+      select: { id: true },
+    });
+    return quiz !== null;
+  }
 }
+
 
 // ============================================================================
 // Progress Repository
@@ -560,7 +798,15 @@ export interface IAcademyProgressRepository {
 export class PrismaAcademyProgressRepository
   implements IAcademyProgressRepository
 {
-  constructor(private readonly prisma: DbClient) {}
+  private readonly client?: DbClient;
+
+  constructor(prisma?: DbClient) {
+    this.client = prisma;
+  }
+
+  private get prisma(): DbClient {
+    return this.client ?? getPrismaClient();
+  }
 
   async upsertCourseProgress(
     data: UpsertCourseProgressInput,
@@ -659,7 +905,15 @@ export interface IAcademyRewardRepository {
 }
 
 export class PrismaAcademyRewardRepository implements IAcademyRewardRepository {
-  constructor(private readonly prisma: DbClient) {}
+  private readonly client?: DbClient;
+
+  constructor(prisma?: DbClient) {
+    this.client = prisma;
+  }
+
+  private get prisma(): DbClient {
+    return this.client ?? getPrismaClient();
+  }
 
   async recordReward(data: RecordRewardInput): Promise<AcademyRewardLedger> {
     return this.prisma.academyRewardLedger.create({

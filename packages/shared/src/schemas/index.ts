@@ -224,3 +224,31 @@ export const GetLessonQuizParamsSchema = z.object({
 
 export type GetLessonQuizParams = z.infer<typeof GetLessonQuizParamsSchema>;
 
+// FEAT-024 Academy Quiz Attempt Schemas
+export const StartQuizAttemptBodySchema = z.object({}).strict();
+
+export const SaveDraftAnswerBodySchema = z
+  .object({
+    optionId: z.string().uuid("Invalid optionId format"),
+  })
+  .strict();
+
+export const QuizAttemptParamSchema = z
+  .object({
+    attemptId: z.string().uuid("Invalid attemptId format"),
+  })
+  .strict();
+
+export const QuizDraftAnswerParamSchema = z
+  .object({
+    attemptId: z.string().uuid("Invalid attemptId format"),
+    questionId: z.string().uuid("Invalid questionId format"),
+  })
+  .strict();
+
+export type StartQuizAttemptBody = z.infer<typeof StartQuizAttemptBodySchema>;
+export type SaveDraftAnswerBody = z.infer<typeof SaveDraftAnswerBodySchema>;
+export type QuizAttemptParam = z.infer<typeof QuizAttemptParamSchema>;
+export type QuizDraftAnswerParam = z.infer<typeof QuizDraftAnswerParamSchema>;
+
+

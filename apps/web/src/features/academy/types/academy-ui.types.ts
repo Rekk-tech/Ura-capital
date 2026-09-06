@@ -124,4 +124,20 @@ export interface QuizDefinitionDto {
   questions: QuizQuestionDto[];
 }
 
+// FEAT-024: Academy Quiz Attempt UI Types
+export interface QuizDraftAnswerDto {
+  questionId: string;
+  selectedOptionId: string | null;
+  updatedAt: string;
+}
+
+export interface QuizAttemptDto {
+  id: string;
+  quizId: string;
+  attemptNumber: number;
+  status: "CREATED" | "IN_PROGRESS" | "SUBMITTED" | "GRADED";
+  startedAt: string;
+  answers: QuizDraftAnswerDto[];
+}
+
 

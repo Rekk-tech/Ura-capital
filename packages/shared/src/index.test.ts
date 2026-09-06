@@ -21,6 +21,10 @@ import {
   SEED_ENVIRONMENTS,
   MIN_DEV_SEED_PASSWORD_LENGTH,
   GetLessonQuizParamsSchema,
+  StartQuizAttemptBodySchema,
+  SaveDraftAnswerBodySchema,
+  QuizAttemptParamSchema,
+  QuizDraftAnswerParamSchema,
 } from "./index.js";
 
 describe("@aura/shared package", () => {
@@ -405,5 +409,56 @@ describe("@aura/shared package", () => {
       expect(parsed.success).toBe(false);
     });
   });
+
+  describe("FEAT-024 Academy Quiz Attempt Lifecycle Schemas", () => {
+    const validUuid = "11111111-1111-4111-8111-111111111111";
+    const validUuid2 = "22222222-2222-4222-8222-222222222222";
+
+    it("accepts empty body for StartQuizAttemptBodySchema", () => {
+      const parsed = StartQuizAttemptBodySchema.safeParse({});
+      expect(parsed.success).toBe(true);
+    });
+
+    it("strictly rejects client-supplied authoritative fields in StartQuizAttemptBodySchema", () => {
+      expect(StartQuizAttemptBodySchema.safeParse({ userId: "victim" }).success).toBe(false);
+      expect(StartQuizAttemptBodySchema.safeParse({ quizId: validUuid }).success).toBe(false);
+      expect(StartQuizAttemptBodySchema.safeParse({ status: "IN_PROGRESS" }).success).toBe(false);
+      expect(StartQuizAttemptBodySchema.safeParse({ score: 100 }).success).toBe(false);
+      expect(StartQuizAttemptBodySchema.safeParse({ passed: true }).success).toBe(false);
+      expect(StartQuizAttemptBodySchema.safeParse({ attemptNumber: 1 }).success).toBe(false);
+    });
+
+    it("validates SaveDraftAnswerBodySchema with valid UUID", () => {
+      const parsed = SaveDraftAnswerBodySchema.safeParse({ optionId: validUuid });
+      expect(parsed.success).toBe(true);
+    });
+
+    it("rejects invalid or extra fields in SaveDraftAnswerBodySchema", () => {
+      expect(SaveDraftAnswerBodySchema.safeParse({ optionId: "not-a-uuid" }).success).toBe(false);
+      expect(SaveDraftAnswerBodySchema.safeParse({ optionId: validUuid, isCorrect: true }).success).toBe(false);
+      expect(SaveDraftAnswerBodySchema.safeParse({}).success).toBe(false);
+    });
+
+    it("validates QuizAttemptParamSchema and QuizDraftAnswerParamSchema", () => {
+      expect(QuizAttemptParamSchema.safeParse({ attemptId: validUuid }).success).toBe(true);
+      expect(QuizAttemptParamSchema.safeParse({ attemptId: "bad" }).success).toBe(false);
+
+      expect(
+        QuizDraftAnswerParamSchema.safeParse({ attemptId: validUuid, questionId: validUuid2 }).success,
+      ).toBe(true);
+      expect(
+        QuizDraftAnswerParamSchema.safeParse({ attemptId: validUuid, questionId: "bad" }).success,
+      ).toBe(false);
+    });
+
+    it("exports required FEAT-024 canonical error codes", () => {
+      expect(ERROR_CODES.QUIZ_ATTEMPT_NOT_FOUND).toBe("QUIZ_ATTEMPT_NOT_FOUND");
+      expect(ERROR_CODES.ATTEMPT_ALREADY_FINALIZED).toBe("ATTEMPT_ALREADY_FINALIZED");
+      expect(ERROR_CODES.INVALID_OPTION_FOR_QUESTION).toBe("INVALID_OPTION_FOR_QUESTION");
+      expect(ERROR_CODES.UNAUTHENTICATED).toBe("UNAUTHENTICATED");
+      expect(ERROR_CODES.INTERNAL_ERROR).toBe("INTERNAL_ERROR");
+    });
+  });
 });
+
 

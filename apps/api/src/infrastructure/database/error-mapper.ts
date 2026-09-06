@@ -22,76 +22,84 @@ export function mapDatabaseError(err: unknown, fallbackMessage = "Database opera
     return err;
   }
 
+  let mapped: AppError;
+
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
     switch (err.code) {
       case "P2002": {
         // Unique constraint violation
         const target = Array.isArray(err.meta?.target) ? (err.meta.target as string[]).join(", ") : undefined;
         if (target && target.includes("email")) {
-          return new AppError(
+          mapped = new AppError(
             "An account with this email address already exists.",
             ERROR_CODES.AUTH_EMAIL_ALREADY_EXISTS,
             HTTP_STATUS.CONFLICT,
           );
+        } else {
+          mapped = new AppError(
+            "A resource with these unique identifiers already exists.",
+            ERROR_CODES.CONFLICT,
+            HTTP_STATUS.CONFLICT,
+          );
         }
-        return new AppError(
-          "A resource with these unique identifiers already exists.",
-          ERROR_CODES.CONFLICT,
-          HTTP_STATUS.CONFLICT,
-        );
+        break;
       }
       case "P2003": {
         // Foreign key constraint violation
-        return new AppError(
+        mapped = new AppError(
           "Referenced parent resource does not exist.",
           ERROR_CODES.VALIDATION_ERROR,
           HTTP_STATUS.BAD_REQUEST,
         );
+        break;
       }
       case "P2025": {
         // Record not found
-        return new AppError(
+        mapped = new AppError(
           "Requested resource was not found.",
           ERROR_CODES.NOT_FOUND,
           HTTP_STATUS.NOT_FOUND,
         );
+        break;
       }
       case "P2028": {
         // Transaction API error / timeout / expired
-        return new AppError(
+        mapped = new AppError(
           "Transaction expired or timed out.",
           ERROR_CODES.INTERNAL_ERROR,
           HTTP_STATUS.INTERNAL_SERVER_ERROR,
         );
+        break;
       }
       default:
-        return new AppError(
+        mapped = new AppError(
           fallbackMessage,
           ERROR_CODES.INTERNAL_ERROR,
           HTTP_STATUS.INTERNAL_SERVER_ERROR,
         );
+        break;
     }
-  }
-
-  if (err instanceof Prisma.PrismaClientInitializationError) {
-    return new AppError(
+  } else if (err instanceof Prisma.PrismaClientInitializationError) {
+    mapped = new AppError(
       "Database connection could not be established.",
       ERROR_CODES.INTERNAL_ERROR,
       HTTP_STATUS.SERVICE_UNAVAILABLE,
     );
-  }
-
-  if (err instanceof Prisma.PrismaClientRustPanicError) {
-    return new AppError(
+  } else if (err instanceof Prisma.PrismaClientRustPanicError) {
+    mapped = new AppError(
       "Critical database engine failure.",
+      ERROR_CODES.INTERNAL_ERROR,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+    );
+  } else {
+    mapped = new AppError(
+      fallbackMessage,
       ERROR_CODES.INTERNAL_ERROR,
       HTTP_STATUS.INTERNAL_SERVER_ERROR,
     );
   }
 
-  return new AppError(
-    fallbackMessage,
-    ERROR_CODES.INTERNAL_ERROR,
-    HTTP_STATUS.INTERNAL_SERVER_ERROR,
-  );
+  Object.assign(mapped, { cause: err });
+  return mapped;
 }
+

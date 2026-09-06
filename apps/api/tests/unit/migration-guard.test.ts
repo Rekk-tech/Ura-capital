@@ -24,7 +24,7 @@ describe("FEAT-012 Migration Reproducibility & Schema Governance Guard (Unit)", 
 
     it("verifies exact migration count and deterministic ordering of approved Phase 2 / FEAT-011 migrations", () => {
       const digests = computeMigrationDigests(migrationsDir);
-      expect(digests.length).toBe(4);
+      expect(digests.length).toBe(5);
 
       const migrationNames = digests.map((m) => m.migration);
       expect(migrationNames).toEqual([
@@ -32,7 +32,9 @@ describe("FEAT-012 Migration Reproducibility & Schema Governance Guard (Unit)", 
         "20260825000001_feat005_refresh_session_rotation",
         "20260827000000_feat009_audit_events",
         "20260903000000_feat019_academy_foundation",
+        "20260906000000_feat024_active_attempt_constraint",
       ]);
+
 
       // Every migration must have a non-empty 64-char SHA256 checksum
       for (const m of digests) {

@@ -493,7 +493,7 @@ Phase 3 Completion State:
 - FEAT-018 is DONE / QA PASS / Human Final Gate APPROVED.
 - Phase 3 is DONE / QA PASS / Human Final Gate APPROVED.
 - HISTORICAL SNAPSHOT (at Phase 3 completion): Phase 4 was IN_PROGRESS / PLANNING; FEAT-019 was APPROVED FOR IMPLEMENTATION; FEAT-020 through FEAT-030 remained BLOCKED.
-- CURRENT CANONICAL STATE: Phase 4 is IN_PROGRESS; FEAT-019 is DONE (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED); FEAT-020 is DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED); FEAT-021 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-022 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-023 is DONE (QA PASS, Human Final Gate APPROVED); FEAT-024 is UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED); FEAT-025 through FEAT-030 are BLOCKED by dependency order; Phase 5 is BLOCKED.
+- CURRENT CANONICAL STATE: Phase 4 is IN_PROGRESS; FEAT-019 is DONE (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED); FEAT-020 is DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED); FEAT-021 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-022 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-023 is DONE (QA PASS, Human Final Gate APPROVED); FEAT-024 is DONE (QA PASS — QA Iteration 1, Human Final Gate APPROVED); FEAT-025 is UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED); FEAT-026 through FEAT-030 are BLOCKED by dependency order; Phase 5 is BLOCKED.
 
 Feature Decomposition:
 
@@ -854,8 +854,8 @@ FEAT-020: DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final G
 FEAT-021: DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED)
 FEAT-022: DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED)
 FEAT-023: DONE (QA PASS, Human Final Gate APPROVED)
-FEAT-024: UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED)
-FEAT-025: BLOCKED by FEAT-024
+FEAT-024: DONE (QA PASS — QA Iteration 1, Human Final Gate APPROVED)
+FEAT-025: UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED)
 FEAT-026: BLOCKED by FEAT-020 / FEAT-024 / FEAT-025
 FEAT-027: BLOCKED by FEAT-025 / FEAT-026
 FEAT-028: BLOCKED by FEAT-020 through FEAT-027
@@ -871,8 +871,8 @@ Feature Decomposition:
 - FEAT-021: Academy Learner Course/Lesson UI - `DONE` (QA PASS — QA Iteration 2, Human Final Gate APPROVED)
 - FEAT-022: Flashcards Domain & Review Flow - `DONE` (QA PASS — QA Iteration 2, Human Final Gate APPROVED)
 - FEAT-023: Quiz Definition & Safe Projection - `DONE` (QA PASS, Human Final Gate APPROVED)
-- FEAT-024: Quiz Attempt Lifecycle - `UNBLOCKED FOR PLANNING` (Implementation: NOT_STARTED)
-- FEAT-025: Server-Side Quiz Evaluation & Secure Submission - `BLOCKED`
+- FEAT-024: Quiz Attempt Lifecycle - `DONE` (QA PASS — QA Iteration 1, Human Final Gate APPROVED)
+- FEAT-025: Server-Side Quiz Evaluation & Secure Submission - `UNBLOCKED FOR PLANNING` (Implementation: NOT_STARTED)
 - FEAT-026: Academy Progression & Completion Tracking - `BLOCKED`
 - FEAT-027: XP & Idempotent Reward Ledger - `BLOCKED`
 - FEAT-028: Academy Authorization & Ownership Hardening - `BLOCKED`
@@ -1067,6 +1067,36 @@ QA Report: reports/qa/phase-4/FEAT-023-QA.md
 Next Action: FEAT-023 complete. FEAT-024 UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED).
 ```
 
+FEAT-024 Status Fields:
+
+```text
+Lifecycle State: DONE
+Planning Status: COMPLETE (HUMAN APPROVED)
+Planning Owner: Antigravity — Temporary Planning Ownership Transfer
+Human Planning Approval: APPROVED
+Human Decisions:
+  - Active Attempt Policy: One active IN_PROGRESS attempt per (user, quiz) tuple — APPROVED BY HUMAN
+  - Database Enforcement: PostgreSQL partial unique index UNIQUE (quiz_id, user_id) WHERE status = 'IN_PROGRESS' — APPROVED BY HUMAN
+  - CREATED State Policy: Start creates IN_PROGRESS directly; CREATED schema-reserved and not active — APPROVED BY HUMAN
+  - Repeated Start Behavior: Idempotent return-existing active attempt (200 OK existing vs 201 Created new) — APPROVED BY HUMAN
+  - Concurrency Strategy: Layered defense (DB partial unique index + transaction advisory lock + P2002 race recovery) — APPROVED BY HUMAN
+  - Draft Answer Persistence Scope: Included in FEAT-024 with zero evaluation/scoring — APPROVED BY HUMAN
+  - Content Continuation & Historical Read: IN_PROGRESS unpublished rejected; SUBMITTED/GRADED owner safe read allowed — APPROVED BY HUMAN
+  - Strict Start Request Body: Empty object {} strictly enforced (authoritative fields rejected with 400) — APPROVED BY HUMAN
+  - Schema Migration Strategy: Minimal constraint-only migration (forward-only, preflight duplicate check) — APPROVED BY HUMAN
+Implementation: COMPLETE (Rework Iteration 1)
+QA Status: QA PASS (QA Iteration 1 + Report Closure)
+QA Report: reports/qa/phase-4/FEAT-024-QA.md
+Human Final Gate: APPROVED
+Feature Type: Backend Domain Lifecycle, State Foundation & Constraint Migration
+Scope Boundaries: Authenticated attempt start/read endpoints; active attempt invariant; draft answer persistence; minimal partial unique index migration; zero correctness leakage; zero scoring/grading; zero progress/XP/reward mutation; zero Redis authority
+Spec Package: .specify/specs/FEAT-024/
+Implementation Report: reports/implementation/phase-4/FEAT-024.md
+Acceptance Criteria: 20 deterministic criteria (AC-001..AC-020) with CRITICAL HARD GATE on Pre-Submission Correct Answer Secrecy
+Tasks: 11 implementation tasks completed (T1..T11)
+Next Action: FEAT-024 DONE. FEAT-025 UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED).
+```
+
 Artifacts:
 
 - `docs/phase-4-feature-decomposition.md`
@@ -1086,6 +1116,9 @@ Artifacts:
 - `.specify/specs/FEAT-023/`
 - `reports/implementation/phase-4/FEAT-023.md`
 - `reports/qa/phase-4/FEAT-023-QA.md`
+- `.specify/specs/FEAT-024/`
+- `reports/implementation/phase-4/FEAT-024.md`
+- `reports/qa/phase-4/FEAT-024-QA.md`
 
 ---
 

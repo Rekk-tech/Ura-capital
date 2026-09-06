@@ -36,7 +36,15 @@ function toUserEntity(user: PrismaUser): UserEntity {
 }
 
 export class PrismaUserRepository implements IUserRepository {
-  constructor(private readonly prisma: PrismaClient | Prisma.TransactionClient = getPrismaClient()) {}
+  private readonly client?: PrismaClient | Prisma.TransactionClient;
+
+  constructor(prisma?: PrismaClient | Prisma.TransactionClient) {
+    this.client = prisma;
+  }
+
+  private get prisma(): PrismaClient | Prisma.TransactionClient {
+    return this.client ?? getPrismaClient();
+  }
 
   async findById(id: string): Promise<UserEntity | null> {
     const user = await this.prisma.user.findUnique({

@@ -11,8 +11,9 @@
 - FEAT-021: DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED)
 - FEAT-022: DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED)
 - FEAT-023: DONE (Human Final Gate APPROVED)
-- FEAT-024: UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED)
-- FEAT-025+: BLOCKED according to dependency graph
+- FEAT-024: DONE (Human Final Gate APPROVED)
+- FEAT-025: UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED)
+- FEAT-026+: BLOCKED according to dependency graph
 - Phase 4: IN_PROGRESS
 - Phase 5: BLOCKED
 
@@ -190,8 +191,8 @@ Human decision required:
 | FEAT-021 | Academy Learner Course/Lesson UI | Implementation | DONE (Human Final Gate APPROVED) |
 | FEAT-022 | Flashcards Domain & Review Flow | Implementation | DONE (Human Final Gate APPROVED) |
 | FEAT-023 | Quiz Definition & Safe Projection | Implementation | DONE (Human Final Gate APPROVED) |
-| FEAT-024 | Quiz Attempt Lifecycle | Implementation | UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED) |
-| FEAT-025 | Server-Side Quiz Evaluation & Secure Submission | Implementation | FEAT-024 |
+| FEAT-024 | Quiz Attempt Lifecycle | Implementation | DONE (Human Final Gate APPROVED) |
+| FEAT-025 | Server-Side Quiz Evaluation & Secure Submission | Implementation | UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED) |
 | FEAT-026 | Academy Progression & Completion Tracking | Implementation | FEAT-020, FEAT-024, FEAT-025 |
 | FEAT-027 | XP & Idempotent Reward Ledger | Implementation | FEAT-025, FEAT-026 |
 | FEAT-028 | Academy Authorization & Ownership Hardening | Implementation / hardening | FEAT-020..FEAT-027 |

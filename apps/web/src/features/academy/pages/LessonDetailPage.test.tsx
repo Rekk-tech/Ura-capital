@@ -46,7 +46,7 @@ function renderWithProviders(courseSlug = "crypto-fundamentals", lessonSlug = "p
     },
   });
 
-  return render(
+  const renderResult = render(
     <QueryClientProvider client={queryClient}>
       <MemoryRouter initialEntries={[`/academy/courses/${courseSlug}/lessons/${lessonSlug}`]}>
         <Routes>
@@ -58,6 +58,54 @@ function renderWithProviders(courseSlug = "crypto-fundamentals", lessonSlug = "p
       </MemoryRouter>
     </QueryClientProvider>
   );
+
+  return { ...renderResult, queryClient };
+}
+
+const FORBIDDEN_CACHE_PATTERNS = [
+  /^user_?id$/i,
+  /^score$/i,
+  /^learner_?score$/i,
+  /^passed$/i,
+  /^is_?correct$/i,
+  /^correct$/i,
+  /^correct_?option/i,
+  /^correct_?option_?id$/i,
+  /^correct_?option_?id_?snapshot$/i,
+  /^correct_?option_?text_?snapshot$/i,
+  /^correct_?answer/i,
+  /^answer_?key$/i,
+  /^solution/i,
+  /^explanation$/i,
+  /^points/i,
+  /^grading$/i,
+  /^grading_?result$/i,
+  /^pass_?fail/i,
+  /^pass_?fail_?result$/i,
+  /^submitted_?at$/i,
+  /^graded_?at$/i,
+  /^completed_?at$/i,
+  /^question_?prompt_?snapshot$/i,
+  /^selected_?option_?text_?snapshot$/i,
+];
+
+function assertNoLeakageInValue(value: unknown, path = ""): void {
+  if (!value || typeof value !== "object") return;
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => assertNoLeakageInValue(item, `${path}[${index}]`));
+    return;
+  }
+  for (const [key, val] of Object.entries(value as Record<string, unknown>)) {
+    const currentPath = path ? `${path}.${key}` : key;
+    for (const pattern of FORBIDDEN_CACHE_PATTERNS) {
+      if (pattern.test(key)) {
+        throw new Error(
+          `SECURITY DEFECT AC-011: Forbidden key "${key}" detected at path "${currentPath}" in query cache.`,
+        );
+      }
+    }
+    assertNoLeakageInValue(val, currentPath);
+  }
 }
 
 describe("LessonDetailPage (Dual-Query, Navigation, Auth, Security - AC-007..AC-012, AC-017)", () => {
@@ -236,7 +284,7 @@ describe("LessonDetailPage (Dual-Query, Navigation, Auth, Security - AC-007..AC-
     expect(lessonSpy).toHaveBeenCalledTimes(2);
   });
 
-  it("renders informational quiz summary card when quiz is available (FEAT-023)", async () => {
+  it("renders informational quiz summary card with Start Quiz button when quiz is available (FEAT-023/FEAT-024)", async () => {
     vi.spyOn(academyApi, "getLessonBySlug").mockResolvedValue(mockLessonDetail);
     vi.spyOn(academyApi, "getCourseBySlug").mockResolvedValue(mockCourseDetail);
     vi.spyOn(academyApi, "getLessonQuiz").mockResolvedValue({
@@ -252,6 +300,9 @@ describe("LessonDetailPage (Dual-Query, Navigation, Auth, Security - AC-007..AC-
         questions: [],
       },
     });
+    vi.spyOn(academyApi, "getCurrentQuizAttempt").mockRejectedValue(
+      new AcademyApiError(404, "QUIZ_ATTEMPT_NOT_FOUND", "Quiz attempt not found")
+    );
 
     renderWithProviders();
 
@@ -263,8 +314,216 @@ describe("LessonDetailPage (Dual-Query, Navigation, Auth, Security - AC-007..AC-
     expect(screen.getByText("Test your understanding of mining consensus.")).toBeDefined();
     expect(screen.getByText("5 Questions")).toBeDefined();
     expect(screen.getByText("Passing Score: 80%")).toBeDefined();
-    expect(screen.getByText(/Quiz attempts are not available yet/i)).toBeDefined();
+    expect(screen.getByTestId("start-quiz-button")).toBeDefined();
+    expect(screen.getByText("Start Quiz")).toBeDefined();
     // Verify zero engineering jargon
     expect(screen.queryByText(/FEAT-/i)).toBeNull();
   });
+
+  it("triggers startQuizAttempt mutation when Start Quiz button is clicked (FEAT-024 AC-018)", async () => {
+    vi.spyOn(academyApi, "getLessonBySlug").mockResolvedValue(mockLessonDetail);
+    vi.spyOn(academyApi, "getCourseBySlug").mockResolvedValue(mockCourseDetail);
+    vi.spyOn(academyApi, "getLessonQuiz").mockResolvedValue({
+      data: {
+        id: "quiz-uuid-1",
+        courseSlug: "crypto-fundamentals",
+        lessonSlug: "proof-of-work",
+        lessonTitle: "Proof of Work Consensus",
+        title: "Proof of Work Mastery Quiz",
+        description: "Test your understanding of mining consensus.",
+        passingScore: 80,
+        totalQuestions: 1,
+        questions: [
+          {
+            id: "q-1",
+            prompt: "What is hashing?",
+            type: "SINGLE_CHOICE",
+            order: 1,
+            options: [
+              { id: "opt-1", text: "One-way function", order: 1 },
+              { id: "opt-2", text: "Two-way encryption", order: 2 },
+            ],
+          },
+        ],
+      },
+    });
+    vi.spyOn(academyApi, "getCurrentQuizAttempt").mockRejectedValue(
+      new AcademyApiError(404, "QUIZ_ATTEMPT_NOT_FOUND", "Quiz attempt not found")
+    );
+    const startAttemptSpy = vi.spyOn(academyApi, "startQuizAttempt").mockResolvedValue({
+      data: {
+        id: "attempt-uuid-1",
+        quizId: "quiz-uuid-1",
+        attemptNumber: 1,
+        status: "IN_PROGRESS",
+        startedAt: new Date().toISOString(),
+        answers: [],
+      },
+    });
+
+    renderWithProviders();
+
+    await waitFor(() => {
+      expect(screen.getByTestId("start-quiz-button")).toBeDefined();
+    });
+
+    const startBtn = screen.getByTestId("start-quiz-button");
+    fireEvent.click(startBtn);
+
+    await waitFor(() => {
+      expect(startAttemptSpy).toHaveBeenCalledWith("crypto-fundamentals", "proof-of-work", undefined);
+    });
+  });
+
+  it("renders active quiz attempt questions, restores draft answers, and saves draft selection (FEAT-024 AC-010, AC-018)", async () => {
+    vi.spyOn(academyApi, "getLessonBySlug").mockResolvedValue(mockLessonDetail);
+    vi.spyOn(academyApi, "getCourseBySlug").mockResolvedValue(mockCourseDetail);
+    vi.spyOn(academyApi, "getLessonQuiz").mockResolvedValue({
+      data: {
+        id: "quiz-uuid-1",
+        courseSlug: "crypto-fundamentals",
+        lessonSlug: "proof-of-work",
+        lessonTitle: "Proof of Work Consensus",
+        title: "Proof of Work Mastery Quiz",
+        description: "Test your understanding of mining consensus.",
+        passingScore: 80,
+        totalQuestions: 1,
+        questions: [
+          {
+            id: "q-1",
+            prompt: "What is hashing?",
+            type: "SINGLE_CHOICE",
+            order: 1,
+            options: [
+              { id: "opt-1", text: "One-way function", order: 1 },
+              { id: "opt-2", text: "Two-way encryption", order: 2 },
+            ],
+          },
+        ],
+      },
+    });
+    vi.spyOn(academyApi, "getCurrentQuizAttempt").mockResolvedValue({
+      data: {
+        id: "attempt-uuid-1",
+        quizId: "quiz-uuid-1",
+        attemptNumber: 1,
+        status: "IN_PROGRESS",
+        startedAt: new Date().toISOString(),
+        answers: [
+          {
+            questionId: "q-1",
+            selectedOptionId: "opt-1",
+            updatedAt: new Date().toISOString(),
+          },
+        ],
+      },
+    });
+
+    const saveDraftSpy = vi.spyOn(academyApi, "saveDraftQuizAnswer").mockResolvedValue({
+      data: {
+        questionId: "q-1",
+        selectedOptionId: "opt-2",
+        updatedAt: new Date().toISOString(),
+      },
+    });
+
+    renderWithProviders();
+
+    await waitFor(() => {
+      expect(screen.getByTestId("quiz-attempt-container")).toBeDefined();
+    });
+
+    // Check attempt badge
+    expect(screen.getByTestId("attempt-status-badge")).toBeDefined();
+    expect(screen.getByText(/Attempt #1 • In Progress/i)).toBeDefined();
+
+    // Check restored selection
+    const radio1 = screen.getByTestId("radio-opt-1") as HTMLInputElement;
+    const radio2 = screen.getByTestId("radio-opt-2") as HTMLInputElement;
+    expect(radio1.checked).toBe(true);
+    expect(radio2.checked).toBe(false);
+
+    // Select option 2
+    fireEvent.click(radio2);
+
+    await waitFor(() => {
+      expect(saveDraftSpy).toHaveBeenCalledWith("attempt-uuid-1", "q-1", "opt-2", undefined);
+    });
+  });
+
+  it("strictly enforces AC-011 secrecy: contains zero submit, score, or correctness leak in DOM (FEAT-024)", async () => {
+    vi.spyOn(academyApi, "getLessonBySlug").mockResolvedValue(mockLessonDetail);
+    vi.spyOn(academyApi, "getCourseBySlug").mockResolvedValue(mockCourseDetail);
+    vi.spyOn(academyApi, "getLessonQuiz").mockResolvedValue({
+      data: {
+        id: "quiz-uuid-1",
+        courseSlug: "crypto-fundamentals",
+        lessonSlug: "proof-of-work",
+        lessonTitle: "Proof of Work Consensus",
+        title: "Proof of Work Mastery Quiz",
+        description: "Test your understanding of mining consensus.",
+        passingScore: 80,
+        totalQuestions: 1,
+        questions: [
+          {
+            id: "q-1",
+            prompt: "What is hashing?",
+            type: "SINGLE_CHOICE",
+            order: 1,
+            options: [
+              { id: "opt-1", text: "One-way function", order: 1 },
+              { id: "opt-2", text: "Two-way encryption", order: 2 },
+            ],
+          },
+        ],
+      },
+    });
+    vi.spyOn(academyApi, "getCurrentQuizAttempt").mockResolvedValue({
+      data: {
+        id: "attempt-uuid-1",
+        quizId: "quiz-uuid-1",
+        attemptNumber: 1,
+        status: "IN_PROGRESS",
+        startedAt: new Date().toISOString(),
+        answers: [],
+      },
+    });
+
+    const { container, queryClient } = renderWithProviders();
+
+    await waitFor(() => {
+      expect(screen.getByTestId("quiz-attempt-container")).toBeDefined();
+    });
+
+    const text = container.textContent ?? "";
+    const lowerHtml = container.innerHTML.toLowerCase();
+
+    // Zero submission controls
+    expect(screen.queryByRole("button", { name: /submit/i })).toBeNull();
+    // Zero correctness evaluation
+    expect(screen.queryByText(/isCorrect/i)).toBeNull();
+    expect(screen.queryByText(/correctOption/i)).toBeNull();
+    expect(screen.queryByText(/correct answer/i)).toBeNull();
+    expect(screen.queryByText(/incorrect/i)).toBeNull();
+    expect(lowerHtml).not.toContain("is_correct");
+    expect(text.toLowerCase()).not.toContain("is_correct");
+    expect(lowerHtml).not.toContain("correctoptionidsnapshot");
+    // Zero score or evaluation result
+    expect(screen.queryByText(/your score/i)).toBeNull();
+    expect(screen.queryByText(/passed!/i)).toBeNull();
+    expect(screen.queryByText(/failed!/i)).toBeNull();
+
+    // AC-011 & Defect Regression: Query cache must contain ZERO forbidden keys
+    const cachedCurrentAttempt = queryClient.getQueryData([
+      "academy",
+      "quiz-attempt",
+      "current",
+      "crypto-fundamentals",
+      "proof-of-work",
+    ]);
+    expect(cachedCurrentAttempt).toBeDefined();
+    assertNoLeakageInValue(cachedCurrentAttempt);
+  });
 });
+
+

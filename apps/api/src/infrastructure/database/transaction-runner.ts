@@ -27,10 +27,18 @@ export type RepositoryFactory = (client: PrismaClient | Prisma.TransactionClient
 export class PrismaTransactionRunner implements ITransactionRunner {
   private readonly asyncLocalStorage = new AsyncLocalStorage<TransactionContext>();
 
+  private readonly client?: PrismaClient;
+
   constructor(
-    private readonly prisma: PrismaClient = getPrismaClient(),
+    prisma?: PrismaClient,
     private readonly repoFactory: RepositoryFactory = createRepositoryContainer,
-  ) {}
+  ) {
+    this.client = prisma;
+  }
+
+  private get prisma(): PrismaClient {
+    return this.client ?? getPrismaClient();
+  }
 
   /**
    * Returns the currently active TransactionContext in this async execution stack, or undefined.

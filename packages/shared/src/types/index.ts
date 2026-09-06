@@ -58,3 +58,49 @@ export interface QuizDefinitionDto {
 export interface QuizDefinitionResponse {
   data: QuizDefinitionDto;
 }
+
+// FEAT-024 Quiz Attempt Lifecycle DTOs
+export interface QuizDraftAnswerDto {
+  questionId: string;
+  selectedOptionId: string | null;
+  updatedAt: string;
+}
+
+export interface QuizAttemptDto {
+  id: string;
+  quizId: string;
+  attemptNumber: number;
+  status: "CREATED" | "IN_PROGRESS" | "SUBMITTED" | "GRADED";
+  startedAt: string;
+  answers: QuizDraftAnswerDto[];
+}
+
+export interface StartAttemptResult {
+  attempt: QuizAttemptDto;
+  created: boolean;
+}
+
+export interface StartQuizAttemptResponse {
+  data: QuizAttemptDto;
+}
+
+export interface CurrentQuizAttemptResponse {
+  data: QuizAttemptDto;
+}
+
+export interface QuizAttemptResponse {
+  data: QuizAttemptDto;
+}
+
+export interface SaveDraftAnswerRequest {
+  optionId: string;
+}
+
+export interface SaveDraftAnswerResponse {
+  data: {
+    questionId: string;
+    selectedOptionId: string;
+    updatedAt: string;
+  };
+}
+

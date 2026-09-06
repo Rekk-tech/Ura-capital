@@ -243,3 +243,85 @@ export function toQuizDefinitionDto(entity: {
   };
 }
 
+// FEAT-024: Quiz Attempt Lifecycle DTOs and Mappers
+
+export interface QuizDraftAnswerDto {
+  questionId: string;
+  selectedOptionId: string | null;
+  updatedAt: string;
+}
+
+export interface QuizAttemptDto {
+  id: string;
+  quizId: string;
+  attemptNumber: number;
+  status: "CREATED" | "IN_PROGRESS" | "SUBMITTED" | "GRADED";
+  startedAt: string;
+  answers: QuizDraftAnswerDto[];
+}
+
+export interface StartAttemptResult {
+  attempt: QuizAttemptDto;
+  created: boolean;
+}
+
+export interface StartQuizAttemptResponse {
+  data: QuizAttemptDto;
+}
+
+export interface CurrentQuizAttemptResponse {
+  data: QuizAttemptDto;
+}
+
+export interface QuizAttemptResponse {
+  data: QuizAttemptDto;
+}
+
+export interface SaveDraftAnswerResponse {
+  data: {
+    questionId: string;
+    selectedOptionId: string;
+    updatedAt: string;
+  };
+}
+
+export function toQuizDraftAnswerDto(entity: {
+  questionId: string;
+  selectedOptionId?: string | null;
+  updatedAt: Date | string;
+}): QuizDraftAnswerDto {
+  return {
+    questionId: entity.questionId,
+    selectedOptionId: entity.selectedOptionId ?? null,
+    updatedAt:
+      entity.updatedAt instanceof Date
+        ? entity.updatedAt.toISOString()
+        : String(entity.updatedAt),
+  };
+}
+
+export function toQuizAttemptDto(entity: {
+  id: string;
+  quizId: string;
+  attemptNumber: number;
+  status: string;
+  startedAt: Date | string;
+  answers?: Array<{
+    questionId: string;
+    selectedOptionId?: string | null;
+    updatedAt: Date | string;
+  }>;
+}): QuizAttemptDto {
+  return {
+    id: entity.id,
+    quizId: entity.quizId,
+    attemptNumber: entity.attemptNumber,
+    status: entity.status as "CREATED" | "IN_PROGRESS" | "SUBMITTED" | "GRADED",
+    startedAt:
+      entity.startedAt instanceof Date
+        ? entity.startedAt.toISOString()
+        : String(entity.startedAt),
+    answers: (entity.answers ?? []).map(toQuizDraftAnswerDto),
+  };
+}
+

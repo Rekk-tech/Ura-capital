@@ -240,5 +240,112 @@ describe("AcademyApiClient (Unit/Contract - AC-002, AC-012)", () => {
       await expect(client.getLessonQuiz("market-intro", "lesson-1")).rejects.toThrow(AcademyApiError);
     });
   });
+
+  describe("startQuizAttempt (FEAT-024)", () => {
+    it("calls POST .../quiz/attempts with empty object body and Bearer token", async () => {
+      const mockAttempt = {
+        data: {
+          id: "attempt-1",
+          quizId: "quiz-1",
+          attemptNumber: 1,
+          status: "IN_PROGRESS" as const,
+          startedAt: "2026-09-06T00:00:00.000Z",
+          answers: [],
+        },
+      };
+
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => mockAttempt,
+      });
+      globalThis.fetch = fetchMock;
+
+      const result = await client.startQuizAttempt("crypto-basics", "pow", "token-abc");
+
+      expect(fetchMock).toHaveBeenCalledWith(
+        "/api/academy/courses/crypto-basics/lessons/pow/quiz/attempts",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: "Bearer token-abc",
+          },
+          body: JSON.stringify({}),
+        },
+      );
+      expect(result).toEqual(mockAttempt);
+    });
+  });
+
+  describe("getCurrentQuizAttempt (FEAT-024)", () => {
+    it("calls GET .../quiz/attempts/current with Bearer token", async () => {
+      const mockAttempt = {
+        data: {
+          id: "attempt-1",
+          quizId: "quiz-1",
+          attemptNumber: 1,
+          status: "IN_PROGRESS" as const,
+          startedAt: "2026-09-06T00:00:00.000Z",
+          answers: [],
+        },
+      };
+
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => mockAttempt,
+      });
+      globalThis.fetch = fetchMock;
+
+      const result = await client.getCurrentQuizAttempt("crypto-basics", "pow", "token-abc");
+
+      expect(fetchMock).toHaveBeenCalledWith(
+        "/api/academy/courses/crypto-basics/lessons/pow/quiz/attempts/current",
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            Authorization: "Bearer token-abc",
+          },
+        },
+      );
+      expect(result).toEqual(mockAttempt);
+    });
+  });
+
+  describe("saveDraftQuizAnswer (FEAT-024)", () => {
+    it("calls PUT /api/academy/quiz-attempts/:attemptId/answers/:questionId with optionId", async () => {
+      const mockAnswer = {
+        data: {
+          questionId: "q-1",
+          selectedOptionId: "opt-1",
+          updatedAt: "2026-09-06T00:00:00.000Z",
+        },
+      };
+
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => mockAnswer,
+      });
+      globalThis.fetch = fetchMock;
+
+      const result = await client.saveDraftQuizAnswer("attempt-1", "q-1", "opt-1", "token-abc");
+
+      expect(fetchMock).toHaveBeenCalledWith(
+        "/api/academy/quiz-attempts/attempt-1/answers/q-1",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: "Bearer token-abc",
+          },
+          body: JSON.stringify({ optionId: "opt-1" }),
+        },
+      );
+      expect(result).toEqual(mockAnswer);
+    });
+  });
 });
+
 

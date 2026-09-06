@@ -1,5 +1,4 @@
 import type { PrismaClient, Prisma } from "@prisma/client";
-import { getPrismaClient } from "./prisma.js";
 import {
   type IUserRepository,
   PrismaUserRepository,
@@ -40,6 +39,7 @@ export interface IRepositoryContainer {
   readonly credentialRepo: ICredentialRepository;
   readonly roleRepo: IRoleRepository;
   readonly refreshSessionRepo: IRefreshSessionRepository;
+  readonly sessionRepo: IRefreshSessionRepository;
   readonly auditRepo: IAuditRepository;
   readonly academyCourseRepo: IAcademyCourseRepository;
   readonly academyQuizRepo: IAcademyQuizRepository;
@@ -53,13 +53,15 @@ export interface IRepositoryContainer {
  * When called without arguments or with root PrismaClient, repositories use root client.
  */
 export function createRepositoryContainer(
-  client: PrismaClient | Prisma.TransactionClient = getPrismaClient(),
+  client?: PrismaClient | Prisma.TransactionClient,
 ): IRepositoryContainer {
+  const refreshSessionRepo = new PrismaRefreshSessionRepository(client);
   return {
     userRepo: new PrismaUserRepository(client),
     credentialRepo: new PrismaCredentialRepository(client),
     roleRepo: new PrismaRoleRepository(client),
-    refreshSessionRepo: new PrismaRefreshSessionRepository(client),
+    refreshSessionRepo,
+    sessionRepo: refreshSessionRepo,
     auditRepo: new PrismaAuditRepository(client),
     academyCourseRepo: new PrismaAcademyCourseRepository(client),
     academyQuizRepo: new PrismaAcademyQuizRepository(client),

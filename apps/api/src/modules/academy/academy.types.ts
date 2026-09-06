@@ -129,6 +129,7 @@ export type {
   LessonFlashcardsResponseDto,
   LessonFlashcardsResponse,
 } from "./academy.dto.js";
+import type { AcademyQuizAttempt, AcademyQuizAnswer } from "@prisma/client";
 
 export interface PublishedQuizRecord {
   id: string;
@@ -155,4 +156,20 @@ export interface PublishedQuizRecord {
   }>;
 }
 
+export type AcademyQuizAttemptWithAnswers = AcademyQuizAttempt & {
+  answers: AcademyQuizAnswer[];
+};
 
+export interface StartAttemptRepoResult {
+  attempt: AcademyQuizAttemptWithAnswers;
+  created: boolean;
+}
+
+export interface UpsertDraftAnswerInput {
+  attemptId: string;
+  quizId: string;
+  questionId: string;
+  selectedOptionId: string;
+  questionPromptSnapshot: string;
+  selectedOptionTextSnapshot: string;
+}

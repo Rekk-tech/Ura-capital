@@ -56,3 +56,30 @@ export const getLessonQuizParamsSchema = z.object({
 
 export type GetLessonQuizParams = z.infer<typeof getLessonQuizParamsSchema>;
 
+// FEAT-024: Quiz Attempt Lifecycle Validation
+export const startQuizAttemptBodySchema = z.object({}).strict();
+
+export const saveDraftAnswerBodySchema = z
+  .object({
+    optionId: z.string().uuid("Invalid optionId format"),
+  })
+  .strict();
+
+export const quizAttemptParamSchema = z
+  .object({
+    attemptId: z.string().uuid("Invalid attemptId format"),
+  })
+  .strict();
+
+export const quizDraftAnswerParamSchema = z
+  .object({
+    attemptId: z.string().uuid("Invalid attemptId format"),
+    questionId: z.string().uuid("Invalid questionId format"),
+  })
+  .strict();
+
+export type StartQuizAttemptBody = z.infer<typeof startQuizAttemptBodySchema>;
+export type SaveDraftAnswerBody = z.infer<typeof saveDraftAnswerBodySchema>;
+export type QuizAttemptParam = z.infer<typeof quizAttemptParamSchema>;
+export type QuizDraftAnswerParam = z.infer<typeof quizDraftAnswerParamSchema>;
+

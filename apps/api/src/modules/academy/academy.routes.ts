@@ -4,8 +4,14 @@ import { createRepositoryContainer } from "../../infrastructure/database/reposit
 import { AcademyCourseReadService } from "./academy-course-read.service.js";
 import { AcademyQuizReadService } from "./academy-quiz-read.service.js";
 import { AcademyCourseController } from "./academy-course.controller.js";
+import { AcademyQuizAttemptService } from "./academy-quiz-attempt.service.js";
+import { AcademyQuizAttemptController } from "./academy-quiz-attempt.controller.js";
+import { transactionRunner } from "../../infrastructure/database/transaction-runner.js";
 
-export function createAcademyRouter(controller?: AcademyCourseController): Router {
+export function createAcademyRouter(
+  controller?: AcademyCourseController,
+  attemptController?: AcademyQuizAttemptController,
+): Router {
   const router = Router();
   const repoContainer = createRepositoryContainer();
   const ctrl =
@@ -13,6 +19,11 @@ export function createAcademyRouter(controller?: AcademyCourseController): Route
     new AcademyCourseController(
       new AcademyCourseReadService(repoContainer.academyCourseRepo),
       new AcademyQuizReadService(repoContainer.academyQuizRepo),
+    );
+  const attemptCtrl =
+    attemptController ??
+    new AcademyQuizAttemptController(
+      new AcademyQuizAttemptService(repoContainer.academyQuizRepo, transactionRunner),
     );
 
   // 1. Course Catalog (Public)
@@ -59,8 +70,57 @@ export function createAcademyRouter(controller?: AcademyCourseController): Route
     (req, res, next) => ctrl.getLessonQuiz(req, res, next),
   );
 
+  // 6. Start Quiz Attempt (Authenticated)
+  router.post(
+    "/api/academy/courses/:courseSlug/lessons/:lessonSlug/quiz/attempts",
+    authenticate,
+    (req, res, next) => attemptCtrl.startAttempt(req, res, next),
+  );
+  router.post(
+    "/academy/courses/:courseSlug/lessons/:lessonSlug/quiz/attempts",
+    authenticate,
+    (req, res, next) => attemptCtrl.startAttempt(req, res, next),
+  );
+
+  // 7. Get Current Active Attempt (Authenticated)
+  router.get(
+    "/api/academy/courses/:courseSlug/lessons/:lessonSlug/quiz/attempts/current",
+    authenticate,
+    (req, res, next) => attemptCtrl.getCurrentAttempt(req, res, next),
+  );
+  router.get(
+    "/academy/courses/:courseSlug/lessons/:lessonSlug/quiz/attempts/current",
+    authenticate,
+    (req, res, next) => attemptCtrl.getCurrentAttempt(req, res, next),
+  );
+
+  // 8. Get Attempt By ID (Authenticated)
+  router.get(
+    "/api/academy/quiz-attempts/:attemptId",
+    authenticate,
+    (req, res, next) => attemptCtrl.getAttemptById(req, res, next),
+  );
+  router.get(
+    "/academy/quiz-attempts/:attemptId",
+    authenticate,
+    (req, res, next) => attemptCtrl.getAttemptById(req, res, next),
+  );
+
+  // 9. Record Draft Answer (Authenticated)
+  router.put(
+    "/api/academy/quiz-attempts/:attemptId/answers/:questionId",
+    authenticate,
+    (req, res, next) => attemptCtrl.recordDraftAnswer(req, res, next),
+  );
+  router.put(
+    "/academy/quiz-attempts/:attemptId/answers/:questionId",
+    authenticate,
+    (req, res, next) => attemptCtrl.recordDraftAnswer(req, res, next),
+  );
+
   return router;
 }
 
 export const academyRouter = createAcademyRouter();
+
 
