@@ -1,7 +1,7 @@
 import React from "react";
 import { useParams, Link } from "react-router-dom";
-import { ChevronRight, ArrowLeft, ArrowRight, BookOpen, Layers } from "lucide-react";
-import { useLessonQuery, useCourseQuery } from "../hooks/use-academy";
+import { ChevronRight, ArrowLeft, ArrowRight, BookOpen, Layers, HelpCircle } from "lucide-react";
+import { useLessonQuery, useCourseQuery, useLessonQuizQuery } from "../hooks/use-academy";
 import { LessonContent } from "../components/LessonContent";
 import { LessonDetailSkeleton, AuthRequiredCard, NotFoundState, ErrorState } from "../components/AcademyStates";
 import { AcademyApiError } from "../types/academy-ui.types";
@@ -14,6 +14,9 @@ export const LessonDetailPage: React.FC = () => {
 
   // Query B: Course outline & metadata for navigation
   const courseQuery = useCourseQuery(courseSlug);
+
+  // Query C: Lesson Quiz Definition (FEAT-023 Informational summary)
+  const quizQuery = useLessonQuizQuery(courseSlug, lessonSlug);
 
   // 1. Handle Lesson Query Loading State
   if (lessonQuery.isLoading) {
@@ -129,6 +132,66 @@ export const LessonDetailPage: React.FC = () => {
         <main className="lesson-content-container">
           <LessonContent content={lesson.content} />
         </main>
+
+        {/* FEAT-023 Informational Quiz Summary Card */}
+        {quizQuery.data?.data && (
+          <section
+            className="lesson-quiz-section"
+            data-testid="lesson-quiz-card"
+            style={{
+              marginTop: "2.5rem",
+              padding: "1.5rem",
+              borderRadius: "0.75rem",
+              border: "1px solid var(--color-border, #334155)",
+              backgroundColor: "var(--color-surface, #1e293b)",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.75rem" }}>
+              <HelpCircle size={20} style={{ color: "var(--color-primary, #38bdf8)" }} aria-hidden="true" />
+              <h2 style={{ fontSize: "1.25rem", fontWeight: 600, margin: 0 }}>
+                {quizQuery.data.data.title}
+              </h2>
+            </div>
+            {quizQuery.data.data.description && (
+              <p style={{ color: "var(--color-text-muted, #94a3b8)", marginBottom: "1rem" }}>
+                {quizQuery.data.data.description}
+              </p>
+            )}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "center", marginBottom: "1rem" }}>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  padding: "0.25rem 0.75rem",
+                  borderRadius: "9999px",
+                  fontSize: "0.875rem",
+                  backgroundColor: "rgba(56, 189, 248, 0.1)",
+                  color: "#38bdf8",
+                }}
+                data-testid="quiz-question-count"
+              >
+                {quizQuery.data.data.totalQuestions} {quizQuery.data.data.totalQuestions === 1 ? "Question" : "Questions"}
+              </span>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  padding: "0.25rem 0.75rem",
+                  borderRadius: "9999px",
+                  fontSize: "0.875rem",
+                  backgroundColor: "rgba(16, 185, 129, 0.1)",
+                  color: "#10b981",
+                }}
+                data-testid="quiz-passing-score"
+              >
+                Passing Score: {quizQuery.data.data.passingScore}%
+              </span>
+            </div>
+            <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted, #94a3b8)", margin: 0 }}>
+              Quiz available &bull; Quiz attempts are not available yet
+            </p>
+          </section>
+        )}
 
         {/* Dual Navigation: Bottom Footer Controls */}
         <footer className="lesson-footer-nav" aria-label="Lesson navigation">

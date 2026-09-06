@@ -28,6 +28,7 @@ import type {
   UpsertLessonProgressInput,
   RecordRewardInput,
   ListPublishedCoursesParams,
+  PublishedQuizRecord,
 } from "./academy.types.js";
 
 type DbClient = PrismaClient | Prisma.TransactionClient;
@@ -298,6 +299,10 @@ export interface IAcademyQuizRepository {
   findAttemptById(id: string): Promise<AcademyQuizAttempt | null>;
   createAnswer(data: CreateQuizAnswerInput): Promise<AcademyQuizAnswer>;
   findAnswersByAttempt(attemptId: string): Promise<AcademyQuizAnswer[]>;
+  findPublishedQuizByLesson(
+    courseSlug: string,
+    lessonSlug: string,
+  ): Promise<PublishedQuizRecord | null>;
 }
 
 export class PrismaAcademyQuizRepository implements IAcademyQuizRepository {
@@ -472,6 +477,62 @@ export class PrismaAcademyQuizRepository implements IAcademyQuizRepository {
     return this.prisma.academyQuizAnswer.findMany({
       where: { attemptId },
     });
+  }
+
+  async findPublishedQuizByLesson(
+    courseSlug: string,
+    lessonSlug: string,
+  ): Promise<PublishedQuizRecord | null> {
+    const quiz = await this.prisma.academyQuiz.findFirst({
+      where: {
+        status: "PUBLISHED",
+        lesson: {
+          slug: lessonSlug,
+          status: "PUBLISHED",
+          course: {
+            slug: courseSlug,
+            status: "PUBLISHED",
+          },
+        },
+      },
+      orderBy: { order: "asc" },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        passingScore: true,
+        lesson: {
+          select: {
+            title: true,
+            slug: true,
+            course: {
+              select: {
+                slug: true,
+              },
+            },
+          },
+        },
+        questions: {
+          select: {
+            id: true,
+            prompt: true,
+            type: true,
+            order: true,
+            options: {
+              select: {
+                id: true,
+                text: true,
+                order: true,
+              },
+              orderBy: { order: "asc" },
+            },
+          },
+          orderBy: { order: "asc" },
+        },
+      },
+    });
+
+    return quiz as PublishedQuizRecord | null;
   }
 }
 

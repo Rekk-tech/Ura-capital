@@ -149,3 +149,97 @@ export function toFlashcardItemDto(entity: {
   };
 }
 
+// FEAT-023: Quiz Definition & Safe Projection DTOs and Mappers
+
+export interface QuizOptionDto {
+  id: string;
+  text: string;
+  order: number;
+}
+
+export interface QuizQuestionDto {
+  id: string;
+  prompt: string;
+  type: "SINGLE_CHOICE";
+  order: number;
+  options: QuizOptionDto[];
+}
+
+export interface QuizDefinitionDto {
+  id: string;
+  courseSlug: string;
+  lessonSlug: string;
+  lessonTitle: string;
+  title: string;
+  description: string | null;
+  passingScore: number;
+  totalQuestions: number;
+  questions: QuizQuestionDto[];
+}
+
+export interface QuizDefinitionResponse {
+  data: QuizDefinitionDto;
+}
+
+export function toQuizOptionDto(entity: {
+  id: string;
+  text: string;
+  order: number;
+}): QuizOptionDto {
+  return {
+    id: entity.id,
+    text: entity.text,
+    order: entity.order,
+  };
+}
+
+export function toQuizQuestionDto(entity: {
+  id: string;
+  prompt: string;
+  type: string;
+  order: number;
+  options?: Array<{ id: string; text: string; order: number }>;
+}): QuizQuestionDto {
+  return {
+    id: entity.id,
+    prompt: entity.prompt,
+    type: "SINGLE_CHOICE",
+    order: entity.order,
+    options: (entity.options ?? []).map(toQuizOptionDto),
+  };
+}
+
+export function toQuizDefinitionDto(entity: {
+  id: string;
+  title: string;
+  description?: string | null;
+  passingScore: number;
+  lesson: {
+    title: string;
+    slug: string;
+    course: {
+      slug: string;
+    };
+  };
+  questions?: Array<{
+    id: string;
+    prompt: string;
+    type: string;
+    order: number;
+    options?: Array<{ id: string; text: string; order: number }>;
+  }>;
+}): QuizDefinitionDto {
+  const mappedQuestions = (entity.questions ?? []).map(toQuizQuestionDto);
+  return {
+    id: entity.id,
+    courseSlug: entity.lesson.course.slug,
+    lessonSlug: entity.lesson.slug,
+    lessonTitle: entity.lesson.title,
+    title: entity.title,
+    description: entity.description ?? null,
+    passingScore: entity.passingScore,
+    totalQuestions: mappedQuestions.length,
+    questions: mappedQuestions,
+  };
+}
+

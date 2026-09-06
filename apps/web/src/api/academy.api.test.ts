@@ -180,4 +180,65 @@ describe("AcademyApiClient (Unit/Contract - AC-002, AC-012)", () => {
       }
     });
   });
+
+  describe("getLessonQuiz (FEAT-023)", () => {
+    it("calls GET /api/academy/courses/:courseSlug/lessons/:lessonSlug/quiz with auth header", async () => {
+      const mockQuiz = {
+        data: {
+          id: "quiz-1",
+          courseSlug: "market-intro",
+          lessonSlug: "lesson-1",
+          lessonTitle: "What is a Market?",
+          title: "Market Quiz",
+          description: "Test market basics",
+          passingScore: 80,
+          totalQuestions: 1,
+          questions: [
+            {
+              id: "q-1",
+              prompt: "What is a market?",
+              type: "SINGLE_CHOICE" as const,
+              order: 1,
+              options: [
+                { id: "opt-1", text: "A place to trade", order: 1 },
+              ],
+            },
+          ],
+        },
+      };
+
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => mockQuiz,
+      });
+      globalThis.fetch = fetchMock;
+
+      const result = await client.getLessonQuiz("market-intro", "lesson-1", "mock-token-xyz");
+
+      expect(fetchMock).toHaveBeenCalledWith("/api/academy/courses/market-intro/lessons/lesson-1/quiz", {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Authorization: "Bearer mock-token-xyz",
+        },
+      });
+      expect(result).toEqual(mockQuiz);
+    });
+
+    it("throws AcademyApiError on 404 response", async () => {
+      globalThis.fetch = vi.fn().mockResolvedValue({
+        ok: false,
+        status: 404,
+        json: async () => ({
+          error: {
+            code: "NOT_FOUND",
+            message: "Resource not found",
+          },
+        }),
+      });
+
+      await expect(client.getLessonQuiz("market-intro", "lesson-1")).rejects.toThrow(AcademyApiError);
+    });
+  });
 });
+

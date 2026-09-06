@@ -207,3 +207,20 @@ export const RefreshResponseSchema = z.object({
   expiresIn: z.number().int().positive(),
   user: SafeUserSchema,
 });
+
+// FEAT-023 Academy Quiz Definition Schemas
+export const GetLessonQuizParamsSchema = z.object({
+  courseSlug: z
+    .string()
+    .min(1)
+    .max(120)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Invalid course slug format"),
+  lessonSlug: z
+    .string()
+    .min(1)
+    .max(120)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Invalid lesson slug format"),
+});
+
+export type GetLessonQuizParams = z.infer<typeof GetLessonQuizParamsSchema>;
+

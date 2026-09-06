@@ -493,7 +493,7 @@ Phase 3 Completion State:
 - FEAT-018 is DONE / QA PASS / Human Final Gate APPROVED.
 - Phase 3 is DONE / QA PASS / Human Final Gate APPROVED.
 - HISTORICAL SNAPSHOT (at Phase 3 completion): Phase 4 was IN_PROGRESS / PLANNING; FEAT-019 was APPROVED FOR IMPLEMENTATION; FEAT-020 through FEAT-030 remained BLOCKED.
-- CURRENT CANONICAL STATE: Phase 4 is IN_PROGRESS; FEAT-019 is DONE (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED); FEAT-020 is DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED); FEAT-021 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-022 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-023 is UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED); FEAT-024 through FEAT-030 are BLOCKED by dependency order; Phase 5 is BLOCKED.
+- CURRENT CANONICAL STATE: Phase 4 is IN_PROGRESS; FEAT-019 is DONE (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED); FEAT-020 is DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED); FEAT-021 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-022 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-023 is DONE (QA PASS, Human Final Gate APPROVED); FEAT-024 is UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED); FEAT-025 through FEAT-030 are BLOCKED by dependency order; Phase 5 is BLOCKED.
 
 Feature Decomposition:
 
@@ -853,8 +853,8 @@ FEAT-019: DONE (QA PASS — Emergency QA Ownership Transfer, Human Dual Review A
 FEAT-020: DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED)
 FEAT-021: DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED)
 FEAT-022: DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED)
-FEAT-023: UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED)
-FEAT-024: BLOCKED by FEAT-023
+FEAT-023: DONE (QA PASS, Human Final Gate APPROVED)
+FEAT-024: UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED)
 FEAT-025: BLOCKED by FEAT-024
 FEAT-026: BLOCKED by FEAT-020 / FEAT-024 / FEAT-025
 FEAT-027: BLOCKED by FEAT-025 / FEAT-026
@@ -870,8 +870,8 @@ Feature Decomposition:
 - FEAT-020: Course & Lesson Read Model APIs - `DONE` (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED)
 - FEAT-021: Academy Learner Course/Lesson UI - `DONE` (QA PASS — QA Iteration 2, Human Final Gate APPROVED)
 - FEAT-022: Flashcards Domain & Review Flow - `DONE` (QA PASS — QA Iteration 2, Human Final Gate APPROVED)
-- FEAT-023: Quiz Definition & Safe Projection - `UNBLOCKED FOR PLANNING` (Implementation: NOT_STARTED)
-- FEAT-024: Quiz Attempt Lifecycle - `BLOCKED`
+- FEAT-023: Quiz Definition & Safe Projection - `DONE` (QA PASS, Human Final Gate APPROVED)
+- FEAT-024: Quiz Attempt Lifecycle - `UNBLOCKED FOR PLANNING` (Implementation: NOT_STARTED)
 - FEAT-025: Server-Side Quiz Evaluation & Secure Submission - `BLOCKED`
 - FEAT-026: Academy Progression & Completion Tracking - `BLOCKED`
 - FEAT-027: XP & Idempotent Reward Ledger - `BLOCKED`
@@ -1039,7 +1039,32 @@ Validation:
   - Seed Safety Guard: PASS
 Implementation Report: reports/implementation/phase-4/FEAT-022.md
 QA Report: reports/qa/phase-4/FEAT-022-QA.md
-Next Action: FEAT-022 complete. FEAT-023 UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED).
+Next Action: FEAT-022 complete. FEAT-023 APPROVED FOR IMPLEMENTATION (Implementation: NOT_STARTED).
+```
+
+FEAT-023 Status Fields:
+
+```text
+Lifecycle State: DONE
+Planning Status: COMPLETE (HUMAN APPROVED)
+Planning Owner: Antigravity — Temporary Planning Ownership Transfer
+Human Planning Approval: APPROVED
+Human Decisions:
+  - Question Type: SINGLE_CHOICE ONLY — APPROVED
+  - Primary Quiz Read Policy: Lowest-order PUBLISHED quiz — APPROVED
+  - Identifier Strategy: Stable opaque UUIDs (quiz.id, question.id, option.id) — APPROVED
+  - passingScore: Safe pre-submission quiz metadata — APPROVED
+Implementation: COMPLETE
+QA Status: PASS (QA Iteration 1)
+Human Final Gate: APPROVED
+Feature Type: Backend API Read Model & Safe Projection Contract
+Scope Boundaries: Lesson-attached primary quiz definition endpoint; safe whitelist DTOs; zero correct-answer exposure; zero attempt creation; zero answer submission; zero scoring; zero progress/XP mutation; zero Redis state; zero schema drift
+Spec Package: .specify/specs/FEAT-023/
+Acceptance Criteria: 18 deterministic criteria (AC-001..AC-018) with CRITICAL HARD GATE on Pre-Submission Correct Answer Secrecy — ALL PASS
+Tasks: 11 implementation tasks defined (T1..T11) — ALL COMPLETE
+Implementation Report: reports/implementation/phase-4/FEAT-023.md
+QA Report: reports/qa/phase-4/FEAT-023-QA.md
+Next Action: FEAT-023 complete. FEAT-024 UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED).
 ```
 
 Artifacts:
@@ -1057,6 +1082,10 @@ Artifacts:
 - `reports/qa/phase-4/FEAT-021-QA.md`
 - `.specify/specs/FEAT-022/`
 - `reports/implementation/phase-4/FEAT-022.md`
+- `reports/qa/phase-4/FEAT-022-QA.md`
+- `.specify/specs/FEAT-023/`
+- `reports/implementation/phase-4/FEAT-023.md`
+- `reports/qa/phase-4/FEAT-023-QA.md`
 
 ---
 

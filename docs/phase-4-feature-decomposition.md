@@ -10,8 +10,9 @@
 - FEAT-020: DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED)
 - FEAT-021: DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED)
 - FEAT-022: DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED)
-- FEAT-023: UNBLOCKED FOR PLANNING (Dependencies FEAT-019 & FEAT-020 satisfied; implementation NOT_STARTED)
-- FEAT-024+: BLOCKED according to dependency graph
+- FEAT-023: DONE (Human Final Gate APPROVED)
+- FEAT-024: UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED)
+- FEAT-025+: BLOCKED according to dependency graph
 - Phase 4: IN_PROGRESS
 - Phase 5: BLOCKED
 
@@ -188,8 +189,8 @@ Human decision required:
 | FEAT-020 | Course & Lesson Read Model APIs | Implementation | DONE (Human Final Gate APPROVED) |
 | FEAT-021 | Academy Learner Course/Lesson UI | Implementation | DONE (Human Final Gate APPROVED) |
 | FEAT-022 | Flashcards Domain & Review Flow | Implementation | DONE (Human Final Gate APPROVED) |
-| FEAT-023 | Quiz Definition & Safe Projection | Implementation | UNBLOCKED FOR PLANNING (FEAT-019, FEAT-020 satisfied; Implementation: NOT_STARTED) |
-| FEAT-024 | Quiz Attempt Lifecycle | Implementation | FEAT-019, FEAT-023 |
+| FEAT-023 | Quiz Definition & Safe Projection | Implementation | DONE (Human Final Gate APPROVED) |
+| FEAT-024 | Quiz Attempt Lifecycle | Implementation | UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED) |
 | FEAT-025 | Server-Side Quiz Evaluation & Secure Submission | Implementation | FEAT-024 |
 | FEAT-026 | Academy Progression & Completion Tracking | Implementation | FEAT-020, FEAT-024, FEAT-025 |
 | FEAT-027 | XP & Idempotent Reward Ledger | Implementation | FEAT-025, FEAT-026 |
@@ -257,7 +258,7 @@ Excluded: Attempt creation/submission/evaluation.
 
 QA Gate: Correct answer leakage sentinel; raw schema fields with correctness never appear in pre-submission API/UI.
 
-Human Decisions: Question types for Production MVP.
+Human Decisions: RESOLVED / HUMAN APPROVED — Question type: SINGLE_CHOICE ONLY (APPROVED). Primary Quiz Read Policy: Lowest-order PUBLISHED quiz (APPROVED). Identifier Strategy: Stable opaque UUIDs (APPROVED). passingScore: Safe pre-submission metadata (APPROVED). Zero per-user attempt creation, zero scoring, zero progress/XP mutation, zero Redis state in FEAT-023.
 
 ### FEAT-024 - Quiz Attempt Lifecycle
 
@@ -373,7 +374,7 @@ PASS requires:
 
 1. Confirm Phase 4 default boundary: learner-facing Academy only, no CMS/admin authoring.
 2. Decide production content ingestion approach.
-3. Decide quiz question types and scoring/pass policy before FEAT-023/FEAT-025.
+3. [RESOLVED] Decide quiz question types before FEAT-023: SINGLE_CHOICE ONLY (APPROVED). (Scoring/pass policy to be finalized before FEAT-025).
 4. [RESOLVED] Decide whether flashcard review state persists in Phase 4: DEFERRED (Phase 4 FEAT-022 behavior: TRANSIENT CLIENT-SIDE REVIEW SESSION ONLY; Option A UI reveal only approved).
 5. Decide whether Academy activates concrete product audit persistence in FEAT-029.
 6. Decide whether admin read-only support visibility is included in FEAT-028 or deferred.

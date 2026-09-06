@@ -20,6 +20,7 @@ import {
   SEED_MODES,
   SEED_ENVIRONMENTS,
   MIN_DEV_SEED_PASSWORD_LENGTH,
+  GetLessonQuizParamsSchema,
 } from "./index.js";
 
 describe("@aura/shared package", () => {
@@ -370,4 +371,39 @@ describe("@aura/shared package", () => {
       expect(email1).not.toBe(email3);
     });
   });
+
+  describe("FEAT-023 Academy Quiz Definition Schema", () => {
+    it("validates valid course and lesson slugs", () => {
+      const parsed = GetLessonQuizParamsSchema.safeParse({
+        courseSlug: "crypto-fundamentals",
+        lessonSlug: "bitcoin-mechanics",
+      });
+      expect(parsed.success).toBe(true);
+    });
+
+    it("rejects uppercase characters in slugs", () => {
+      const parsed = GetLessonQuizParamsSchema.safeParse({
+        courseSlug: "Crypto-Fundamentals",
+        lessonSlug: "bitcoin-mechanics",
+      });
+      expect(parsed.success).toBe(false);
+    });
+
+    it("rejects special characters and traversal attempts", () => {
+      const parsed = GetLessonQuizParamsSchema.safeParse({
+        courseSlug: "../crypto",
+        lessonSlug: "bitcoin_mechanics",
+      });
+      expect(parsed.success).toBe(false);
+    });
+
+    it("rejects empty or whitespace slugs", () => {
+      const parsed = GetLessonQuizParamsSchema.safeParse({
+        courseSlug: "",
+        lessonSlug: "   ",
+      });
+      expect(parsed.success).toBe(false);
+    });
+  });
 });
+

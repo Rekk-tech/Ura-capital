@@ -130,4 +130,29 @@ export type {
   LessonFlashcardsResponse,
 } from "./academy.dto.js";
 
+export interface PublishedQuizRecord {
+  id: string;
+  title: string;
+  description: string | null;
+  passingScore: number;
+  lesson: {
+    title: string;
+    slug: string;
+    course: {
+      slug: string;
+    };
+  };
+  questions: Array<{
+    id: string;
+    prompt: string;
+    type: string;
+    order: number;
+    options: Array<{
+      id: string;
+      text: string;
+      order: number;
+    }>;
+  }>;
+}
+
 

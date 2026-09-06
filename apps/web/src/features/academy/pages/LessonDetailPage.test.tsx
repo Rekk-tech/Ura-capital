@@ -235,4 +235,36 @@ describe("LessonDetailPage (Dual-Query, Navigation, Auth, Security - AC-007..AC-
     });
     expect(lessonSpy).toHaveBeenCalledTimes(2);
   });
+
+  it("renders informational quiz summary card when quiz is available (FEAT-023)", async () => {
+    vi.spyOn(academyApi, "getLessonBySlug").mockResolvedValue(mockLessonDetail);
+    vi.spyOn(academyApi, "getCourseBySlug").mockResolvedValue(mockCourseDetail);
+    vi.spyOn(academyApi, "getLessonQuiz").mockResolvedValue({
+      data: {
+        id: "quiz-uuid-1",
+        courseSlug: "crypto-fundamentals",
+        lessonSlug: "proof-of-work",
+        lessonTitle: "Proof of Work Consensus",
+        title: "Proof of Work Mastery Quiz",
+        description: "Test your understanding of mining consensus.",
+        passingScore: 80,
+        totalQuestions: 5,
+        questions: [],
+      },
+    });
+
+    renderWithProviders();
+
+    await waitFor(() => {
+      expect(screen.getByTestId("lesson-quiz-card")).toBeDefined();
+    });
+
+    expect(screen.getByText("Proof of Work Mastery Quiz")).toBeDefined();
+    expect(screen.getByText("Test your understanding of mining consensus.")).toBeDefined();
+    expect(screen.getByText("5 Questions")).toBeDefined();
+    expect(screen.getByText("Passing Score: 80%")).toBeDefined();
+    expect(screen.getByText(/Quiz attempts are not available yet/i)).toBeDefined();
+    // Verify zero engineering jargon
+    expect(screen.queryByText(/FEAT-/i)).toBeNull();
+  });
 });

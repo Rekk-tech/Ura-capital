@@ -39,3 +39,20 @@ export const lessonSlugParamSchema = z.object({
 });
 
 export type LessonSlugParam = z.infer<typeof lessonSlugParamSchema>;
+
+// FEAT-023: Quiz Definition Params Validation
+export const getLessonQuizParamsSchema = z.object({
+  courseSlug: z
+    .string()
+    .min(1)
+    .max(120)
+    .regex(SLUG_REGEX, "Invalid course slug format"),
+  lessonSlug: z
+    .string()
+    .min(1)
+    .max(120)
+    .regex(SLUG_REGEX, "Invalid lesson slug format"),
+});
+
+export type GetLessonQuizParams = z.infer<typeof getLessonQuizParamsSchema>;
+

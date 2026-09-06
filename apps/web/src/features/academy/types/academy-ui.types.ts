@@ -97,3 +97,31 @@ export type FlashcardReviewState =
   | "READY_FRONT"
   | "REVEALED";
 
+// FEAT-023: Academy Quiz Definition UI Types
+export interface QuizOptionDto {
+  id: string;
+  text: string;
+  order: number;
+}
+
+export interface QuizQuestionDto {
+  id: string;
+  prompt: string;
+  type: "SINGLE_CHOICE";
+  order: number;
+  options: QuizOptionDto[];
+}
+
+export interface QuizDefinitionDto {
+  id: string;
+  courseSlug: string;
+  lessonSlug: string;
+  lessonTitle: string;
+  title: string;
+  description: string | null;
+  passingScore: number;
+  totalQuestions: number;
+  questions: QuizQuestionDto[];
+}
+
+

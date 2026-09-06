@@ -2,14 +2,17 @@ import { Router } from "express";
 import { authenticate } from "../auth/auth.middleware.js";
 import { createRepositoryContainer } from "../../infrastructure/database/repository-factory.js";
 import { AcademyCourseReadService } from "./academy-course-read.service.js";
+import { AcademyQuizReadService } from "./academy-quiz-read.service.js";
 import { AcademyCourseController } from "./academy-course.controller.js";
 
 export function createAcademyRouter(controller?: AcademyCourseController): Router {
   const router = Router();
+  const repoContainer = createRepositoryContainer();
   const ctrl =
     controller ??
     new AcademyCourseController(
-      new AcademyCourseReadService(createRepositoryContainer().academyCourseRepo),
+      new AcademyCourseReadService(repoContainer.academyCourseRepo),
+      new AcademyQuizReadService(repoContainer.academyQuizRepo),
     );
 
   // 1. Course Catalog (Public)
@@ -44,7 +47,20 @@ export function createAcademyRouter(controller?: AcademyCourseController): Route
     (req, res, next) => ctrl.getFlashcards(req, res, next),
   );
 
+  // 5. Lesson Quiz Definition (Authenticated)
+  router.get(
+    "/api/academy/courses/:courseSlug/lessons/:lessonSlug/quiz",
+    authenticate,
+    (req, res, next) => ctrl.getLessonQuiz(req, res, next),
+  );
+  router.get(
+    "/academy/courses/:courseSlug/lessons/:lessonSlug/quiz",
+    authenticate,
+    (req, res, next) => ctrl.getLessonQuiz(req, res, next),
+  );
+
   return router;
 }
 
 export const academyRouter = createAcademyRouter();
+
