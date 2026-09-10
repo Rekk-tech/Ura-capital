@@ -6,14 +6,21 @@ import { AcademyQuizReadService } from "./academy-quiz-read.service.js";
 import { AcademyCourseController } from "./academy-course.controller.js";
 import { AcademyQuizAttemptService } from "./academy-quiz-attempt.service.js";
 import { AcademyQuizAttemptController } from "./academy-quiz-attempt.controller.js";
+import { AcademyProgressionService } from "./academy-progression.service.js";
+import { AcademyProgressionController } from "./academy-progression.controller.js";
 import { transactionRunner } from "../../infrastructure/database/transaction-runner.js";
 
 export function createAcademyRouter(
   controller?: AcademyCourseController,
   attemptController?: AcademyQuizAttemptController,
+  progressionController?: AcademyProgressionController,
 ): Router {
   const router = Router();
   const repoContainer = createRepositoryContainer();
+  const progressionService = new AcademyProgressionService(
+    repoContainer.academyProgressRepo,
+    transactionRunner,
+  );
   const ctrl =
     controller ??
     new AcademyCourseController(
@@ -23,8 +30,15 @@ export function createAcademyRouter(
   const attemptCtrl =
     attemptController ??
     new AcademyQuizAttemptController(
-      new AcademyQuizAttemptService(repoContainer.academyQuizRepo, transactionRunner),
+      new AcademyQuizAttemptService(
+        repoContainer.academyQuizRepo,
+        transactionRunner,
+        progressionService,
+      ),
     );
+  const progressCtrl =
+    progressionController ??
+    new AcademyProgressionController(progressionService);
 
   // 1. Course Catalog (Public)
   router.get("/api/academy/courses", (req, res, next) => ctrl.listCourses(req, res, next));
@@ -140,6 +154,30 @@ export function createAcademyRouter(
     "/academy/quiz-attempts/:attemptId/result",
     authenticate,
     (req, res, next) => attemptCtrl.getGradedResult(req, res, next),
+  );
+
+  // 12. Course Progress Read (Authenticated) - FEAT-026
+  router.get(
+    "/api/academy/courses/:courseSlug/progress",
+    authenticate,
+    (req, res, next) => progressCtrl.getCourseProgress(req, res, next),
+  );
+  router.get(
+    "/academy/courses/:courseSlug/progress",
+    authenticate,
+    (req, res, next) => progressCtrl.getCourseProgress(req, res, next),
+  );
+
+  // 13. Complete Informational Lesson (Authenticated) - FEAT-026
+  router.post(
+    "/api/academy/courses/:courseSlug/lessons/:lessonSlug/complete",
+    authenticate,
+    (req, res, next) => progressCtrl.completeLesson(req, res, next),
+  );
+  router.post(
+    "/academy/courses/:courseSlug/lessons/:lessonSlug/complete",
+    authenticate,
+    (req, res, next) => progressCtrl.completeLesson(req, res, next),
   );
 
   return router;

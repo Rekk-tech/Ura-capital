@@ -87,3 +87,44 @@ export type QuizDraftAnswerParam = z.infer<typeof quizDraftAnswerParamSchema>;
 export const submitQuizAttemptBodySchema = z.object({}).strict();
 export type SubmitQuizAttemptBody = z.infer<typeof submitQuizAttemptBodySchema>;
 
+// FEAT-026: Academy Progression & Completion Tracking Validation
+export { CompleteLessonBodySchema, type CompleteLessonBody } from "@aura/shared";
+
+export const completeLessonParamSchema = z
+  .object({
+    courseSlug: z
+      .string({ required_error: "Course slug is required" })
+      .trim()
+      .min(1, { message: "Course slug cannot be empty" })
+      .max(100, { message: "Course slug cannot exceed 100 characters" })
+      .regex(SLUG_REGEX, {
+        message: "Course slug must be lowercase alphanumeric with hyphens",
+      }),
+    lessonSlug: z
+      .string({ required_error: "Lesson slug is required" })
+      .trim()
+      .min(1, { message: "Lesson slug cannot be empty" })
+      .max(100, { message: "Lesson slug cannot exceed 100 characters" })
+      .regex(SLUG_REGEX, {
+        message: "Lesson slug must be lowercase alphanumeric with hyphens",
+      }),
+  })
+  .strict();
+
+export type CompleteLessonParam = z.infer<typeof completeLessonParamSchema>;
+
+export const courseProgressParamSchema = z
+  .object({
+    courseSlug: z
+      .string({ required_error: "Course slug is required" })
+      .trim()
+      .min(1, { message: "Course slug cannot be empty" })
+      .max(100, { message: "Course slug cannot exceed 100 characters" })
+      .regex(SLUG_REGEX, {
+        message: "Course slug must be lowercase alphanumeric with hyphens",
+      }),
+  })
+  .strict();
+
+export type CourseProgressParam = z.infer<typeof courseProgressParamSchema>;
+

@@ -493,7 +493,7 @@ Phase 3 Completion State:
 - FEAT-018 is DONE / QA PASS / Human Final Gate APPROVED.
 - Phase 3 is DONE / QA PASS / Human Final Gate APPROVED.
 - HISTORICAL SNAPSHOT (at Phase 3 completion): Phase 4 was IN_PROGRESS / PLANNING; FEAT-019 was APPROVED FOR IMPLEMENTATION; FEAT-020 through FEAT-030 remained BLOCKED.
-- CURRENT CANONICAL STATE: Phase 4 is IN_PROGRESS; FEAT-019 is DONE (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED); FEAT-020 is DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED); FEAT-021 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-022 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-023 is DONE (QA PASS, Human Final Gate APPROVED); FEAT-024 is DONE (QA PASS — QA Iteration 1, Human Final Gate APPROVED); FEAT-025 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-026 is UNBLOCKED FOR PLANNING; FEAT-027 through FEAT-030 are BLOCKED by dependency order; Phase 5 is planned and implementation-blocked by the Phase 4 Human Phase Final Gate.
+- CURRENT CANONICAL STATE: Phase 4 is IN_PROGRESS; FEAT-019 is DONE (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED); FEAT-020 is DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED); FEAT-021 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-022 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-023 is DONE (QA PASS, Human Final Gate APPROVED); FEAT-024 is DONE (QA PASS — QA Iteration 1, Human Final Gate APPROVED); FEAT-025 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-026 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-027 is UNBLOCKED FOR CODEX PLANNING; FEAT-028 through FEAT-030 are BLOCKED by dependency order; Phase 5 is planned and implementation-blocked by the Phase 4 Human Phase Final Gate.
 
 Feature Decomposition:
 
@@ -856,8 +856,8 @@ FEAT-022: DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED)
 FEAT-023: DONE (QA PASS, Human Final Gate APPROVED)
 FEAT-024: DONE (QA PASS — QA Iteration 1, Human Final Gate APPROVED)
 FEAT-025: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
-FEAT-026: READY FOR PLANNING REVIEW
-FEAT-027: BLOCKED by FEAT-025 / FEAT-026
+FEAT-026: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
+FEAT-027: UNBLOCKED FOR CODEX PLANNING
 FEAT-028: BLOCKED by FEAT-020 through FEAT-027
 FEAT-029: BLOCKED by FEAT-025 / FEAT-027 and Human product-audit decision
 FEAT-030: BLOCKED by FEAT-019 through FEAT-029 as applicable
@@ -873,8 +873,8 @@ Feature Decomposition:
 - FEAT-023: Quiz Definition & Safe Projection - `DONE` (QA PASS, Human Final Gate APPROVED)
 - FEAT-024: Quiz Attempt Lifecycle - `DONE` (QA PASS — QA Iteration 1, Human Final Gate APPROVED)
 - FEAT-025: Server-Side Quiz Evaluation & Secure Submission - `DONE` (Implementation: COMPLETE, Internal Feature Gate: PASS)
-- FEAT-026: Academy Progression & Completion Tracking - `READY FOR PLANNING REVIEW`
-- FEAT-027: XP & Idempotent Reward Ledger - `BLOCKED`
+- FEAT-026: Academy Progression & Completion Tracking - `DONE` (Implementation: COMPLETE, Internal Feature Gate: PASS)
+- FEAT-027: XP & Idempotent Reward Ledger - `UNBLOCKED FOR CODEX PLANNING`
 - FEAT-028: Academy Authorization & Ownership Hardening - `BLOCKED`
 - FEAT-029: Academy Product Audit Decision & Integration - `BLOCKED`
 - FEAT-030: Phase 4 Academy Integration Gate - `BLOCKED`
@@ -1121,36 +1121,261 @@ Implementation Owner: DEV-A
 QA Status: READY FOR QA
 Feature-Level Human Final Gate: REMOVED for FEAT-025 under phase-owned workflow
 Internal Feature Quality Gate: PASS
+Planning Status: HUMAN APPROVED
+Human Planning Approval: APPROVED
+QA Status: PASS — Antigravity QA with Human Dual Review
+Human Dual Review: APPROVED
+Human Final Gate: APPROVED
+QA Independence Note: Antigravity was both implementation owner and QA executor; Human Dual Review applied as compensating governance control.
+Planning Owner: Antigravity — Temporary Planning Ownership Transfer
+Implementation Owner: Antigravity
+QA Executor: Antigravity (QA Iteration 1)
+Spec Package: HUMAN APPROVED (.specify/specs/FEAT-020/)
+Human Planning Decision (Auth): APPROVED (Courses & Course Detail = PUBLIC; Lesson Detail = AUTHENTICATED)
+Feature Type: Course and lesson read model API implementation feature
+Scope Boundaries: Read-only course and lesson APIs; zero UI; zero flashcard review; zero quiz projection; zero progress mutation; zero XP/rewards; zero schema changes; zero Redis authority/cache
+Endpoints Implemented:
+  - GET /api/academy/courses (Public, paginated, PUBLISHED only)
+  - GET /api/academy/courses/:slug (Public, course outline with PUBLISHED lesson summaries)
+  - GET /api/academy/courses/:courseSlug/lessons/:lessonSlug (Authenticated, PUBLISHED only, cross-course ownership check)
+DTOs & Projections: Whitelist-only safe learner DTOs; zero internal metadata or raw Prisma leaks
+Layering: Controller -> Service -> Repository -> PostgreSQL (Boundary Guard compliant)
+Audit Policy: Zero product audit records for ordinary read traffic
+Redis Policy: ZERO Redis usage / state
+Tasks: 7 implementation tasks completed in dependency order
+Acceptance Criteria: 16 deterministic criteria (AC-001..AC-016) mapped and passing
+Validation:
+  - Clean, lint (0 errors/warnings), prisma validate, typecheck, build PASS
+  - Standard test suite: PASS (56 test files, 519 tests, 0 skips)
+  - Unit test suite: PASS (35 test files, 373 tests, 0 skips)
+  - Live PostgreSQL DB test suite: PASS (13 test files, 113 tests, 0 skips)
+  - Redis test suite: PASS (5 test files, 50 tests, 0 skips)
+  - Persistence Guard: PASS (14 tests)
+  - Migration Guard: PASS (4 migrations, 0 blocking risks)
+  - Static Boundary Guard: PASS (controllers=7, services=11, repositories=6)
+  - Product Audit Governance Guard: PASS
+  - Seed Safety Guard: PASS
+Next Action: FEAT-021 implemented and ready for independent QA
+```
+
+FEAT-021 Governance Fields:
+
+```text
+Lifecycle State: DONE
+Implementation: COMPLETED
+Implementation Owner: Antigravity
+QA Status: PASS — QA Iteration 2
+Human Final Gate: APPROVED
+Planning Status: APPROVED
+Planning Owner: Antigravity — Temporary Planning Ownership Transfer
+Human Planning Approval: APPROVED
+Feature Type: Learner-facing Web UI implementation
+Scope Boundaries: Course catalog, course detail, and lesson detail UI in apps/web consuming FEAT-020 APIs; zero UI for quizzes/flashcards/progress/XP; zero backend changes; zero schema changes
+Spec Package: .specify/specs/FEAT-021/
+Tasks: 12 implementation tasks completed
+Acceptance Criteria: 17 deterministic criteria (AC-001..AC-017) PASS
+Defects:
+  - DEF-021-01 (P1 Open Redirect Security Defect): FIXED / VERIFIED
+  - DEF-021-02 (P2 Accessibility Heading Hierarchy Defect): FIXED / VERIFIED
+Evidence Gap:
+  - GAP-021-01 (Client-Side Logout Query Cache Invalidation): OPEN / NON-BLOCKING
+Validation (Latest QA Iteration 2):
+  - Clean: PASS
+  - Lint: PASS (0 errors, 0 warnings)
+  - Prisma Schema Validation: PASS
+  - Typecheck: PASS
+  - Monorepo Build: PASS (Vite web bundle + API/shared tsc)
+  - Monorepo Test: PASS (62 files, 602 tests)
+  - Unit Test: PASS (41 files, 456 tests)
+  - Database Test: PASS (13 files, 113 tests)
+  - Redis Test: PASS (5 files, 50 tests)
+  - Static Boundary Guard: PASS (controllers=7, services=11, repositories=6)
+  - Migration Guard: PASS (4 migrations, 0 blocking risks)
+  - Persistence Guard: PASS (14 tests)
+  - Product Audit Governance Guard: PASS
+  - Seed Safety Guard: PASS
+Implementation Report: reports/implementation/phase-4/FEAT-021.md
+QA Report: reports/qa/phase-4/FEAT-021-QA.md
+Next Action: FEAT-022 in planning review (implementation NOT_STARTED)
+```
+
+FEAT-022 Governance Fields:
+
+```text
+Lifecycle State: DONE
+Implementation: COMPLETE
+Implementation Owner: Antigravity
+QA Status: PASS (QA Iteration 2: DEF-022-01 & GOV-022-01 FIXED VERIFIED)
+Human Final Gate: APPROVED
+Planning Status: APPROVED
+Planning Owner: Antigravity — Temporary Planning Ownership Transfer
+Human Planning Approval: APPROVED
+Human Product Decision: APPROVED (Transient Client-Side Review Session Only; Persistence DEFERRED)
+Human Answer-Secrecy Decision: APPROVED (Option A — UI Reveal Only)
+Feature Type: Backend API Read Model & Frontend Interactive Flashcard Review UI
+Scope Boundaries: Lesson-attached flashcard read API and interactive frontend review container in apps/web; zero DB review persistence; zero spaced repetition; zero progress/XP mutation; zero Redis state; zero schema drift
+Spec Package: .specify/specs/FEAT-022/
+Tasks: 12 implementation tasks (T1..T12) completed; Rework Iteration 1 verified
+Acceptance Criteria: 18 deterministic criteria (AC-001..AC-018) VERIFIED PASS
+Validation:
+  - Clean: PASS
+  - Lint: PASS (0 errors, 0 warnings)
+  - Prisma Schema Validation: PASS
+  - Typecheck: PASS
+  - Monorepo Build: PASS (Vite web bundle + API/shared tsc)
+  - Monorepo Test: PASS (64 files, 623 tests)
+  - Unit Test: PASS (43 files, 472 tests)
+  - Database Test: PASS (14 files, 121 tests)
+  - Redis Test: PASS (5 files, 50 tests)
+  - Persistence Guard: PASS (14 tests)
+  - Migration Guard: PASS (4 migrations, 0 blocking risks)
+  - Static Boundary Guard: PASS (controllers=7, services=11, repositories=6)
+  - Product Audit Governance Guard: PASS
+  - Seed Safety Guard: PASS
+Implementation Report: reports/implementation/phase-4/FEAT-022.md
+QA Report: reports/qa/phase-4/FEAT-022-QA.md
+Next Action: FEAT-022 complete. FEAT-023 APPROVED FOR IMPLEMENTATION (Implementation: NOT_STARTED).
+```
+
+FEAT-023 Status Fields:
+
+```text
+Lifecycle State: DONE
+Planning Status: COMPLETE (HUMAN APPROVED)
+Planning Owner: Antigravity — Temporary Planning Ownership Transfer
+Human Planning Approval: APPROVED
+Human Decisions:
+  - Question Type: SINGLE_CHOICE ONLY — APPROVED
+  - Primary Quiz Read Policy: Lowest-order PUBLISHED quiz — APPROVED
+  - Identifier Strategy: Stable opaque UUIDs (quiz.id, question.id, option.id) — APPROVED
+  - passingScore: Safe pre-submission quiz metadata — APPROVED
+Implementation: COMPLETE
+QA Status: PASS (QA Iteration 1)
+Human Final Gate: APPROVED
+Feature Type: Backend API Read Model & Safe Projection Contract
+Scope Boundaries: Lesson-attached primary quiz definition endpoint; safe whitelist DTOs; zero correct-answer exposure; zero attempt creation; zero answer submission; zero scoring; zero progress/XP mutation; zero Redis state; zero schema drift
+Spec Package: .specify/specs/FEAT-023/
+Acceptance Criteria: 18 deterministic criteria (AC-001..AC-018) with CRITICAL HARD GATE on Pre-Submission Correct Answer Secrecy — ALL PASS
+Tasks: 11 implementation tasks defined (T1..T11) — ALL COMPLETE
+Implementation Report: reports/implementation/phase-4/FEAT-023.md
+QA Report: reports/qa/phase-4/FEAT-023-QA.md
+Next Action: FEAT-023 complete. FEAT-024 UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED).
+```
+
+FEAT-024 Status Fields:
+
+```text
+Lifecycle State: DONE
+Planning Status: COMPLETE (HUMAN APPROVED)
+Planning Owner: Antigravity — Temporary Planning Ownership Transfer
+Human Planning Approval: APPROVED
+Human Decisions:
+  - Active Attempt Policy: One active IN_PROGRESS attempt per (user, quiz) tuple — APPROVED BY HUMAN
+  - Database Enforcement: PostgreSQL partial unique index UNIQUE (quiz_id, user_id) WHERE status = 'IN_PROGRESS' — APPROVED BY HUMAN
+  - CREATED State Policy: Start creates IN_PROGRESS directly; CREATED schema-reserved and not active — APPROVED BY HUMAN
+  - Repeated Start Behavior: Idempotent return-existing active attempt (200 OK existing vs 201 Created new) — APPROVED BY HUMAN
+  - Concurrency Strategy: Layered defense (DB partial unique index + transaction advisory lock + P2002 race recovery) — APPROVED BY HUMAN
+  - Draft Answer Persistence Scope: Included in FEAT-024 with zero evaluation/scoring — APPROVED BY HUMAN
+  - Content Continuation & Historical Read: IN_PROGRESS unpublished rejected; SUBMITTED/GRADED owner safe read allowed — APPROVED BY HUMAN
+  - Strict Start Request Body: Empty object {} strictly enforced (authoritative fields rejected with 400) — APPROVED BY HUMAN
+  - Schema Migration Strategy: Minimal constraint-only migration (forward-only, preflight duplicate check) — APPROVED BY HUMAN
+Implementation: COMPLETE (Rework Iteration 1)
+QA Status: QA PASS (QA Iteration 1 + Report Closure)
+QA Report: reports/qa/phase-4/FEAT-024-QA.md
+Human Final Gate: APPROVED
+Feature Type: Backend Domain Lifecycle, State Foundation & Constraint Migration
+Scope Boundaries: Authenticated attempt start/read endpoints; active attempt invariant; draft answer persistence; minimal partial unique index migration; zero correctness leakage; zero scoring/grading; zero progress/XP/reward mutation; zero Redis authority
+Spec Package: .specify/specs/FEAT-024/
+Implementation Report: reports/implementation/phase-4/FEAT-024.md
+Acceptance Criteria: 20 deterministic criteria (AC-001..AC-020) with CRITICAL HARD GATE on Pre-Submission Correct Answer Secrecy
+Tasks: 11 implementation tasks completed (T1..T11)
+Next Action: FEAT-024 DONE. FEAT-025 APPROVED FOR IMPLEMENTATION (Implementation: NOT_STARTED).
+```
+
+FEAT-025 Status Fields:
+
+```text
+Lifecycle State: DONE
+Planning Status: COMPLETE (HUMAN APPROVED)
+Planning Owner: Antigravity — Temporary Planning Ownership Transfer
+Human Planning Approval: APPROVED
+Human Decisions:
+  - Lifecycle Transition: Two-stage transition IN_PROGRESS -> SUBMITTED -> GRADED inside ONE atomic transaction — APPROVED BY HUMAN
+  - Repeated Submit: Idempotent return of existing graded result with 200 OK — APPROVED BY HUMAN
+  - Unanswered Questions: Strict completion requirement rejecting submission with 400 UNANSWERED_QUESTIONS — APPROVED BY HUMAN
+  - Score Rounding: Integer percentage Math.round((C / N) * 100) — APPROVED BY HUMAN
+  - Zero-Question Quiz: Reject with 400 INVALID_QUIZ_STATE — APPROVED BY HUMAN
+  - Result Visibility: Score, pass/fail, and per-question correctness; explanations deferred — APPROVED BY HUMAN
+  - Result Endpoint: Dedicated GET .../result endpoint — APPROVED BY HUMAN
+  - Retry Policy: Unlimited retry via new attempt once current is GRADED — APPROVED BY HUMAN
+  - Evaluation Source: Current live quiz definition with atomic snapshot writing — APPROVED BY HUMAN
+  - Schema Migration: Minimal additive check-constraint migration for score range and graded-state coherence — APPROVED BY HUMAN
+  - Historical passingScore: Omitted from QuizResultDto (Option B); persisted passed boolean is sole authority — APPROVED BY HUMAN
+Implementation: COMPLETE
+Implementation Owner: DEV-A
+QA Status: READY FOR QA
+Feature-Level Human Final Gate: REMOVED for FEAT-025 under phase-owned workflow
+Internal Feature Quality Gate: PASS
 Feature Type: Backend Domain Evaluation, Lifecycle Finalization & Result Projection
 Scope Boundaries: Authenticated attempt submit/result endpoints; server-authoritative evaluation; score and pass/fail derivation; answer correctness snapshot persistence; zero progress/XP/reward mutations; zero Redis authority
 Spec Package: .specify/specs/FEAT-025/
 Implementation Report: reports/implementation/phase-4/FEAT-025.md
 Acceptance Criteria: 20 deterministic criteria (AC-001..AC-020) with CRITICAL HARD GATES on Server-Authoritative Evaluation and Secrecy Regression (All 20 VERIFIED)
 Tasks: 11 implementation tasks completed (T1..T11)
-Next Action: FEAT-026 READY FOR PLANNING REVIEW.
+```
+
+FEAT-026 Governance Fields:
+
+```text
+Lifecycle State: DONE
+Implementation: COMPLETE
+Implementation Owner: Antigravity / DEV-A
+Planning Owner: Codex
+Internal Feature Quality Gate: PASS
+QA Status: READY FOR QA
+Feature Type: Backend progression, completion tracking, and learner progress presentation
+Scope Boundaries: Authenticated learner progress read; informational lesson completion proposal; FEAT-025 post-grade progress reconciliation; course rollup; completion fact contract for FEAT-027; zero XP/reward/audit mutation; zero Redis durable progress authority
+Human Decisions: APPROVED
+  - Quiz pass automatically completes lesson
+  - Informational lesson completion by explicit learner action
+  - Lesson completion monotonicity
+  - Historical course completion monotonicity
+  - New published lesson after completion preserves historical completion while current coverage recalculates
+  - Draft/archived lesson denominator policy
+  - Zero published lesson semantics
+  - Progress percentage rounding
+Unresolved Human Decisions: ZERO
+Spec Package: .specify/specs/FEAT-026/
+Implementation Report: reports/implementation/phase-4/FEAT-026.md
+Human-Approved Migration Decision: ZERO production migration based on existing Academy progress tables and constraints
+Acceptance Criteria: 20 deterministic criteria (AC-001..AC-020) with CRITICAL HARD GATES on Server-Authoritative Progression and Progress/Quiz Correctness Secrecy Regression (All 20 VERIFIED)
+Tasks: 11 implementation tasks completed (T001..T011)
+FEAT-027: UNBLOCKED FOR CODEX PLANNING
+Next Action: Codex may plan FEAT-027.
 ```
 
 Artifacts:
 
 - `docs/phase-4-feature-decomposition.md`
+- `docs/master-roadmap.md`
+- `docs/cross-phase-contracts.md`
+- `docs/integration-strategy.md`
 - `.specify/specs/FEAT-019/`
+- `reports/qa/phase-4/FEAT-019-QA.md`
 - `.specify/specs/FEAT-020/`
+- `reports/qa/phase-4/FEAT-020-QA.md`
 - `.specify/specs/FEAT-021/`
-- `reports/implementation/phase-4/FEAT-019.md`
-- `reports/implementation/phase-4/FEAT-020.md`
-- `reports/implementation/phase-4/FEAT-021.md`
+- `reports/qa/phase-4/FEAT-021-QA.md`
 - `.specify/specs/FEAT-022/`
-- `reports/implementation/phase-4/FEAT-022.md`
 - `reports/qa/phase-4/FEAT-022-QA.md`
 - `.specify/specs/FEAT-023/`
-- `reports/implementation/phase-4/FEAT-023.md`
 - `reports/qa/phase-4/FEAT-023-QA.md`
 - `.specify/specs/FEAT-024/`
-- `reports/implementation/phase-4/FEAT-024.md`
 - `reports/qa/phase-4/FEAT-024-QA.md`
 - `.specify/specs/FEAT-025/`
 - `reports/implementation/phase-4/FEAT-025.md`
-
+- `.specify/specs/FEAT-026/`
+- `reports/implementation/phase-4/FEAT-026.md`
 ---
 
 # Phase 5 - Simulation Engine

@@ -35,6 +35,7 @@ export interface LessonDetailDto {
   title: string;
   content: string | null;
   order: number;
+  progress?: LessonProgressDto | null;
 }
 
 export interface PaginationMeta {
@@ -158,5 +159,25 @@ export interface QuizResultDto {
   gradedAt: string;
   answers: QuizResultAnswerDto[];
 }
+
+// FEAT-026: Academy Progression & Completion Tracking UI Types
+export interface LessonProgressDto {
+  lessonSlug: string;
+  status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
+  completed: boolean;
+  completedAt: string | null;
+}
+
+export interface CourseProgressDto {
+  courseSlug: string;
+  completedLessons: number;
+  totalLessons: number;
+  progressPercent: number;
+  status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
+  completed: boolean;
+  completedAt: string | null;
+  lessons: LessonProgressDto[];
+}
+
 
 

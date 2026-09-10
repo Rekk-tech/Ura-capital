@@ -10,6 +10,7 @@ import {
   useSaveDraftQuizAnswerMutation,
   useSubmitQuizAttemptMutation,
   useGradedQuizResultQuery,
+  useCompleteLessonMutation,
 } from "../hooks/use-academy";
 import { LessonContent } from "../components/LessonContent";
 import { LessonDetailSkeleton, AuthRequiredCard, NotFoundState, ErrorState } from "../components/AcademyStates";
@@ -32,9 +33,11 @@ export const LessonDetailPage: React.FC = () => {
   const startAttemptMutation = useStartQuizAttemptMutation();
   const saveDraftMutation = useSaveDraftQuizAnswerMutation();
   const submitAttemptMutation = useSubmitQuizAttemptMutation();
+  const completeLessonMutation = useCompleteLessonMutation();
   const [savingQuestionId, setSavingQuestionId] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [completeError, setCompleteError] = useState<string | null>(null);
 
   const activeAttempt =
     currentAttemptQuery.data?.data && currentAttemptQuery.data.data.status === "IN_PROGRESS"
@@ -51,10 +54,35 @@ export const LessonDetailPage: React.FC = () => {
   const gradedResultQuery = useGradedQuizResultQuery(gradedAttemptId);
   const gradedResult = submitAttemptMutation.data?.data ?? gradedResultQuery.data?.data;
 
+  const isLessonCompleted = Boolean(
+    lessonQuery.data?.data?.progress?.completed ||
+      completeLessonMutation.isSuccess ||
+      (gradedResult && gradedResult.passed),
+  );
+
   const handleStartQuiz = () => {
     if (!courseSlug || !lessonSlug) return;
     setSubmitError(null);
     startAttemptMutation.mutate({ courseSlug, lessonSlug });
+  };
+
+  const handleCompleteLesson = () => {
+    if (!courseSlug || !lessonSlug) return;
+    setCompleteError(null);
+    completeLessonMutation.mutate(
+      { courseSlug, lessonSlug },
+      {
+        onError: (err: unknown) => {
+          if (err instanceof AcademyApiError) {
+            setCompleteError(err.message);
+          } else if (err instanceof Error) {
+            setCompleteError(err.message);
+          } else {
+            setCompleteError("Failed to complete lesson.");
+          }
+        },
+      },
+    );
   };
 
   const handleSubmitQuiz = () => {
@@ -182,9 +210,31 @@ export const LessonDetailPage: React.FC = () => {
       <article className="lesson-reading-column" aria-labelledby="lesson-main-heading">
         <header className="lesson-header">
           <div className="lesson-header-meta" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-            <div className="lesson-position-badge">
-              <BookOpen size={14} aria-hidden="true" className="pill-icon" />
-              <span>{positionLabel}</span>
+            <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+              <div className="lesson-position-badge">
+                <BookOpen size={14} aria-hidden="true" className="pill-icon" />
+                <span>{positionLabel}</span>
+              </div>
+              {isLessonCompleted && (
+                <span
+                  data-testid="lesson-completed-badge"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.35rem",
+                    padding: "0.25rem 0.6rem",
+                    borderRadius: "9999px",
+                    fontSize: "0.75rem",
+                    fontWeight: 600,
+                    backgroundColor: "rgba(16, 185, 129, 0.15)",
+                    color: "#10b981",
+                    border: "1px solid rgba(16, 185, 129, 0.3)",
+                  }}
+                >
+                  <CheckCircle size={13} aria-hidden="true" />
+                  Completed
+                </span>
+              )}
             </div>
             {courseSlug && lessonSlug && (
               <Link
@@ -208,6 +258,72 @@ export const LessonDetailPage: React.FC = () => {
         <main className="lesson-content-container">
           <LessonContent content={lesson.content} />
         </main>
+
+        {/* FEAT-026 Informational Lesson Completion Section */}
+        {!quizQuery.data?.data && !quizQuery.isLoading && (
+          <section
+            className="informational-lesson-completion-section"
+            data-testid="informational-lesson-completion"
+            style={{
+              marginTop: "2rem",
+              padding: "1.5rem",
+              borderRadius: "0.75rem",
+              border: "1px solid var(--color-border, #334155)",
+              backgroundColor: "var(--color-surface, #1e293b)",
+              display: "flex",
+              flexDirection: "column",
+              gap: "1rem",
+              alignItems: "flex-start",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              <CheckCircle
+                size={20}
+                style={{ color: isLessonCompleted ? "#10b981" : "var(--color-primary, #38bdf8)" }}
+                aria-hidden="true"
+              />
+              <h2 style={{ fontSize: "1.125rem", fontWeight: 600, margin: 0 }}>
+                {isLessonCompleted ? "Lesson Completed" : "Complete Lesson"}
+              </h2>
+            </div>
+            <p style={{ color: "var(--color-text-muted, #94a3b8)", margin: 0, fontSize: "0.875rem" }}>
+              {isLessonCompleted
+                ? "You have completed this lesson. You can proceed to the next module."
+                : "When you have finished reviewing the material, mark this lesson as complete to track your course progression."}
+            </p>
+            {!isLessonCompleted ? (
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleCompleteLesson}
+                disabled={completeLessonMutation.isPending}
+                data-testid="mark-lesson-complete-button"
+                style={{ cursor: completeLessonMutation.isPending ? "not-allowed" : "pointer" }}
+              >
+                {completeLessonMutation.isPending ? "Marking Complete..." : "Mark Lesson as Complete"}
+              </button>
+            ) : (
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  color: "#10b981",
+                  fontSize: "0.875rem",
+                  fontWeight: 500,
+                }}
+              >
+                <CheckCircle size={16} aria-hidden="true" />
+                <span>Marked as complete</span>
+              </div>
+            )}
+            {completeError && (
+              <p style={{ color: "#ef4444", fontSize: "0.875rem", margin: 0 }} data-testid="complete-lesson-error">
+                {completeError}
+              </p>
+            )}
+          </section>
+        )}
 
         {/* FEAT-023 Informational Quiz Summary Card */}
         {quizQuery.data?.data && (

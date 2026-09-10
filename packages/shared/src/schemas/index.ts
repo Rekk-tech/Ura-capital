@@ -255,4 +255,8 @@ export type QuizDraftAnswerParam = z.infer<typeof QuizDraftAnswerParamSchema>;
 export const SubmitQuizAttemptBodySchema = z.object({}).strict();
 export type SubmitQuizAttemptBody = z.infer<typeof SubmitQuizAttemptBodySchema>;
 
+// FEAT-026 Academy Progression & Completion Tracking Schemas
+export const CompleteLessonBodySchema = z.object({}).strict();
+export type CompleteLessonBody = z.infer<typeof CompleteLessonBodySchema>;
+
 

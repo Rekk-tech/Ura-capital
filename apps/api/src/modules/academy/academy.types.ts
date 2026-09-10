@@ -129,7 +129,14 @@ export type {
   LessonFlashcardsResponseDto,
   LessonFlashcardsResponse,
 } from "./academy.dto.js";
-import type { AcademyQuizAttempt, AcademyQuizAnswer } from "@prisma/client";
+import type {
+  AcademyCourse,
+  AcademyLesson,
+  AcademyUserCourseProgress,
+  AcademyUserLessonProgress,
+  AcademyQuizAttempt,
+  AcademyQuizAnswer,
+} from "@prisma/client";
 
 export interface PublishedQuizRecord {
   id: string;
@@ -165,6 +172,18 @@ export interface StartAttemptRepoResult {
   created: boolean;
 }
 
+export interface SafeProgressUpsertResult<T> {
+  progress: T;
+  isFirstCompletion: boolean;
+}
+
+export interface PublishedCourseWithLessonsProgress {
+  course: AcademyCourse;
+  courseProgress: AcademyUserCourseProgress | null;
+  publishedLessons: Array<Pick<AcademyLesson, "id" | "slug" | "title" | "order">>;
+  lessonProgressMap: Map<string, AcademyUserLessonProgress>;
+}
+
 export interface UpsertDraftAnswerInput {
   attemptId: string;
   quizId: string;
@@ -173,3 +192,4 @@ export interface UpsertDraftAnswerInput {
   questionPromptSnapshot: string;
   selectedOptionTextSnapshot: string;
 }
+

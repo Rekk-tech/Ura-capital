@@ -10,6 +10,8 @@ import {
   QuizDefinitionDto,
   QuizAttemptDto,
   QuizResultDto,
+  CourseProgressDto,
+  LessonProgressDto,
 } from "../features/academy/types/academy-ui.types";
 
 export interface IAcademyApiClient {
@@ -24,6 +26,8 @@ export interface IAcademyApiClient {
   saveDraftQuizAnswer(attemptId: string, questionId: string, optionId: string, accessToken?: string): Promise<{ data: { questionId: string; selectedOptionId: string; updatedAt: string } }>;
   submitQuizAttempt(attemptId: string, accessToken?: string): Promise<{ data: QuizResultDto }>;
   getGradedQuizResult(attemptId: string, accessToken?: string): Promise<{ data: QuizResultDto }>;
+  getCourseProgress(courseSlug: string, accessToken?: string): Promise<{ data: CourseProgressDto }>;
+  completeLesson(courseSlug: string, lessonSlug: string, accessToken?: string): Promise<{ data: LessonProgressDto }>;
 }
 
 
@@ -319,6 +323,61 @@ export class AcademyApiClient implements IAcademyApiClient {
     }
 
     return (await res.json()) as { data: QuizResultDto };
+  }
+
+  async getCourseProgress(
+    courseSlug: string,
+    accessToken?: string
+  ): Promise<{ data: CourseProgressDto }> {
+    const url = `${this.baseUrl}/courses/${encodeURIComponent(courseSlug)}/progress`;
+
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+    };
+
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers,
+    });
+
+    if (!res.ok) {
+      await this.handleError(res);
+    }
+
+    return (await res.json()) as { data: CourseProgressDto };
+  }
+
+  async completeLesson(
+    courseSlug: string,
+    lessonSlug: string,
+    accessToken?: string
+  ): Promise<{ data: LessonProgressDto }> {
+    const url = `${this.baseUrl}/courses/${encodeURIComponent(courseSlug)}/lessons/${encodeURIComponent(lessonSlug)}/complete`;
+
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    };
+
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({}),
+    });
+
+    if (!res.ok) {
+      await this.handleError(res);
+    }
+
+    return (await res.json()) as { data: LessonProgressDto };
   }
 
 

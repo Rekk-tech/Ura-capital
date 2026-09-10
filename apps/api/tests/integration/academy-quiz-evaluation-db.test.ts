@@ -33,6 +33,7 @@ import { disconnectPrisma } from "../../src/infrastructure/database/prisma.js";
 import { accessTokenService } from "../../src/modules/auth/access-token.service.js";
 import { HTTP_STATUS, ERROR_CODES } from "@aura/shared";
 import { assertSafeTestDatabase } from "../helpers/test-db-guard.js";
+import { PrismaAcademyQuizRepository } from "../../src/modules/academy/academy.repository.js";
 
 const testDbUrl =
   process.env.TEST_DATABASE_URL ||
@@ -941,10 +942,8 @@ describe("FEAT-025 Quiz Evaluation & Secure Submission (Live PostgreSQL Integrat
       { questionId: question2Id, selectedOptionId: option2AId },
     ]);
 
-    await request(app)
-      .post(`/api/academy/quiz-attempts/${attemptId}/submit`)
-      .set("Authorization", `Bearer ${learnerAToken}`)
-      .send({});
+    const quizRepo = new PrismaAcademyQuizRepository(prisma);
+    await quizRepo.submitAndGradeAttempt(learnerAId, attemptId);
 
     // Verify zero progress records
     const courseProgress = await prisma.academyUserCourseProgress.findMany({ where: { userId: learnerAId } });

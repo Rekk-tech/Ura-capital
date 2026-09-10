@@ -127,3 +127,51 @@ export interface QuizResultResponse {
   data: QuizResultDto;
 }
 
+// FEAT-026 Academy Progression & Completion Tracking Types & DTOs
+export type AcademyProgressStatus = "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
+
+export interface LessonProgressDto {
+  lessonSlug: string;
+  status: AcademyProgressStatus;
+  completed: boolean;
+  completedAt: string | null;
+}
+
+export interface CourseProgressDto {
+  courseSlug: string;
+  completedLessons: number;
+  totalLessons: number;
+  progressPercent: number;
+  status: AcademyProgressStatus;
+  completed: boolean;
+  completedAt: string | null;
+  lessons: LessonProgressDto[];
+}
+
+export interface CourseProgressResponse {
+  data: CourseProgressDto;
+}
+
+export interface CompleteLessonResponse {
+  data: LessonProgressDto;
+}
+
+export interface AcademyCompletionFact {
+  readonly userId: string;
+  readonly resourceType: "LESSON" | "COURSE";
+  readonly resourceId: string;
+  readonly isFirstCompletion: boolean;
+  readonly completedAt: Date;
+}
+
+export function getCompletionKey(
+  userIdOrFact: string | AcademyCompletionFact,
+  resourceType?: "LESSON" | "COURSE",
+  resourceId?: string,
+): string {
+  if (typeof userIdOrFact === "object" && userIdOrFact !== null) {
+    return `${userIdOrFact.userId}:${userIdOrFact.resourceType}:${userIdOrFact.resourceId}`;
+  }
+  return `${userIdOrFact}:${resourceType}:${resourceId}`;
+}
+

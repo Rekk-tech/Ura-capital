@@ -28,6 +28,7 @@ export interface LessonDetailDto {
   title: string;
   content: string | null;
   order: number;
+  progress?: LessonProgressDto | null;
 }
 
 export interface PaginationMeta {
@@ -101,14 +102,17 @@ export function toCourseDetailDto(entity: {
   };
 }
 
-export function toLessonDetailDto(entity: {
-  courseSlug?: string;
-  course?: { slug: string };
-  slug: string;
-  title: string;
-  content: string | null;
-  order: number;
-}): LessonDetailDto {
+export function toLessonDetailDto(
+  entity: {
+    courseSlug?: string;
+    course?: { slug: string };
+    slug: string;
+    title: string;
+    content: string | null;
+    order: number;
+  },
+  progress?: LessonProgressDto | null,
+): LessonDetailDto {
   const courseSlug = entity.courseSlug ?? entity.course?.slug ?? "";
   return {
     courseSlug,
@@ -116,6 +120,7 @@ export function toLessonDetailDto(entity: {
     title: entity.title,
     content: entity.content ?? null,
     order: entity.order,
+    ...(progress !== undefined ? { progress } : {}),
   };
 }
 
@@ -369,6 +374,72 @@ export function toQuizResultDto(entity: {
       isCorrect: Boolean(a.isCorrect),
       correctOptionId: a.correctOptionIdSnapshot ?? "",
     })),
+  };
+}
+
+// FEAT-026: Academy Progression & Completion Tracking DTOs and Mappers
+
+export type {
+  LessonProgressDto,
+  CourseProgressDto,
+  CourseProgressResponse,
+  CompleteLessonResponse,
+  AcademyCompletionFact,
+} from "@aura/shared";
+
+import type { LessonProgressDto, CourseProgressDto } from "@aura/shared";
+
+export function toLessonProgressDto(entity: {
+  slug: string;
+  status?: string;
+  completed?: boolean;
+  completedAt?: Date | string | null;
+}): LessonProgressDto {
+  const isCompleted = entity.completed ?? entity.status === "COMPLETED";
+  const completedAt =
+    entity.completedAt instanceof Date
+      ? entity.completedAt.toISOString()
+      : entity.completedAt
+        ? String(entity.completedAt)
+        : null;
+
+  return {
+    lessonSlug: entity.slug,
+    status: isCompleted
+      ? "COMPLETED"
+      : ((entity.status as "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED") ??
+        "NOT_STARTED"),
+    completed: isCompleted,
+    completedAt,
+  };
+}
+
+export function toCourseProgressDto(entity: {
+  courseSlug: string;
+  completedLessons: number;
+  totalLessons: number;
+  progressPercent: number;
+  status: string;
+  completed: boolean;
+  completedAt: Date | string | null;
+  lessons?: LessonProgressDto[];
+}): CourseProgressDto {
+  const completedAt =
+    entity.completedAt instanceof Date
+      ? entity.completedAt.toISOString()
+      : entity.completedAt
+        ? String(entity.completedAt)
+        : null;
+
+  return {
+    courseSlug: entity.courseSlug,
+    completedLessons: entity.completedLessons,
+    totalLessons: entity.totalLessons,
+    progressPercent: entity.progressPercent,
+    status: entity.status as "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED",
+    completed: entity.completed,
+    completedAt,
+    lessons: entity.lessons ?? [],
   };
 }
 

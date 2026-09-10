@@ -15,10 +15,13 @@ import {
   submitQuizAttemptBodySchema,
 } from "./academy.validation.js";
 
+import type { AcademyProgressionService } from "./academy-progression.service.js";
+
 export class AcademyQuizAttemptService {
   constructor(
     private readonly quizRepo: IAcademyQuizRepository,
     private readonly txRunner: ITransactionRunner = defaultTransactionRunner,
+    private readonly progressionService?: AcademyProgressionService,
   ) {}
 
   /**
@@ -264,12 +267,23 @@ export class AcademyQuizAttemptService {
     }
 
     // 2. Coordinate atomic evaluation transaction within TransactionRunner
-    return await this.txRunner.run(async (ctx) => {
+    const result = await this.txRunner.run(async (ctx) => {
       return await ctx.repositories.academyQuizRepo.submitAndGradeAttempt(
         userId,
         attemptId,
       );
     });
+
+    // 3. Post-grade progression reconciliation (FEAT-026)
+    // Preserves FEAT-025 grading transaction boundary by running in its own transaction
+    if (this.progressionService) {
+      await this.progressionService.reconcileProgressFromGradedAttempt(
+        userId,
+        attemptId,
+      );
+    }
+
+    return result;
   }
 
   /**

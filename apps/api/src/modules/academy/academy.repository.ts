@@ -32,6 +32,8 @@ import type {
   AcademyQuizAttemptWithAnswers,
   StartAttemptRepoResult,
   UpsertDraftAnswerInput,
+  SafeProgressUpsertResult,
+  PublishedCourseWithLessonsProgress,
 } from "./academy.types.js";
 import { getPrismaClient } from "../../infrastructure/database/prisma.js";
 import { ERROR_CODES, HTTP_STATUS, type QuizResultDto, type QuizResultAnswerDto } from "@aura/shared";
@@ -1073,6 +1075,48 @@ export interface IAcademyProgressRepository {
     userId: string,
     lessonId: string,
   ): Promise<AcademyUserLessonProgress | null>;
+
+  findCourseProgressBySlug(
+    userId: string,
+    courseSlug: string,
+  ): Promise<PublishedCourseWithLessonsProgress | null>;
+  findPublishedLessonWithCourse(
+    courseSlug: string,
+    lessonSlug: string,
+  ): Promise<(AcademyLesson & { course: AcademyCourse }) | null>;
+  hasPublishedQuiz(lessonId: string): Promise<boolean>;
+  findGradedAttempt(
+    attemptId: string,
+    userId: string,
+  ): Promise<
+    | (AcademyQuizAttempt & {
+        quiz: AcademyQuiz & {
+          lesson: AcademyLesson & {
+            course: AcademyCourse;
+          };
+        };
+      })
+    | null
+  >;
+  getPublishedLessonsForCourse(
+    courseId: string,
+  ): Promise<Array<Pick<AcademyLesson, "id" | "slug" | "title" | "order">>>;
+  listLessonProgressForUser(
+    userId: string,
+    lessonIds: string[],
+  ): Promise<AcademyUserLessonProgress[]>;
+  upsertLessonProgressSafe(
+    userId: string,
+    lessonId: string,
+    status: string,
+    targetCompletedAt?: Date | null,
+  ): Promise<SafeProgressUpsertResult<AcademyUserLessonProgress>>;
+  upsertCourseProgressSafe(
+    userId: string,
+    courseId: string,
+    status: string,
+    targetCompletedAt?: Date | null,
+  ): Promise<SafeProgressUpsertResult<AcademyUserCourseProgress>>;
 }
 
 export class PrismaAcademyProgressRepository
@@ -1162,6 +1206,464 @@ export class PrismaAcademyProgressRepository
         },
       },
     });
+  }
+
+  async findCourseProgressBySlug(
+    userId: string,
+    courseSlug: string,
+  ): Promise<PublishedCourseWithLessonsProgress | null> {
+    const course = await this.prisma.academyCourse.findFirst({
+      where: {
+        slug: courseSlug,
+        status: "PUBLISHED",
+      },
+    });
+
+    if (!course) {
+      return null;
+    }
+
+    const [courseProgress, publishedLessons] = await Promise.all([
+      this.prisma.academyUserCourseProgress.findUnique({
+        where: {
+          userId_courseId: {
+            userId,
+            courseId: course.id,
+          },
+        },
+      }),
+      this.prisma.academyLesson.findMany({
+        where: {
+          courseId: course.id,
+          status: "PUBLISHED",
+        },
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+          order: true,
+        },
+        orderBy: [{ order: "asc" }, { title: "asc" }, { id: "asc" }],
+      }),
+    ]);
+
+    const lessonIds = publishedLessons.map((l) => l.id);
+    const lessonProgressList =
+      lessonIds.length > 0
+        ? await this.prisma.academyUserLessonProgress.findMany({
+            where: {
+              userId,
+              lessonId: { in: lessonIds },
+            },
+          })
+        : [];
+
+    const lessonProgressMap = new Map<string, AcademyUserLessonProgress>();
+    for (const lp of lessonProgressList) {
+      lessonProgressMap.set(lp.lessonId, lp);
+    }
+
+    return {
+      course,
+      courseProgress,
+      publishedLessons,
+      lessonProgressMap,
+    };
+  }
+
+  async findPublishedLessonWithCourse(
+    courseSlug: string,
+    lessonSlug: string,
+  ): Promise<(AcademyLesson & { course: AcademyCourse }) | null> {
+    return this.prisma.academyLesson.findFirst({
+      where: {
+        slug: lessonSlug,
+        status: "PUBLISHED",
+        course: {
+          slug: courseSlug,
+          status: "PUBLISHED",
+        },
+      },
+      include: {
+        course: true,
+      },
+    });
+  }
+
+  async hasPublishedQuiz(lessonId: string): Promise<boolean> {
+    const count = await this.prisma.academyQuiz.count({
+      where: {
+        lessonId,
+        status: "PUBLISHED",
+      },
+    });
+    return count > 0;
+  }
+
+  async findGradedAttempt(
+    attemptId: string,
+    userId: string,
+  ): Promise<
+    | (AcademyQuizAttempt & {
+        quiz: AcademyQuiz & {
+          lesson: AcademyLesson & {
+            course: AcademyCourse;
+          };
+        };
+      })
+    | null
+  > {
+    return this.prisma.academyQuizAttempt.findFirst({
+      where: {
+        id: attemptId,
+        userId,
+      },
+      include: {
+        quiz: {
+          include: {
+            lesson: {
+              include: {
+                course: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async getPublishedLessonsForCourse(
+    courseId: string,
+  ): Promise<Array<Pick<AcademyLesson, "id" | "slug" | "title" | "order">>> {
+    return this.prisma.academyLesson.findMany({
+      where: {
+        courseId,
+        status: "PUBLISHED",
+      },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        order: true,
+      },
+      orderBy: [{ order: "asc" }, { title: "asc" }, { id: "asc" }],
+    });
+  }
+
+  async listLessonProgressForUser(
+    userId: string,
+    lessonIds: string[],
+  ): Promise<AcademyUserLessonProgress[]> {
+    if (lessonIds.length === 0) return [];
+    return this.prisma.academyUserLessonProgress.findMany({
+      where: {
+        userId,
+        lessonId: { in: lessonIds },
+      },
+    });
+  }
+
+  async upsertLessonProgressSafe(
+    userId: string,
+    lessonId: string,
+    status: string,
+    targetCompletedAt?: Date | null,
+  ): Promise<SafeProgressUpsertResult<AcademyUserLessonProgress>> {
+    // 1. Transaction-scoped advisory lock for concurrency safety
+    await this.prisma.$executeRaw(
+      Prisma.sql`SELECT pg_advisory_xact_lock(hashtext('lesson_progress:' || ${userId} || ':' || ${lessonId}));`,
+    );
+
+    // 2. Query existing progress under serialization
+    const existing = await this.prisma.academyUserLessonProgress.findUnique({
+      where: {
+        userId_lessonId: {
+          userId,
+          lessonId,
+        },
+      },
+    });
+
+    if (status === "COMPLETED") {
+      const completedAt = targetCompletedAt ?? new Date();
+
+      if (existing) {
+        // Monotonicity: if already COMPLETED or has completedAt, preserve original completedAt
+        if (existing.status === "COMPLETED" || existing.completedAt !== null) {
+          return {
+            progress: existing,
+            isFirstCompletion: false,
+          };
+        }
+
+        // Transition from NOT_STARTED / IN_PROGRESS to COMPLETED
+        const updated = await this.prisma.academyUserLessonProgress.update({
+          where: { id: existing.id },
+          data: {
+            status: "COMPLETED",
+            completedAt,
+          },
+        });
+
+        return {
+          progress: updated,
+          isFirstCompletion: true,
+        };
+      }
+
+      // No prior record: insert new COMPLETED record
+      try {
+        const created = await this.prisma.academyUserLessonProgress.create({
+          data: {
+            userId,
+            lessonId,
+            status: "COMPLETED",
+            startedAt: completedAt,
+            completedAt,
+          },
+        });
+
+        return {
+          progress: created,
+          isFirstCompletion: true,
+        };
+      } catch (err: unknown) {
+        if (this.isP2002Error(err)) {
+          const fallback = await this.prisma.academyUserLessonProgress.findUnique({
+            where: {
+              userId_lessonId: {
+                userId,
+                lessonId,
+              },
+            },
+          });
+          if (fallback) {
+            return {
+              progress: fallback,
+              isFirstCompletion: false,
+            };
+          }
+        }
+        throw err;
+      }
+    }
+
+    // status !== "COMPLETED" (e.g. IN_PROGRESS or NOT_STARTED)
+    if (existing) {
+      // Monotonicity: NEVER downgrade COMPLETED to IN_PROGRESS or NOT_STARTED
+      if (existing.status === "COMPLETED" || existing.completedAt !== null) {
+        return {
+          progress: existing,
+          isFirstCompletion: false,
+        };
+      }
+
+      const updated = await this.prisma.academyUserLessonProgress.update({
+        where: { id: existing.id },
+        data: {
+          status,
+          completedAt: null,
+        },
+      });
+
+      return {
+        progress: updated,
+        isFirstCompletion: false,
+      };
+    }
+
+    try {
+      const created = await this.prisma.academyUserLessonProgress.create({
+        data: {
+          userId,
+          lessonId,
+          status,
+          startedAt: new Date(),
+          completedAt: null,
+        },
+      });
+
+      return {
+        progress: created,
+        isFirstCompletion: false,
+      };
+    } catch (err: unknown) {
+      if (this.isP2002Error(err)) {
+        const fallback = await this.prisma.academyUserLessonProgress.findUnique({
+          where: {
+            userId_lessonId: {
+              userId,
+              lessonId,
+            },
+          },
+        });
+        if (fallback) {
+          return {
+            progress: fallback,
+            isFirstCompletion: false,
+          };
+        }
+      }
+      throw err;
+    }
+  }
+
+  async upsertCourseProgressSafe(
+    userId: string,
+    courseId: string,
+    status: string,
+    targetCompletedAt?: Date | null,
+  ): Promise<SafeProgressUpsertResult<AcademyUserCourseProgress>> {
+    // 1. Transaction-scoped advisory lock for concurrency safety
+    await this.prisma.$executeRaw(
+      Prisma.sql`SELECT pg_advisory_xact_lock(hashtext('course_progress:' || ${userId} || ':' || ${courseId}));`,
+    );
+
+    // 2. Query existing course progress under serialization
+    const existing = await this.prisma.academyUserCourseProgress.findUnique({
+      where: {
+        userId_courseId: {
+          userId,
+          courseId,
+        },
+      },
+    });
+
+    if (status === "COMPLETED") {
+      const completedAt = targetCompletedAt ?? new Date();
+
+      if (existing) {
+        // Monotonicity: if already COMPLETED or has completedAt, preserve original completedAt
+        if (existing.status === "COMPLETED" || existing.completedAt !== null) {
+          return {
+            progress: existing,
+            isFirstCompletion: false,
+          };
+        }
+
+        // Transition from NOT_STARTED / IN_PROGRESS to COMPLETED
+        const updated = await this.prisma.academyUserCourseProgress.update({
+          where: { id: existing.id },
+          data: {
+            status: "COMPLETED",
+            completedAt,
+          },
+        });
+
+        return {
+          progress: updated,
+          isFirstCompletion: true,
+        };
+      }
+
+      // No prior record: insert new COMPLETED record
+      try {
+        const created = await this.prisma.academyUserCourseProgress.create({
+          data: {
+            userId,
+            courseId,
+            status: "COMPLETED",
+            startedAt: completedAt,
+            completedAt,
+          },
+        });
+
+        return {
+          progress: created,
+          isFirstCompletion: true,
+        };
+      } catch (err: unknown) {
+        if (this.isP2002Error(err)) {
+          const fallback = await this.prisma.academyUserCourseProgress.findUnique({
+            where: {
+              userId_courseId: {
+                userId,
+                courseId,
+              },
+            },
+          });
+          if (fallback) {
+            return {
+              progress: fallback,
+              isFirstCompletion: false,
+            };
+          }
+        }
+        throw err;
+      }
+    }
+
+    // status !== "COMPLETED" (e.g. IN_PROGRESS)
+    if (existing) {
+      // Monotonicity: NEVER downgrade COMPLETED course progress
+      if (existing.status === "COMPLETED" || existing.completedAt !== null) {
+        return {
+          progress: existing,
+          isFirstCompletion: false,
+        };
+      }
+
+      const updated = await this.prisma.academyUserCourseProgress.update({
+        where: { id: existing.id },
+        data: {
+          status,
+          completedAt: null,
+        },
+      });
+
+      return {
+        progress: updated,
+        isFirstCompletion: false,
+      };
+    }
+
+    try {
+      const created = await this.prisma.academyUserCourseProgress.create({
+        data: {
+          userId,
+          courseId,
+          status,
+          startedAt: new Date(),
+          completedAt: null,
+        },
+      });
+
+      return {
+        progress: created,
+        isFirstCompletion: false,
+      };
+    } catch (err: unknown) {
+      if (this.isP2002Error(err)) {
+        const fallback = await this.prisma.academyUserCourseProgress.findUnique({
+          where: {
+            userId_courseId: {
+              userId,
+              courseId,
+            },
+          },
+        });
+        if (fallback) {
+          return {
+            progress: fallback,
+            isFirstCompletion: false,
+          };
+        }
+      }
+      throw err;
+    }
+  }
+
+  private isP2002Error(err: unknown): boolean {
+    if (!err || typeof err !== "object") return false;
+    const errObj = err as Record<string, unknown>;
+    if (errObj.code === "P2002") return true;
+    if (
+      errObj.cause &&
+      typeof errObj.cause === "object" &&
+      (errObj.cause as Record<string, unknown>).code === "P2002"
+    )
+      return true;
+    return false;
   }
 }
 

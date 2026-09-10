@@ -53,7 +53,10 @@ export class AcademyCourseReadService {
     };
   }
 
-  async getLessonBySlug(courseSlug: string, lessonSlug: string): Promise<LessonDetailResponse> {
+  async getLessonBySlug(
+    courseSlug: string,
+    lessonSlug: string,
+  ): Promise<LessonDetailResponse> {
     const lesson = await this.courseRepo.findPublishedLessonByCourseAndSlug(courseSlug, lessonSlug);
 
     if (!lesson) {

@@ -221,6 +221,14 @@ export function useSubmitQuizAttemptMutation() {
         queryClient.invalidateQueries({
           queryKey: ["academy", "quiz-attempt", "current", variables.courseSlug, variables.lessonSlug],
         });
+        queryClient.invalidateQueries({
+          queryKey: ["academy", "lesson", variables.courseSlug, variables.lessonSlug],
+        });
+      }
+      if (variables.courseSlug) {
+        queryClient.invalidateQueries({
+          queryKey: ["academy", "course-progress", variables.courseSlug],
+        });
       }
     },
   });
@@ -240,6 +248,45 @@ export function useGradedQuizResultQuery(
     retry: false,
   });
 }
+
+export function useCourseProgressQuery(
+  courseSlug: string | undefined,
+  accessToken?: string,
+) {
+  return useQuery({
+    queryKey: ["academy", "course-progress", courseSlug],
+    queryFn: () => {
+      if (!courseSlug) throw new Error("Course slug is required");
+      return academyApi.getCourseProgress(courseSlug, accessToken);
+    },
+    enabled: Boolean(courseSlug && accessToken),
+    retry: false,
+  });
+}
+
+export function useCompleteLessonMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      courseSlug,
+      lessonSlug,
+      accessToken,
+    }: {
+      courseSlug: string;
+      lessonSlug: string;
+      accessToken?: string;
+    }) => academyApi.completeLesson(courseSlug, lessonSlug, accessToken),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["academy", "course-progress", variables.courseSlug],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["academy", "lesson", variables.courseSlug, variables.lessonSlug],
+      });
+    },
+  });
+}
+
 
 
 

@@ -13,7 +13,7 @@
 - FEAT-023: DONE (Human Final Gate APPROVED)
 - FEAT-024: DONE (Human Final Gate APPROVED)
 - FEAT-025: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
-- FEAT-026: READY FOR PLANNING REVIEW
+- FEAT-026: APPROVED FOR IMPLEMENTATION (Planning Owner: Codex; Implementation NOT_STARTED; Implementation Owner: Antigravity / DEV-A)
 - FEAT-027+: BLOCKED according to dependency graph
 - Phase 4: IN_PROGRESS
 - Phase 5: BLOCKED
@@ -200,8 +200,8 @@ Human decision required:
 | FEAT-023 | Quiz Definition & Safe Projection | Implementation | DONE (Human Final Gate APPROVED) |
 | FEAT-024 | Quiz Attempt Lifecycle | Implementation | DONE (Human Final Gate APPROVED) |
 | FEAT-025 | Server-Side Quiz Evaluation & Secure Submission | Implementation | DONE (Internal Feature Gate: PASS) |
-| FEAT-026 | Academy Progression & Completion Tracking | Implementation | READY FOR PLANNING REVIEW (Dependencies: FEAT-020, FEAT-024, FEAT-025) |
-| FEAT-027 | XP & Idempotent Reward Ledger | Implementation | FEAT-025, FEAT-026 |
+| FEAT-026 | Academy Progression & Completion Tracking | Implementation | APPROVED FOR IMPLEMENTATION (Planning Owner: Codex; Implementation NOT_STARTED; Dependencies: FEAT-020, FEAT-024, FEAT-025) |
+| FEAT-027 | XP & Idempotent Reward Ledger | Implementation | BLOCKED by FEAT-026 |
 | FEAT-028 | Academy Authorization & Ownership Hardening | Implementation / hardening | FEAT-020..FEAT-027 |
 | FEAT-029 | Academy Product Audit Decision & Integration | Conditional implementation | FEAT-025, FEAT-027, Human audit decision |
 | FEAT-030 | Phase 4 Academy Integration Gate | Validation gate | FEAT-019..FEAT-029 as applicable |
@@ -294,15 +294,19 @@ Human Decisions: Passing thresholds and scoring policy.
 
 ### FEAT-026 - Academy Progression & Completion Tracking
 
-Goal: Maintain server-authoritative course/lesson/quiz progression.
+Goal: Maintain server-authoritative course and lesson progression for the authenticated learner while preserving FEAT-025 grading ownership.
 
-Scope: User progress records, completion state, percentage calculation, read APIs for current user.
+Scope: User lesson progress, user course progress, percentage calculation, authenticated read API, informational lesson completion proposal, post-grade reconciliation from FEAT-025 `GRADED` attempts, frontend progress presentation, and internal completion fact contract for FEAT-027.
 
-Excluded: XP/reward granting and admin analytics.
+Excluded: XP/reward granting, `AcademyUserXp` writes, `AcademyRewardLedger` writes, product audit emission, Redis durable progress authority, quiz scoring/evaluation, FEAT-027 behavior, and admin analytics.
 
-QA Gate: User-scoped access, concurrency-safe completion, no client-written percentages.
+QA Gate: User-scoped access, server-authoritative progression, concurrency-safe completion, FEAT-025 reconciliation retry, progress/correctness secrecy regression, zero XP/reward/audit/Redis side effects.
 
-Human Decisions: Course completion formula.
+Planning Status: HUMAN APPROVED (Codex-owned). Implementation: COMPLETE. Internal Feature Gate: PASS.
+
+Human Decisions: APPROVED - quiz pass auto-completion, informational lesson completion policy, lesson/course monotonicity, new-published-lesson semantics, draft/archived denominator policy, zero-published-lesson semantics, and percentage rounding. Unresolved Human Decisions: ZERO.
+
+Human-Approved Migration Decision: ZERO production migration based on existing progress tables and constraints.
 
 ### FEAT-027 - XP & Idempotent Reward Ledger
 
