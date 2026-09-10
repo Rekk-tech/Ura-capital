@@ -7,10 +7,12 @@ import {
   toQuizAttemptDto,
   type QuizAttemptDto,
   type StartAttemptResult,
+  type QuizResultDto,
 } from "./academy.dto.js";
 import {
   startQuizAttemptBodySchema,
   saveDraftAnswerBodySchema,
+  submitQuizAttemptBodySchema,
 } from "./academy.validation.js";
 
 export class AcademyQuizAttemptService {
@@ -241,6 +243,51 @@ export class AcademyQuizAttemptService {
       selectedOptionId: answer.selectedOptionId ?? option.id,
       updatedAt: answer.updatedAt.toISOString(),
     };
+  }
+
+  /**
+   * FEAT-025: Submit and grade quiz attempt server-authoritatively.
+   */
+  async submitAttempt(
+    userId: string,
+    attemptId: string,
+    body: unknown,
+  ): Promise<QuizResultDto> {
+    // 1. Strict Zod validation: rejects forged fields or non-empty body with 400 VALIDATION_ERROR
+    const parsedBody = submitQuizAttemptBodySchema.safeParse(body);
+    if (!parsedBody.success) {
+      throw new AppError(
+        "Validation failed",
+        ERROR_CODES.VALIDATION_ERROR,
+        HTTP_STATUS.BAD_REQUEST,
+      );
+    }
+
+    // 2. Coordinate atomic evaluation transaction within TransactionRunner
+    return await this.txRunner.run(async (ctx) => {
+      return await ctx.repositories.academyQuizRepo.submitAndGradeAttempt(
+        userId,
+        attemptId,
+      );
+    });
+  }
+
+  /**
+   * FEAT-025: Read historical graded result for an owned attempt.
+   */
+  async getGradedResult(
+    userId: string,
+    attemptId: string,
+  ): Promise<QuizResultDto> {
+    const result = await this.quizRepo.findGradedAttemptResult(attemptId, userId);
+    if (!result) {
+      throw new AppError(
+        "Quiz attempt not found",
+        ERROR_CODES.QUIZ_ATTEMPT_NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND,
+      );
+    }
+    return result;
   }
 
   private isP2002Error(err: unknown): boolean {

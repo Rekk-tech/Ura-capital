@@ -12,10 +12,17 @@
 - FEAT-022: DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED)
 - FEAT-023: DONE (Human Final Gate APPROVED)
 - FEAT-024: DONE (Human Final Gate APPROVED)
-- FEAT-025: UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED)
-- FEAT-026+: BLOCKED according to dependency graph
+- FEAT-025: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
+- FEAT-026: READY FOR PLANNING REVIEW
+- FEAT-027+: BLOCKED according to dependency graph
 - Phase 4: IN_PROGRESS
 - Phase 5: BLOCKED
+
+**Master Planning Governance**:
+- Remaining Phase 4 phase-owned workflow transition: HUMAN APPROVED.
+- FEAT-019 through FEAT-024 historical QA and Human Final Gate approvals are preserved.
+- FEAT-025 through FEAT-029 use internal feature quality gates.
+- FEAT-030 is the Phase 4 Academy Integration Gate with Human Phase Final Gate after Codex Phase QA.
 
 
 *(HISTORICAL SNAPSHOT: Prior to FEAT-020 Human Final Gate approval, FEAT-020 was IMPLEMENTED / READY FOR QA and FEAT-021 through FEAT-030 were BLOCKED by dependency order).*
@@ -192,8 +199,8 @@ Human decision required:
 | FEAT-022 | Flashcards Domain & Review Flow | Implementation | DONE (Human Final Gate APPROVED) |
 | FEAT-023 | Quiz Definition & Safe Projection | Implementation | DONE (Human Final Gate APPROVED) |
 | FEAT-024 | Quiz Attempt Lifecycle | Implementation | DONE (Human Final Gate APPROVED) |
-| FEAT-025 | Server-Side Quiz Evaluation & Secure Submission | Implementation | UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED) |
-| FEAT-026 | Academy Progression & Completion Tracking | Implementation | FEAT-020, FEAT-024, FEAT-025 |
+| FEAT-025 | Server-Side Quiz Evaluation & Secure Submission | Implementation | DONE (Internal Feature Gate: PASS) |
+| FEAT-026 | Academy Progression & Completion Tracking | Implementation | READY FOR PLANNING REVIEW (Dependencies: FEAT-020, FEAT-024, FEAT-025) |
 | FEAT-027 | XP & Idempotent Reward Ledger | Implementation | FEAT-025, FEAT-026 |
 | FEAT-028 | Academy Authorization & Ownership Hardening | Implementation / hardening | FEAT-020..FEAT-027 |
 | FEAT-029 | Academy Product Audit Decision & Integration | Conditional implementation | FEAT-025, FEAT-027, Human audit decision |
@@ -341,6 +348,8 @@ Scope: Full Academy lifecycle, answer leakage, ownership, progression, XP idempo
 
 Excluded: New product functionality.
 
+QA Report: Codex writes `reports/qa/phase-4/PHASE-4-QA.md` or an explicitly canonical equivalent.
+
 QA Gate: PASS / CONDITIONAL PASS / FAIL with no unresolved P0/P1 security, integrity, or answer leakage defects.
 
 Human Decisions: Final Phase 4 approval.
@@ -361,10 +370,19 @@ FEAT-019
 
 FEAT-030 is the final Phase 4 Academy Integration Gate.
 
+Workflow transition:
+
+- FEAT-019 through FEAT-024 retain their existing QA history, Human approvals, and Final Gate decisions.
+- FEAT-025 through FEAT-029 use the new phase-owned workflow.
+- Under the new workflow, FEAT-025 through FEAT-029 still require immutable approved specs, implementation, tests, implementation reports, internal feature quality gates, and dependency satisfaction.
+- FEAT-025 through FEAT-029 do not require separate Human Final Gates before FEAT-030.
+- Human approval is primarily Master Planning Approval, then the Phase 4 Final Gate after FEAT-030 QA.
+
 PASS requires:
 
-- FEAT-019 through FEAT-028 are DONE / QA PASS / Human Final Gate APPROVED.
-- FEAT-029 is either DONE / QA PASS / Human Final Gate APPROVED or explicitly deferred by Human with documented risk.
+- FEAT-019 through FEAT-024 remain DONE / QA PASS / Human Final Gate APPROVED according to their historical governance.
+- FEAT-025 through FEAT-028 complete implementation reports, tests, and internal feature quality gates under the phase-owned workflow.
+- FEAT-029 either completes its internal quality gate or is explicitly deferred by Human with documented risk.
 - Correct answers are never exposed before submission.
 - Server-side evaluation, progression, XP, and rewards are authoritative.
 - Duplicate rewards are prevented by PostgreSQL constraints and transactions.

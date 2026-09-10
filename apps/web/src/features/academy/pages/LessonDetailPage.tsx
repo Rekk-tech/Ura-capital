@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ChevronRight, ArrowLeft, ArrowRight, BookOpen, Layers, HelpCircle } from "lucide-react";
+import { ChevronRight, ArrowLeft, ArrowRight, BookOpen, Layers, HelpCircle, CheckCircle, XCircle } from "lucide-react";
 import {
   useLessonQuery,
   useCourseQuery,
@@ -8,6 +8,8 @@ import {
   useCurrentQuizAttemptQuery,
   useStartQuizAttemptMutation,
   useSaveDraftQuizAnswerMutation,
+  useSubmitQuizAttemptMutation,
+  useGradedQuizResultQuery,
 } from "../hooks/use-academy";
 import { LessonContent } from "../components/LessonContent";
 import { LessonDetailSkeleton, AuthRequiredCard, NotFoundState, ErrorState } from "../components/AcademyStates";
@@ -25,21 +27,48 @@ export const LessonDetailPage: React.FC = () => {
   // Query C: Lesson Quiz Definition (FEAT-023)
   const quizQuery = useLessonQuizQuery(courseSlug, lessonSlug);
 
-  // Query D & Mutations: Quiz Attempt Lifecycle (FEAT-024)
+  // Query D & Mutations: Quiz Attempt Lifecycle (FEAT-024 & FEAT-025)
   const currentAttemptQuery = useCurrentQuizAttemptQuery(courseSlug, lessonSlug);
   const startAttemptMutation = useStartQuizAttemptMutation();
   const saveDraftMutation = useSaveDraftQuizAnswerMutation();
+  const submitAttemptMutation = useSubmitQuizAttemptMutation();
   const [savingQuestionId, setSavingQuestionId] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const activeAttempt =
     currentAttemptQuery.data?.data && currentAttemptQuery.data.data.status === "IN_PROGRESS"
       ? currentAttemptQuery.data.data
       : null;
 
+  const gradedAttemptId =
+    currentAttemptQuery.data?.data && currentAttemptQuery.data.data.status === "GRADED"
+      ? currentAttemptQuery.data.data.id
+      : submitAttemptMutation.data?.data
+        ? submitAttemptMutation.data.data.attemptId
+        : undefined;
+
+  const gradedResultQuery = useGradedQuizResultQuery(gradedAttemptId);
+  const gradedResult = submitAttemptMutation.data?.data ?? gradedResultQuery.data?.data;
+
   const handleStartQuiz = () => {
     if (!courseSlug || !lessonSlug) return;
+    setSubmitError(null);
     startAttemptMutation.mutate({ courseSlug, lessonSlug });
+  };
+
+  const handleSubmitQuiz = () => {
+    if (!activeAttempt || !courseSlug || !lessonSlug) return;
+    setSubmitError(null);
+    submitAttemptMutation.mutate({
+      attemptId: activeAttempt.id,
+      courseSlug,
+      lessonSlug,
+    }, {
+      onError: (err) => {
+        setSubmitError(err instanceof Error ? err.message : "Failed to submit quiz.");
+      },
+    });
   };
 
   const handleSelectOption = (questionId: string, optionId: string) => {
@@ -251,8 +280,104 @@ export const LessonDetailPage: React.FC = () => {
               )}
             </div>
 
-            {/* If no active attempt: display Start Quiz button */}
-            {!activeAttempt && (
+            {/* Graded Result Card (FEAT-025) */}
+            {gradedResult && (
+              <div
+                className="quiz-graded-card"
+                data-testid="quiz-graded-card"
+                style={{
+                  marginTop: "1.5rem",
+                  padding: "1.5rem",
+                  borderRadius: "0.5rem",
+                  backgroundColor: gradedResult.passed ? "rgba(34, 197, 94, 0.08)" : "rgba(239, 68, 68, 0.08)",
+                  border: `1px solid ${gradedResult.passed ? "rgba(34, 197, 94, 0.3)" : "rgba(239, 68, 68, 0.3)"}`,
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+                  <div>
+                    <h3 style={{ fontSize: "1.25rem", fontWeight: 700, margin: 0, color: gradedResult.passed ? "#22c55e" : "#ef4444" }}>
+                      Quiz {gradedResult.passed ? "Passed" : "Failed"}
+                    </h3>
+                    <p style={{ margin: "0.25rem 0 0 0", fontSize: "0.875rem", color: "var(--color-text-muted, #94a3b8)" }}>
+                      Final Score: <strong style={{ color: "var(--color-text, #fff)" }}>{gradedResult.score}%</strong>
+                    </p>
+                  </div>
+                  <span
+                    data-testid="quiz-result-badge"
+                    style={{
+                      padding: "0.25rem 0.75rem",
+                      borderRadius: "9999px",
+                      fontSize: "0.75rem",
+                      fontWeight: 600,
+                      backgroundColor: gradedResult.passed ? "rgba(34, 197, 94, 0.2)" : "rgba(239, 68, 68, 0.2)",
+                      color: gradedResult.passed ? "#22c55e" : "#ef4444",
+                    }}
+                  >
+                    {gradedResult.passed ? "PASSED" : "FAILED"}
+                  </span>
+                </div>
+
+                {/* Per-question correctness breakdown */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginTop: "1rem" }}>
+                  {quizQuery.data.data.questions.map((q, idx) => {
+                    const ans = gradedResult.answers.find((a) => a.questionId === q.id);
+                    const isCorrect = ans?.isCorrect ?? false;
+                    return (
+                      <div
+                        key={q.id}
+                        data-testid={`graded-question-${q.id}`}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          padding: "0.5rem 0.75rem",
+                          borderRadius: "0.375rem",
+                          backgroundColor: "rgba(255, 255, 255, 0.02)",
+                          fontSize: "0.875rem",
+                        }}
+                      >
+                        <span>{idx + 1}. {q.prompt}</span>
+                        <span
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.25rem",
+                            color: isCorrect ? "#22c55e" : "#ef4444",
+                            fontWeight: 500,
+                          }}
+                          data-testid={`question-correctness-${q.id}`}
+                        >
+                          {isCorrect ? (
+                            <>
+                              <CheckCircle size={14} /> Correct
+                            </>
+                          ) : (
+                            <>
+                              <XCircle size={14} /> Incorrect
+                            </>
+                          )}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div style={{ marginTop: "1.5rem" }}>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={handleStartQuiz}
+                    disabled={startAttemptMutation.isPending}
+                    data-testid="retake-quiz-button"
+                  >
+                    {startAttemptMutation.isPending ? "Starting New Attempt..." : "Retake Quiz"}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* If no active attempt and no graded result: display Start Quiz button */}
+            {!gradedResult && !activeAttempt && (
               <div style={{ marginTop: "1rem" }}>
                 {startAttemptMutation.isError && (
                   <p
@@ -277,8 +402,8 @@ export const LessonDetailPage: React.FC = () => {
               </div>
             )}
 
-            {/* If active attempt exists: render safe questions and single-choice options */}
-            {activeAttempt && (
+            {/* If active attempt exists and not yet graded: render safe questions and single-choice options */}
+            {!gradedResult && activeAttempt && (
               <div
                 className="quiz-attempt-questions"
                 data-testid="quiz-attempt-container"
@@ -370,6 +495,43 @@ export const LessonDetailPage: React.FC = () => {
                     </div>
                   );
                 })}
+
+                {/* Submit Quiz Controls */}
+                {(() => {
+                  const answeredCount = quizQuery.data.data.questions.filter((q) => {
+                    const ans = activeAttempt.answers.find((a) => a.questionId === q.id);
+                    return Boolean(ans && ans.selectedOptionId);
+                  }).length;
+                  const totalCount = quizQuery.data.data.questions.length;
+                  const allAnswered = totalCount > 0 && answeredCount === totalCount;
+
+                  return (
+                    <div style={{ marginTop: "0.5rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ fontSize: "0.875rem", color: "var(--color-text-muted, #94a3b8)" }}>
+                          {answeredCount} of {totalCount} questions answered
+                        </span>
+                        {allAnswered && (
+                          <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={handleSubmitQuiz}
+                            disabled={submitAttemptMutation.isPending}
+                            data-testid="submit-quiz-button"
+                            style={{ cursor: submitAttemptMutation.isPending ? "not-allowed" : "pointer" }}
+                          >
+                            {submitAttemptMutation.isPending ? "Submitting Quiz..." : "Submit Quiz"}
+                          </button>
+                        )}
+                      </div>
+                      {submitError && (
+                        <p style={{ color: "#ef4444", fontSize: "0.875rem", margin: 0 }} data-testid="submit-quiz-error">
+                          {submitError}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
             )}
           </section>

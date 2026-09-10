@@ -118,6 +118,30 @@ export function createAcademyRouter(
     (req, res, next) => attemptCtrl.recordDraftAnswer(req, res, next),
   );
 
+  // 10. Submit Quiz Attempt (Authenticated)
+  router.post(
+    "/api/academy/quiz-attempts/:attemptId/submit",
+    authenticate,
+    (req, res, next) => attemptCtrl.submitAttempt(req, res, next),
+  );
+  router.post(
+    "/academy/quiz-attempts/:attemptId/submit",
+    authenticate,
+    (req, res, next) => attemptCtrl.submitAttempt(req, res, next),
+  );
+
+  // 11. Get Graded Attempt Result (Authenticated)
+  router.get(
+    "/api/academy/quiz-attempts/:attemptId/result",
+    authenticate,
+    (req, res, next) => attemptCtrl.getGradedResult(req, res, next),
+  );
+  router.get(
+    "/academy/quiz-attempts/:attemptId/result",
+    authenticate,
+    (req, res, next) => attemptCtrl.getGradedResult(req, res, next),
+  );
+
   return router;
 }
 

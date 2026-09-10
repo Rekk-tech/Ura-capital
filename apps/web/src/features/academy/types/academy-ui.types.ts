@@ -140,4 +140,23 @@ export interface QuizAttemptDto {
   answers: QuizDraftAnswerDto[];
 }
 
+// FEAT-025: Academy Quiz Result UI Types
+export interface QuizResultAnswerDto {
+  questionId: string;
+  selectedOptionId: string | null;
+  isCorrect: boolean;
+  correctOptionId: string;
+}
+
+export interface QuizResultDto {
+  attemptId: string;
+  quizId: string;
+  status: "GRADED";
+  score: number;
+  passed: boolean;
+  submittedAt: string;
+  gradedAt: string;
+  answers: QuizResultAnswerDto[];
+}
+
 

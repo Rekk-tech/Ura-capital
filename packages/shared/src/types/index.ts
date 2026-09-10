@@ -104,3 +104,26 @@ export interface SaveDraftAnswerResponse {
   };
 }
 
+// FEAT-025 Quiz Evaluation & Secure Submission DTOs
+export interface QuizResultAnswerDto {
+  questionId: string;
+  selectedOptionId: string | null;
+  isCorrect: boolean;
+  correctOptionId: string;
+}
+
+export interface QuizResultDto {
+  attemptId: string;
+  quizId: string;
+  status: "GRADED";
+  score: number;
+  passed: boolean;
+  submittedAt: string;
+  gradedAt: string;
+  answers: QuizResultAnswerDto[];
+}
+
+export interface QuizResultResponse {
+  data: QuizResultDto;
+}
+

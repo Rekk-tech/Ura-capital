@@ -200,5 +200,46 @@ export function useSaveDraftQuizAnswerMutation() {
   });
 }
 
+export function useSubmitQuizAttemptMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      attemptId,
+      accessToken,
+    }: {
+      attemptId: string;
+      accessToken?: string;
+      courseSlug?: string;
+      lessonSlug?: string;
+    }) => academyApi.submitQuizAttempt(attemptId, accessToken),
+    onSuccess: (result, variables) => {
+      queryClient.setQueryData(
+        ["academy", "quiz-result", variables.attemptId],
+        result,
+      );
+      if (variables.courseSlug && variables.lessonSlug) {
+        queryClient.invalidateQueries({
+          queryKey: ["academy", "quiz-attempt", "current", variables.courseSlug, variables.lessonSlug],
+        });
+      }
+    },
+  });
+}
+
+export function useGradedQuizResultQuery(
+  attemptId: string | undefined,
+  accessToken?: string,
+) {
+  return useQuery({
+    queryKey: ["academy", "quiz-result", attemptId],
+    queryFn: () => {
+      if (!attemptId) throw new Error("Attempt ID is required");
+      return academyApi.getGradedQuizResult(attemptId, accessToken);
+    },
+    enabled: Boolean(attemptId),
+    retry: false,
+  });
+}
+
 
 

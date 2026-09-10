@@ -34,6 +34,8 @@ import type {
   UpsertDraftAnswerInput,
 } from "./academy.types.js";
 import { getPrismaClient } from "../../infrastructure/database/prisma.js";
+import { ERROR_CODES, HTTP_STATUS, type QuizResultDto, type QuizResultAnswerDto } from "@aura/shared";
+import { AppError } from "../../shared/errors/error-envelope.js";
 
 type DbClient = PrismaClient | Prisma.TransactionClient;
 
@@ -342,6 +344,14 @@ export interface IAcademyQuizRepository {
     | null
   >;
   verifyPublishedHierarchyByQuizId(quizId: string): Promise<boolean>;
+  submitAndGradeAttempt(
+    userId: string,
+    attemptId: string,
+  ): Promise<QuizResultDto>;
+  findGradedAttemptResult(
+    attemptId: string,
+    userId: string,
+  ): Promise<QuizResultDto | null>;
 }
 
 
@@ -770,6 +780,276 @@ export class PrismaAcademyQuizRepository implements IAcademyQuizRepository {
       select: { id: true },
     });
     return quiz !== null;
+  }
+
+  async submitAndGradeAttempt(
+    userId: string,
+    attemptId: string,
+  ): Promise<QuizResultDto> {
+    // 1. Acquire row lock using SELECT ... FOR UPDATE scoped by attemptId and userId
+    interface RawAttemptRow {
+      id: string;
+      user_id: string;
+      quiz_id: string;
+      status: string;
+      score: number | null;
+      passed: boolean | null;
+      submitted_at: Date | null;
+      graded_at: Date | null;
+    }
+
+    const attempts = await this.prisma.$queryRaw<RawAttemptRow[]>(
+      Prisma.sql`SELECT id, user_id, quiz_id, status, score, passed, submitted_at, graded_at FROM "academy_quiz_attempts" WHERE "id" = ${attemptId} AND "user_id" = ${userId} FOR UPDATE;`,
+    );
+
+    if (attempts.length === 0) {
+      throw new AppError(
+        "Quiz attempt not found",
+        ERROR_CODES.QUIZ_ATTEMPT_NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND,
+      );
+    }
+
+    const attempt = attempts[0]!;
+
+    // 2. Re-read under lock: If already GRADED, execute idempotent replay
+    if (attempt.status === "GRADED") {
+      return this.reconstructPersistedResult(
+        attempt.id,
+        attempt.quiz_id,
+        attempt.score!,
+        attempt.passed!,
+        attempt.submitted_at!,
+        attempt.graded_at!,
+      );
+    }
+
+    // 3. Ensure attempt is IN_PROGRESS (CREATED or any other status yields 404)
+    if (attempt.status !== "IN_PROGRESS") {
+      throw new AppError(
+        "Quiz attempt not found",
+        ERROR_CODES.QUIZ_ATTEMPT_NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND,
+      );
+    }
+
+    // 4. Validate content publication scoping: Course, Lesson, Quiz must be PUBLISHED
+    const quiz = await this.prisma.academyQuiz.findUnique({
+      where: { id: attempt.quiz_id },
+      include: {
+        lesson: {
+          include: {
+            course: true,
+          },
+        },
+      },
+    });
+
+    if (
+      !quiz ||
+      quiz.status !== "PUBLISHED" ||
+      quiz.lesson.status !== "PUBLISHED" ||
+      quiz.lesson.course.status !== "PUBLISHED"
+    ) {
+      throw new AppError(
+        "Resource not found",
+        ERROR_CODES.NOT_FOUND,
+        HTTP_STATUS.NOT_FOUND,
+      );
+    }
+
+    // 5. Load quiz questions and options
+    const questions = await this.prisma.academyQuizQuestion.findMany({
+      where: { quizId: quiz.id },
+      include: {
+        options: {
+          orderBy: { order: "asc" },
+        },
+      },
+      orderBy: { order: "asc" },
+    });
+
+    if (questions.length === 0) {
+      throw new AppError(
+        "Quiz has no questions to evaluate",
+        ERROR_CODES.INVALID_QUIZ_STATE,
+        HTTP_STATUS.BAD_REQUEST,
+      );
+    }
+
+    // 6. Load all draft answers for this attempt
+    const draftAnswers = await this.prisma.academyQuizAnswer.findMany({
+      where: { attemptId: attempt.id },
+    });
+
+    // 7. Strict completeness check: Ensure all questions have a draft answer with a selected option
+    const answeredMap = new Map(draftAnswers.map((a) => [a.questionId, a]));
+    for (const q of questions) {
+      const draft = answeredMap.get(q.id);
+      if (!draft || !draft.selectedOptionId) {
+        throw new AppError(
+          "All questions must be answered before submitting",
+          ERROR_CODES.UNANSWERED_QUESTIONS,
+          HTTP_STATUS.BAD_REQUEST,
+        );
+      }
+    }
+
+    // 8. Transactional intermediate step: set status = 'SUBMITTED'
+    const now = new Date();
+    await this.prisma.academyQuizAttempt.update({
+      where: { id: attempt.id },
+      data: {
+        status: "SUBMITTED",
+        submittedAt: now,
+      },
+    });
+
+    // 9. Evaluate each answer against current server-authoritative quiz definition
+    let correctCount = 0;
+    const evaluatedAnswers: QuizResultAnswerDto[] = [];
+
+    for (const question of questions) {
+      const draft = answeredMap.get(question.id)!;
+
+      // Relational validation
+      if (draft.quizId !== quiz.id) {
+        throw new Error("Integrity defect: draft answer quizId mismatch");
+      }
+
+      // Exactly-one-correct defensive check
+      const correctOptions = question.options.filter((o) => o.isCorrect);
+      if (correctOptions.length !== 1) {
+        throw new Error(`Integrity defect: question ${question.id} has ${correctOptions.length} correct options`);
+      }
+      const correctOption = correctOptions[0]!;
+
+      // Option relational validation
+      const optionBelongs = question.options.some((o) => o.id === draft.selectedOptionId);
+      if (!optionBelongs) {
+        throw new Error("Integrity defect: selectedOptionId does not belong to question");
+      }
+
+      const isCorrect = draft.selectedOptionId === correctOption.id;
+      if (isCorrect) {
+        correctCount += 1;
+      }
+
+      // Persist frozen correctness snapshots atomically
+      await this.prisma.academyQuizAnswer.update({
+        where: {
+          attemptId_questionId: {
+            attemptId: attempt.id,
+            questionId: question.id,
+          },
+        },
+        data: {
+          isCorrect,
+          correctOptionIdSnapshot: correctOption.id,
+          correctOptionTextSnapshot: correctOption.text,
+        },
+      });
+
+      evaluatedAnswers.push({
+        questionId: question.id,
+        selectedOptionId: draft.selectedOptionId,
+        isCorrect,
+        correctOptionId: correctOption.id,
+      });
+    }
+
+    // 10. Compute integer score and pass/fail
+    const score = Math.round((correctCount / questions.length) * 100);
+    const passed = score >= quiz.passingScore;
+
+    // 11. Finalize attempt to GRADED
+    const finalizedAttempt = await this.prisma.academyQuizAttempt.update({
+      where: { id: attempt.id },
+      data: {
+        status: "GRADED",
+        score,
+        passed,
+        gradedAt: now,
+      },
+    });
+
+    return {
+      attemptId: finalizedAttempt.id,
+      quizId: finalizedAttempt.quizId,
+      status: "GRADED",
+      score,
+      passed,
+      submittedAt: finalizedAttempt.submittedAt!.toISOString(),
+      gradedAt: finalizedAttempt.gradedAt!.toISOString(),
+      answers: evaluatedAnswers,
+    };
+  }
+
+  private async reconstructPersistedResult(
+    attemptId: string,
+    quizId: string,
+    score: number,
+    passed: boolean,
+    submittedAt: Date,
+    gradedAt: Date,
+  ): Promise<QuizResultDto> {
+    const answers = await this.prisma.academyQuizAnswer.findMany({
+      where: { attemptId },
+      orderBy: { createdAt: "asc" },
+    });
+
+    return {
+      attemptId,
+      quizId,
+      status: "GRADED",
+      score,
+      passed,
+      submittedAt: submittedAt.toISOString(),
+      gradedAt: gradedAt.toISOString(),
+      answers: answers.map((a) => ({
+        questionId: a.questionId,
+        selectedOptionId: a.selectedOptionId,
+        isCorrect: a.isCorrect ?? false,
+        correctOptionId: a.correctOptionIdSnapshot ?? "",
+      })),
+    };
+  }
+
+  async findGradedAttemptResult(
+    attemptId: string,
+    userId: string,
+  ): Promise<QuizResultDto | null> {
+    const attempt = await this.prisma.academyQuizAttempt.findFirst({
+      where: {
+        id: attemptId,
+        userId,
+      },
+      include: {
+        answers: {
+          orderBy: { createdAt: "asc" },
+        },
+      },
+    });
+
+    if (!attempt || attempt.status !== "GRADED") {
+      return null;
+    }
+
+    return {
+      attemptId: attempt.id,
+      quizId: attempt.quizId,
+      status: "GRADED",
+      score: attempt.score!,
+      passed: attempt.passed!,
+      submittedAt: attempt.submittedAt!.toISOString(),
+      gradedAt: attempt.gradedAt!.toISOString(),
+      answers: attempt.answers.map((a) => ({
+        questionId: a.questionId,
+        selectedOptionId: a.selectedOptionId,
+        isCorrect: a.isCorrect ?? false,
+        correctOptionId: a.correctOptionIdSnapshot ?? "",
+      })),
+    };
   }
 }
 

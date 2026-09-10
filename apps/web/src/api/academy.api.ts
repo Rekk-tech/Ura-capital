@@ -9,6 +9,7 @@ import {
   PaginationMeta,
   QuizDefinitionDto,
   QuizAttemptDto,
+  QuizResultDto,
 } from "../features/academy/types/academy-ui.types";
 
 export interface IAcademyApiClient {
@@ -21,6 +22,8 @@ export interface IAcademyApiClient {
   getCurrentQuizAttempt(courseSlug: string, lessonSlug: string, accessToken?: string): Promise<{ data: QuizAttemptDto }>;
   getQuizAttemptById(attemptId: string, accessToken?: string): Promise<{ data: QuizAttemptDto }>;
   saveDraftQuizAnswer(attemptId: string, questionId: string, optionId: string, accessToken?: string): Promise<{ data: { questionId: string; selectedOptionId: string; updatedAt: string } }>;
+  submitQuizAttempt(attemptId: string, accessToken?: string): Promise<{ data: QuizResultDto }>;
+  getGradedQuizResult(attemptId: string, accessToken?: string): Promise<{ data: QuizResultDto }>;
 }
 
 
@@ -263,6 +266,61 @@ export class AcademyApiClient implements IAcademyApiClient {
 
     return (await res.json()) as { data: { questionId: string; selectedOptionId: string; updatedAt: string } };
   }
+
+  async submitQuizAttempt(
+    attemptId: string,
+    accessToken?: string
+  ): Promise<{ data: QuizResultDto }> {
+    const url = `/api/academy/quiz-attempts/${encodeURIComponent(attemptId)}/submit`;
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
+
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({}),
+    });
+
+    if (!res.ok) {
+      await this.handleError(res);
+    }
+
+    return (await res.json()) as { data: QuizResultDto };
+  }
+
+  async getGradedQuizResult(
+    attemptId: string,
+    accessToken?: string
+  ): Promise<{ data: QuizResultDto }> {
+    const url = `/api/academy/quiz-attempts/${encodeURIComponent(attemptId)}/result`;
+
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+    };
+
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers,
+    });
+
+    if (!res.ok) {
+      await this.handleError(res);
+    }
+
+    return (await res.json()) as { data: QuizResultDto };
+  }
+
 
 
   private async handleError(res: Response): Promise<never> {

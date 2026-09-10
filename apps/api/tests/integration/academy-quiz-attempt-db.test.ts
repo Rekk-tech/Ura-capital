@@ -335,17 +335,17 @@ describe("FEAT-024 Quiz Attempt Lifecycle (Live PostgreSQL Integration)", () => 
     it("permits multiple historical GRADED or SUBMITTED attempts for same user and quiz", async () => {
       await prisma.$executeRaw`
         INSERT INTO "academy_quiz_attempts" (
-          "id", "user_id", "quiz_id", "attempt_number", "status", "quiz_title_snapshot", "started_at", "created_at", "updated_at"
+          "id", "user_id", "quiz_id", "attempt_number", "status", "score", "passed", "submitted_at", "graded_at", "quiz_title_snapshot", "started_at", "created_at", "updated_at"
         ) VALUES (
-          gen_random_uuid(), ${learnerAId}, ${publishedQuizId}, 1, 'GRADED', 'PoW Quiz', NOW(), NOW(), NOW()
+          gen_random_uuid(), ${learnerAId}, ${publishedQuizId}, 1, 'GRADED', 80, true, NOW(), NOW(), 'PoW Quiz', NOW(), NOW(), NOW()
         );
       `;
 
       await prisma.$executeRaw`
         INSERT INTO "academy_quiz_attempts" (
-          "id", "user_id", "quiz_id", "attempt_number", "status", "quiz_title_snapshot", "started_at", "created_at", "updated_at"
+          "id", "user_id", "quiz_id", "attempt_number", "status", "score", "passed", "submitted_at", "graded_at", "quiz_title_snapshot", "started_at", "created_at", "updated_at"
         ) VALUES (
-          gen_random_uuid(), ${learnerAId}, ${publishedQuizId}, 2, 'GRADED', 'PoW Quiz', NOW(), NOW(), NOW()
+          gen_random_uuid(), ${learnerAId}, ${publishedQuizId}, 2, 'GRADED', 90, true, NOW(), NOW(), 'PoW Quiz', NOW(), NOW(), NOW()
         );
       `;
 
@@ -582,6 +582,8 @@ describe("FEAT-024 Quiz Attempt Lifecycle (Live PostgreSQL Integration)", () => 
           startedAt: new Date("2026-08-01T00:00:00.000Z"),
           score: 100,
           passed: true,
+          submittedAt: new Date("2026-08-01T00:05:00.000Z"),
+          gradedAt: new Date("2026-08-01T00:05:00.000Z"),
         },
       });
 
@@ -612,6 +614,7 @@ describe("FEAT-024 Quiz Attempt Lifecycle (Live PostgreSQL Integration)", () => 
           status: "SUBMITTED",
           quizTitleSnapshot: "Historical PoW Quiz",
           startedAt: new Date("2026-08-01T00:00:00.000Z"),
+          submittedAt: new Date("2026-08-01T00:05:00.000Z"),
         },
       });
 

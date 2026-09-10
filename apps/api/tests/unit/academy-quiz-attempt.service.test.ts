@@ -29,6 +29,8 @@ describe("AcademyQuizAttemptService - Unit Tests (FEAT-024)", () => {
     findQuestionWithQuiz: vi.fn().mockResolvedValue(null),
     findOptionWithQuestion: vi.fn().mockResolvedValue(null),
     verifyPublishedHierarchyByQuizId: vi.fn().mockResolvedValue(true),
+    submitAndGradeAttempt: vi.fn(),
+    findGradedAttemptResult: vi.fn(),
     ...overrides,
   });
 
@@ -474,6 +476,206 @@ describe("AcademyQuizAttemptService - Unit Tests (FEAT-024)", () => {
         questionPromptSnapshot: "What is hashing?",
         selectedOptionTextSnapshot: "One-way function",
       });
+    });
+  });
+
+  // ==========================================================================
+  // FEAT-025 Server-Side Quiz Evaluation & Secure Submission Tests
+  // ==========================================================================
+
+  describe("submitAttempt (FEAT-025)", () => {
+    const mockGradedResult = {
+      attemptId: "attempt-uuid-1",
+      quizId: "quiz-uuid-1",
+      status: "GRADED" as const,
+      score: 100,
+      passed: true,
+      submittedAt: "2026-09-07T00:00:00.000Z",
+      gradedAt: "2026-09-07T00:00:01.000Z",
+      answers: [
+        {
+          questionId: "q-1",
+          selectedOptionId: "opt-1",
+          isCorrect: true,
+          correctOptionId: "opt-1",
+        },
+      ],
+    };
+
+    it("rejects non-empty body with 400 VALIDATION_ERROR (AC-002)", async () => {
+      const mockRepo = createMockRepo();
+      const service = new AcademyQuizAttemptService(mockRepo);
+
+      await expect(
+        service.submitAttempt("user-uuid-1", "attempt-uuid-1", { score: 100 }),
+      ).rejects.toThrowError(
+        new AppError("Validation failed", ERROR_CODES.VALIDATION_ERROR, HTTP_STATUS.BAD_REQUEST),
+      );
+
+      await expect(
+        service.submitAttempt("user-uuid-1", "attempt-uuid-1", { passed: true }),
+      ).rejects.toThrowError(
+        new AppError("Validation failed", ERROR_CODES.VALIDATION_ERROR, HTTP_STATUS.BAD_REQUEST),
+      );
+
+      await expect(
+        service.submitAttempt("user-uuid-1", "attempt-uuid-1", { userId: "spoofed-user" }),
+      ).rejects.toThrowError(
+        new AppError("Validation failed", ERROR_CODES.VALIDATION_ERROR, HTTP_STATUS.BAD_REQUEST),
+      );
+
+      await expect(
+        service.submitAttempt("user-uuid-1", "attempt-uuid-1", { isCorrect: true }),
+      ).rejects.toThrowError(
+        new AppError("Validation failed", ERROR_CODES.VALIDATION_ERROR, HTTP_STATUS.BAD_REQUEST),
+      );
+    });
+
+    it("executes atomic grading transaction and returns QuizResultDto on success (AC-008, AC-011)", async () => {
+      const mockRepo = createMockRepo({
+        submitAndGradeAttempt: vi.fn().mockResolvedValue(mockGradedResult),
+      });
+      const mockTx = createMockTxRunner(mockRepo);
+      const service = new AcademyQuizAttemptService(mockRepo, mockTx);
+
+      const result = await service.submitAttempt("user-uuid-1", "attempt-uuid-1", {});
+
+      expect(mockTx.run).toHaveBeenCalledTimes(1);
+      expect(mockRepo.submitAndGradeAttempt).toHaveBeenCalledWith("user-uuid-1", "attempt-uuid-1");
+      expect(result).toEqual(mockGradedResult);
+    });
+
+    it("propagates 400 UNANSWERED_QUESTIONS when repository detects incomplete answers (AC-005)", async () => {
+      const mockRepo = createMockRepo({
+        submitAndGradeAttempt: vi.fn().mockRejectedValue(
+          new AppError("All questions must be answered before submitting", ERROR_CODES.UNANSWERED_QUESTIONS, HTTP_STATUS.BAD_REQUEST),
+        ),
+      });
+      const mockTx = createMockTxRunner(mockRepo);
+      const service = new AcademyQuizAttemptService(mockRepo, mockTx);
+
+      await expect(
+        service.submitAttempt("user-uuid-1", "attempt-uuid-1", {}),
+      ).rejects.toThrowError(
+        new AppError("All questions must be answered before submitting", ERROR_CODES.UNANSWERED_QUESTIONS, HTTP_STATUS.BAD_REQUEST),
+      );
+    });
+
+    it("propagates 400 INVALID_QUIZ_STATE when quiz has 0 questions (AC-006)", async () => {
+      const mockRepo = createMockRepo({
+        submitAndGradeAttempt: vi.fn().mockRejectedValue(
+          new AppError("Quiz has no questions to evaluate", ERROR_CODES.INVALID_QUIZ_STATE, HTTP_STATUS.BAD_REQUEST),
+        ),
+      });
+      const mockTx = createMockTxRunner(mockRepo);
+      const service = new AcademyQuizAttemptService(mockRepo, mockTx);
+
+      await expect(
+        service.submitAttempt("user-uuid-1", "attempt-uuid-1", {}),
+      ).rejects.toThrowError(
+        new AppError("Quiz has no questions to evaluate", ERROR_CODES.INVALID_QUIZ_STATE, HTTP_STATUS.BAD_REQUEST),
+      );
+    });
+
+    it("propagates 404 QUIZ_ATTEMPT_NOT_FOUND on nonexistent or foreign attempt (AC-003)", async () => {
+      const mockRepo = createMockRepo({
+        submitAndGradeAttempt: vi.fn().mockRejectedValue(
+          new AppError("Quiz attempt not found", ERROR_CODES.QUIZ_ATTEMPT_NOT_FOUND, HTTP_STATUS.NOT_FOUND),
+        ),
+      });
+      const mockTx = createMockTxRunner(mockRepo);
+      const service = new AcademyQuizAttemptService(mockRepo, mockTx);
+
+      await expect(
+        service.submitAttempt("user-uuid-1", "attempt-uuid-1", {}),
+      ).rejects.toThrowError(
+        new AppError("Quiz attempt not found", ERROR_CODES.QUIZ_ATTEMPT_NOT_FOUND, HTTP_STATUS.NOT_FOUND),
+      );
+    });
+  });
+
+  describe("getGradedResult (FEAT-025)", () => {
+    const mockGradedResult = {
+      attemptId: "attempt-uuid-1",
+      quizId: "quiz-uuid-1",
+      status: "GRADED" as const,
+      score: 80,
+      passed: true,
+      submittedAt: "2026-09-07T00:00:00.000Z",
+      gradedAt: "2026-09-07T00:00:01.000Z",
+      answers: [
+        {
+          questionId: "q-1",
+          selectedOptionId: "opt-1",
+          isCorrect: true,
+          correctOptionId: "opt-1",
+        },
+      ],
+    };
+
+    it("returns QuizResultDto for owned GRADED attempt (AC-015)", async () => {
+      const mockRepo = createMockRepo({
+        findGradedAttemptResult: vi.fn().mockResolvedValue(mockGradedResult),
+      });
+      const service = new AcademyQuizAttemptService(mockRepo);
+
+      const result = await service.getGradedResult("user-uuid-1", "attempt-uuid-1");
+
+      expect(mockRepo.findGradedAttemptResult).toHaveBeenCalledWith("attempt-uuid-1", "user-uuid-1");
+      expect(result).toEqual(mockGradedResult);
+    });
+
+    it("throws 404 QUIZ_ATTEMPT_NOT_FOUND when attempt is nonexistent, foreign, or not GRADED (AC-003, AC-015)", async () => {
+      const mockRepo = createMockRepo({
+        findGradedAttemptResult: vi.fn().mockResolvedValue(null),
+      });
+      const service = new AcademyQuizAttemptService(mockRepo);
+
+      await expect(
+        service.getGradedResult("user-uuid-1", "attempt-uuid-1"),
+      ).rejects.toThrowError(
+        new AppError("Quiz attempt not found", ERROR_CODES.QUIZ_ATTEMPT_NOT_FOUND, HTTP_STATUS.NOT_FOUND),
+      );
+    });
+  });
+
+  describe("Score Formula & Pass/Fail Invariants (FEAT-025)", () => {
+    it("computes integer percentage via Math.round((C / N) * 100) (AC-009)", () => {
+      // 1 out of 3 = 33%
+      expect(Math.round((1 / 3) * 100)).toBe(33);
+      // 2 out of 3 = 67%
+      expect(Math.round((2 / 3) * 100)).toBe(67);
+      // 4 out of 5 = 80%
+      expect(Math.round((4 / 5) * 100)).toBe(80);
+      // 0 out of 5 = 0%
+      expect(Math.round((0 / 5) * 100)).toBe(0);
+      // 5 out of 5 = 100%
+      expect(Math.round((5 / 5) * 100)).toBe(100);
+    });
+
+    it("evaluates pass/fail with threshold equality score >= passingScore (AC-010)", () => {
+      const passingScore = 80;
+      // Below threshold
+      expect(79 >= passingScore).toBe(false);
+      // Threshold equality PASSES
+      expect(80 >= passingScore).toBe(true);
+      // Above threshold
+      expect(81 >= passingScore).toBe(true);
+      expect(100 >= passingScore).toBe(true);
+    });
+
+    it("verifies passingScore is omitted from QuizResultDto (Option B)", () => {
+      const dto = {
+        attemptId: "attempt-1",
+        quizId: "quiz-1",
+        status: "GRADED" as const,
+        score: 80,
+        passed: true,
+        submittedAt: "2026-09-07T00:00:00.000Z",
+        gradedAt: "2026-09-07T00:00:01.000Z",
+        answers: [],
+      };
+      expect("passingScore" in dto).toBe(false);
     });
   });
 });

@@ -493,7 +493,7 @@ Phase 3 Completion State:
 - FEAT-018 is DONE / QA PASS / Human Final Gate APPROVED.
 - Phase 3 is DONE / QA PASS / Human Final Gate APPROVED.
 - HISTORICAL SNAPSHOT (at Phase 3 completion): Phase 4 was IN_PROGRESS / PLANNING; FEAT-019 was APPROVED FOR IMPLEMENTATION; FEAT-020 through FEAT-030 remained BLOCKED.
-- CURRENT CANONICAL STATE: Phase 4 is IN_PROGRESS; FEAT-019 is DONE (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED); FEAT-020 is DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED); FEAT-021 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-022 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-023 is DONE (QA PASS, Human Final Gate APPROVED); FEAT-024 is DONE (QA PASS — QA Iteration 1, Human Final Gate APPROVED); FEAT-025 is UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED); FEAT-026 through FEAT-030 are BLOCKED by dependency order; Phase 5 is BLOCKED.
+- CURRENT CANONICAL STATE: Phase 4 is IN_PROGRESS; FEAT-019 is DONE (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED); FEAT-020 is DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED); FEAT-021 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-022 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-023 is DONE (QA PASS, Human Final Gate APPROVED); FEAT-024 is DONE (QA PASS — QA Iteration 1, Human Final Gate APPROVED); FEAT-025 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-026 is UNBLOCKED FOR PLANNING; FEAT-027 through FEAT-030 are BLOCKED by dependency order; Phase 5 is planned and implementation-blocked by the Phase 4 Human Phase Final Gate.
 
 Feature Decomposition:
 
@@ -855,8 +855,8 @@ FEAT-021: DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED)
 FEAT-022: DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED)
 FEAT-023: DONE (QA PASS, Human Final Gate APPROVED)
 FEAT-024: DONE (QA PASS — QA Iteration 1, Human Final Gate APPROVED)
-FEAT-025: UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED)
-FEAT-026: BLOCKED by FEAT-020 / FEAT-024 / FEAT-025
+FEAT-025: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
+FEAT-026: READY FOR PLANNING REVIEW
 FEAT-027: BLOCKED by FEAT-025 / FEAT-026
 FEAT-028: BLOCKED by FEAT-020 through FEAT-027
 FEAT-029: BLOCKED by FEAT-025 / FEAT-027 and Human product-audit decision
@@ -872,8 +872,8 @@ Feature Decomposition:
 - FEAT-022: Flashcards Domain & Review Flow - `DONE` (QA PASS — QA Iteration 2, Human Final Gate APPROVED)
 - FEAT-023: Quiz Definition & Safe Projection - `DONE` (QA PASS, Human Final Gate APPROVED)
 - FEAT-024: Quiz Attempt Lifecycle - `DONE` (QA PASS — QA Iteration 1, Human Final Gate APPROVED)
-- FEAT-025: Server-Side Quiz Evaluation & Secure Submission - `UNBLOCKED FOR PLANNING` (Implementation: NOT_STARTED)
-- FEAT-026: Academy Progression & Completion Tracking - `BLOCKED`
+- FEAT-025: Server-Side Quiz Evaluation & Secure Submission - `DONE` (Implementation: COMPLETE, Internal Feature Gate: PASS)
+- FEAT-026: Academy Progression & Completion Tracking - `READY FOR PLANNING REVIEW`
 - FEAT-027: XP & Idempotent Reward Ledger - `BLOCKED`
 - FEAT-028: Academy Authorization & Ownership Hardening - `BLOCKED`
 - FEAT-029: Academy Product Audit Decision & Integration - `BLOCKED`
@@ -1094,7 +1094,40 @@ Spec Package: .specify/specs/FEAT-024/
 Implementation Report: reports/implementation/phase-4/FEAT-024.md
 Acceptance Criteria: 20 deterministic criteria (AC-001..AC-020) with CRITICAL HARD GATE on Pre-Submission Correct Answer Secrecy
 Tasks: 11 implementation tasks completed (T1..T11)
-Next Action: FEAT-024 DONE. FEAT-025 UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED).
+Next Action: FEAT-024 DONE. FEAT-025 APPROVED FOR IMPLEMENTATION (Implementation: NOT_STARTED).
+```
+
+FEAT-025 Status Fields:
+
+```text
+Lifecycle State: DONE
+Planning Status: COMPLETE (HUMAN APPROVED)
+Planning Owner: Antigravity — Temporary Planning Ownership Transfer
+Human Planning Approval: APPROVED
+Human Decisions:
+  - Lifecycle Transition: Two-stage transition IN_PROGRESS -> SUBMITTED -> GRADED inside ONE atomic transaction — APPROVED BY HUMAN
+  - Repeated Submit: Idempotent return of existing graded result with 200 OK — APPROVED BY HUMAN
+  - Unanswered Questions: Strict completion requirement rejecting submission with 400 UNANSWERED_QUESTIONS — APPROVED BY HUMAN
+  - Score Rounding: Integer percentage Math.round((C / N) * 100) — APPROVED BY HUMAN
+  - Zero-Question Quiz: Reject with 400 INVALID_QUIZ_STATE — APPROVED BY HUMAN
+  - Result Visibility: Score, pass/fail, and per-question correctness; explanations deferred — APPROVED BY HUMAN
+  - Result Endpoint: Dedicated GET .../result endpoint — APPROVED BY HUMAN
+  - Retry Policy: Unlimited retry via new attempt once current is GRADED — APPROVED BY HUMAN
+  - Evaluation Source: Current live quiz definition with atomic snapshot writing — APPROVED BY HUMAN
+  - Schema Migration: Minimal additive check-constraint migration for score range and graded-state coherence — APPROVED BY HUMAN
+  - Historical passingScore: Omitted from QuizResultDto (Option B); persisted passed boolean is sole authority — APPROVED BY HUMAN
+Implementation: COMPLETE
+Implementation Owner: DEV-A
+QA Status: READY FOR QA
+Feature-Level Human Final Gate: REMOVED for FEAT-025 under phase-owned workflow
+Internal Feature Quality Gate: PASS
+Feature Type: Backend Domain Evaluation, Lifecycle Finalization & Result Projection
+Scope Boundaries: Authenticated attempt submit/result endpoints; server-authoritative evaluation; score and pass/fail derivation; answer correctness snapshot persistence; zero progress/XP/reward mutations; zero Redis authority
+Spec Package: .specify/specs/FEAT-025/
+Implementation Report: reports/implementation/phase-4/FEAT-025.md
+Acceptance Criteria: 20 deterministic criteria (AC-001..AC-020) with CRITICAL HARD GATES on Server-Authoritative Evaluation and Secrecy Regression (All 20 VERIFIED)
+Tasks: 11 implementation tasks completed (T1..T11)
+Next Action: FEAT-026 READY FOR PLANNING REVIEW.
 ```
 
 Artifacts:
@@ -1106,10 +1139,6 @@ Artifacts:
 - `reports/implementation/phase-4/FEAT-019.md`
 - `reports/implementation/phase-4/FEAT-020.md`
 - `reports/implementation/phase-4/FEAT-021.md`
-- `reports/qa/phase-4/FEAT-019-QA.md`
-- `reports/qa/phase-4/FEAT-019-QA3-TEMP-EVIDENCE.md`
-- `reports/qa/phase-4/FEAT-020-QA.md`
-- `reports/qa/phase-4/FEAT-021-QA.md`
 - `.specify/specs/FEAT-022/`
 - `reports/implementation/phase-4/FEAT-022.md`
 - `reports/qa/phase-4/FEAT-022-QA.md`
@@ -1119,6 +1148,8 @@ Artifacts:
 - `.specify/specs/FEAT-024/`
 - `reports/implementation/phase-4/FEAT-024.md`
 - `reports/qa/phase-4/FEAT-024-QA.md`
+- `.specify/specs/FEAT-025/`
+- `reports/implementation/phase-4/FEAT-025.md`
 
 ---
 

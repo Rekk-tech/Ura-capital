@@ -141,4 +141,67 @@ export class AcademyQuizAttemptController {
       next(error);
     }
   }
+
+  async submitAttempt(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        throw new AppError(
+          "Authentication required",
+          ERROR_CODES.UNAUTHENTICATED,
+          HTTP_STATUS.UNAUTHORIZED,
+        );
+      }
+
+      const parsedParams = quizAttemptParamSchema.safeParse(req.params);
+      if (!parsedParams.success) {
+        throw new AppError(
+          "Validation failed",
+          ERROR_CODES.VALIDATION_ERROR,
+          HTTP_STATUS.BAD_REQUEST,
+        );
+      }
+
+      const result = await this.attemptService.submitAttempt(
+        userId,
+        parsedParams.data.attemptId,
+        req.body,
+      );
+
+      res.status(HTTP_STATUS.OK).json({ data: result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getGradedResult(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        throw new AppError(
+          "Authentication required",
+          ERROR_CODES.UNAUTHENTICATED,
+          HTTP_STATUS.UNAUTHORIZED,
+        );
+      }
+
+      const parsedParams = quizAttemptParamSchema.safeParse(req.params);
+      if (!parsedParams.success) {
+        throw new AppError(
+          "Validation failed",
+          ERROR_CODES.VALIDATION_ERROR,
+          HTTP_STATUS.BAD_REQUEST,
+        );
+      }
+
+      const result = await this.attemptService.getGradedResult(
+        userId,
+        parsedParams.data.attemptId,
+      );
+
+      res.status(HTTP_STATUS.OK).json({ data: result });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

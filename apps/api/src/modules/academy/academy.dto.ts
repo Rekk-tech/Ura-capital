@@ -325,3 +325,50 @@ export function toQuizAttemptDto(entity: {
   };
 }
 
+// FEAT-025 Quiz Evaluation & Secure Submission DTOs
+export type {
+  QuizResultAnswerDto,
+  QuizResultDto,
+  QuizResultResponse,
+} from "@aura/shared";
+
+import type { QuizResultDto } from "@aura/shared";
+
+export function toQuizResultDto(entity: {
+  id: string;
+  quizId: string;
+  status: string;
+  score: number | null;
+  passed: boolean | null;
+  submittedAt: Date | string | null;
+  gradedAt: Date | string | null;
+  answers?: Array<{
+    questionId: string;
+    selectedOptionId?: string | null;
+    isCorrect?: boolean | null;
+    correctOptionIdSnapshot?: string | null;
+  }>;
+}): QuizResultDto {
+  return {
+    attemptId: entity.id,
+    quizId: entity.quizId,
+    status: "GRADED",
+    score: entity.score ?? 0,
+    passed: entity.passed ?? false,
+    submittedAt:
+      entity.submittedAt instanceof Date
+        ? entity.submittedAt.toISOString()
+        : String(entity.submittedAt ?? ""),
+    gradedAt:
+      entity.gradedAt instanceof Date
+        ? entity.gradedAt.toISOString()
+        : String(entity.gradedAt ?? ""),
+    answers: (entity.answers ?? []).map((a) => ({
+      questionId: a.questionId,
+      selectedOptionId: a.selectedOptionId ?? null,
+      isCorrect: Boolean(a.isCorrect),
+      correctOptionId: a.correctOptionIdSnapshot ?? "",
+    })),
+  };
+}
+

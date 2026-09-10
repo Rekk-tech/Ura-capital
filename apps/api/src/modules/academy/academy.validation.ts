@@ -83,3 +83,7 @@ export type SaveDraftAnswerBody = z.infer<typeof saveDraftAnswerBodySchema>;
 export type QuizAttemptParam = z.infer<typeof quizAttemptParamSchema>;
 export type QuizDraftAnswerParam = z.infer<typeof quizDraftAnswerParamSchema>;
 
+// FEAT-025: Quiz Evaluation & Secure Submission Validation
+export const submitQuizAttemptBodySchema = z.object({}).strict();
+export type SubmitQuizAttemptBody = z.infer<typeof submitQuizAttemptBodySchema>;
+
