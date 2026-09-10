@@ -89,8 +89,8 @@ describe("FEAT-012 PostgreSQL Migration Reproducibility & Schema Governance (Int
     it("verifies clean applied migration state against PostgreSQL _prisma_migrations", async () => {
       const result = await verifyAppliedMigrationIntegrity(prisma, migrationsDir);
       expect(result.integrityPass).toBe(true);
-      expect(result.appliedCount).toBe(5);
-      expect(result.verifiedCount).toBe(5);
+      expect(result.appliedCount).toBe(7);
+      expect(result.verifiedCount).toBe(7);
     });
 
     it("detects drift and throws error when an already-applied migration file is modified", async () => {
