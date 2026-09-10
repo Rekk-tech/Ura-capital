@@ -1350,6 +1350,9 @@ Implementation Report: reports/implementation/phase-4/FEAT-026.md
 Human-Approved Migration Decision: ZERO production migration based on existing Academy progress tables and constraints
 Acceptance Criteria: 20 deterministic criteria (AC-001..AC-020) with CRITICAL HARD GATES on Server-Authoritative Progression and Progress/Quiz Correctness Secrecy Regression (All 20 VERIFIED)
 Tasks: 11 implementation tasks completed (T001..T011)
+Git Checkpoint: PUBLISHED (commit a711ab4)
+CI: GREEN (Run 34493917371 / Job 102927429466)
+Tag: feat-026-approved
 FEAT-027: UNBLOCKED FOR CODEX PLANNING
 Next Action: Codex may plan FEAT-027.
 ```
