@@ -3,6 +3,10 @@ import { HTTP_STATUS, ERROR_CODES } from "@aura/shared";
 import { AppError } from "../../shared/errors/error-envelope.js";
 import type { AuthenticatedRequest } from "../auth/auth.types.js";
 import type { AcademyProgressionService } from "./academy-progression.service.js";
+import {
+  courseProgressParamSchema,
+  completeLessonParamSchema,
+} from "./academy.validation.js";
 
 export class AcademyProgressionController {
   constructor(private readonly service: AcademyProgressionService) {}
@@ -26,10 +30,18 @@ export class AcademyProgressionController {
         );
       }
 
-      const { courseSlug } = req.params;
+      const parsedParams = courseProgressParamSchema.safeParse(req.params);
+      if (!parsedParams.success) {
+        throw new AppError(
+          "Validation failed",
+          ERROR_CODES.VALIDATION_ERROR,
+          HTTP_STATUS.BAD_REQUEST,
+        );
+      }
+
       const result = await this.service.getCourseProgress(
         userId,
-        courseSlug as string,
+        parsedParams.data.courseSlug,
       );
 
       res.status(HTTP_STATUS.OK).json({ data: result });
@@ -57,11 +69,19 @@ export class AcademyProgressionController {
         );
       }
 
-      const { courseSlug, lessonSlug } = req.params;
+      const parsedParams = completeLessonParamSchema.safeParse(req.params);
+      if (!parsedParams.success) {
+        throw new AppError(
+          "Validation failed",
+          ERROR_CODES.VALIDATION_ERROR,
+          HTTP_STATUS.BAD_REQUEST,
+        );
+      }
+
       const result = await this.service.completeInformationalLesson(
         userId,
-        courseSlug as string,
-        lessonSlug as string,
+        parsedParams.data.courseSlug,
+        parsedParams.data.lessonSlug,
         req.body,
       );
 

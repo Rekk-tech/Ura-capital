@@ -493,7 +493,7 @@ Phase 3 Completion State:
 - FEAT-018 is DONE / QA PASS / Human Final Gate APPROVED.
 - Phase 3 is DONE / QA PASS / Human Final Gate APPROVED.
 - HISTORICAL SNAPSHOT (at Phase 3 completion): Phase 4 was IN_PROGRESS / PLANNING; FEAT-019 was APPROVED FOR IMPLEMENTATION; FEAT-020 through FEAT-030 remained BLOCKED.
-- CURRENT CANONICAL STATE: Phase 4 is IN_PROGRESS; FEAT-019 is DONE (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED); FEAT-020 is DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED); FEAT-021 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-022 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-023 is DONE (QA PASS, Human Final Gate APPROVED); FEAT-024 is DONE (QA PASS — QA Iteration 1, Human Final Gate APPROVED); FEAT-025 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-026 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-027 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-028 is UNBLOCKED FOR IMPLEMENTATION; FEAT-029 is UNBLOCKED FOR DEFER CLOSURE; FEAT-030 is BLOCKED; Phase 5 is planned and implementation-blocked by the Phase 4 Human Phase Final Gate.
+- CURRENT CANONICAL STATE: Phase 4 is IN_PROGRESS; FEAT-019 is DONE (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED); FEAT-020 is DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED); FEAT-021 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-022 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-023 is DONE (QA PASS, Human Final Gate APPROVED); FEAT-024 is DONE (QA PASS — QA Iteration 1, Human Final Gate APPROVED); FEAT-025 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-026 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-027 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-028 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-029 is IMPLEMENTATION COMPLETE / DEFER CLOSURE VERIFIED; FEAT-030 is UNBLOCKED FOR CODEX PHASE QA; Phase 5 is planned and implementation-blocked by the Phase 4 Human Phase Final Gate.
 
 Feature Decomposition:
 
@@ -858,9 +858,9 @@ FEAT-024: DONE (QA PASS — QA Iteration 1, Human Final Gate APPROVED)
 FEAT-025: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 FEAT-026: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 FEAT-027: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
-FEAT-028: UNBLOCKED FOR IMPLEMENTATION
-FEAT-029: UNBLOCKED FOR DEFER CLOSURE
-FEAT-030: BLOCKED by FEAT-019 through FEAT-029 as applicable
+FEAT-028: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
+FEAT-029: IMPLEMENTATION COMPLETE / DEFER CLOSURE VERIFIED
+FEAT-030: UNBLOCKED FOR CODEX PHASE QA
 Phase 5: BLOCKED
 ```
 
@@ -875,9 +875,9 @@ Feature Decomposition:
 - FEAT-025: Server-Side Quiz Evaluation & Secure Submission - `DONE` (Implementation: COMPLETE, Internal Feature Gate: PASS)
 - FEAT-026: Academy Progression & Completion Tracking - `DONE` (Implementation: COMPLETE, Internal Feature Gate: PASS)
 - FEAT-027: XP & Idempotent Reward Ledger - `DONE` (Implementation: COMPLETE, Internal Feature Gate: PASS)
-- FEAT-028: Academy Authorization & Ownership Hardening - `UNBLOCKED FOR IMPLEMENTATION`
-- FEAT-029: Academy Product Audit Decision & Integration - `UNBLOCKED FOR DEFER CLOSURE`
-- FEAT-030: Phase 4 Academy Integration Gate - `BLOCKED`
+- FEAT-028: Academy Authorization & Ownership Hardening - `DONE` (Implementation: COMPLETE, Internal Feature Gate: PASS)
+- FEAT-029: Academy Product Audit Decision & Integration - `IMPLEMENTATION COMPLETE / DEFER CLOSURE VERIFIED`
+- FEAT-030: Phase 4 Academy Integration Gate - `UNBLOCKED FOR CODEX PHASE QA`
 
 FEAT-019 Governance Fields:
 
@@ -917,8 +917,7 @@ Audit Governance Guard: PASS - zero premature product audit schemas/APIs
 Seed Safety Guard: PASS - zero unsafe seed scripts, credentials, or default admin backdoors
 Blocking Issues: NONE
 FEAT-020: DONE (Human Final Gate APPROVED)
-FEAT-021: UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED)
-FEAT-022 through FEAT-030: BLOCKED
+HISTORICAL SNAPSHOT (after FEAT-020 approval): FEAT-021 was UNBLOCKED FOR PLANNING (Implementation: NOT_STARTED); FEAT-022 through FEAT-030 were BLOCKED.
 ```
 
 FEAT-020 Governance Fields:
@@ -1354,9 +1353,9 @@ Git Checkpoint: PUBLISHED (commit a711ab4)
 CI: GREEN (Run 34493917371 / Job 102927429466)
 Tag: feat-026-approved
 FEAT-027: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
-FEAT-028: UNBLOCKED FOR IMPLEMENTATION
-FEAT-029: UNBLOCKED FOR IMPLEMENTATION
-Next Action: Antigravity may implement FEAT-028 and FEAT-029 in parallel Git worktrees from the approved FEAT-027 baseline.
+FEAT-028: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
+FEAT-029: IMPLEMENTATION COMPLETE / DEFER CLOSURE VERIFIED
+Next Action: Codex may begin FEAT-030 Phase 4 Academy Integration Gate / Phase QA.
 ```
 
 FEAT-027 Governance Fields:
@@ -1391,43 +1390,51 @@ Tasks: 12 implementation tasks completed (T001..T012)
 Git Checkpoint: PUBLISHED (commit f1b1290)
 CI: GREEN (Run 34757868281 / Job 103725282868)
 Tag: feat-027-approved
-FEAT-028: UNBLOCKED FOR IMPLEMENTATION
-FEAT-029: UNBLOCKED FOR DEFER CLOSURE
-Next Action: Antigravity may implement FEAT-028 and close FEAT-029 deferral in parallel Git worktrees from the approved FEAT-027 baseline.
+FEAT-028: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
+FEAT-029: IMPLEMENTATION COMPLETE / DEFER CLOSURE VERIFIED
+Next Action: Codex may begin FEAT-030 Phase 4 Academy Integration Gate / Phase QA. Phase 4 remains IN_PROGRESS and Phase 5 remains blocked until FEAT-030 and the Human Phase Final Gate pass.
 ```
 
 FEAT-028 Governance Fields:
 
 ```text
-Lifecycle State: UNBLOCKED FOR IMPLEMENTATION
+Lifecycle State: DONE
 Planning Status: CODEX UPFRONT PLANNING COMPLETE
 Planning Owner: Codex
-Implementation: NOT_STARTED
-Implementation Owner After Approval: Antigravity / DEV-A
+Implementation: COMPLETE
+Implementation Owner: Antigravity / DEV-A
+Internal Feature Gate: PASS
+Implementation Report: reports/implementation/phase-4/FEAT-028.md
 Feature Type: Academy authorization and ownership hardening
 Scope Boundaries: endpoint authorization matrix; IDOR tests; owner-scoped attempts/results/progress/XP/rewards; JWT role spoof rejection; zero new admin/support Academy routes
 Human Decision: ADMIN / SUPPORT learner visibility DEFERRED; learner ownership hardening only.
 Spec Package: .specify/specs/FEAT-028/
-Acceptance Criteria: 22 deterministic criteria (AC-001..AC-022)
-Tasks: 10 planned implementation tasks (T001..T010)
+Acceptance Criteria: 22 deterministic criteria (AC-001..AC-022) - ALL PASS
+Tasks: 10 implementation tasks (T001..T010) - ALL COMPLETE
 Start Condition: FEAT-027 implementation complete, Internal Feature Gate PASS, checkpoint PUBLISHED, CI GREEN, tag feat-027-approved
+FEAT-030: UNBLOCKED FOR CODEX PHASE QA
 ```
 
 FEAT-029 Governance Fields:
 
 ```text
-Lifecycle State: UNBLOCKED FOR DEFER CLOSURE
+Lifecycle State: IMPLEMENTATION COMPLETE / DEFER CLOSURE VERIFIED
 Planning Status: CODEX UPFRONT PLANNING COMPLETE
 Planning Owner: Codex
-Implementation: NOT_STARTED
-Implementation Owner After Approval: Antigravity / DEV-A
+Implementation: COMPLETE
+Implementation Owner: Codex (governance / verification closure only)
 Feature Type: Academy product audit deferral governance / verification closure
 Scope Boundaries: FEAT-016 product audit governance; DEFER branch; no product audit table/migration/API/UI/event persistence; no AuthSecurityAuditRecord misuse; no grading/progress/reward semantic change
 Human Decision: Durable Academy product audit DEFERRED for Phase 4 with accepted risk.
 Spec Package: .specify/specs/FEAT-029/
-Acceptance Criteria: 24 deterministic criteria (AC-001..AC-024)
-Tasks: 10 planned implementation tasks (T001..T010)
+Acceptance Criteria: 24 deterministic criteria (AC-001..AC-024) - ALL PASS after clean integration re-validation
+Tasks: 10 implementation tasks (T001..T010) - COMPLETE
 Start Condition: FEAT-027 implementation complete, Internal Feature Gate PASS, checkpoint PUBLISHED, CI GREEN, tag feat-027-approved
+Audit Decision: DEFERRED FOR PHASE 4
+Self-Verification: PASS AFTER CLEAN INTEGRATION RE-VALIDATION
+Historical Contaminated FAIL: PRESERVED in reports/implementation/phase-4/FEAT-029.md
+QA Independence: REDUCED - Codex implemented the defer closure; Human Dual Review remains the compensating control at Phase 4 Final Gate.
+FEAT-030: UNBLOCKED FOR CODEX PHASE QA
 ```
 
 Artifacts:

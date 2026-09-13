@@ -15,9 +15,9 @@
 - FEAT-025: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 - FEAT-026: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 - FEAT-027: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
-- FEAT-028: UNBLOCKED FOR IMPLEMENTATION
-- FEAT-029: UNBLOCKED FOR IMPLEMENTATION
-- FEAT-030: BLOCKED according to dependency graph
+- FEAT-028: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
+- FEAT-029: IMPLEMENTATION COMPLETE / DEFER CLOSURE VERIFIED
+- FEAT-030: UNBLOCKED FOR CODEX PHASE QA
 - Phase 4: IN_PROGRESS
 - Phase 5: BLOCKED
 
@@ -204,10 +204,10 @@ Human decision locked:
 | FEAT-024 | Quiz Attempt Lifecycle | Implementation | DONE (Human Final Gate APPROVED) |
 | FEAT-025 | Server-Side Quiz Evaluation & Secure Submission | Implementation | DONE (Internal Feature Gate: PASS) |
 | FEAT-026 | Academy Progression & Completion Tracking | Implementation | DONE (Internal Feature Gate: PASS) |
-| FEAT-027 | XP & Idempotent Reward Ledger | Implementation | APPROVED FOR IMPLEMENTATION |
-| FEAT-028 | Academy Authorization & Ownership Hardening | Implementation / hardening | PLANNED / BLOCKED BY FEAT-027 IMPLEMENTATION GATE |
-| FEAT-029 | Academy Product Audit Decision & Integration | Governance / verification closure | PLANNED / BLOCKED BY FEAT-027 IMPLEMENTATION GATE |
-| FEAT-030 | Phase 4 Academy Integration Gate | Validation gate | FEAT-019..FEAT-029 as applicable |
+| FEAT-027 | XP & Idempotent Reward Ledger | Implementation | DONE (Internal Feature Gate: PASS) |
+| FEAT-028 | Academy Authorization & Ownership Hardening | Implementation / hardening | DONE (Internal Feature Gate: PASS) |
+| FEAT-029 | Academy Product Audit Decision & Integration | Governance / verification closure | IMPLEMENTATION COMPLETE / DEFER CLOSURE VERIFIED |
+| FEAT-030 | Phase 4 Academy Integration Gate | Validation gate | UNBLOCKED FOR CODEX PHASE QA |
 
 ## 12. Feature Details
 
@@ -337,7 +337,7 @@ Excluded: Public role management, admin content authoring, admin/support learner
 
 QA Gate: User A cannot read/write User B's attempts/progress; client role/admin spoofing rejected.
 
-Planning Status: PLANNED / UNBLOCKED FOR IMPLEMENTATION. Implementation NOT_STARTED.
+Planning Status: HUMAN APPROVED (Codex-owned). Implementation: COMPLETE. Internal Feature Gate: PASS. Implementation Report: `reports/implementation/phase-4/FEAT-028.md`.
 
 Human Decisions: APPROVED - ADMIN / SUPPORT learner visibility is DEFERRED. FEAT-028 adds zero new admin/support Academy routes and remains learner ownership hardening only.
 
@@ -351,9 +351,11 @@ Excluded: AuthSecurityAuditRecord reuse, public audit APIs, audit UI, product au
 
 QA Gate: Zero product audit activation, FEAT-016 abstraction intact, FEAT-009 unchanged, existing guards/regression pass, accepted risk documented.
 
-Planning Status: PLANNED / UNBLOCKED FOR DEFER CLOSURE. Implementation NOT_STARTED.
+Planning Status: IMPLEMENTATION COMPLETE / DEFER CLOSURE VERIFIED. Implementation Report: `reports/implementation/phase-4/FEAT-029.md`.
 
 Human Decisions: APPROVED - Durable Academy product audit is DEFERRED for Phase 4. Accepted rationale: no current compliance/product requirement before Phase 4 exit; activation would touch stable quiz/progression/reward services close to the integration gate; FEAT-016 abstraction remains available later; FEAT-009 auth/security audit remains unchanged.
+
+Self-Verification: PASS AFTER CLEAN INTEGRATION RE-VALIDATION. Historical contaminated FAIL is preserved in `reports/implementation/phase-4/FEAT-029.md`. Clean canonical validation is 14/14 PASS, DB regression is 20 files / 240 tests PASS, and FEAT-030 is unblocked for Codex Phase QA.
 
 Parallel Note: FEAT-028 and FEAT-029 may run in parallel after FEAT-027 gate because FEAT-029 is DEFER. Both must start from the same `feat-027-approved` checkpoint, use isolated Git worktrees, and never run in the same working directory.
 
@@ -434,4 +436,4 @@ PASS requires:
 
 ## 16. Readiness
 
-FEAT-027 READY FOR IMPLEMENTATION. FEAT-028 and FEAT-029 remain blocked until FEAT-027 gate/checkpoint/CI/tag.
+FEAT-027 through FEAT-029 have completed their internal feature gates / defer closure. FEAT-030 is UNBLOCKED FOR CODEX PHASE QA. Phase 4 remains IN_PROGRESS and Phase 5 remains BLOCKED until FEAT-030 and the Human Phase Final Gate pass.
