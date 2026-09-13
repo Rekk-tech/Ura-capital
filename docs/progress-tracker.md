@@ -493,7 +493,7 @@ Phase 3 Completion State:
 - FEAT-018 is DONE / QA PASS / Human Final Gate APPROVED.
 - Phase 3 is DONE / QA PASS / Human Final Gate APPROVED.
 - HISTORICAL SNAPSHOT (at Phase 3 completion): Phase 4 was IN_PROGRESS / PLANNING; FEAT-019 was APPROVED FOR IMPLEMENTATION; FEAT-020 through FEAT-030 remained BLOCKED.
-- CURRENT CANONICAL STATE: Phase 4 is IN_PROGRESS; FEAT-019 is DONE (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED); FEAT-020 is DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED); FEAT-021 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-022 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-023 is DONE (QA PASS, Human Final Gate APPROVED); FEAT-024 is DONE (QA PASS — QA Iteration 1, Human Final Gate APPROVED); FEAT-025 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-026 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-027 is UNBLOCKED FOR CODEX PLANNING; FEAT-028 through FEAT-030 are BLOCKED by dependency order; Phase 5 is planned and implementation-blocked by the Phase 4 Human Phase Final Gate.
+- CURRENT CANONICAL STATE: Phase 4 is IN_PROGRESS; FEAT-019 is DONE (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED); FEAT-020 is DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED); FEAT-021 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-022 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-023 is DONE (QA PASS, Human Final Gate APPROVED); FEAT-024 is DONE (QA PASS — QA Iteration 1, Human Final Gate APPROVED); FEAT-025 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-026 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-027 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-028 is UNBLOCKED FOR IMPLEMENTATION; FEAT-029 is UNBLOCKED FOR IMPLEMENTATION; FEAT-030 is BLOCKED; Phase 5 is planned and implementation-blocked by the Phase 4 Human Phase Final Gate.
 
 Feature Decomposition:
 
@@ -857,9 +857,9 @@ FEAT-023: DONE (QA PASS, Human Final Gate APPROVED)
 FEAT-024: DONE (QA PASS — QA Iteration 1, Human Final Gate APPROVED)
 FEAT-025: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 FEAT-026: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
-FEAT-027: UNBLOCKED FOR CODEX PLANNING
-FEAT-028: BLOCKED by FEAT-020 through FEAT-027
-FEAT-029: BLOCKED by FEAT-025 / FEAT-027 and Human product-audit decision
+FEAT-027: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
+FEAT-028: UNBLOCKED FOR IMPLEMENTATION
+FEAT-029: UNBLOCKED FOR IMPLEMENTATION
 FEAT-030: BLOCKED by FEAT-019 through FEAT-029 as applicable
 Phase 5: BLOCKED
 ```
@@ -874,9 +874,9 @@ Feature Decomposition:
 - FEAT-024: Quiz Attempt Lifecycle - `DONE` (QA PASS — QA Iteration 1, Human Final Gate APPROVED)
 - FEAT-025: Server-Side Quiz Evaluation & Secure Submission - `DONE` (Implementation: COMPLETE, Internal Feature Gate: PASS)
 - FEAT-026: Academy Progression & Completion Tracking - `DONE` (Implementation: COMPLETE, Internal Feature Gate: PASS)
-- FEAT-027: XP & Idempotent Reward Ledger - `UNBLOCKED FOR CODEX PLANNING`
-- FEAT-028: Academy Authorization & Ownership Hardening - `BLOCKED`
-- FEAT-029: Academy Product Audit Decision & Integration - `BLOCKED`
+- FEAT-027: XP & Idempotent Reward Ledger - `DONE` (Implementation: COMPLETE, Internal Feature Gate: PASS)
+- FEAT-028: Academy Authorization & Ownership Hardening - `UNBLOCKED FOR IMPLEMENTATION`
+- FEAT-029: Academy Product Audit Decision & Integration - `UNBLOCKED FOR IMPLEMENTATION`
 - FEAT-030: Phase 4 Academy Integration Gate - `BLOCKED`
 
 FEAT-019 Governance Fields:
@@ -1353,8 +1353,78 @@ Tasks: 11 implementation tasks completed (T001..T011)
 Git Checkpoint: PUBLISHED (commit a711ab4)
 CI: GREEN (Run 34493917371 / Job 102927429466)
 Tag: feat-026-approved
-FEAT-027: UNBLOCKED FOR CODEX PLANNING
-Next Action: Codex may plan FEAT-027.
+FEAT-027: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
+FEAT-028: UNBLOCKED FOR IMPLEMENTATION
+FEAT-029: UNBLOCKED FOR IMPLEMENTATION
+Next Action: Antigravity may implement FEAT-028 and FEAT-029 in parallel Git worktrees from the approved FEAT-027 baseline.
+```
+
+FEAT-027 Governance Fields:
+
+```text
+Lifecycle State: DONE
+Planning Status: HUMAN APPROVED
+Planning Owner: Codex
+Implementation: COMPLETE
+Implementation Owner: Antigravity / DEV-A
+Internal Feature Gate: PASS
+Canonical 14 Validation: PASS (14/14 commands with no skips)
+Implementation Report: reports/implementation/phase-4/FEAT-027.md
+Feature Type: XP and idempotent reward ledger implementation feature
+Dependencies: FEAT-026 DONE / Internal Feature Gate PASS / Git checkpoint PUBLISHED / CI GREEN / tag feat-026-approved
+Scope Boundaries: FEAT-026 AcademyCompletionFact consumption; lesson/course XP rewards; AcademyRewardLedger idempotency; AcademyUserXp aggregate; zero Redis durable authority; zero product audit activation; zero subscription/badge behavior
+Human Decisions:
+  - lesson first completion reward = 10 XP
+  - course first completion reward = 50 XP
+  - failed quiz = 0 XP
+  - repeated quiz attempt = 0 additional XP
+  - historical automatic reward backfill = DEFERRED
+  - current-user XP read API = INCLUDED
+  - lightweight learner XP display = INCLUDED
+  - badges = OUT OF SCOPE
+  - premium/subscription = OUT OF SCOPE
+  - level mechanics = DEFERRED
+Reward Recovery Decision: `AcademyCompletionFact.isFirstCompletion` is informational only; durable reward eligibility is authenticated user + persisted completion state + deterministic reward identity + RewardLedger absence/presence. Progression-commit/reward-failure retry must award missing reward exactly once.
+Spec Package: .specify/specs/FEAT-027/
+Acceptance Criteria: 27 deterministic criteria (AC-001..AC-027, ALL VERIFIED PASS)
+Tasks: 12 implementation tasks completed (T001..T012)
+FEAT-028: UNBLOCKED FOR IMPLEMENTATION
+FEAT-029: UNBLOCKED FOR IMPLEMENTATION
+Next Action: Antigravity may implement FEAT-028 and FEAT-029 in parallel Git worktrees from the approved FEAT-027 baseline.
+```
+
+FEAT-028 Governance Fields:
+
+```text
+Lifecycle State: UNBLOCKED FOR IMPLEMENTATION
+Planning Status: CODEX UPFRONT PLANNING COMPLETE
+Planning Owner: Codex
+Implementation: NOT_STARTED
+Implementation Owner After Approval: Antigravity / DEV-A
+Feature Type: Academy authorization and ownership hardening
+Scope Boundaries: endpoint authorization matrix; IDOR tests; owner-scoped attempts/results/progress/XP/rewards; JWT role spoof rejection; zero new admin/support Academy routes
+Human Decision: ADMIN / SUPPORT learner visibility DEFERRED; learner ownership hardening only.
+Spec Package: .specify/specs/FEAT-028/
+Acceptance Criteria: 22 deterministic criteria (AC-001..AC-022)
+Tasks: 10 planned implementation tasks (T001..T010)
+Start Condition: FEAT-027 implementation complete, Internal Feature Gate PASS, checkpoint PUBLISHED, CI GREEN, tag feat-027-approved
+```
+
+FEAT-029 Governance Fields:
+
+```text
+Lifecycle State: UNBLOCKED FOR IMPLEMENTATION
+Planning Status: CODEX UPFRONT PLANNING COMPLETE
+Planning Owner: Codex
+Implementation: NOT_STARTED
+Implementation Owner After Approval: Antigravity / DEV-A
+Feature Type: Academy product audit deferral governance / verification closure
+Scope Boundaries: FEAT-016 product audit governance; DEFER branch; no product audit table/migration/API/UI/event persistence; no AuthSecurityAuditRecord misuse; no grading/progress/reward semantic change
+Human Decision: Durable Academy product audit DEFERRED for Phase 4 with accepted risk.
+Spec Package: .specify/specs/FEAT-029/
+Acceptance Criteria: 24 deterministic criteria (AC-001..AC-024)
+Tasks: 10 planned implementation tasks (T001..T010)
+Start Condition: FEAT-027 implementation complete, Internal Feature Gate PASS, checkpoint PUBLISHED, CI GREEN, tag feat-027-approved
 ```
 
 Artifacts:
@@ -1379,6 +1449,10 @@ Artifacts:
 - `reports/implementation/phase-4/FEAT-025.md`
 - `.specify/specs/FEAT-026/`
 - `reports/implementation/phase-4/FEAT-026.md`
+- `.specify/specs/FEAT-027/`
+- `reports/implementation/phase-4/FEAT-027.md`
+- `.specify/specs/FEAT-028/`
+- `.specify/specs/FEAT-029/`
 ---
 
 # Phase 5 - Simulation Engine

@@ -8,18 +8,27 @@ import { AcademyQuizAttemptService } from "./academy-quiz-attempt.service.js";
 import { AcademyQuizAttemptController } from "./academy-quiz-attempt.controller.js";
 import { AcademyProgressionService } from "./academy-progression.service.js";
 import { AcademyProgressionController } from "./academy-progression.controller.js";
+import { AcademyRewardService } from "./academy-reward.service.js";
+import { AcademyRewardController } from "./academy-reward.controller.js";
 import { transactionRunner } from "../../infrastructure/database/transaction-runner.js";
 
 export function createAcademyRouter(
   controller?: AcademyCourseController,
   attemptController?: AcademyQuizAttemptController,
   progressionController?: AcademyProgressionController,
+  rewardController?: AcademyRewardController,
 ): Router {
   const router = Router();
   const repoContainer = createRepositoryContainer();
+  const rewardService = new AcademyRewardService(
+    repoContainer.academyRewardRepo,
+    repoContainer.academyProgressRepo,
+    transactionRunner,
+  );
   const progressionService = new AcademyProgressionService(
     repoContainer.academyProgressRepo,
     transactionRunner,
+    rewardService,
   );
   const ctrl =
     controller ??
@@ -39,6 +48,9 @@ export function createAcademyRouter(
   const progressCtrl =
     progressionController ??
     new AcademyProgressionController(progressionService);
+  const rewardCtrl =
+    rewardController ??
+    new AcademyRewardController(rewardService);
 
   // 1. Course Catalog (Public)
   router.get("/api/academy/courses", (req, res, next) => ctrl.listCourses(req, res, next));
@@ -180,8 +192,21 @@ export function createAcademyRouter(
     (req, res, next) => progressCtrl.completeLesson(req, res, next),
   );
 
+  // 14. Current User XP Read (Authenticated) - FEAT-027
+  router.get(
+    "/api/academy/me/xp",
+    authenticate,
+    (req, res, next) => rewardCtrl.getMyXp(req, res, next),
+  );
+  router.get(
+    "/academy/me/xp",
+    authenticate,
+    (req, res, next) => rewardCtrl.getMyXp(req, res, next),
+  );
+
   return router;
 }
+
 
 export const academyRouter = createAcademyRouter();
 

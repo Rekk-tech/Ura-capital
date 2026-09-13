@@ -33,8 +33,10 @@ import type {
   StartAttemptRepoResult,
   UpsertDraftAnswerInput,
   SafeProgressUpsertResult,
+  SafeRecordRewardResult,
   PublishedCourseWithLessonsProgress,
 } from "./academy.types.js";
+
 import { getPrismaClient } from "../../infrastructure/database/prisma.js";
 import { ERROR_CODES, HTTP_STATUS, type QuizResultDto, type QuizResultAnswerDto } from "@aura/shared";
 import { AppError } from "../../shared/errors/error-envelope.js";
@@ -1673,6 +1675,7 @@ export class PrismaAcademyProgressRepository
 
 export interface IAcademyRewardRepository {
   recordReward(data: RecordRewardInput): Promise<AcademyRewardLedger>;
+  recordRewardSafe(data: RecordRewardInput): Promise<SafeRecordRewardResult>;
   findRewardBySemanticTuple(
     userId: string,
     sourceType: string,
@@ -1712,6 +1715,64 @@ export class PrismaAcademyRewardRepository implements IAcademyRewardRepository {
     });
   }
 
+  async recordRewardSafe(data: RecordRewardInput): Promise<SafeRecordRewardResult> {
+    // 1. Transaction-scoped advisory lock on canonical reward identity
+    await this.prisma.$executeRaw(
+      Prisma.sql`SELECT pg_advisory_xact_lock(hashtext('reward:' || ${data.userId} || ':' || ${data.sourceType} || ':' || ${data.sourceId} || ':' || ${data.rewardType}));`,
+    );
+
+    // 2. Check if canonical reward record already exists
+    const existing = await this.findRewardBySemanticTuple(
+      data.userId,
+      data.sourceType,
+      data.sourceId,
+      data.rewardType,
+    );
+    if (existing) {
+      return {
+        reward: existing,
+        isDuplicate: true,
+      };
+    }
+
+    // 3. Insert new reward ledger record with conflict fallback
+    try {
+      const created = await this.prisma.academyRewardLedger.create({
+        data: {
+          userId: data.userId,
+          sourceType: data.sourceType,
+          sourceId: data.sourceId,
+          rewardType: data.rewardType,
+          amount: data.amount,
+          idempotencyKey: data.idempotencyKey,
+          status: data.status ?? "APPLIED",
+          metadata: data.metadata ? (data.metadata as Prisma.InputJsonValue) : undefined,
+        },
+      });
+
+      return {
+        reward: created,
+        isDuplicate: false,
+      };
+    } catch (err: unknown) {
+      if (this.isP2002Error(err)) {
+        const fallback = await this.findRewardBySemanticTuple(
+          data.userId,
+          data.sourceType,
+          data.sourceId,
+          data.rewardType,
+        );
+        if (fallback) {
+          return {
+            reward: fallback,
+            isDuplicate: true,
+          };
+        }
+      }
+      throw err;
+    }
+  }
+
   async findRewardBySemanticTuple(
     userId: string,
     sourceType: string,
@@ -1746,11 +1807,12 @@ export class PrismaAcademyRewardRepository implements IAcademyRewardRepository {
       where: { userId },
       create: {
         userId,
-        totalXp: initialOrDelta,
-        level: 1,
+        totalXp: Math.max(0, initialOrDelta),
+        level: 1, // AC-026: Level mechanics deferred; default to 1, no formula
       },
       update: {
         totalXp: { increment: initialOrDelta },
+        // AC-026: Do not update level using invented formula
       },
     });
   }
@@ -1760,4 +1822,18 @@ export class PrismaAcademyRewardRepository implements IAcademyRewardRepository {
       where: { userId },
     });
   }
+
+  private isP2002Error(err: unknown): boolean {
+    if (!err || typeof err !== "object") return false;
+    const errObj = err as Record<string, unknown>;
+    if (errObj.code === "P2002") return true;
+    if (
+      errObj.cause &&
+      typeof errObj.cause === "object" &&
+      (errObj.cause as Record<string, unknown>).code === "P2002"
+    )
+      return true;
+    return false;
+  }
 }
+

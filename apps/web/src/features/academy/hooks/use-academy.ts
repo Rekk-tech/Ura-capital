@@ -283,9 +283,24 @@ export function useCompleteLessonMutation() {
       queryClient.invalidateQueries({
         queryKey: ["academy", "lesson", variables.courseSlug, variables.lessonSlug],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["academy", "me", "xp"],
+      });
     },
   });
 }
+
+// FEAT-027: Current User XP Query Hook
+export function useMyXpQuery(accessToken?: string) {
+  return useQuery({
+    queryKey: ["academy", "me", "xp", accessToken],
+    queryFn: () => academyApi.getMyXp(accessToken),
+    staleTime: 1000 * 60 * 1, // 1 minute
+    retry: false,
+  });
+}
+
+
 
 
 

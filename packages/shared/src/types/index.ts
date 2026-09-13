@@ -175,3 +175,37 @@ export function getCompletionKey(
   return `${userIdOrFact}:${resourceType}:${resourceId}`;
 }
 
+// FEAT-027 Academy XP & Reward Ledger Types & DTOs
+export interface LearnerXpDto {
+  totalXp: number;
+}
+
+export interface LearnerXpResponse {
+  data: LearnerXpDto;
+}
+
+export interface RewardReconciliationResult {
+  readonly rewardLedgerId: string;
+  readonly userId: string;
+  readonly sourceType: string;
+  readonly sourceId: string;
+  readonly rewardType: string;
+  readonly amount: number;
+  readonly isDuplicate: boolean;
+  readonly totalXp: number;
+}
+
+/**
+ * Derives the canonical deterministic idempotency key for an Academy reward.
+ * Format: academy:reward:{userId}:{sourceType}:{sourceId}:{rewardType}
+ */
+export function deriveRewardIdempotencyKey(
+  userId: string,
+  sourceType: string,
+  sourceId: string,
+  rewardType: string,
+): string {
+  return `academy:reward:${userId}:${sourceType}:${sourceId}:${rewardType}`;
+}
+
+

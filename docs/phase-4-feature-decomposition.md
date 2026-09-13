@@ -13,8 +13,11 @@
 - FEAT-023: DONE (Human Final Gate APPROVED)
 - FEAT-024: DONE (Human Final Gate APPROVED)
 - FEAT-025: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
-- FEAT-026: APPROVED FOR IMPLEMENTATION (Planning Owner: Codex; Implementation NOT_STARTED; Implementation Owner: Antigravity / DEV-A)
-- FEAT-027+: BLOCKED according to dependency graph
+- FEAT-026: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
+- FEAT-027: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
+- FEAT-028: UNBLOCKED FOR IMPLEMENTATION
+- FEAT-029: UNBLOCKED FOR IMPLEMENTATION
+- FEAT-030: BLOCKED according to dependency graph
 - Phase 4: IN_PROGRESS
 - Phase 5: BLOCKED
 
@@ -183,10 +186,10 @@ Potential Academy product audit candidates:
 - `ACADEMY_REWARD_GRANTED`
 - `ACADEMY_PROGRESS_COMPLETED`
 
-Human decision required:
+Human decision locked:
 
-- Whether Academy is the first domain to activate concrete product audit persistence.
-- If yes, the owning feature must define a product audit table/schema, event taxonomy, metadata allowlist, transaction strategy, retention posture, and tests.
+- Durable Academy product audit is DEFERRED for Phase 4.
+- FEAT-029 verifies accepted risk and preservation of FEAT-016 governance only.
 - `AuthSecurityAuditRecord` must not be used for Academy product events.
 
 ## 11. Proposed Feature Sequence
@@ -200,10 +203,10 @@ Human decision required:
 | FEAT-023 | Quiz Definition & Safe Projection | Implementation | DONE (Human Final Gate APPROVED) |
 | FEAT-024 | Quiz Attempt Lifecycle | Implementation | DONE (Human Final Gate APPROVED) |
 | FEAT-025 | Server-Side Quiz Evaluation & Secure Submission | Implementation | DONE (Internal Feature Gate: PASS) |
-| FEAT-026 | Academy Progression & Completion Tracking | Implementation | APPROVED FOR IMPLEMENTATION (Planning Owner: Codex; Implementation NOT_STARTED; Dependencies: FEAT-020, FEAT-024, FEAT-025) |
-| FEAT-027 | XP & Idempotent Reward Ledger | Implementation | BLOCKED by FEAT-026 |
-| FEAT-028 | Academy Authorization & Ownership Hardening | Implementation / hardening | FEAT-020..FEAT-027 |
-| FEAT-029 | Academy Product Audit Decision & Integration | Conditional implementation | FEAT-025, FEAT-027, Human audit decision |
+| FEAT-026 | Academy Progression & Completion Tracking | Implementation | DONE (Internal Feature Gate: PASS) |
+| FEAT-027 | XP & Idempotent Reward Ledger | Implementation | APPROVED FOR IMPLEMENTATION |
+| FEAT-028 | Academy Authorization & Ownership Hardening | Implementation / hardening | PLANNED / BLOCKED BY FEAT-027 IMPLEMENTATION GATE |
+| FEAT-029 | Academy Product Audit Decision & Integration | Governance / verification closure | PLANNED / BLOCKED BY FEAT-027 IMPLEMENTATION GATE |
 | FEAT-030 | Phase 4 Academy Integration Gate | Validation gate | FEAT-019..FEAT-029 as applicable |
 
 ## 12. Feature Details
@@ -312,37 +315,63 @@ Human-Approved Migration Decision: ZERO production migration based on existing p
 
 Goal: Grant XP/rewards exactly once for approved Academy achievements.
 
-Scope: UserXP aggregate, RewardLedger, idempotency keys, transactionally safe reward mutation.
+Scope: FEAT-026 completion/progression fact consumption, first lesson/course completion XP, reward reconciliation after progression commits, `AcademyRewardLedger` semantic idempotency, `AcademyUserXp` aggregate mutation, replay/concurrency protection, current-user XP read API, and lightweight read-only learner XP display.
 
-Excluded: Badges unless Human approves, monetization, subscription entitlements.
+Excluded: Badges, monetization, subscription entitlements, historical automatic reward backfill, level mechanics, level thresholds, level-up events, level rewards, public reward mutation endpoint, Kafka/RabbitMQ, and outbox.
 
-QA Gate: Duplicate/retry/concurrent reward prevention, rollback behavior, DB uniqueness authority.
+QA Gate: Duplicate/retry/concurrent reward prevention, rollback behavior, DB uniqueness authority, progression-commit/reward-failure recovery, read-only XP projection, and no level mechanics.
 
-Human Decisions: XP amounts and reward triggers.
+Planning Status: HUMAN APPROVED / APPROVED FOR IMPLEMENTATION (Codex-owned). Implementation NOT_STARTED.
+
+Human Decisions: APPROVED - lesson first completion 10 XP, course first completion 50 XP, failed quiz 0 XP, repeated quiz attempt 0 additional XP, historical automatic reward backfill deferred, current-user XP read API included, lightweight learner XP display included, badges out of scope, premium/subscription out of scope, level mechanics deferred.
+
+Recovery Architecture: `AcademyCompletionFact.isFirstCompletion` is informational only. Durable reward eligibility is determined by authenticated user, persisted Academy completion state, deterministic reward identity, and absence/presence of the `AcademyRewardLedger` row. If progression commits and reward fails, retry/reconciliation must award the missing reward exactly once.
 
 ### FEAT-028 - Academy Authorization & Ownership Hardening
 
 Goal: Verify Academy endpoints enforce user ownership and server-side authorization.
 
-Scope: Personal attempts, progress, XP, ownership boundaries, IDOR hardening, optional admin-read policy if approved.
+Scope: Personal attempts, progress, XP, reward history, ownership boundaries, and IDOR hardening.
 
-Excluded: Public role management, admin content authoring.
+Excluded: Public role management, admin content authoring, admin/support learner visibility, support read API, and new admin/support Academy routes.
 
 QA Gate: User A cannot read/write User B's attempts/progress; client role/admin spoofing rejected.
 
-Human Decisions: Whether admins get read-only support visibility in Phase 4.
+Planning Status: PLANNED / BLOCKED BY FEAT-027 IMPLEMENTATION GATE. Implementation NOT_STARTED.
+
+Human Decisions: APPROVED - ADMIN / SUPPORT learner visibility is DEFERRED. FEAT-028 adds zero new admin/support Academy routes and remains learner ownership hardening only.
 
 ### FEAT-029 - Academy Product Audit Decision & Integration
 
-Goal: Apply FEAT-016 product-audit governance to Academy high-value events if Human approves concrete persistence.
+Goal: Record and verify Human-approved deferral of durable Academy product audit for Phase 4.
 
-Scope: Event taxonomy, metadata allowlist, transaction strategy, repository abstraction, audit table only if explicitly approved.
+Scope: Accepted risk documentation, verification of zero product audit table/migration/API/UI/event persistence, FEAT-016 abstraction preservation, FEAT-009 auth/security audit invariance, and regression/guard evidence.
 
-Excluded: AuthSecurityAuditRecord reuse, public audit APIs, audit UI.
+Excluded: AuthSecurityAuditRecord reuse, public audit APIs, audit UI, product audit table, product audit migration, Academy product-event persistence, and grading/progress/reward semantic changes.
 
-QA Gate: FEAT-016 10-point activation criteria, metadata sanitizer, transaction coupling tests.
+QA Gate: Zero product audit activation, FEAT-016 abstraction intact, FEAT-009 unchanged, existing guards/regression pass, accepted risk documented.
 
-Human Decisions: Required before implementation: activate durable Academy product audit persistence or defer with accepted risk.
+Planning Status: PLANNED / BLOCKED BY FEAT-027 IMPLEMENTATION GATE. Implementation NOT_STARTED.
+
+Human Decisions: APPROVED - Durable Academy product audit is DEFERRED for Phase 4. Accepted rationale: no current compliance/product requirement before Phase 4 exit; activation would touch stable quiz/progression/reward services close to the integration gate; FEAT-016 abstraction remains available later; FEAT-009 auth/security audit remains unchanged.
+
+Parallel Note: FEAT-028 and FEAT-029 may run in parallel after FEAT-027 gate because FEAT-029 is DEFER. Both must start from the same `feat-027-approved` checkpoint, use isolated Git worktrees, and never run in the same working directory.
+
+FEAT-028 / FEAT-029 File Ownership Matrix:
+
+| File / Surface | Owner During Parallel Wave | Notes |
+| --- | --- | --- |
+| `apps/api/src/modules/academy/academy.routes.ts` | FEAT-028 OWNER | FEAT-029 DEFER must not add product audit routes. |
+| `apps/api/src/modules/academy/*.controller.ts` | FEAT-028 OWNER | FEAT-029 DEFER should not modify controllers except guard/test evidence if required. |
+| `apps/api/src/modules/academy/*.service.ts` | FEAT-028 OWNER | FEAT-029 DEFER must not add audit hooks or redefine semantics. |
+| `apps/api/src/modules/academy/academy.types.ts` | FEAT-027 OWNER until checkpoint; then INTEGRATION OWNER | FEAT-028/029 must not redefine reward/progress contracts. |
+| `apps/api/src/modules/academy/academy.dto.ts` | FEAT-028 OWNER for DTO secrecy checks | FEAT-029 should not expose audit DTOs publicly. |
+| `packages/shared/src/**` | FEAT-027 OWNER for XP/reward contracts; INTEGRATION OWNER after checkpoint | FEAT-028/029 may consume but not redefine FEAT-027 contracts. |
+| `apps/api/prisma/schema.prisma` and migrations | NO OWNER IN FEAT-029 DEFER | FEAT-029 must add zero product audit schema/migration. |
+| `apps/api/package.json` | INTEGRATION OWNER | Coordinate test script additions and avoid duplicate suite registration. |
+| `docs/progress-tracker.md` and phase decomposition | CODEX / INTEGRATION OWNER | Antigravity reports implementation; Codex owns lifecycle governance. |
+| `reports/implementation/phase-4/FEAT-028.md` | FEAT-028 OWNER | Separate report. |
+| `reports/implementation/phase-4/FEAT-029.md` | FEAT-029 OWNER | Separate report. |
 
 ### FEAT-030 - Phase 4 Academy Integration Gate
 
@@ -366,7 +395,7 @@ FEAT-019
   -> FEAT-022
   -> FEAT-023 -> FEAT-024 -> FEAT-025 -> FEAT-026 -> FEAT-027
   -> FEAT-028
-  -> FEAT-029 (conditional on Human audit decision)
+  -> FEAT-029 (DEFER governance / verification closure)
   -> FEAT-030
 ```
 
@@ -393,15 +422,16 @@ PASS requires:
 - User-scoped Academy data is protected from IDOR.
 - Phase 2 and Phase 3 regression remains green.
 
-## 15. Human Decisions Required
+## 15. Human Decisions
 
 1. Confirm Phase 4 default boundary: learner-facing Academy only, no CMS/admin authoring.
 2. Decide production content ingestion approach.
 3. [RESOLVED] Decide quiz question types before FEAT-023: SINGLE_CHOICE ONLY (APPROVED). (Scoring/pass policy to be finalized before FEAT-025).
 4. [RESOLVED] Decide whether flashcard review state persists in Phase 4: DEFERRED (Phase 4 FEAT-022 behavior: TRANSIENT CLIENT-SIDE REVIEW SESSION ONLY; Option A UI reveal only approved).
-5. Decide whether Academy activates concrete product audit persistence in FEAT-029.
-6. Decide whether admin read-only support visibility is included in FEAT-028 or deferred.
+5. [RESOLVED] Durable Academy product audit persistence in FEAT-029: DEFERRED FOR PHASE 4.
+6. [RESOLVED] Admin/support learner visibility in FEAT-028: DEFERRED.
+7. [RESOLVED] FEAT-027 XP/reward policy: lesson first completion 10 XP, course first completion 50 XP, failed quiz 0 XP, repeated quiz attempt 0 additional XP, historical automatic reward backfill deferred, current-user XP read API included, lightweight learner XP display included, level mechanics deferred.
 
 ## 16. Readiness
 
-READY FOR HUMAN REVIEW.
+FEAT-027 READY FOR IMPLEMENTATION. FEAT-028 and FEAT-029 remain blocked until FEAT-027 gate/checkpoint/CI/tag.

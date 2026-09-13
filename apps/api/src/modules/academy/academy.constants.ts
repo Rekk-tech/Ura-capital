@@ -45,3 +45,37 @@ export const QUIZ_QUESTION_TYPES = {
 
 export type QuizQuestionType =
   (typeof QUIZ_QUESTION_TYPES)[keyof typeof QUIZ_QUESTION_TYPES];
+
+// FEAT-027 Academy XP & Reward Policy Constants
+export const ACADEMY_XP_POLICY = {
+  LESSON_FIRST_COMPLETION_XP: 10,
+  COURSE_FIRST_COMPLETION_XP: 50,
+  FAILED_QUIZ_XP: 0,
+  REPEAT_ATTEMPT_XP: 0,
+} as const;
+
+export const ACADEMY_REWARD_TYPES = {
+  XP: "XP",
+} as const;
+
+export type AcademyRewardType =
+  (typeof ACADEMY_REWARD_TYPES)[keyof typeof ACADEMY_REWARD_TYPES];
+
+export const ACADEMY_SOURCE_TYPES = {
+  LESSON_COMPLETION: "LESSON_COMPLETION",
+  COURSE_COMPLETION: "COURSE_COMPLETION",
+  QUIZ_PERFECT_SCORE: "QUIZ_PERFECT_SCORE",
+  FLASHCARD_SESSION: "FLASHCARD_SESSION",
+} as const;
+
+export type AcademySourceType =
+  (typeof ACADEMY_SOURCE_TYPES)[keyof typeof ACADEMY_SOURCE_TYPES];
+
+export const ACADEMY_RESOURCE_TYPES = {
+  LESSON: "LESSON",
+  COURSE: "COURSE",
+} as const;
+
+export type AcademyResourceType =
+  (typeof ACADEMY_RESOURCE_TYPES)[keyof typeof ACADEMY_RESOURCE_TYPES];
+

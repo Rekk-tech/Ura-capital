@@ -1,8 +1,9 @@
 import React from "react";
 import { useParams, Link } from "react-router-dom";
 import { ChevronRight, BookOpen } from "lucide-react";
-import { useCourseQuery, useCourseProgressQuery } from "../hooks/use-academy";
+import { useCourseQuery, useCourseProgressQuery, useMyXpQuery } from "../hooks/use-academy";
 import { LessonOutlineList } from "../components/LessonOutlineList";
+import { LearnerXpDisplay } from "../components/LearnerXpDisplay";
 import { CourseDetailSkeleton, ErrorState, NotFoundState } from "../components/AcademyStates";
 import { AcademyApiError } from "../types/academy-ui.types";
 
@@ -10,6 +11,7 @@ export const CourseDetailPage: React.FC = () => {
   const { courseSlug } = useParams<{ courseSlug: string }>();
   const { data, isLoading, isError, error, refetch } = useCourseQuery(courseSlug);
   const progressQuery = useCourseProgressQuery(courseSlug);
+  const xpQuery = useMyXpQuery();
 
   if (isLoading) {
     return <CourseDetailSkeleton />;
@@ -81,6 +83,9 @@ export const CourseDetailPage: React.FC = () => {
             <BookOpen size={14} aria-hidden="true" className="pill-icon" />
             {derivedLessonCount} {derivedLessonCount === 1 ? "Lesson" : "Lessons"}
           </span>
+          {xpQuery.data?.data && (
+            <LearnerXpDisplay totalXp={xpQuery.data.data.totalXp} />
+          )}
         </div>
 
         <h1 className="course-detail-title">{course.title}</h1>

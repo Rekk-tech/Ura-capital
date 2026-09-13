@@ -890,9 +890,10 @@ describe("Academy Progression & Completion Tracking DB Tests (FEAT-026)", () => 
       const rewardsAfter = await prisma.academyRewardLedger.count();
       const auditAfter = await prisma.authSecurityAuditRecord.count();
 
-      // Zero writes
-      expect(xpAfter).toBe(xpBefore);
-      expect(rewardsAfter).toBe(rewardsBefore);
+      // FEAT-027 active: internal reward reconciliation writes 1 user XP aggregate and 2 ledgers (lesson + course)
+      // Zero product audit writes preserved
+      expect(xpAfter).toBe(xpBefore + 1);
+      expect(rewardsAfter).toBe(rewardsBefore + 2);
       expect(auditAfter).toBe(auditBefore);
     });
   });

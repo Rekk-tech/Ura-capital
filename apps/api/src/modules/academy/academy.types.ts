@@ -136,7 +136,10 @@ import type {
   AcademyUserLessonProgress,
   AcademyQuizAttempt,
   AcademyQuizAnswer,
+  AcademyRewardLedger,
 } from "@prisma/client";
+
+
 
 export interface PublishedQuizRecord {
   id: string;
@@ -176,6 +179,12 @@ export interface SafeProgressUpsertResult<T> {
   progress: T;
   isFirstCompletion: boolean;
 }
+
+export interface SafeRecordRewardResult {
+  reward: AcademyRewardLedger;
+  isDuplicate: boolean;
+}
+
 
 export interface PublishedCourseWithLessonsProgress {
   course: AcademyCourse;

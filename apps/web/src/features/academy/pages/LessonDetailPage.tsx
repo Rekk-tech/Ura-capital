@@ -11,10 +11,13 @@ import {
   useSubmitQuizAttemptMutation,
   useGradedQuizResultQuery,
   useCompleteLessonMutation,
+  useMyXpQuery,
 } from "../hooks/use-academy";
 import { LessonContent } from "../components/LessonContent";
+import { LearnerXpDisplay } from "../components/LearnerXpDisplay";
 import { LessonDetailSkeleton, AuthRequiredCard, NotFoundState, ErrorState } from "../components/AcademyStates";
 import { AcademyApiError } from "../types/academy-ui.types";
+
 
 export const LessonDetailPage: React.FC = () => {
   const { courseSlug, lessonSlug } = useParams<{ courseSlug: string; lessonSlug: string }>();
@@ -34,7 +37,9 @@ export const LessonDetailPage: React.FC = () => {
   const saveDraftMutation = useSaveDraftQuizAnswerMutation();
   const submitAttemptMutation = useSubmitQuizAttemptMutation();
   const completeLessonMutation = useCompleteLessonMutation();
+  const xpQuery = useMyXpQuery();
   const [savingQuestionId, setSavingQuestionId] = useState<string | null>(null);
+
   const [saveError, setSaveError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [completeError, setCompleteError] = useState<string | null>(null);
@@ -236,6 +241,9 @@ export const LessonDetailPage: React.FC = () => {
                 </span>
               )}
             </div>
+            {xpQuery.data?.data && (
+              <LearnerXpDisplay totalXp={xpQuery.data.data.totalXp} />
+            )}
             {courseSlug && lessonSlug && (
               <Link
                 to={`/academy/courses/${encodeURIComponent(courseSlug)}/lessons/${encodeURIComponent(lessonSlug)}/flashcards`}

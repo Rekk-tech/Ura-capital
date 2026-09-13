@@ -12,7 +12,9 @@ import {
   QuizResultDto,
   CourseProgressDto,
   LessonProgressDto,
+  LearnerXpDto,
 } from "../features/academy/types/academy-ui.types";
+
 
 export interface IAcademyApiClient {
   listCourses(params?: ListCoursesParams): Promise<{ data: CourseSummaryDto[]; pagination: PaginationMeta }>;
@@ -28,7 +30,9 @@ export interface IAcademyApiClient {
   getGradedQuizResult(attemptId: string, accessToken?: string): Promise<{ data: QuizResultDto }>;
   getCourseProgress(courseSlug: string, accessToken?: string): Promise<{ data: CourseProgressDto }>;
   completeLesson(courseSlug: string, lessonSlug: string, accessToken?: string): Promise<{ data: LessonProgressDto }>;
+  getMyXp(accessToken?: string): Promise<{ data: LearnerXpDto }>;
 }
+
 
 
 export class AcademyApiClient implements IAcademyApiClient {
@@ -379,6 +383,30 @@ export class AcademyApiClient implements IAcademyApiClient {
 
     return (await res.json()) as { data: LessonProgressDto };
   }
+
+  async getMyXp(accessToken?: string): Promise<{ data: LearnerXpDto }> {
+    const url = `${this.baseUrl}/me/xp`;
+
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+    };
+
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers,
+    });
+
+    if (!res.ok) {
+      await this.handleError(res);
+    }
+
+    return (await res.json()) as { data: LearnerXpDto };
+  }
+
 
 
 

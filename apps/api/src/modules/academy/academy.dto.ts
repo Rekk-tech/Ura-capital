@@ -443,3 +443,27 @@ export function toCourseProgressDto(entity: {
   };
 }
 
+// FEAT-027: Academy XP & Reward Ledger DTOs and Mappers
+
+export type {
+  LearnerXpDto,
+  LearnerXpResponse,
+  RewardReconciliationResult,
+} from "@aura/shared";
+export { deriveRewardIdempotencyKey } from "@aura/shared";
+
+import type { LearnerXpDto } from "@aura/shared";
+
+/**
+ * Maps authoritative XP entity/aggregate to a minimal safe learner DTO.
+ * AC-016, AC-026: Exposes totalXp ONLY. Does NOT expose userId, DB ids,
+ * idempotency key, level, secrets, or internal relations.
+ */
+export function toLearnerXpDto(entity: { totalXp: number } | number): LearnerXpDto {
+  const totalXp = typeof entity === "number" ? entity : entity.totalXp;
+  return {
+    totalXp: Math.max(0, totalXp),
+  };
+}
+
+

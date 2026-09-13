@@ -128,3 +128,78 @@ export const courseProgressParamSchema = z
 
 export type CourseProgressParam = z.infer<typeof courseProgressParamSchema>;
 
+// FEAT-027: Reward Metadata Allowlist & Sanitization (AC-009, AC-012)
+const ALLOWED_METADATA_KEYS = new Set([
+  "courseSlug",
+  "lessonSlug",
+  "completedAt",
+  "source",
+]);
+
+const FORBIDDEN_METADATA_PATTERNS = [
+  /password/i,
+  /token/i,
+  /cookie/i,
+  /secret/i,
+  /key/i,
+  /hash/i,
+  /correct/i,
+  /explanation/i,
+  /answer/i,
+  /option/i,
+  /score/i,
+];
+
+/**
+ * Sanitizes reward ledger metadata according to FEAT-027 AC-009 & AC-012:
+ * - Allowlisted keys only: courseSlug, lessonSlug, completedAt, source
+ * - Flat primitives only (string, number, boolean)
+ * - Strings bounded to 256 characters
+ * - Strictly strips secrets, tokens, answers, correctness, explanations
+ * - Max 10 keys total
+ */
+export function sanitizeRewardMetadata(
+  metadata?: Record<string, unknown> | null,
+): Record<string, string | number | boolean> | undefined {
+  if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) {
+    return undefined;
+  }
+
+  const sanitized: Record<string, string | number | boolean> = {};
+  let count = 0;
+
+  for (const [rawKey, rawValue] of Object.entries(metadata)) {
+    if (count >= 10) break;
+    const trimmedKey = rawKey.trim();
+
+    // Check allowlist
+    if (!ALLOWED_METADATA_KEYS.has(trimmedKey)) {
+      continue;
+    }
+
+    // Double check forbidden patterns just in case
+    if (FORBIDDEN_METADATA_PATTERNS.some((p) => p.test(trimmedKey))) {
+      continue;
+    }
+
+    if (typeof rawValue === "string") {
+      // Check if string content looks like a token/secret
+      if (rawValue.length > 256) {
+        sanitized[trimmedKey] = rawValue.substring(0, 256);
+      } else {
+        sanitized[trimmedKey] = rawValue;
+      }
+      count++;
+    } else if (typeof rawValue === "number" && Number.isFinite(rawValue)) {
+      sanitized[trimmedKey] = rawValue;
+      count++;
+    } else if (typeof rawValue === "boolean") {
+      sanitized[trimmedKey] = rawValue;
+      count++;
+    }
+  }
+
+  return Object.keys(sanitized).length > 0 ? sanitized : undefined;
+}
+
+

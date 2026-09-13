@@ -39,3 +39,53 @@ export const ERROR_CODES = {
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];
+
+// FEAT-027 Academy XP & Reward Ledger Policy Constants
+// Locked Human Decisions:
+// - Lesson first completion: 10 XP
+// - Course first completion: 50 XP
+// - Failed quiz: 0 XP
+// - Repeated quiz attempt: 0 additional XP
+// - Level mechanics: DEFERRED (Total XP authority only)
+// - Historical automatic backfill: DEFERRED
+export const ACADEMY_XP_POLICY = {
+  LESSON_FIRST_COMPLETION_XP: 10,
+  COURSE_FIRST_COMPLETION_XP: 50,
+  FAILED_QUIZ_XP: 0,
+  REPEAT_ATTEMPT_XP: 0,
+} as const;
+
+export const ACADEMY_REWARD_TYPES = {
+  XP: "XP",
+} as const;
+
+export type AcademyRewardType =
+  (typeof ACADEMY_REWARD_TYPES)[keyof typeof ACADEMY_REWARD_TYPES];
+
+export const ACADEMY_SOURCE_TYPES = {
+  LESSON_COMPLETION: "LESSON_COMPLETION",
+  COURSE_COMPLETION: "COURSE_COMPLETION",
+  QUIZ_PERFECT_SCORE: "QUIZ_PERFECT_SCORE",
+  FLASHCARD_SESSION: "FLASHCARD_SESSION",
+} as const;
+
+export type AcademySourceType =
+  (typeof ACADEMY_SOURCE_TYPES)[keyof typeof ACADEMY_SOURCE_TYPES];
+
+export const ACADEMY_RESOURCE_TYPES = {
+  LESSON: "LESSON",
+  COURSE: "COURSE",
+} as const;
+
+export type AcademyResourceType =
+  (typeof ACADEMY_RESOURCE_TYPES)[keyof typeof ACADEMY_RESOURCE_TYPES];
+
+export const REWARD_LEDGER_STATUS = {
+  PENDING: "PENDING",
+  APPLIED: "APPLIED",
+  REVERSED: "REVERSED",
+} as const;
+
+export type RewardLedgerStatus =
+  (typeof REWARD_LEDGER_STATUS)[keyof typeof REWARD_LEDGER_STATUS];
+

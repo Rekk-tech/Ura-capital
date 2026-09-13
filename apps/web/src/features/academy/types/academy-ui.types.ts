@@ -179,5 +179,11 @@ export interface CourseProgressDto {
   lessons: LessonProgressDto[];
 }
 
+// FEAT-027: Academy XP & Reward Ledger UI Types
+export interface LearnerXpDto {
+  totalXp: number;
+}
+
+
 
 

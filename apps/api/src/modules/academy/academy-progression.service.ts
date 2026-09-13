@@ -16,6 +16,8 @@ import {
   completeLessonParamSchema,
 } from "./academy.validation.js";
 
+import type { AcademyRewardService } from "./academy-reward.service.js";
+
 export interface ReconcileResult {
   lessonProgress: LessonProgressDto | null;
   facts: AcademyCompletionFact[];
@@ -30,7 +32,9 @@ export class AcademyProgressionService {
   constructor(
     private readonly progressRepo: IAcademyProgressRepository,
     private readonly txRunner: ITransactionRunner = defaultTransactionRunner,
+    private readonly rewardService?: AcademyRewardService,
   ) {}
+
 
   /**
    * Reads authenticated current-user course progress with server-authoritative
@@ -178,7 +182,13 @@ export class AcademyProgressionService {
     }
 
     // 4. Atomic progression transaction coordinating lesson progress and course rollup
-    return await this.txRunner.run(async (ctx) => {
+    let courseCompleted = false;
+    let courseFirstCompletion = false;
+    let courseCompletedAt: Date | null = null;
+    let lessonFirstCompletion = false;
+    let lessonCompletedAt: Date | null = null;
+
+    const result = await this.txRunner.run(async (ctx) => {
       const repo = ctx.repositories.academyProgressRepo;
       const now = new Date();
       const facts: AcademyCompletionFact[] = [];
@@ -191,13 +201,16 @@ export class AcademyProgressionService {
         now,
       );
 
+      lessonFirstCompletion = lessonResult.isFirstCompletion;
+      lessonCompletedAt = lessonResult.progress.completedAt ?? now;
+
       if (lessonResult.isFirstCompletion) {
         facts.push({
           userId,
           resourceType: "LESSON",
           resourceId: lesson.id,
           isFirstCompletion: true,
-          completedAt: lessonResult.progress.completedAt ?? now,
+          completedAt: lessonCompletedAt,
         });
       }
 
@@ -226,13 +239,17 @@ export class AcademyProgressionService {
           "COMPLETED",
           now,
         );
+        courseCompleted = true;
+        courseFirstCompletion = courseResult.isFirstCompletion;
+        courseCompletedAt = courseResult.progress.completedAt ?? now;
+
         if (courseResult.isFirstCompletion) {
           facts.push({
             userId,
             resourceType: "COURSE",
             resourceId: lesson.courseId,
             isFirstCompletion: true,
-            completedAt: courseResult.progress.completedAt ?? now,
+            completedAt: courseCompletedAt,
           });
         }
       } else if (totalCount > 0 && completedCount > 0) {
@@ -254,6 +271,44 @@ export class AcademyProgressionService {
         facts,
       };
     });
+
+    // 5. Post-progression-commit reward reconciliation (FEAT-027 orchestration)
+    if (this.rewardService) {
+      await this.rewardService.reconcileRewardForCompletion(
+        userId,
+        {
+          userId,
+          resourceType: "LESSON",
+          resourceId: lesson.id,
+          isFirstCompletion: lessonFirstCompletion,
+          completedAt: lessonCompletedAt ?? new Date(),
+        },
+        {
+          courseSlug,
+          lessonSlug,
+          source: "MANUAL_COMPLETION",
+        },
+      );
+
+      if (courseCompleted) {
+        await this.rewardService.reconcileRewardForCompletion(
+          userId,
+          {
+            userId,
+            resourceType: "COURSE",
+            resourceId: lesson.courseId,
+            isFirstCompletion: courseFirstCompletion,
+            completedAt: courseCompletedAt ?? new Date(),
+          },
+          {
+            courseSlug,
+            source: "MANUAL_COMPLETION",
+          },
+        );
+      }
+    }
+
+    return result;
   }
 
   /**
@@ -291,7 +346,13 @@ export class AcademyProgressionService {
     }
 
     // 3. Passing attempt: execute progression transaction
-    return await this.txRunner.run(async (ctx) => {
+    let courseCompleted = false;
+    let courseFirstCompletion = false;
+    let courseCompletedAt: Date | null = null;
+    let lessonFirstCompletion = false;
+    let lessonCompletedAt: Date | null = null;
+
+    const result = await this.txRunner.run(async (ctx) => {
       const repo = ctx.repositories.academyProgressRepo;
       const lessonId = attempt.quiz.lessonId;
       const courseId = attempt.quiz.lesson.courseId;
@@ -306,13 +367,16 @@ export class AcademyProgressionService {
         completedAt,
       );
 
+      lessonFirstCompletion = lessonResult.isFirstCompletion;
+      lessonCompletedAt = lessonResult.progress.completedAt ?? completedAt;
+
       if (lessonResult.isFirstCompletion) {
         facts.push({
           userId,
           resourceType: "LESSON",
           resourceId: lessonId,
           isFirstCompletion: true,
-          completedAt: lessonResult.progress.completedAt ?? completedAt,
+          completedAt: lessonCompletedAt,
         });
       }
 
@@ -339,13 +403,17 @@ export class AcademyProgressionService {
           "COMPLETED",
           completedAt,
         );
+        courseCompleted = true;
+        courseFirstCompletion = courseResult.isFirstCompletion;
+        courseCompletedAt = courseResult.progress.completedAt ?? completedAt;
+
         if (courseResult.isFirstCompletion) {
           facts.push({
             userId,
             resourceType: "COURSE",
             resourceId: courseId,
             isFirstCompletion: true,
-            completedAt: courseResult.progress.completedAt ?? completedAt,
+            completedAt: courseCompletedAt,
           });
         }
       } else if (totalCount > 0 && completedCount > 0) {
@@ -367,5 +435,45 @@ export class AcademyProgressionService {
         facts,
       };
     });
+
+    // 4. Post-progression-commit reward reconciliation (FEAT-027 orchestration)
+    if (this.rewardService) {
+      await this.rewardService.reconcileRewardForCompletion(
+        userId,
+        {
+          userId,
+          resourceType: "LESSON",
+          resourceId: attempt.quiz.lessonId,
+          isFirstCompletion: lessonFirstCompletion,
+          completedAt: lessonCompletedAt ?? new Date(),
+        },
+        {
+          courseSlug: attempt.quiz.lesson.course.slug,
+          lessonSlug: attempt.quiz.lesson.slug,
+          source: "GRADED_QUIZ",
+        },
+      );
+
+      if (courseCompleted) {
+        await this.rewardService.reconcileRewardForCompletion(
+          userId,
+          {
+            userId,
+            resourceType: "COURSE",
+            resourceId: attempt.quiz.lesson.courseId,
+            isFirstCompletion: courseFirstCompletion,
+            completedAt: courseCompletedAt ?? new Date(),
+          },
+          {
+            courseSlug: attempt.quiz.lesson.course.slug,
+            source: "GRADED_QUIZ",
+          },
+        );
+      }
+    }
+
+    return result;
   }
 }
+
+
