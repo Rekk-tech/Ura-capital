@@ -321,7 +321,7 @@ Excluded: Badges, monetization, subscription entitlements, historical automatic 
 
 QA Gate: Duplicate/retry/concurrent reward prevention, rollback behavior, DB uniqueness authority, progression-commit/reward-failure recovery, read-only XP projection, and no level mechanics.
 
-Planning Status: HUMAN APPROVED / APPROVED FOR IMPLEMENTATION (Codex-owned). Implementation NOT_STARTED.
+Planning Status: HUMAN APPROVED (Codex-owned). Implementation: COMPLETE. Internal Feature Gate: PASS. Git Checkpoint: PUBLISHED (commit f1b1290). CI: GREEN (Run 34757868281 / Job 103725282868). Tag: feat-027-approved.
 
 Human Decisions: APPROVED - lesson first completion 10 XP, course first completion 50 XP, failed quiz 0 XP, repeated quiz attempt 0 additional XP, historical automatic reward backfill deferred, current-user XP read API included, lightweight learner XP display included, badges out of scope, premium/subscription out of scope, level mechanics deferred.
 
@@ -337,7 +337,7 @@ Excluded: Public role management, admin content authoring, admin/support learner
 
 QA Gate: User A cannot read/write User B's attempts/progress; client role/admin spoofing rejected.
 
-Planning Status: PLANNED / BLOCKED BY FEAT-027 IMPLEMENTATION GATE. Implementation NOT_STARTED.
+Planning Status: PLANNED / UNBLOCKED FOR IMPLEMENTATION. Implementation NOT_STARTED.
 
 Human Decisions: APPROVED - ADMIN / SUPPORT learner visibility is DEFERRED. FEAT-028 adds zero new admin/support Academy routes and remains learner ownership hardening only.
 
@@ -351,7 +351,7 @@ Excluded: AuthSecurityAuditRecord reuse, public audit APIs, audit UI, product au
 
 QA Gate: Zero product audit activation, FEAT-016 abstraction intact, FEAT-009 unchanged, existing guards/regression pass, accepted risk documented.
 
-Planning Status: PLANNED / BLOCKED BY FEAT-027 IMPLEMENTATION GATE. Implementation NOT_STARTED.
+Planning Status: PLANNED / UNBLOCKED FOR DEFER CLOSURE. Implementation NOT_STARTED.
 
 Human Decisions: APPROVED - Durable Academy product audit is DEFERRED for Phase 4. Accepted rationale: no current compliance/product requirement before Phase 4 exit; activation would touch stable quiz/progression/reward services close to the integration gate; FEAT-016 abstraction remains available later; FEAT-009 auth/security audit remains unchanged.
 

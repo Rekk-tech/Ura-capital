@@ -493,7 +493,7 @@ Phase 3 Completion State:
 - FEAT-018 is DONE / QA PASS / Human Final Gate APPROVED.
 - Phase 3 is DONE / QA PASS / Human Final Gate APPROVED.
 - HISTORICAL SNAPSHOT (at Phase 3 completion): Phase 4 was IN_PROGRESS / PLANNING; FEAT-019 was APPROVED FOR IMPLEMENTATION; FEAT-020 through FEAT-030 remained BLOCKED.
-- CURRENT CANONICAL STATE: Phase 4 is IN_PROGRESS; FEAT-019 is DONE (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED); FEAT-020 is DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED); FEAT-021 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-022 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-023 is DONE (QA PASS, Human Final Gate APPROVED); FEAT-024 is DONE (QA PASS — QA Iteration 1, Human Final Gate APPROVED); FEAT-025 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-026 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-027 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-028 is UNBLOCKED FOR IMPLEMENTATION; FEAT-029 is UNBLOCKED FOR IMPLEMENTATION; FEAT-030 is BLOCKED; Phase 5 is planned and implementation-blocked by the Phase 4 Human Phase Final Gate.
+- CURRENT CANONICAL STATE: Phase 4 is IN_PROGRESS; FEAT-019 is DONE (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED); FEAT-020 is DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED); FEAT-021 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-022 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-023 is DONE (QA PASS, Human Final Gate APPROVED); FEAT-024 is DONE (QA PASS — QA Iteration 1, Human Final Gate APPROVED); FEAT-025 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-026 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-027 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-028 is UNBLOCKED FOR IMPLEMENTATION; FEAT-029 is UNBLOCKED FOR DEFER CLOSURE; FEAT-030 is BLOCKED; Phase 5 is planned and implementation-blocked by the Phase 4 Human Phase Final Gate.
 
 Feature Decomposition:
 
@@ -859,7 +859,7 @@ FEAT-025: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 FEAT-026: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 FEAT-027: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 FEAT-028: UNBLOCKED FOR IMPLEMENTATION
-FEAT-029: UNBLOCKED FOR IMPLEMENTATION
+FEAT-029: UNBLOCKED FOR DEFER CLOSURE
 FEAT-030: BLOCKED by FEAT-019 through FEAT-029 as applicable
 Phase 5: BLOCKED
 ```
@@ -876,7 +876,7 @@ Feature Decomposition:
 - FEAT-026: Academy Progression & Completion Tracking - `DONE` (Implementation: COMPLETE, Internal Feature Gate: PASS)
 - FEAT-027: XP & Idempotent Reward Ledger - `DONE` (Implementation: COMPLETE, Internal Feature Gate: PASS)
 - FEAT-028: Academy Authorization & Ownership Hardening - `UNBLOCKED FOR IMPLEMENTATION`
-- FEAT-029: Academy Product Audit Decision & Integration - `UNBLOCKED FOR IMPLEMENTATION`
+- FEAT-029: Academy Product Audit Decision & Integration - `UNBLOCKED FOR DEFER CLOSURE`
 - FEAT-030: Phase 4 Academy Integration Gate - `BLOCKED`
 
 FEAT-019 Governance Fields:
@@ -1388,9 +1388,12 @@ Reward Recovery Decision: `AcademyCompletionFact.isFirstCompletion` is informati
 Spec Package: .specify/specs/FEAT-027/
 Acceptance Criteria: 27 deterministic criteria (AC-001..AC-027, ALL VERIFIED PASS)
 Tasks: 12 implementation tasks completed (T001..T012)
+Git Checkpoint: PUBLISHED (commit f1b1290)
+CI: GREEN (Run 34757868281 / Job 103725282868)
+Tag: feat-027-approved
 FEAT-028: UNBLOCKED FOR IMPLEMENTATION
-FEAT-029: UNBLOCKED FOR IMPLEMENTATION
-Next Action: Antigravity may implement FEAT-028 and FEAT-029 in parallel Git worktrees from the approved FEAT-027 baseline.
+FEAT-029: UNBLOCKED FOR DEFER CLOSURE
+Next Action: Antigravity may implement FEAT-028 and close FEAT-029 deferral in parallel Git worktrees from the approved FEAT-027 baseline.
 ```
 
 FEAT-028 Governance Fields:
@@ -1413,7 +1416,7 @@ Start Condition: FEAT-027 implementation complete, Internal Feature Gate PASS, c
 FEAT-029 Governance Fields:
 
 ```text
-Lifecycle State: UNBLOCKED FOR IMPLEMENTATION
+Lifecycle State: UNBLOCKED FOR DEFER CLOSURE
 Planning Status: CODEX UPFRONT PLANNING COMPLETE
 Planning Owner: Codex
 Implementation: NOT_STARTED
