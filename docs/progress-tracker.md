@@ -818,29 +818,41 @@ Rebuild education features on the new architecture.
 
 ## Acceptance Criteria
 
-- [ ] Correct answers are not exposed before submission
-- [ ] Server validates submitted answers
-- [ ] XP is not duplicated by repeat submission
-- [ ] Progress is persisted per user
-- [ ] Academy APIs are authenticated as required
-- [ ] Unit/integration tests pass
+- [x] Correct answers are not exposed before submission
+- [x] Server validates submitted answers
+- [x] XP is not duplicated by repeat submission
+- [x] Progress is persisted per user
+- [x] Academy APIs are authenticated as required
+- [x] Unit/integration tests pass
 
 Status:
 
 ```text
-IN_PROGRESS
+DONE
 ```
 
 Planning:
 
 ```text
-IN_PROGRESS
+DONE
 ```
 
 Implementation:
 
 ```text
-IN_PROGRESS
+COMPLETE
+```
+
+QA:
+
+```text
+PASS
+```
+
+Human Phase Final Gate:
+
+```text
+APPROVED
 ```
 
 Phase 4 Planning & Implementation State:
