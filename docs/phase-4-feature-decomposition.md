@@ -1,6 +1,6 @@
 # Aura Capital - Phase 4 Feature Decomposition
 
-**Status**: PHASE 4 IN_PROGRESS  
+**Status**: PHASE 4 DONE / QA PASS / Human Phase Final Gate APPROVED  
 **Phase**: Phase 4 - Academy  
 **Owner**: Codex Planner / Architect / QA Governance  
 **Date**: 2026-09-03
@@ -17,9 +17,9 @@
 - FEAT-027: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 - FEAT-028: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 - FEAT-029: IMPLEMENTATION COMPLETE / DEFER CLOSURE VERIFIED
-- FEAT-030: UNBLOCKED FOR CODEX PHASE QA
-- Phase 4: IN_PROGRESS
-- Phase 5: BLOCKED
+- FEAT-030: DONE / QA PASS
+- Phase 4: DONE / QA PASS / Human Phase Final Gate APPROVED
+- Phase 5: UNBLOCKED FOR IMPLEMENTATION / NEXT APPROVED PLANNING STEP
 
 **Master Planning Governance**:
 - Remaining Phase 4 phase-owned workflow transition: HUMAN APPROVED.
@@ -207,7 +207,7 @@ Human decision locked:
 | FEAT-027 | XP & Idempotent Reward Ledger | Implementation | DONE (Internal Feature Gate: PASS) |
 | FEAT-028 | Academy Authorization & Ownership Hardening | Implementation / hardening | DONE (Internal Feature Gate: PASS) |
 | FEAT-029 | Academy Product Audit Decision & Integration | Governance / verification closure | IMPLEMENTATION COMPLETE / DEFER CLOSURE VERIFIED |
-| FEAT-030 | Phase 4 Academy Integration Gate | Validation gate | UNBLOCKED FOR CODEX PHASE QA |
+| FEAT-030 | Phase 4 Academy Integration Gate | Validation gate | DONE / QA PASS |
 
 ## 12. Feature Details
 
@@ -355,7 +355,7 @@ Planning Status: IMPLEMENTATION COMPLETE / DEFER CLOSURE VERIFIED. Implementatio
 
 Human Decisions: APPROVED - Durable Academy product audit is DEFERRED for Phase 4. Accepted rationale: no current compliance/product requirement before Phase 4 exit; activation would touch stable quiz/progression/reward services close to the integration gate; FEAT-016 abstraction remains available later; FEAT-009 auth/security audit remains unchanged.
 
-Self-Verification: PASS AFTER CLEAN INTEGRATION RE-VALIDATION. Historical contaminated FAIL is preserved in `reports/implementation/phase-4/FEAT-029.md`. Clean canonical validation is 14/14 PASS, DB regression is 20 files / 240 tests PASS, and FEAT-030 is unblocked for Codex Phase QA.
+Self-Verification: PASS AFTER CLEAN INTEGRATION RE-VALIDATION. Historical contaminated FAIL is preserved in `reports/implementation/phase-4/FEAT-029.md`. Clean canonical validation is 14/14 PASS, DB regression is 20 files / 240 tests PASS, and FEAT-030 is DONE / QA PASS.
 
 Parallel Note: FEAT-028 and FEAT-029 may run in parallel after FEAT-027 gate because FEAT-029 is DEFER. Both must start from the same `feat-027-approved` checkpoint, use isolated Git worktrees, and never run in the same working directory.
 
@@ -436,4 +436,4 @@ PASS requires:
 
 ## 16. Readiness
 
-FEAT-027 through FEAT-029 have completed their internal feature gates / defer closure. FEAT-030 is UNBLOCKED FOR CODEX PHASE QA. Phase 4 remains IN_PROGRESS and Phase 5 remains BLOCKED until FEAT-030 and the Human Phase Final Gate pass.
+FEAT-027 through FEAT-029 have completed their internal feature gates / defer closure. FEAT-030 is DONE / QA PASS. Phase 4 is DONE / QA PASS / Human Phase Final Gate APPROVED. Phase 5 is UNBLOCKED FOR IMPLEMENTATION / NEXT APPROVED PLANNING STEP.
