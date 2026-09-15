@@ -29,6 +29,10 @@ import { getPrismaClient } from "../../infrastructure/database/prisma.js";
 
 type DbClient = PrismaClient | Prisma.TransactionClient;
 
+export type SimulationMarketSnapshotWithAsset = SimulationMarketSnapshot & {
+  asset: SimulationAsset;
+};
+
 function toDecimal(val: Prisma.Decimal | string | number): Prisma.Decimal {
   return val instanceof Prisma.Decimal ? val : new Prisma.Decimal(val);
 }
@@ -142,7 +146,11 @@ export interface ISimulationMarketSnapshotRepository {
   createSnapshot(data: CreateSnapshotInput): Promise<SimulationMarketSnapshot>;
   findSnapshotById(id: string): Promise<SimulationMarketSnapshot | null>;
   findSnapshot(scenarioId: string, cycle: number, assetId: string): Promise<SimulationMarketSnapshot | null>;
-  listSnapshotsByScenarioAndCycle(scenarioId: string, cycle: number): Promise<SimulationMarketSnapshot[]>;
+  listSnapshotsByScenarioAndCycle(
+    scenarioId: string,
+    cycle: number,
+    filter?: { assetStatus?: string; assetType?: string },
+  ): Promise<SimulationMarketSnapshotWithAsset[]>;
 }
 
 export class PrismaSimulationMarketSnapshotRepository implements ISimulationMarketSnapshotRepository {
@@ -182,16 +190,27 @@ export class PrismaSimulationMarketSnapshotRepository implements ISimulationMark
     });
   }
 
-  async listSnapshotsByScenarioAndCycle(scenarioId: string, cycle: number): Promise<SimulationMarketSnapshot[]> {
+  async listSnapshotsByScenarioAndCycle(
+    scenarioId: string,
+    cycle: number,
+    filter?: { assetStatus?: string; assetType?: string },
+  ): Promise<SimulationMarketSnapshotWithAsset[]> {
     return this.client.simulationMarketSnapshot.findMany({
       where: {
         scenarioId,
         cycle,
+        asset: {
+          status: filter?.assetStatus,
+          assetType: filter?.assetType,
+        },
       },
       include: {
         asset: true,
       },
-      orderBy: { asset: { displayOrder: "asc" } },
+      orderBy: [
+        { asset: { displayOrder: "asc" } },
+        { asset: { symbol: "asc" } },
+      ],
     });
   }
 }
@@ -278,6 +297,10 @@ export class PrismaSimulationSessionRepository implements ISimulationSessionRepo
         userId,
         status: filter?.status,
       },
+      include: {
+        scenario: true,
+        portfolio: true,
+      },
       orderBy: { createdAt: "desc" },
     });
   }
@@ -317,6 +340,13 @@ export interface ISimulationPortfolioRepository {
   findPortfolioById(id: string): Promise<SimulationPortfolio | null>;
   updateCashBalance(id: string, cashBalance: Prisma.Decimal | string | number): Promise<SimulationPortfolio>;
   updateRealizedPnl(id: string, realizedPnl: Prisma.Decimal | string | number): Promise<SimulationPortfolio>;
+  updatePortfolioAccounting(
+    id: string,
+    data: {
+      cashBalance: Prisma.Decimal | string | number;
+      realizedPnl?: Prisma.Decimal | string | number;
+    },
+  ): Promise<SimulationPortfolio>;
   createPosition(data: CreatePositionInput): Promise<SimulationPosition>;
   findPosition(portfolioId: string, assetId: string): Promise<SimulationPosition | null>;
   listPositions(portfolioId: string): Promise<SimulationPosition[]>;
@@ -326,6 +356,7 @@ export interface ISimulationPortfolioRepository {
     quantity: number,
     averageCost: Prisma.Decimal | string | number,
   ): Promise<SimulationPosition>;
+  deletePosition(portfolioId: string, assetId: string): Promise<SimulationPosition | null>;
 }
 
 export class PrismaSimulationPortfolioRepository implements ISimulationPortfolioRepository {
@@ -387,6 +418,22 @@ export class PrismaSimulationPortfolioRepository implements ISimulationPortfolio
     });
   }
 
+  async updatePortfolioAccounting(
+    id: string,
+    data: {
+      cashBalance: Prisma.Decimal | string | number;
+      realizedPnl?: Prisma.Decimal | string | number;
+    },
+  ): Promise<SimulationPortfolio> {
+    return this.client.simulationPortfolio.update({
+      where: { id },
+      data: {
+        cashBalance: toDecimal(data.cashBalance),
+        realizedPnl: data.realizedPnl !== undefined ? toDecimal(data.realizedPnl) : undefined,
+      },
+    });
+  }
+
   async createPosition(data: CreatePositionInput): Promise<SimulationPosition> {
     return this.client.simulationPosition.create({
       data: {
@@ -442,6 +489,21 @@ export class PrismaSimulationPortfolioRepository implements ISimulationPortfolio
         averageCost: cost,
       },
     });
+  }
+
+  async deletePosition(portfolioId: string, assetId: string): Promise<SimulationPosition | null> {
+    try {
+      return await this.client.simulationPosition.delete({
+        where: {
+          portfolioId_assetId: {
+            portfolioId,
+            assetId,
+          },
+        },
+      });
+    } catch {
+      return null;
+    }
   }
 }
 

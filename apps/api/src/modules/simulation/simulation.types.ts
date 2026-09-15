@@ -1,4 +1,26 @@
-import type { Prisma } from "@prisma/client";
+import type {
+  Prisma,
+  SimulationScenario,
+  SimulationAsset,
+  SimulationMarketSnapshot,
+  SimulationSession,
+  SimulationPortfolio,
+  SimulationPosition,
+  SimulationOrder,
+  SimulationTrade,
+} from "@prisma/client";
+
+export type Decimal = Prisma.Decimal;
+export type {
+  SimulationScenario,
+  SimulationAsset,
+  SimulationMarketSnapshot,
+  SimulationSession,
+  SimulationPortfolio,
+  SimulationPosition,
+  SimulationOrder,
+  SimulationTrade,
+};
 
 // ============================================================================
 // Phase 5: Simulation Domain Types & Closed-Set Constants (FEAT-031)
