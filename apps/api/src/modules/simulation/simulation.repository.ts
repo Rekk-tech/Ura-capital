@@ -340,6 +340,13 @@ export interface ISimulationPortfolioRepository {
   findPortfolioById(id: string): Promise<SimulationPortfolio | null>;
   updateCashBalance(id: string, cashBalance: Prisma.Decimal | string | number): Promise<SimulationPortfolio>;
   updateRealizedPnl(id: string, realizedPnl: Prisma.Decimal | string | number): Promise<SimulationPortfolio>;
+  updatePortfolioAccounting(
+    id: string,
+    data: {
+      cashBalance: Prisma.Decimal | string | number;
+      realizedPnl?: Prisma.Decimal | string | number;
+    },
+  ): Promise<SimulationPortfolio>;
   createPosition(data: CreatePositionInput): Promise<SimulationPosition>;
   findPosition(portfolioId: string, assetId: string): Promise<SimulationPosition | null>;
   listPositions(portfolioId: string): Promise<SimulationPosition[]>;
@@ -349,6 +356,7 @@ export interface ISimulationPortfolioRepository {
     quantity: number,
     averageCost: Prisma.Decimal | string | number,
   ): Promise<SimulationPosition>;
+  deletePosition(portfolioId: string, assetId: string): Promise<SimulationPosition | null>;
 }
 
 export class PrismaSimulationPortfolioRepository implements ISimulationPortfolioRepository {
@@ -410,6 +418,22 @@ export class PrismaSimulationPortfolioRepository implements ISimulationPortfolio
     });
   }
 
+  async updatePortfolioAccounting(
+    id: string,
+    data: {
+      cashBalance: Prisma.Decimal | string | number;
+      realizedPnl?: Prisma.Decimal | string | number;
+    },
+  ): Promise<SimulationPortfolio> {
+    return this.client.simulationPortfolio.update({
+      where: { id },
+      data: {
+        cashBalance: toDecimal(data.cashBalance),
+        realizedPnl: data.realizedPnl !== undefined ? toDecimal(data.realizedPnl) : undefined,
+      },
+    });
+  }
+
   async createPosition(data: CreatePositionInput): Promise<SimulationPosition> {
     return this.client.simulationPosition.create({
       data: {
@@ -465,6 +489,21 @@ export class PrismaSimulationPortfolioRepository implements ISimulationPortfolio
         averageCost: cost,
       },
     });
+  }
+
+  async deletePosition(portfolioId: string, assetId: string): Promise<SimulationPosition | null> {
+    try {
+      return await this.client.simulationPosition.delete({
+        where: {
+          portfolioId_assetId: {
+            portfolioId,
+            assetId,
+          },
+        },
+      });
+    } catch {
+      return null;
+    }
   }
 }
 

@@ -19,8 +19,8 @@ Implementation: IN_PROGRESS
 FEAT-031: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS, Git Checkpoint: PUBLISHED, CI: GREEN, Tag: feat-031-approved)
 FEAT-032: DONE / INTEGRATED (Self-Verification: PASS; QA Independence: REDUCED)
 FEAT-033: DONE / INTEGRATED (Internal Feature Gate: PASS)
-FEAT-034: UNBLOCKED FOR IMPLEMENTATION
-FEAT-035: PLANNED / BLOCKED BY FEAT-034
+FEAT-034: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
+FEAT-035: UNBLOCKED FOR IMPLEMENTATION
 FEAT-036: PLANNED / BLOCKED BY FEAT-035
 FEAT-037: PLANNED / BLOCKED BY FEAT-036
 FEAT-038: PLANNED / BLOCKED BY FEAT-037
@@ -65,8 +65,8 @@ Unresolved Human Decisions: ZERO for Phase 5 master planning decisions covered b
 | FEAT-031 | Simulation Domain Schema & Persistence Foundation | Implementation | Phase 2, Phase 3, Phase 4 approved | DONE (Internal Feature Gate: PASS, Tag: feat-031-approved) |
 | FEAT-032 | Asset Universe & Market Snapshot Read Model | Implementation | FEAT-031 | DONE / INTEGRATED |
 | FEAT-033 | Simulation Session Lifecycle | Implementation | FEAT-031 | DONE / INTEGRATED |
-| FEAT-034 | Portfolio & Position Accounting Foundation | Implementation | FEAT-032 + FEAT-033 | UNBLOCKED FOR IMPLEMENTATION |
-| FEAT-035 | Market Order Submission & Execution | Implementation | FEAT-034 | PLANNED / BLOCKED BY FEAT-034 |
+| FEAT-034 | Portfolio & Position Accounting Foundation | Implementation | FEAT-032 + FEAT-033 | DONE (Internal Feature Gate: PASS) |
+| FEAT-035 | Market Order Submission & Execution | Implementation | FEAT-034 | UNBLOCKED FOR IMPLEMENTATION |
 | FEAT-036 | Order Idempotency & Concurrency Adversarial Hardening | Hardening | FEAT-035 | PLANNED / BLOCKED BY FEAT-035 |
 | FEAT-037 | Current PnL & Portfolio Valuation | Implementation | FEAT-036 | PLANNED / BLOCKED BY FEAT-036 |
 | FEAT-038 | Simulation Learner UI | Implementation | FEAT-037 | PLANNED / BLOCKED BY FEAT-037 |
