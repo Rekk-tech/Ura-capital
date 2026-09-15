@@ -17,9 +17,9 @@ Phase 4: DONE / QA PASS / Human Phase Final Gate APPROVED
 Phase 5: IN_PROGRESS
 Implementation: IN_PROGRESS
 FEAT-031: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
-FEAT-032: IMPLEMENTATION COMPLETE (Self-Verification: PASS; QA Independence: REDUCED)
-FEAT-033: UNBLOCKED FOR IMPLEMENTATION
-FEAT-034: PLANNED / BLOCKED BY FEAT-032 + FEAT-033
+FEAT-032: DONE / INTEGRATED (Self-Verification: PASS; QA Independence: REDUCED)
+FEAT-033: DONE / INTEGRATED (Internal Feature Gate: PASS)
+FEAT-034: UNBLOCKED FOR IMPLEMENTATION
 FEAT-035: PLANNED / BLOCKED BY FEAT-034
 FEAT-036: PLANNED / BLOCKED BY FEAT-035
 FEAT-037: PLANNED / BLOCKED BY FEAT-036
@@ -63,9 +63,9 @@ Unresolved Human Decisions: ZERO for Phase 5 master planning decisions covered b
 | ID | Title | Type | Dependencies | State |
 | --- | --- | --- | --- | --- |
 | FEAT-031 | Simulation Domain Schema & Persistence Foundation | Implementation | Phase 2, Phase 3, Phase 4 approved | DONE (Internal Feature Gate: PASS) |
-| FEAT-032 | Asset Universe & Market Snapshot Read Model | Implementation | FEAT-031 | IMPLEMENTATION COMPLETE / SELF-VERIFICATION PASS |
-| FEAT-033 | Simulation Session Lifecycle | Implementation | FEAT-031 | UNBLOCKED FOR IMPLEMENTATION |
-| FEAT-034 | Portfolio & Position Accounting Foundation | Implementation | FEAT-032 + FEAT-033 | PLANNED / BLOCKED BY FEAT-032 + FEAT-033 |
+| FEAT-032 | Asset Universe & Market Snapshot Read Model | Implementation | FEAT-031 | DONE / INTEGRATED |
+| FEAT-033 | Simulation Session Lifecycle | Implementation | FEAT-031 | DONE / INTEGRATED |
+| FEAT-034 | Portfolio & Position Accounting Foundation | Implementation | FEAT-032 + FEAT-033 | UNBLOCKED FOR IMPLEMENTATION |
 | FEAT-035 | Market Order Submission & Execution | Implementation | FEAT-034 | PLANNED / BLOCKED BY FEAT-034 |
 | FEAT-036 | Order Idempotency & Concurrency Adversarial Hardening | Hardening | FEAT-035 | PLANNED / BLOCKED BY FEAT-035 |
 | FEAT-037 | Current PnL & Portfolio Valuation | Implementation | FEAT-036 | PLANNED / BLOCKED BY FEAT-036 |

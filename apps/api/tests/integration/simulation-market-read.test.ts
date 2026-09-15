@@ -207,11 +207,11 @@ describe("FEAT-032 Simulation market read routes", () => {
     expect(unknownCycle.body.error.message).toBe("Market snapshots not found");
   });
 
-  it("does not introduce FEAT-033 session routes", async () => {
+  it("does not introduce unbuilt FEAT-034 order routes", async () => {
     const token = mockAuthenticatedUser();
 
     const res = await request(app)
-      .post("/api/simulation/sessions")
+      .post("/api/simulation/orders")
       .set("Authorization", `Bearer ${token}`)
       .send({})
       .expect(HTTP_STATUS.NOT_FOUND);

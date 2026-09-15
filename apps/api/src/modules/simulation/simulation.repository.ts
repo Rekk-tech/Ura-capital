@@ -297,6 +297,10 @@ export class PrismaSimulationSessionRepository implements ISimulationSessionRepo
         userId,
         status: filter?.status,
       },
+      include: {
+        scenario: true,
+        portfolio: true,
+      },
       orderBy: { createdAt: "desc" },
     });
   }
