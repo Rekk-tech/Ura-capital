@@ -69,7 +69,6 @@ export function evaluateProductAuditGovernance(inputs: GovernanceGuardEvaluation
       // Check prohibited domain roots (unapproved future domains or premature product audit)
       const prohibitedDomainRoots = [
         "ai",
-        "simulation",
         "community",
         "subscription",
         "productaudit",
@@ -141,7 +140,6 @@ export function evaluateProductAuditGovernance(inputs: GovernanceGuardEvaluation
           "businessaudit",
           "productauditevent",
           "productauditrecord",
-          "simulation",
           "community",
           "subscription",
           "ai_",

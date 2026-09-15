@@ -44,6 +44,14 @@ const KNOWN_PRISMA_MODELS = new Set([
   "academyUserLessonProgress",
   "academyUserXp",
   "academyRewardLedger",
+  "simulationScenario",
+  "simulationAsset",
+  "simulationMarketSnapshot",
+  "simulationSession",
+  "simulationPortfolio",
+  "simulationPosition",
+  "simulationOrder",
+  "simulationTrade",
 ]);
 
 const KNOWN_PRISMA_ACTIONS = new Set([

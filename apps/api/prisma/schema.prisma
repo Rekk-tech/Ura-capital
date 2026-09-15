@@ -31,6 +31,10 @@ model User {
   xp                  AcademyUserXp?
   rewards             AcademyRewardLedger[]
 
+  // Phase 5 Simulation relations
+  simulationSessions  SimulationSession[]
+  simulationOrders    SimulationOrder[]
+
   @@map("users")
 }
 
@@ -367,5 +371,173 @@ model AcademyRewardLedger {
   @@index([userId])
   @@index([sourceType, sourceId])
   @@map("academy_reward_ledger")
+}
+
+// ============================================================================
+// Phase 5: Simulation Engine Domain Models (FEAT-031)
+// ============================================================================
+
+model SimulationScenario {
+  id              String                     @id @default(uuid())
+  key             String                     @unique
+  name            String
+  status          String                     @default("ACTIVE") // ACTIVE, ARCHIVED
+  createdAt       DateTime                   @default(now()) @map("created_at")
+  updatedAt       DateTime                   @updatedAt @map("updated_at")
+
+  marketSnapshots SimulationMarketSnapshot[]
+  sessions        SimulationSession[]
+
+  @@map("simulation_scenarios")
+}
+
+model SimulationAsset {
+  id              String                     @id @default(uuid())
+  symbol          String                     @unique
+  name            String
+  assetType       String                     @default("EQUITY") @map("asset_type") // EQUITY
+  status          String                     @default("ACTIVE") // ACTIVE, ARCHIVED
+  displayOrder    Int                        @default(0) @map("display_order")
+  createdAt       DateTime                   @default(now()) @map("created_at")
+  updatedAt       DateTime                   @updatedAt @map("updated_at")
+
+  marketSnapshots SimulationMarketSnapshot[]
+  positions       SimulationPosition[]
+  orders          SimulationOrder[]
+  trades          SimulationTrade[]
+
+  @@map("simulation_assets")
+}
+
+model SimulationMarketSnapshot {
+  id         String             @id @default(uuid())
+  scenarioId String             @map("scenario_id")
+  assetId    String             @map("asset_id")
+  cycle      Int
+  price      Decimal            @db.Decimal(20, 6)
+  occurredAt DateTime           @map("occurred_at")
+  createdAt  DateTime           @default(now()) @map("created_at")
+
+  scenario   SimulationScenario @relation(fields: [scenarioId], references: [id], onDelete: Restrict)
+  asset      SimulationAsset    @relation(fields: [assetId], references: [id], onDelete: Restrict)
+
+  @@unique([scenarioId, cycle, assetId])
+  @@index([scenarioId, cycle])
+  @@index([assetId])
+  @@map("simulation_market_snapshots")
+}
+
+model SimulationSession {
+  id           String              @id @default(uuid())
+  userId       String              @map("user_id")
+  scenarioId   String              @map("scenario_id")
+  status       String              @default("CREATED") // CREATED, ACTIVE, COMPLETED, CANCELLED
+  startingCash Decimal             @default(100000.0000) @map("starting_cash") @db.Decimal(20, 4)
+  currentCycle Int                 @default(1) @map("current_cycle")
+  startedAt    DateTime?           @map("started_at")
+  completedAt  DateTime?           @map("completed_at")
+  cancelledAt  DateTime?           @map("cancelled_at")
+  createdAt    DateTime            @default(now()) @map("created_at")
+  updatedAt    DateTime            @updatedAt @map("updated_at")
+
+  user         User                @relation(fields: [userId], references: [id], onDelete: Restrict)
+  scenario     SimulationScenario  @relation(fields: [scenarioId], references: [id], onDelete: Restrict)
+  portfolio    SimulationPortfolio?
+  orders       SimulationOrder[]
+  trades       SimulationTrade[]
+
+  @@unique([id, userId])
+  @@index([userId])
+  @@index([scenarioId])
+  @@index([status])
+  @@map("simulation_sessions")
+}
+
+model SimulationPortfolio {
+  id          String               @id @default(uuid())
+  sessionId   String               @unique @map("session_id")
+  cashBalance Decimal              @map("cash_balance") @db.Decimal(20, 4)
+  realizedPnl Decimal              @default(0.0000) @map("realized_pnl") @db.Decimal(20, 4)
+  createdAt   DateTime             @default(now()) @map("created_at")
+  updatedAt   DateTime             @updatedAt @map("updated_at")
+
+  session     SimulationSession    @relation(fields: [sessionId], references: [id], onDelete: Restrict)
+  positions   SimulationPosition[]
+
+  @@map("simulation_portfolios")
+}
+
+model SimulationPosition {
+  id          String              @id @default(uuid())
+  portfolioId String              @map("portfolio_id")
+  assetId     String              @map("asset_id")
+  quantity    Int
+  averageCost Decimal             @map("average_cost") @db.Decimal(20, 6)
+  createdAt   DateTime            @default(now()) @map("created_at")
+  updatedAt   DateTime            @updatedAt @map("updated_at")
+
+  portfolio   SimulationPortfolio @relation(fields: [portfolioId], references: [id], onDelete: Restrict)
+  asset       SimulationAsset     @relation(fields: [assetId], references: [id], onDelete: Restrict)
+
+  @@unique([portfolioId, assetId])
+  @@index([portfolioId])
+  @@index([assetId])
+  @@map("simulation_positions")
+}
+
+model SimulationOrder {
+  id                 String            @id @default(uuid())
+  sessionId          String            @map("session_id")
+  userId             String            @map("user_id")
+  assetId            String            @map("asset_id")
+  side               String            // BUY, SELL
+  type               String            @default("MARKET") // MARKET
+  quantity           Int
+  status             String            @default("RECEIVED") // RECEIVED, FILLED, REJECTED
+  idempotencyKey     String            @map("idempotency_key")
+  requestFingerprint String            @map("request_fingerprint")
+  rejectionCode      String?           @map("rejection_code")
+  executionPrice     Decimal?          @map("execution_price") @db.Decimal(20, 6)
+  executedQuantity   Int?              @map("executed_quantity")
+  submittedAt        DateTime          @default(now()) @map("submitted_at")
+  filledAt           DateTime?         @map("filled_at")
+  createdAt          DateTime          @default(now()) @map("created_at")
+  updatedAt          DateTime          @updatedAt @map("updated_at")
+
+  session            SimulationSession @relation(fields: [sessionId], references: [id], onDelete: Restrict)
+  user               User              @relation(fields: [userId], references: [id], onDelete: Restrict)
+  asset              SimulationAsset   @relation(fields: [assetId], references: [id], onDelete: Restrict)
+  trade              SimulationTrade?
+
+  @@unique([userId, sessionId, idempotencyKey])
+  @@unique([id, sessionId, assetId])
+  @@index([sessionId])
+  @@index([userId])
+  @@index([assetId])
+  @@index([status])
+  @@map("simulation_orders")
+}
+
+model SimulationTrade {
+  id             String            @id @default(uuid())
+  orderId        String            @unique @map("order_id")
+  sessionId      String            @map("session_id")
+  assetId        String            @map("asset_id")
+  side           String            // BUY, SELL
+  quantity       Int
+  executionPrice Decimal           @map("execution_price") @db.Decimal(20, 6)
+  notional       Decimal           @map("notional") @db.Decimal(20, 4)
+  realizedPnl    Decimal           @default(0.0000) @map("realized_pnl") @db.Decimal(20, 4)
+  executedAt     DateTime          @default(now()) @map("executed_at")
+  createdAt      DateTime          @default(now()) @map("created_at")
+
+  order          SimulationOrder   @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  session        SimulationSession @relation(fields: [sessionId], references: [id], onDelete: Restrict)
+  asset          SimulationAsset   @relation(fields: [assetId], references: [id], onDelete: Restrict)
+
+  @@index([sessionId])
+  @@index([assetId])
+  @@index([orderId])
+  @@map("simulation_trades")
 }
 

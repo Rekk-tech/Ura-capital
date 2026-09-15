@@ -60,7 +60,7 @@ Reserved naming ranges reduce collisions during parallel development:
 | Phase | Owner | Suggested Migration Prefix |
 | --- | --- | --- |
 | Remaining new Phase 4 work | DEV-A | `20261004xxxxxx_feat025_...` through `20261004xxxxxx_feat030_...` for new/unapplied Phase 4 additions only |
-| Phase 5 | DEV-A | `20261005xxxxxx_feat031_...` through `20261005xxxxxx_feat040_...` |
+| Phase 5 | DEV-A | actual Prisma migration timestamps at implementation time with descriptive `feat03x_...` suffixes |
 | Phase 6 | DEV-B | `20261006xxxxxx_feat041_...` through `20261006xxxxxx_feat047_...` |
 | Phase 7 | DEV-B | `20261007xxxxxx_feat048_...` through `20261007xxxxxx_feat054_...` |
 

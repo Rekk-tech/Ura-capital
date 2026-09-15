@@ -103,16 +103,16 @@ export function evaluateSeedSafety(inputs: SeedSafetyGuardInput): SeedSafetyGuar
       const modelName = match[1];
       const normalized = modelName.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-      // Prohibit premature domain models from unapproved future phases
+      // Prohibit premature domain models from unapproved future phases (Phase 6 Community, Phase 7 Subscription, Phase 8 AI, product audit)
       const prohibitedDomainRoots = [
-        "simulation",
         "community",
         "subscription",
         "ai",
-        "trade",
-        "portfolio",
         "leaderboard",
         "productaudit",
+        "businessaudit",
+        "brokerage",
+        "realmoney",
       ];
 
       for (const root of prohibitedDomainRoots) {

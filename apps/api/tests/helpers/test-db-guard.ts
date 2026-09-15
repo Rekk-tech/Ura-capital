@@ -112,6 +112,14 @@ export function assertSafeTestDatabase(
 }
 
 export interface TestCleanupClient {
+  simulationTrade?: { deleteMany: () => Promise<unknown> };
+  simulationOrder?: { deleteMany: () => Promise<unknown> };
+  simulationPosition?: { deleteMany: () => Promise<unknown> };
+  simulationPortfolio?: { deleteMany: () => Promise<unknown> };
+  simulationSession?: { deleteMany: () => Promise<unknown> };
+  simulationMarketSnapshot?: { deleteMany: () => Promise<unknown> };
+  simulationAsset?: { deleteMany: () => Promise<unknown> };
+  simulationScenario?: { deleteMany: () => Promise<unknown> };
   academyRewardLedger?: { deleteMany: () => Promise<unknown> };
   academyUserXp?: { deleteMany: () => Promise<unknown> };
   academyUserLessonProgress?: { deleteMany: () => Promise<unknown> };
@@ -134,6 +142,16 @@ export interface TestCleanupClient {
 
 export async function cleanAllTestTables(prisma: TestCleanupClient | null | undefined): Promise<void> {
   if (!prisma) return;
+  // Phase 5 Simulation tables (in reverse dependency order)
+  if (prisma.simulationTrade) await prisma.simulationTrade.deleteMany().catch(() => {});
+  if (prisma.simulationOrder) await prisma.simulationOrder.deleteMany().catch(() => {});
+  if (prisma.simulationPosition) await prisma.simulationPosition.deleteMany().catch(() => {});
+  if (prisma.simulationPortfolio) await prisma.simulationPortfolio.deleteMany().catch(() => {});
+  if (prisma.simulationSession) await prisma.simulationSession.deleteMany().catch(() => {});
+  if (prisma.simulationMarketSnapshot) await prisma.simulationMarketSnapshot.deleteMany().catch(() => {});
+  if (prisma.simulationAsset) await prisma.simulationAsset.deleteMany().catch(() => {});
+  if (prisma.simulationScenario) await prisma.simulationScenario.deleteMany().catch(() => {});
+
   // Phase 4 Academy tables (in reverse dependency order)
   if (prisma.academyRewardLedger) await prisma.academyRewardLedger.deleteMany().catch(() => {});
   if (prisma.academyUserXp) await prisma.academyUserXp.deleteMany().catch(() => {});

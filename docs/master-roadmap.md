@@ -24,12 +24,12 @@ PLAN UPFRONT
 - Phase 1: DONE / QA PASS / Human Final Gate APPROVED.
 - Phase 2: DONE / QA PASS / Human Final Gate APPROVED.
 - Phase 3: DONE / QA PASS / Human Final Gate APPROVED.
-- Phase 4: IN_PROGRESS.
+- Phase 4: DONE / QA PASS / Human Phase Final Gate APPROVED.
 - FEAT-019 through FEAT-024: DONE / approved according to current tracker.
 - FEAT-025: existing planning package and resolved Human product decisions are reviewed inputs; do not discard or reopen unless a master contract conflict is found.
 - FEAT-025 through FEAT-029: remaining Phase 4 implementation features under phase-owned governance; no separate Human Final Gate is required per feature.
 - FEAT-030: Phase 4 Academy Integration Gate; validation-only; Codex produces `reports/qa/phase-4/PHASE-4-QA.md` or an explicitly canonical equivalent.
-- Phase 5: PLANNED for DEV-A; implementation BLOCKED by Phase 4 Human Phase Final Gate.
+- Phase 5: MASTER PLANNING APPROVED for DEV-A; FEAT-031 APPROVED FOR IMPLEMENTATION; implementation NOT_STARTED.
 - Phase 6: PLANNED for DEV-B; contract-first preparation AUTHORIZED, while full production implementation waits for Phase 6 product decisions.
 - Phase 7: PLANNED for DEV-B; contract-first preparation may begin after Phase 6 core contracts freeze, while full production implementation waits for Phase 7 product decisions.
 
@@ -60,8 +60,8 @@ Protected shared architecture may not be redesigned by either developer without 
 
 | Phase | Title | Owner | Business Objective | Technical Objective | Status |
 | --- | --- | --- | --- | --- | --- |
-| Phase 4 | Academy | DEV-A | Deliver learner-facing Academy MVP | Academy schema, read APIs, UI, quizzes, progression, rewards | IN_PROGRESS |
-| Phase 5 | Simulation Engine | DEV-A | Deliver server-authoritative financial simulation | Simulation persistence, market/order/portfolio engines, settlement, UI | PLANNED |
+| Phase 4 | Academy | DEV-A | Deliver learner-facing Academy MVP | Academy schema, read APIs, UI, quizzes, progression, rewards | DONE / QA PASS / Human APPROVED |
+| Phase 5 | Simulation Engine | DEV-A | Deliver server-authoritative financial simulation | Simulation persistence, market/order/portfolio/current valuation engines, UI | MASTER PLANNING APPROVED |
 | Phase 6 | Community | DEV-B | Deliver safe multi-user community | Posts, comments, likes, moderation baseline | PLANNED |
 | Phase 7 | Subscription / Premium | DEV-B | Deliver entitlement-based premium access | Subscription persistence, provider boundary, entitlement checks | PLANNED |
 | Phase 8 | Aura Intelligence | UNASSIGNED | Deliver context-aware AI learning assistant | AI gateway, context resolver, quotas, guardrails, observability | IDENTIFIED |
@@ -142,21 +142,21 @@ Deliver an individual server-authoritative simulation where users can trade in a
 
 Technical Objective:
 
-Create Simulation PostgreSQL schema, deterministic market/clock/order/portfolio/settlement services, transient Redis coordination where justified, safe APIs, UI, and a Phase 5 integration gate.
+Create Simulation PostgreSQL schema, deterministic scenario/cycle, market snapshot, order, portfolio, and current valuation services, transient Redis order-rate limiting where justified, safe APIs, UI, and a Phase 5 integration gate.
 
-Phase 5 depends on Phase 4 Human Phase Final Gate approval as project sequencing, but its core domain does not require Academy runtime outputs. It has HARD dependencies on Phase 2 auth/security and Phase 3 data foundation. No Phase 5 implementation overlap is currently authorized.
+Phase 5 sequencing dependency on the Phase 4 Human Phase Final Gate is satisfied. Its core domain does not require Academy runtime outputs. It has HARD dependencies on Phase 2 auth/security and Phase 3 data foundation. Human has approved the Phase 5 master planning package; FEAT-031 is approved for implementation and implementation remains NOT_STARTED until Antigravity begins FEAT-031.
 
 Feature List:
 
-- FEAT-031 - Simulation Persistence Foundation.
-- FEAT-032 - Server Clock, Market Scenario & Phase Engine.
-- FEAT-033 - Order Intent API & Validation.
-- FEAT-034 - Trade Execution & Portfolio Accounting.
-- FEAT-035 - Simulation Settlement, Events & Snapshots.
-- FEAT-036 - Simulation Read Models & Dashboard APIs.
-- FEAT-037 - Simulation Leaderboard & Redis Cache Boundary.
+- FEAT-031 - Simulation Domain Schema & Persistence Foundation.
+- FEAT-032 - Asset Universe & Market Snapshot Read Model.
+- FEAT-033 - Simulation Session Lifecycle.
+- FEAT-034 - Portfolio & Position Accounting Foundation.
+- FEAT-035 - Market Order Submission & Execution.
+- FEAT-036 - Order Idempotency & Concurrency Adversarial Hardening.
+- FEAT-037 - Current PnL & Portfolio Valuation.
 - FEAT-038 - Simulation Learner UI.
-- FEAT-039 - Simulation Security, Audit & Abuse Hardening.
+- FEAT-039 - Simulation Authorization, Rate Limit & Audit-Deferral Hardening.
 - FEAT-040 - Phase 5 Simulation Integration Gate.
 
 Inputs:
@@ -169,33 +169,34 @@ Inputs:
 
 Outputs:
 
-- Durable simulation sessions, market snapshots, orders, trades, positions, portfolio snapshots, settlement records, and event history.
+- Durable simulation scenarios, assets, market snapshots, sessions, portfolios, positions, orders, and trades.
 - Safe simulation APIs and UI.
 - Simulation integration QA report.
 
 Primary APIs:
 
-- `POST /simulation/sessions`
-- `GET /simulation/sessions/:id`
-- `GET /simulation/sessions/:id/state`
-- `POST /simulation/sessions/:id/orders`
-- `GET /simulation/sessions/:id/orders`
-- `GET /simulation/sessions/:id/portfolio`
-- `GET /simulation/sessions/:id/events`
-- `POST /simulation/sessions/:id/settle` only if server-controlled/manual test/admin operation is approved; otherwise settlement is internal.
+- `GET /api/simulation/assets`
+- `GET /api/simulation/scenarios/:scenarioKey/snapshots/:cycle`
+- `POST /api/simulation/sessions`
+- `POST /api/simulation/sessions/:simulationId/start`
+- `GET /api/simulation/sessions/:simulationId`
+- `POST /api/simulation/sessions/:simulationId/orders`
+- `GET /api/simulation/sessions/:simulationId/orders`
+- `GET /api/simulation/sessions/:simulationId/portfolio`
+- `GET /api/simulation/sessions/:simulationId/valuation`
+- `POST /api/simulation/sessions/:simulationId/complete`
+- `POST /api/simulation/sessions/reset`
 
 DTOs:
 
 - `SimulationSessionDto`
-- `SimulationStateDto`
 - `MarketSnapshotDto`
-- `OrderIntentRequest`
+- `SimulationPortfolioDto`
+- `SimulationPositionDto`
+- `SimulationOrderRequest`
 - `OrderDto`
 - `TradeDto`
-- `PositionDto`
-- `PortfolioDto`
-- `SimulationEventDto`
-- `LeaderboardEntryDto`
+- `CurrentValuationDto`
 
 Schema Ownership:
 
@@ -203,28 +204,23 @@ Phase 5 owns simulation tables only. It may reference `users` with restrictive h
 
 Redis Policy:
 
-Allowed: transient locks, phase timers, ephemeral leaderboards/cache, idempotency acceleration. PostgreSQL remains durable authority for sessions, orders, trades, positions, settlement, balances, and history.
+Allowed: transient order rate-limit counters and narrowly scoped coordination if approved by the owning feature. PostgreSQL remains durable authority for sessions, orders, trades, positions, cash, PnL, idempotency results, and history.
 
 Audit Policy:
 
-High-value simulation actions must follow FEAT-016. Concrete product audit persistence requires an owning feature decision in FEAT-039 or a prior Human-approved audit activation.
+Durable Simulation product audit is deferred for Phase 5. FEAT-016 product-audit governance remains available later. FEAT-039 verifies zero product audit table, migration, API, UI, event persistence, and zero `AuthSecurityAuditRecord` reuse.
 
 Migration Ownership:
 
-DEV-A owns Phase 5 simulation migrations. Use reserved names `20261005xxxxxx_feat031_...` through `20261005xxxxxx_feat040_...` unless Codex assigns a different timestamp range. Existing approved Phase 4 migrations are immutable and must not be renamed to fit future ranges.
+DEV-A owns Phase 5 simulation migrations. New migration directories must use actual Prisma migration timestamps at implementation time and descriptive `feat03x_...` suffixes. Existing approved Phase 4 migrations are immutable and must not be renamed to fit future ranges.
 
 QA Gate:
 
-FEAT-040 must run fresh DB migration, Phase 4/5 upgrade validation, deterministic engine tests, concurrency/rollback tests, Redis outage tests where Redis is used, E2E simulation flow, and full regression.
+FEAT-040 must run fresh DB migration, Phase 4 to Phase 5 upgrade validation, deterministic scenario/snapshot tests, order/accounting/idempotency/concurrency tests, Redis rate-limit tests, E2E simulation flow, UI critical journey checks, audit-deferral checks, and full regression.
 
 Human Decisions:
 
-- Initial simulated asset universe and scenario set.
-- Phase duration/default cycle rules.
-- Starting cash and portfolio constraints.
-- Order types included in MVP.
-- Leaderboard inclusion and privacy scope.
-- Product audit activation for simulation high-value events.
+All Phase 5 master-planning product decisions are locked in `docs/phase-5-feature-decomposition.md`. There are no unresolved Human decisions blocking FEAT-031 implementation.
 
 ## 6. Phase 6 - Community
 
@@ -445,7 +441,7 @@ Project merge/integration critical path:
 
 ```text
 Phase 4 FEAT-025 -> FEAT-026 -> FEAT-027 -> FEAT-028 -> FEAT-029 decision -> FEAT-030
-  -> Phase 5 FEAT-031 -> FEAT-034 -> FEAT-035 -> FEAT-038 -> FEAT-040
+  -> Phase 5 FEAT-031 -> (FEAT-032 + FEAT-033) -> FEAT-034 -> FEAT-035 -> FEAT-036 -> FEAT-037 -> FEAT-038 -> FEAT-039 -> FEAT-040
   -> sequential integration of Phase 6
   -> sequential integration of Phase 7
 ```
@@ -466,7 +462,7 @@ Migration history rule:
 - Existing approved Phase 4 `202609...` migrations remain as-is.
 - Reserved future ranges apply only to new/unapplied work:
   - Remaining new Phase 4 work: `20261004xxxxxx_feat025_...` through `20261004xxxxxx_feat030_...`
-  - Phase 5: `20261005xxxxxx_feat031_...` through `20261005xxxxxx_feat040_...`
+  - Phase 5: actual Prisma migration timestamps with descriptive `feat03x_...` suffixes
   - Phase 6: `20261006xxxxxx_feat041_...` through `20261006xxxxxx_feat047_...`
   - Phase 7: `20261007xxxxxx_feat048_...` through `20261007xxxxxx_feat054_...`
 
@@ -474,8 +470,7 @@ Migration history rule:
 
 Blocking before Phase 5 implementation:
 
-- Complete Phase 4 Human Phase Final Gate.
-- Approve Simulation MVP rules: asset universe, starting cash, order types, phase/cycle policy.
+- None at planning-governance level. Human Master Planning is APPROVED and FEAT-031 is APPROVED FOR IMPLEMENTATION.
 
 Blocking before Phase 6 implementation:
 

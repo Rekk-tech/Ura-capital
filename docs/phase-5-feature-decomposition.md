@@ -1,180 +1,421 @@
 # Aura Capital - Phase 5 Feature Decomposition
 
-Status: HUMAN APPROVED / PLANNED  
-Phase: Phase 5 - Simulation Engine  
-Owner: DEV-A  
-Date: 2026-09-07  
+Status: MASTER PLANNING APPROVED
+Phase: Phase 5 - Simulation Engine
+Owner after approval: DEV-A / Antigravity
+Planning Owner: Codex
+Architecture Owner: Codex
+QA Governance Owner: Codex
+Date: 2026-09-14
 Scope: Planning only. Application code changes: ZERO.
+Human Master Planning Decision: APPROVED.
 
-Human Master Planning Approval: APPROVED.
-
-Implementation status:
+## 1. Canonical State
 
 ```text
-BLOCKED by Phase 4 Human Phase Final Gate
+Phase 4: DONE / QA PASS / Human Phase Final Gate APPROVED
+Phase 5: IN_PROGRESS
+Implementation: IN_PROGRESS
+FEAT-031: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
+FEAT-032: UNBLOCKED FOR IMPLEMENTATION
+FEAT-033: UNBLOCKED FOR IMPLEMENTATION
+FEAT-034: PLANNED / BLOCKED BY FEAT-032 + FEAT-033
+FEAT-035: PLANNED / BLOCKED BY FEAT-034
+FEAT-036: PLANNED / BLOCKED BY FEAT-035
+FEAT-037: PLANNED / BLOCKED BY FEAT-036
+FEAT-038: PLANNED / BLOCKED BY FEAT-037
+FEAT-039: PLANNED / BLOCKED BY FEAT-038
+FEAT-040: BLOCKED BY FEAT-039
 ```
 
-## 1. Phase Boundary
+## 2. Human-Approved MVP Decisions
 
-Phase 5 builds a server-authoritative individual financial simulation.
+| Decision | Approved Value |
+| --- | --- |
+| Starting cash | `100000.0000` simulated USD units |
+| Display denomination | USD simulation only |
+| Asset universe | fixed mock equities only |
+| External market provider | DEFERRED |
+| Market model | server-owned deterministic persisted snapshots |
+| Scenario scope | single deterministic MVP scenario |
+| Market timeline | server-controlled discrete integer cycles |
+| Order type | MARKET only |
+| Fractional quantity | DEFERRED |
+| Short selling | DEFERRED |
+| Margin / leverage | DEFERRED |
+| Options / derivatives | OUT OF SCOPE |
+| Crypto | OUT OF SCOPE |
+| Trading fee | 0 |
+| Slippage | 0 |
+| Execution price | authoritative current market snapshot price |
+| Historical valuation chart | DEFERRED |
+| Leaderboards | OUT OF SCOPE |
+| Competitions / multi-user simulation | OUT OF SCOPE |
+| Admin/support Simulation visibility | DEFERRED |
+| Durable Simulation product audit | DEFERRED FOR PHASE 5 |
+| Real money | HARD BOUNDARY - prohibited |
+| Brokerage integration | HARD BOUNDARY - prohibited |
 
-In scope:
+Unresolved Human Decisions: ZERO for Phase 5 master planning decisions covered by this package.
 
-- Simulation sessions.
-- Simulated assets and scenario configuration.
-- Server clock/phase/market engine.
-- Order intents.
-- Trade execution.
-- Positions and portfolio accounting.
-- Settlement and event history.
-- Simulation read APIs and UI.
-- Optional Redis cache/locks/leaderboard, never durable authority.
+## 3. Feature Matrix
 
-Out of scope:
+| ID | Title | Type | Dependencies | State |
+| --- | --- | --- | --- | --- |
+| FEAT-031 | Simulation Domain Schema & Persistence Foundation | Implementation | Phase 2, Phase 3, Phase 4 approved | DONE (Internal Feature Gate: PASS) |
+| FEAT-032 | Asset Universe & Market Snapshot Read Model | Implementation | FEAT-031 | UNBLOCKED FOR IMPLEMENTATION |
+| FEAT-033 | Simulation Session Lifecycle | Implementation | FEAT-031 | UNBLOCKED FOR IMPLEMENTATION |
+| FEAT-034 | Portfolio & Position Accounting Foundation | Implementation | FEAT-032 + FEAT-033 | PLANNED / BLOCKED BY FEAT-032 + FEAT-033 |
+| FEAT-035 | Market Order Submission & Execution | Implementation | FEAT-034 | PLANNED / BLOCKED BY FEAT-034 |
+| FEAT-036 | Order Idempotency & Concurrency Adversarial Hardening | Hardening | FEAT-035 | PLANNED / BLOCKED BY FEAT-035 |
+| FEAT-037 | Current PnL & Portfolio Valuation | Implementation | FEAT-036 | PLANNED / BLOCKED BY FEAT-036 |
+| FEAT-038 | Simulation Learner UI | Implementation | FEAT-037 | PLANNED / BLOCKED BY FEAT-037 |
+| FEAT-039 | Simulation Authorization, Rate Limit & Audit-Deferral Hardening | Hardening / governance | FEAT-038 | PLANNED / BLOCKED BY FEAT-038 |
+| FEAT-040 | Phase 5 Simulation Integration Gate | Validation gate | FEAT-039 | BLOCKED BY FEAT-039 |
 
-- Real-money trading.
-- Brokerage integration.
-- Community behavior.
-- Subscription payment provider behavior.
-- AI coaching.
-- Academy schema redesign.
+## 4. Dependency Graph
 
-## 2. Dependency Classification
+```text
+FEAT-031
+   |-- FEAT-032
+   |-- FEAT-033
 
-| Dependency | Type | Reason |
-| --- | --- | --- |
-| Phase 2 auth/security | HARD | Simulation sessions are user-owned and protected. |
-| Phase 3 data foundation | HARD | Requires PostgreSQL migrations, transactions, constraints, Redis boundary. |
-| Phase 4 Academy outputs | INDEPENDENT | Simulation MVP does not consume Academy data. Phase 4 completion remains governance sequencing. |
-| Phase 7 entitlements | SOFT | Premium-gated simulation features can be integrated after entitlement contract freezes. |
-| Phase 8 AI | INDEPENDENT | AI coaching comes later. |
+FEAT-032 + FEAT-033
+   -> FEAT-034
+   -> FEAT-035
+   -> FEAT-036
+   -> FEAT-037
+   -> FEAT-038
+   -> FEAT-039
+   -> FEAT-040
+```
 
-## 3. Feature Sequence
+FEAT-032 and FEAT-033 may be planned independently after FEAT-031. With the current single Antigravity implementation session, implementation remains sequential unless Human explicitly changes delivery mode.
 
-| ID | Title | Type | Dependencies |
-| --- | --- | --- | --- |
-| FEAT-031 | Simulation Persistence Foundation | Implementation | Phase 3, Phase 4 Human Phase Final Gate by governance |
-| FEAT-032 | Server Clock, Market Scenario & Phase Engine | Implementation | FEAT-031 |
-| FEAT-033 | Order Intent API & Validation | Implementation | FEAT-031, FEAT-032 |
-| FEAT-034 | Trade Execution & Portfolio Accounting | Implementation | FEAT-033 |
-| FEAT-035 | Simulation Settlement, Events & Snapshots | Implementation | FEAT-034 |
-| FEAT-036 | Simulation Read Models & Dashboard APIs | Implementation | FEAT-031, FEAT-035 |
-| FEAT-037 | Simulation Leaderboard & Redis Cache Boundary | Implementation | FEAT-035, FEAT-036 |
-| FEAT-038 | Simulation Learner UI | Implementation | FEAT-036 |
-| FEAT-039 | Simulation Security, Audit & Abuse Hardening | Hardening | FEAT-033 through FEAT-038 |
-| FEAT-040 | Phase 5 Simulation Integration Gate | Validation gate | FEAT-031 through FEAT-039 |
+## 5. FEAT-031 Exact Model List
 
-## 4. Feature Details
+FEAT-031 owns these Phase 5 models:
 
-### FEAT-031 - Simulation Persistence Foundation
+1. `SimulationScenario`
+2. `SimulationAsset`
+3. `SimulationMarketSnapshot`
+4. `SimulationSession`
+5. `SimulationPortfolio`
+6. `SimulationPosition`
+7. `SimulationOrder`
+8. `SimulationTrade`
 
-Goal: Create durable simulation schema and repositories.
+No product audit table, leaderboard table, competition table, subscription table, community table, or external provider table is approved in Phase 5 master planning.
 
-Scope: `SimulationSession`, `SimulationAsset`, `SimulationScenario`, `MarketSnapshot`, `SimulationEvent`, initial `Portfolio`, `Position`, `Order`, and `Trade` schema boundaries if required by the approved design.
+## 6. Scenario / Cycle Model
 
-Deliverables: Prisma migration, repositories, DB constraints, test fixtures.
+Canonical scenario model:
 
-Acceptance: fresh/upgrade migrations pass; user FK restricts/cascades as approved; no client-authoritative fields; no Academy/Community/Subscription/AI schema.
+- `SimulationScenario` owns deterministic scenario metadata.
+- `SimulationMarketSnapshot` belongs to one scenario and one asset.
+- `SimulationSession` stores `scenarioId` and `currentCycle`.
+- No separate cycle table is introduced in Phase 5 MVP.
 
-### FEAT-032 - Server Clock, Market Scenario & Phase Engine
+Cycle numbering:
 
-Goal: Make server the authority for phase, cycle, simulated time, and market scenario progression.
+- Integer and one-based.
+- The first learner-visible and persisted market cycle is `1`.
+- Cycle `0` is not a valid persisted Simulation market cycle in Phase 5.
 
-Scope: deterministic clock service, phase rules, scenario seed, market state computation.
+Snapshot uniqueness:
 
-Acceptance: client time input ignored; GET does not mutate; deterministic tests pass; invalid phases rejected.
+```text
+scenarioId + cycle + assetId
+```
 
-### FEAT-033 - Order Intent API & Validation
+Snapshot immutability:
 
-Goal: Accept user order intent without trusting client price/balance/phase.
+- Once a snapshot is used for order execution, normal application behavior must not update or delete it.
+- Correction workflows are out of scope unless Human approves operational repair semantics.
 
-Scope: order request schema, authenticated route, server-side eligibility checks, safe errors.
+## 7. Monetary Precision Contract
 
-Acceptance: invalid order types rejected; missing auth rejected; user cannot trade for another user; client price ignored.
+Canonical durable precision:
 
-### FEAT-034 - Trade Execution & Portfolio Accounting
+| Value | Storage |
+| --- | --- |
+| cash | `NUMERIC(20,4)` / Prisma Decimal |
+| notional | `NUMERIC(20,4)` / Prisma Decimal |
+| realized PnL | `NUMERIC(20,4)` / Prisma Decimal |
+| fees | `NUMERIC(20,4)` / Prisma Decimal, fixed at `0.0000` in Phase 5 |
+| price | `NUMERIC(20,6)` / Prisma Decimal |
+| average cost | `NUMERIC(20,6)` / Prisma Decimal |
+| quantity | positive `INTEGER` |
 
-Goal: Execute valid orders transactionally and update portfolio/positions.
+API Decimal contract:
 
-Scope: balance checks, oversell rejection, trade records, position updates, transaction rollback.
+- Decimal values are serialized as decimal strings.
+- Request Decimal values are accepted only where explicitly approved.
+- No uncontrolled JavaScript `Number` arithmetic for authoritative money, price, notional, PnL, or average cost.
 
-Acceptance: insufficient balance rejected; oversell rejected; concurrent orders preserve balance/position integrity.
+Rounding and normalization:
 
-### FEAT-035 - Simulation Settlement, Events & Snapshots
+- Rounding mode: half-up to the target scale at persistence boundaries.
+- Rounding boundary: service/repository boundary before persistence and response serialization.
+- Internal calculations may retain higher precision temporarily through Decimal operations.
+- Zero normalizes to positive zero string form (`0.0000` or `0.000000` by field scale).
+- Negative zero is rejected or normalized before persistence; it must never be durable.
+- Scientific notation in public request payloads is rejected with `400 VALIDATION_ERROR`.
+- Values exceeding approved precision/scale are rejected safely.
 
-Goal: Persist deterministic settlement and event history.
+## 8. Session Lifecycle
 
-Scope: settlement service, event records, market/portfolio snapshots.
+Canonical lifecycle:
 
-Acceptance: settlement idempotent; event ordering deterministic; historical snapshots remain meaningful after scenario changes.
+```text
+CREATED -> ACTIVE -> COMPLETED
+CREATED -> CANCELLED
+ACTIVE -> CANCELLED
+```
 
-### FEAT-036 - Simulation Read Models & Dashboard APIs
+Completion:
 
-Goal: Serve safe simulation state to the learner UI.
+- Explicit server-authorized learner completion action.
 
-Scope: session state, portfolio, positions, orders, trades, event history.
+Active session policy:
 
-Acceptance: only owner can read private simulation state; DTOs mark data as simulated; no sensitive internals.
+- At most one `ACTIVE` simulation per user.
+- PostgreSQL partial unique protection is required.
+- Service pre-check alone is insufficient.
+- Concurrent starts must not create two active sessions.
 
-### FEAT-037 - Simulation Leaderboard & Redis Cache Boundary
+Reset policy:
 
-Goal: Add optional leaderboard/cache without moving authority out of PostgreSQL.
+- Old current session becomes `CANCELLED`.
+- A new `CREATED` session is created.
+- Historical sessions, orders, trades, positions, and portfolios are never deleted by normal reset behavior.
 
-Scope: Redis transient cache, TTL, rebuild from PostgreSQL, outage behavior.
+## 9. Accounting Authority
 
-Acceptance: Redis loss does not corrupt durable results; leaderboard can rebuild; keys sanitized/namespaced.
+Canonical architecture:
 
-### FEAT-038 - Simulation Learner UI
+```text
+immutable order/trade history
++
+materialized portfolio/position state
+```
 
-Goal: Build learner-facing simulation interface.
+Precedence:
 
-Scope: dashboard, order ticket, portfolio, market state, history, loading/error/empty states.
+- Trade history is the historical execution record.
+- Portfolio/position state is the operational current state.
+- Reconciliation tests must reconstruct materialized state from trades where practical and verify no drift.
 
-Acceptance: UI clearly says simulation; no gambling-like UX; no hidden UI auth assumption.
+Fee and slippage:
 
-### FEAT-039 - Simulation Security, Audit & Abuse Hardening
+- Phase 5 fee = 0.
+- Phase 5 slippage = 0.
+- Execution price = current authoritative market snapshot price.
+- No fee component is included in Phase 5 average-cost basis.
 
-Goal: Harden simulation against tampering and abuse.
+Realized PnL:
 
-Scope: ownership, IDOR, replay/double-submit, product audit decision, rate-limit/quota where needed.
+```text
+(executionPrice - averageCost) * quantity
+```
 
-Acceptance: client cannot change balance/price/phase; audit policy follows FEAT-016; high-value mutations tested.
+Persist realized PnL per immutable trade. Portfolio-level realized PnL is a server-derived aggregate from trades unless FEAT-034 explicitly materializes it with reconciliation tests.
 
-### FEAT-040 - Phase 5 Simulation Integration Gate
+## 10. Order Request Contract
 
-Goal: Validate integrated Phase 5.
+Canonical route:
 
-Scope: validation only; full simulation lifecycle, migrations, Redis, audit, UI, regression.
+```text
+POST /api/simulation/sessions/:simulationId/orders
+```
 
-Acceptance: no P0/P1 security/integrity defects; full validation PASS; Phase 6 integration readiness assessed.
+Request body:
 
-## 5. Feature Contract Matrix
+```json
+{
+  "side": "BUY",
+  "type": "MARKET",
+  "assetSymbol": "AURA",
+  "quantity": 1,
+  "idempotencyKey": "client-generated-opaque-key"
+}
+```
 
-| Feature | Requirements | Dependencies | Contracts / APIs | Schema Ownership | Acceptance Gate | Integration Requirements |
-| --- | --- | --- | --- | --- | --- | --- |
-| FEAT-031 | Durable simulation persistence, constraints, repositories | Phase 2/3; Phase 4 Human Phase Final Gate by governance | Repository interfaces for sessions/assets/portfolio/orders/trades/events | Owns `simulation_sessions`, `simulation_assets`, `simulation_scenarios`, initial portfolio/order/trade tables | Fresh/upgrade migrations, FK/unique/check constraints, repository boundary | Must preserve Phase 1-4 migrations and auth regressions |
-| FEAT-032 | Server-owned clock/phase/market state | FEAT-031 | Internal engine contracts, no public mutation via GET | May add phase/scenario fields if not in FEAT-031 | Deterministic phase tests; client time ignored | Must use server clock and deterministic seeds |
-| FEAT-033 | Order intent validation and safe API | FEAT-031, FEAT-032 | `POST /simulation/sessions/:id/orders`, `OrderIntentRequest`, `OrderDto` | Owns order table additions/indexes | Invalid order/client price rejected; owner-only | Must not mutate portfolio outside transaction path |
-| FEAT-034 | Trade execution and accounting | FEAT-033 | Trade execution service, portfolio/position repositories | Owns trades, positions, portfolio balance fields | Insufficient balance/oversell/concurrency tests PASS | Must use UoW and PostgreSQL constraints |
-| FEAT-035 | Settlement/events/snapshots | FEAT-034 | Settlement service and `SimulationEventDto` | Owns settlement/event/snapshot tables | Idempotent deterministic settlement; event order stable | Must preserve historical meaning after config changes |
-| FEAT-036 | Safe read models | FEAT-031, FEAT-035 | `GET /simulation/sessions/:id/state`, portfolio/order/event reads | No new authority beyond read indexes/views if approved | Owner-only reads; simulated-data marker present | UI and future AI consume read DTOs only |
-| FEAT-037 | Leaderboard/cache boundary | FEAT-035, FEAT-036 | `LeaderboardEntryDto`; Redis key namespace | PostgreSQL remains leaderboard authority; Redis cache only | Redis loss/rebuild/outage tests PASS | Must not affect settlement/portfolio truth |
-| FEAT-038 | Learner UI | FEAT-036 | Central API client calls, UI route contracts | No schema | Desktop/mobile smoke, accessibility, no gambling-like copy | Must consume safe DTOs and display simulated-data warnings |
-| FEAT-039 | Security/audit hardening | FEAT-033..038 | Ownership checks, product audit decision, abuse limits | May add audit table only if Human activates product audit | IDOR/tampering/replay tests PASS | Must preserve auth/RBAC/Redis/audit boundaries |
-| FEAT-040 | Final validation gate | FEAT-031..039 | Phase QA report | No schema | Full Phase 5 PASS/FAIL gate | Fresh DB, upgrade DB, Redis, UI/E2E, regression |
+Canonical asset identifier:
 
-## 6. Human Decisions Required
+- Stable `assetSymbol`.
+- Internal asset IDs are not required in public order requests.
 
-Blocking before implementation:
+Strict schema:
 
-- Phase 4 Human Phase Final Gate approval.
-- Starting cash.
-- Asset universe.
-- Order types.
-- Phase/cycle duration rules.
-- Whether leaderboard is in MVP.
+Any unapproved authoritative field returns `400 VALIDATION_ERROR`, including:
 
-Deferred until integration:
+- `executionPrice`
+- `cashAfter`
+- `positionAfter`
+- `realizedPnl`
+- `unrealizedPnl`
+- `status`
+- `filledAt`
+- `userId`
+- `scenario`
+- `cycle`
 
-- Premium-gated simulation capabilities.
-- Concrete product audit persistence.
+Response whitelist must be deterministic enough for idempotent replay and must not expose internal lock, SQL, Prisma, or constraint details.
+
+## 11. Idempotency Contract
+
+Scope:
+
+```text
+userId + simulationId + idempotencyKey
+```
+
+Rules:
+
+- Idempotency records/identity are retained with Simulation history.
+- No automatic idempotency deletion during normal lifecycle.
+- Same key + same canonical request fingerprint returns the original result.
+- Same key + different canonical payload returns `409 IDEMPOTENCY_CONFLICT`.
+- PostgreSQL unique constraints are final authority.
+- Redis must not be final idempotency authority.
+
+FEAT-035 implements the minimum complete idempotency contract. FEAT-036 adversarially hardens and stress-tests it.
+
+## 12. FEAT-035 Minimum Locking Strategy
+
+FEAT-035 must not ship financially unsafe execution.
+
+Minimum required strategy:
+
+- Execute BUY/SELL inside one FEAT-013 TransactionRunner boundary.
+- Lock the session portfolio row before cash/position mutation.
+- Lock the target position row when it exists.
+- Create missing position under the unique `(portfolioId, assetId)` constraint.
+- Re-check cash/position after locks.
+- Use PostgreSQL constraints to prevent negative cash and negative position.
+- Keep order, trade, cash, position, and realized PnL mutation atomic.
+
+FEAT-036 remains responsible for high-contention adversarial verification, deadlock/retry policy if needed, and diagnostics hardening.
+
+## 13. Valuation Policy
+
+Historical valuation chart/snapshot persistence is DEFERRED.
+
+FEAT-037 provides current server-authoritative:
+
+- cash
+- positions
+- market value
+- realized PnL
+- unrealized PnL
+- equity
+- orders
+- trades
+
+Current valuation is calculated after order execution where needed and/or on read against the current cycle snapshot. No unconditional historical valuation table or `GET .../valuations` history API is approved.
+
+## 14. FEAT-039 Audit / Rate-Limit Policy
+
+Durable Simulation product audit is DEFERRED FOR PHASE 5.
+
+FEAT-039 must not add:
+
+- product audit table
+- product audit migration
+- public audit API
+- audit UI
+- Academy/Auth audit reuse
+- Simulation product-event persistence
+
+Accepted risk:
+
+- High-value Simulation business events are not durably product-audited in Phase 5.
+- FEAT-016 product audit abstraction remains available for later activation.
+- Auth/security audit remains unaffected.
+
+Order submission rate limiting:
+
+- INCLUDED in FEAT-039 for abuse/resource protection.
+- Approved policy: per authenticated user + per simulation order route, 60 order submissions per 10 minutes, with safe `429 TOO_MANY_REQUESTS` and `Retry-After`.
+- Redis may store transient counters only.
+- Redis must not become order, portfolio, or idempotency authority.
+- Rate-limit rejection must not mutate Simulation business state.
+
+## 15. FEAT-040 Conditional PASS Policy
+
+`CONDITIONAL PASS` may be used only for non-security, non-financial-integrity, non-migration, non-transaction, non-authorization, non-mandatory-validation P3/advisory issues.
+
+`CONDITIONAL PASS` is prohibited for:
+
+- P0/P1
+- IDOR
+- auth regression
+- client-controlled price/cash/position/PnL
+- overspend
+- oversell
+- duplicate order
+- idempotency violation
+- accounting drift
+- Decimal corruption
+- migration integrity
+- database integrity
+- transaction behavior
+- Redis durable authority
+- Redis fail-closed behavior where required
+- durable audit misuse
+- mandatory test skip
+- mandatory validation not executed
+- real-money/brokerage boundary violation
+
+## 16. AC And Task Counts
+
+| Feature | AC Count | Task Count |
+| --- | ---: | ---: |
+| FEAT-031 | 24 | 14 |
+| FEAT-032 | 16 | 10 |
+| FEAT-033 | 20 | 12 |
+| FEAT-034 | 22 | 13 |
+| FEAT-035 | 28 | 16 |
+| FEAT-036 | 18 | 11 |
+| FEAT-037 | 16 | 10 |
+| FEAT-038 | 16 | 10 |
+| FEAT-039 | 24 | 13 |
+| FEAT-040 | 28 | 13 |
+
+## 17. Validation And Reports
+
+Canonical validation remains the 14-command gate:
+
+```text
+npm run clean
+npm run lint
+npx prisma validate --schema=apps/api/prisma/schema.prisma
+npm run typecheck
+npm run build
+npm run test
+npm run test:unit
+npm run test:db
+npm run test:redis
+npm run guard:persistence
+npm run guard:migration
+npm run guard:boundary
+npm run guard:audit-governance
+npm run guard:seed-safety
+```
+
+Implementation reports:
+
+- `reports/implementation/phase-5/FEAT-031.md` through `reports/implementation/phase-5/FEAT-039.md`
+
+Phase QA report:
+
+- `reports/qa/phase-5/PHASE-5-QA.md`
+
+Git strategy:
+
+- baseline: `phase-4-approved`
+- feature checkpoints: `feat-031-approved` through `feat-039-approved`
+- phase checkpoint after Human final gate: `phase-5-approved`
+
+Never rewrite approved tags.

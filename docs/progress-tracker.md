@@ -493,7 +493,7 @@ Phase 3 Completion State:
 - FEAT-018 is DONE / QA PASS / Human Final Gate APPROVED.
 - Phase 3 is DONE / QA PASS / Human Final Gate APPROVED.
 - HISTORICAL SNAPSHOT (at Phase 3 completion): Phase 4 was IN_PROGRESS / PLANNING; FEAT-019 was APPROVED FOR IMPLEMENTATION; FEAT-020 through FEAT-030 remained BLOCKED.
-- CURRENT CANONICAL STATE: Phase 4 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-019 is DONE (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED); FEAT-020 is DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED); FEAT-021 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-022 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-023 is DONE (QA PASS, Human Final Gate APPROVED); FEAT-024 is DONE (QA PASS — QA Iteration 1, Human Final Gate APPROVED); FEAT-025 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-026 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-027 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-028 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-029 is IMPLEMENTATION COMPLETE / DEFER CLOSURE VERIFIED; FEAT-030 is DONE / QA PASS; Phase 5 is UNBLOCKED FOR IMPLEMENTATION / NEXT APPROVED PLANNING STEP.
+- CURRENT CANONICAL STATE: Phase 4 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-019 is DONE (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED); FEAT-020 is DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED); FEAT-021 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-022 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-023 is DONE (QA PASS, Human Final Gate APPROVED); FEAT-024 is DONE (QA PASS — QA Iteration 1, Human Final Gate APPROVED); FEAT-025 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-026 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-027 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-028 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-029 is IMPLEMENTATION COMPLETE / DEFER CLOSURE VERIFIED; FEAT-030 is DONE / QA PASS; Phase 5 is IN_PROGRESS; FEAT-031 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-032 is UNBLOCKED FOR IMPLEMENTATION; FEAT-033 is UNBLOCKED FOR IMPLEMENTATION.
 
 Feature Decomposition:
 
@@ -875,7 +875,8 @@ FEAT-027: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 FEAT-028: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 FEAT-029: IMPLEMENTATION COMPLETE / DEFER CLOSURE VERIFIED
 FEAT-030: DONE / QA PASS
-Phase 5: UNBLOCKED FOR IMPLEMENTATION / NEXT APPROVED PLANNING STEP
+Phase 5: MASTER PLANNING APPROVED
+Phase 5 Implementation: NOT_STARTED
 ```
 
 Feature Decomposition:
@@ -1486,51 +1487,114 @@ Artifacts:
 
 ## Goal
 
-Build a server-authoritative individual financial simulation.
+Build a server-authoritative individual financial simulation with fixed mock equities, deterministic persisted market snapshots, USD-only simulated money, and no real-money/brokerage behavior.
 
 ## Scope
 
+- SimulationScenario
+- SimulationAsset
+- SimulationMarketSnapshot
 - SimulationSession
-- Assets
-- Market engine
-- Phase engine
-- Orders
-- Trades
-- Positions
-- Portfolio
-- Settlement
-- Market snapshots
-- Event history
-- Leaderboard strategy
+- SimulationPortfolio
+- SimulationPosition
+- SimulationOrder
+- SimulationTrade
+- Order rate limiting for abuse/resource protection
+- Durable Simulation product audit deferral governance
 
 ## Architecture Rules
 
 ```text
-Server owns clock.
+Server owns cycle.
 Server owns price.
-Server owns phase.
+Server owns lifecycle state.
 Server owns balance.
-Client submits intent.
+Client submits strict market order request.
+PostgreSQL is durable Simulation authority.
+Redis is transient rate-limit/coordination only.
 ```
 
 ## Acceptance Criteria
 
 - [ ] User sessions are isolated
-- [ ] GET does not mutate market state
-- [ ] Client cannot manipulate phase using time input
-- [ ] Client cannot manipulate price/balance
-- [ ] Insufficient balance is rejected
+- [ ] PostgreSQL-backed schema/migrations are reproducible
+- [ ] Client cannot manipulate scenario cycle, price, balance, position, PnL, or lifecycle state
+- [ ] MARKET orders execute at authoritative current snapshot price
+- [ ] Insufficient cash is rejected
 - [ ] Overselling is rejected
-- [ ] Invalid order types are rejected
-- [ ] Concurrent trade behavior is safe
-- [ ] Settlement is deterministic/testable
-- [ ] Simulation integration tests pass
+- [ ] Idempotent replay and conflicts are deterministic
+- [ ] Concurrent order behavior is safe
+- [ ] Current valuation is derived from current snapshot only
+- [ ] Simulation rate limiting is transient Redis-only
+- [ ] Durable Simulation product audit remains deferred
+- [ ] Simulation integration gate passes
 
 Status:
 
 ```text
-TODO
+MASTER PLANNING APPROVED
 ```
+
+Planning:
+
+```text
+COMPLETE / PENDING HUMAN MASTER PLANNING APPROVAL
+```
+
+Implementation:
+
+```text
+IN_PROGRESS
+```
+
+Phase 5 State:
+
+```text
+Baseline: phase-4-approved
+Owner: DEV-A / Antigravity
+FEAT-031: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
+FEAT-032: UNBLOCKED FOR IMPLEMENTATION
+FEAT-033: UNBLOCKED FOR IMPLEMENTATION
+FEAT-034: PLANNED / BLOCKED BY FEAT-032 + FEAT-033
+FEAT-035: PLANNED / BLOCKED BY FEAT-034
+FEAT-036: PLANNED / BLOCKED BY FEAT-035
+FEAT-037: PLANNED / BLOCKED BY FEAT-036
+FEAT-038: PLANNED / BLOCKED BY FEAT-037
+FEAT-039: PLANNED / BLOCKED BY FEAT-038
+FEAT-040: BLOCKED BY FEAT-039
+Application code changes: FEAT-031 persistence only (FEAT-032/033: ZERO)
+Unresolved Human decisions: ZERO
+```
+
+Planning Artifacts:
+
+- `docs/phase-5-feature-decomposition.md`
+- `.specify/specs/FEAT-031/`
+- `.specify/specs/FEAT-032/`
+- `.specify/specs/FEAT-033/`
+- `.specify/specs/FEAT-034/`
+- `.specify/specs/FEAT-035/`
+- `.specify/specs/FEAT-036/`
+- `.specify/specs/FEAT-037/`
+- `.specify/specs/FEAT-038/`
+- `.specify/specs/FEAT-039/`
+- `.specify/specs/FEAT-040/`
+
+Planned Implementation Reports:
+
+- `reports/implementation/phase-5/FEAT-031.md`
+- `reports/implementation/phase-5/FEAT-032.md`
+- `reports/implementation/phase-5/FEAT-033.md`
+- `reports/implementation/phase-5/FEAT-034.md`
+- `reports/implementation/phase-5/FEAT-035.md`
+- `reports/implementation/phase-5/FEAT-036.md`
+- `reports/implementation/phase-5/FEAT-037.md`
+- `reports/implementation/phase-5/FEAT-038.md`
+- `reports/implementation/phase-5/FEAT-039.md`
+
+Planned Phase QA:
+
+- `reports/qa/phase-5/PHASE-5-QA.md`
 
 ---
 

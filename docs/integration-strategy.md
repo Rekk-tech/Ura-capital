@@ -110,7 +110,7 @@ Parallel branches must reserve migration ranges and rebase before merge. If time
 Reserved future ranges:
 
 - Remaining new Phase 4 work: `20261004xxxxxx_feat025_...` through `20261004xxxxxx_feat030_...`
-- Phase 5: `20261005xxxxxx_feat031_...` through `20261005xxxxxx_feat040_...`
+- Phase 5: actual Prisma migration timestamps at implementation time with descriptive `feat03x_...` suffixes
 - Phase 6: `20261006xxxxxx_feat041_...` through `20261006xxxxxx_feat047_...`
 - Phase 7: `20261007xxxxxx_feat048_...` through `20261007xxxxxx_feat054_...`
 

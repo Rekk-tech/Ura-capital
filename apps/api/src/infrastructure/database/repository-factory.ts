@@ -29,6 +29,22 @@ import {
   PrismaAcademyProgressRepository,
   PrismaAcademyRewardRepository,
 } from "../../modules/academy/academy.repository.js";
+import {
+  type ISimulationScenarioRepository,
+  type ISimulationAssetRepository,
+  type ISimulationMarketSnapshotRepository,
+  type ISimulationSessionRepository,
+  type ISimulationPortfolioRepository,
+  type ISimulationOrderRepository,
+  type ISimulationTradeRepository,
+  PrismaSimulationScenarioRepository,
+  PrismaSimulationAssetRepository,
+  PrismaSimulationMarketSnapshotRepository,
+  PrismaSimulationSessionRepository,
+  PrismaSimulationPortfolioRepository,
+  PrismaSimulationOrderRepository,
+  PrismaSimulationTradeRepository,
+} from "../../modules/simulation/simulation.repository.js";
 
 /**
  * Shared container representing all domain repository instances bound to a specific
@@ -45,6 +61,15 @@ export interface IRepositoryContainer {
   readonly academyQuizRepo: IAcademyQuizRepository;
   readonly academyProgressRepo: IAcademyProgressRepository;
   readonly academyRewardRepo: IAcademyRewardRepository;
+  // Phase 5 Simulation repositories
+  readonly simulationScenarioRepo: ISimulationScenarioRepository;
+  readonly simulationAssetRepo: ISimulationAssetRepository;
+  readonly simulationSnapshotRepo: ISimulationMarketSnapshotRepository;
+  readonly simulationMarketSnapshotRepo: ISimulationMarketSnapshotRepository;
+  readonly simulationSessionRepo: ISimulationSessionRepository;
+  readonly simulationPortfolioRepo: ISimulationPortfolioRepository;
+  readonly simulationOrderRepo: ISimulationOrderRepository;
+  readonly simulationTradeRepo: ISimulationTradeRepository;
 }
 
 /**
@@ -56,6 +81,7 @@ export function createRepositoryContainer(
   client?: PrismaClient | Prisma.TransactionClient,
 ): IRepositoryContainer {
   const refreshSessionRepo = new PrismaRefreshSessionRepository(client);
+  const simulationSnapshotRepo = new PrismaSimulationMarketSnapshotRepository(client);
   return {
     userRepo: new PrismaUserRepository(client),
     credentialRepo: new PrismaCredentialRepository(client),
@@ -67,6 +93,15 @@ export function createRepositoryContainer(
     academyQuizRepo: new PrismaAcademyQuizRepository(client),
     academyProgressRepo: new PrismaAcademyProgressRepository(client),
     academyRewardRepo: new PrismaAcademyRewardRepository(client),
+    // Phase 5 Simulation repositories
+    simulationScenarioRepo: new PrismaSimulationScenarioRepository(client),
+    simulationAssetRepo: new PrismaSimulationAssetRepository(client),
+    simulationSnapshotRepo,
+    simulationMarketSnapshotRepo: simulationSnapshotRepo,
+    simulationSessionRepo: new PrismaSimulationSessionRepository(client),
+    simulationPortfolioRepo: new PrismaSimulationPortfolioRepository(client),
+    simulationOrderRepo: new PrismaSimulationOrderRepository(client),
+    simulationTradeRepo: new PrismaSimulationTradeRepository(client),
   };
 }
 
@@ -85,3 +120,12 @@ export const academyQuizRepository = rootRepositoryContainer.academyQuizRepo;
 export const academyProgressRepository = rootRepositoryContainer.academyProgressRepo;
 export const academyRewardRepository = rootRepositoryContainer.academyRewardRepo;
 
+// Phase 5 Simulation repository singletons
+export const simulationScenarioRepository = rootRepositoryContainer.simulationScenarioRepo;
+export const simulationAssetRepository = rootRepositoryContainer.simulationAssetRepo;
+export const simulationSnapshotRepository = rootRepositoryContainer.simulationSnapshotRepo;
+export const simulationMarketSnapshotRepository = rootRepositoryContainer.simulationMarketSnapshotRepo;
+export const simulationSessionRepository = rootRepositoryContainer.simulationSessionRepo;
+export const simulationPortfolioRepository = rootRepositoryContainer.simulationPortfolioRepo;
+export const simulationOrderRepository = rootRepositoryContainer.simulationOrderRepo;
+export const simulationTradeRepository = rootRepositoryContainer.simulationTradeRepo;
