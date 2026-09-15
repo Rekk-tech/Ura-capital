@@ -16,7 +16,7 @@ Human Master Planning Decision: APPROVED.
 Phase 4: DONE / QA PASS / Human Phase Final Gate APPROVED
 Phase 5: IN_PROGRESS
 Implementation: IN_PROGRESS
-FEAT-031: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
+FEAT-031: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS, Git Checkpoint: PUBLISHED, CI: GREEN, Tag: feat-031-approved)
 FEAT-032: DONE / INTEGRATED (Self-Verification: PASS; QA Independence: REDUCED)
 FEAT-033: DONE / INTEGRATED (Internal Feature Gate: PASS)
 FEAT-034: UNBLOCKED FOR IMPLEMENTATION
@@ -62,7 +62,7 @@ Unresolved Human Decisions: ZERO for Phase 5 master planning decisions covered b
 
 | ID | Title | Type | Dependencies | State |
 | --- | --- | --- | --- | --- |
-| FEAT-031 | Simulation Domain Schema & Persistence Foundation | Implementation | Phase 2, Phase 3, Phase 4 approved | DONE (Internal Feature Gate: PASS) |
+| FEAT-031 | Simulation Domain Schema & Persistence Foundation | Implementation | Phase 2, Phase 3, Phase 4 approved | DONE (Internal Feature Gate: PASS, Tag: feat-031-approved) |
 | FEAT-032 | Asset Universe & Market Snapshot Read Model | Implementation | FEAT-031 | DONE / INTEGRATED |
 | FEAT-033 | Simulation Session Lifecycle | Implementation | FEAT-031 | DONE / INTEGRATED |
 | FEAT-034 | Portfolio & Position Accounting Foundation | Implementation | FEAT-032 + FEAT-033 | UNBLOCKED FOR IMPLEMENTATION |

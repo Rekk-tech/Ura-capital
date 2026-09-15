@@ -1552,7 +1552,7 @@ Phase 5 State:
 ```text
 Baseline: phase-4-approved
 Owner: DEV-A / Antigravity
-FEAT-031: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
+FEAT-031: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS, Git Checkpoint: PUBLISHED, CI: GREEN, Tag: feat-031-approved)
 FEAT-032: DONE / INTEGRATED (Self-Verification: PASS; QA Independence: REDUCED)
 FEAT-033: DONE / INTEGRATED (Internal Feature Gate: PASS)
 FEAT-034: UNBLOCKED FOR IMPLEMENTATION
