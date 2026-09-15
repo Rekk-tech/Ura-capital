@@ -185,12 +185,14 @@ export function assertSafeMigrationDatabase(
 }
 
 /**
- * Computes Prisma-compatible SHA256 checksum of SQL migration content.
- * Normalizes CRLF line endings to LF before hashing.
+ * Computes the checksum Prisma records in _prisma_migrations.
+ *
+ * Prisma hashes the migration file content as read from disk, so the guard
+ * must not normalize line endings or it will report false drift on worktrees
+ * checked out with CRLF migration files.
  */
 export function computePrismaMigrationChecksum(sqlContent: string): string {
-  const normalized = sqlContent.replace(/\r\n/g, "\n");
-  return crypto.createHash("sha256").update(normalized).digest("hex");
+  return crypto.createHash("sha256").update(sqlContent).digest("hex");
 }
 
 /**

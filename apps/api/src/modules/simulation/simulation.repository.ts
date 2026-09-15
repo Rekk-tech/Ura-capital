@@ -29,6 +29,10 @@ import { getPrismaClient } from "../../infrastructure/database/prisma.js";
 
 type DbClient = PrismaClient | Prisma.TransactionClient;
 
+export type SimulationMarketSnapshotWithAsset = SimulationMarketSnapshot & {
+  asset: SimulationAsset;
+};
+
 function toDecimal(val: Prisma.Decimal | string | number): Prisma.Decimal {
   return val instanceof Prisma.Decimal ? val : new Prisma.Decimal(val);
 }
@@ -142,7 +146,11 @@ export interface ISimulationMarketSnapshotRepository {
   createSnapshot(data: CreateSnapshotInput): Promise<SimulationMarketSnapshot>;
   findSnapshotById(id: string): Promise<SimulationMarketSnapshot | null>;
   findSnapshot(scenarioId: string, cycle: number, assetId: string): Promise<SimulationMarketSnapshot | null>;
-  listSnapshotsByScenarioAndCycle(scenarioId: string, cycle: number): Promise<SimulationMarketSnapshot[]>;
+  listSnapshotsByScenarioAndCycle(
+    scenarioId: string,
+    cycle: number,
+    filter?: { assetStatus?: string; assetType?: string },
+  ): Promise<SimulationMarketSnapshotWithAsset[]>;
 }
 
 export class PrismaSimulationMarketSnapshotRepository implements ISimulationMarketSnapshotRepository {
@@ -182,16 +190,27 @@ export class PrismaSimulationMarketSnapshotRepository implements ISimulationMark
     });
   }
 
-  async listSnapshotsByScenarioAndCycle(scenarioId: string, cycle: number): Promise<SimulationMarketSnapshot[]> {
+  async listSnapshotsByScenarioAndCycle(
+    scenarioId: string,
+    cycle: number,
+    filter?: { assetStatus?: string; assetType?: string },
+  ): Promise<SimulationMarketSnapshotWithAsset[]> {
     return this.client.simulationMarketSnapshot.findMany({
       where: {
         scenarioId,
         cycle,
+        asset: {
+          status: filter?.assetStatus,
+          assetType: filter?.assetType,
+        },
       },
       include: {
         asset: true,
       },
-      orderBy: { asset: { displayOrder: "asc" } },
+      orderBy: [
+        { asset: { displayOrder: "asc" } },
+        { asset: { symbol: "asc" } },
+      ],
     });
   }
 }
@@ -277,6 +296,10 @@ export class PrismaSimulationSessionRepository implements ISimulationSessionRepo
       where: {
         userId,
         status: filter?.status,
+      },
+      include: {
+        scenario: true,
+        portfolio: true,
       },
       orderBy: { createdAt: "desc" },
     });
