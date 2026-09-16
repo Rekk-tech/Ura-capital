@@ -356,6 +356,8 @@ export interface ISimulationPortfolioRepository {
     quantity: number,
     averageCost: Prisma.Decimal | string | number,
   ): Promise<SimulationPosition>;
+  findPortfolioBySessionIdForUpdate(sessionId: string): Promise<SimulationPortfolio | null>;
+  findPositionForUpdate(portfolioId: string, assetId: string): Promise<SimulationPosition | null>;
   deletePosition(portfolioId: string, assetId: string): Promise<SimulationPosition | null>;
 }
 
@@ -505,6 +507,66 @@ export class PrismaSimulationPortfolioRepository implements ISimulationPortfolio
       return null;
     }
   }
+
+  async findPortfolioBySessionIdForUpdate(sessionId: string): Promise<SimulationPortfolio | null> {
+    interface RawPortfolioRow {
+      id: string;
+      sessionId: string;
+      cashBalance: string | Prisma.Decimal;
+      realizedPnl: string | Prisma.Decimal;
+      createdAt: Date;
+      updatedAt: Date;
+    }
+    const rows = await (this.client as PrismaClient).$queryRaw<RawPortfolioRow[]>(
+      Prisma.sql`SELECT id, session_id as "sessionId", cash_balance as "cashBalance", realized_pnl as "realizedPnl", created_at as "createdAt", updated_at as "updatedAt"
+                 FROM "simulation_portfolios"
+                 WHERE "session_id" = ${sessionId}
+                 FOR UPDATE;`,
+    );
+    if (!rows || rows.length === 0) {
+      return null;
+    }
+    const r = rows[0]!;
+    return {
+      id: r.id,
+      sessionId: r.sessionId,
+      cashBalance: toDecimal(r.cashBalance),
+      realizedPnl: toDecimal(r.realizedPnl),
+      createdAt: new Date(r.createdAt),
+      updatedAt: new Date(r.updatedAt),
+    };
+  }
+
+  async findPositionForUpdate(portfolioId: string, assetId: string): Promise<SimulationPosition | null> {
+    interface RawPositionRow {
+      id: string;
+      portfolioId: string;
+      assetId: string;
+      quantity: number;
+      averageCost: string | Prisma.Decimal;
+      createdAt: Date;
+      updatedAt: Date;
+    }
+    const rows = await (this.client as PrismaClient).$queryRaw<RawPositionRow[]>(
+      Prisma.sql`SELECT id, portfolio_id as "portfolioId", asset_id as "assetId", quantity, average_cost as "averageCost", created_at as "createdAt", updated_at as "updatedAt"
+                 FROM "simulation_positions"
+                 WHERE "portfolio_id" = ${portfolioId} AND "asset_id" = ${assetId}
+                 FOR UPDATE;`,
+    );
+    if (!rows || rows.length === 0) {
+      return null;
+    }
+    const r = rows[0]!;
+    return {
+      id: r.id,
+      portfolioId: r.portfolioId,
+      assetId: r.assetId,
+      quantity: Number(r.quantity),
+      averageCost: toDecimal(r.averageCost),
+      createdAt: new Date(r.createdAt),
+      updatedAt: new Date(r.updatedAt),
+    };
+  }
 }
 
 // ============================================================================
@@ -518,7 +580,7 @@ export interface ISimulationOrderRepository {
     userId: string,
     sessionId: string,
     idempotencyKey: string,
-  ): Promise<SimulationOrder | null>;
+  ): Promise<(SimulationOrder & { asset?: SimulationAsset | null; trade?: SimulationTrade | null }) | null>;
   listOrdersBySessionId(sessionId: string): Promise<SimulationOrder[]>;
   updateOrderStatus(
     id: string,
@@ -553,6 +615,8 @@ export class PrismaSimulationOrderRepository implements ISimulationOrderReposito
         requestFingerprint: data.requestFingerprint,
         executionPrice: data.executionPrice ? toDecimal(data.executionPrice) : null,
         executedQuantity: data.executedQuantity ?? null,
+        filledAt: data.filledAt !== undefined ? data.filledAt : (data.status === "FILLED" ? new Date() : null),
+        rejectionCode: data.rejectionCode ?? null,
       },
     });
   }

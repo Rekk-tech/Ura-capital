@@ -151,6 +151,8 @@ export interface CreateOrderInput {
   requestFingerprint: string;
   executionPrice?: Prisma.Decimal | string | number | null;
   executedQuantity?: number | null;
+  filledAt?: Date | null;
+  rejectionCode?: string | null;
 }
 
 export interface CreateTradeInput {
