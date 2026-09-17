@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ShieldCheck, Cpu, BookOpen, TrendingUp, Users, Activity } from "lucide-react";
 import { APP_NAME } from "@aura/shared";
 import { AcademyRoutes } from "./router/academy-routes";
+import { SimulationRoutes } from "./router/simulation-routes";
 
 const defaultQueryClient = new QueryClient({
   defaultOptions: {
@@ -68,7 +69,9 @@ const LandingView: React.FC = () => (
           Server-authoritative simulated markets, isolated user sessions, deterministic order
           matching, and risk reflection.
         </p>
-        <span className="badge badge-success">Ready for Phase 5</span>
+        <Link to="/simulation" className="badge badge-success" style={{ textDecoration: "none", display: "inline-block" }}>
+          Open Simulation →
+        </Link>
       </div>
 
       <div className="card">
@@ -143,6 +146,9 @@ export const AppContent: React.FC = () => {
           <Link to="/academy" className="nav-link">
             Courses
           </Link>
+          <Link to="/simulation" className="nav-link">
+            Simulation
+          </Link>
         </nav>
 
         <div className="status-pill">
@@ -155,6 +161,7 @@ export const AppContent: React.FC = () => {
         <Routes>
           <Route path="/" element={<LandingView />} />
           <Route path="/academy/*" element={<AcademyRoutes />} />
+          <Route path="/simulation/*" element={<SimulationRoutes />} />
         </Routes>
       </div>
 
