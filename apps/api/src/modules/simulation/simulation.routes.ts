@@ -11,12 +11,15 @@ import { SimulationOrderService } from "./simulation-order.service.js";
 import { SimulationOrderController } from "./simulation-order.controller.js";
 import { SimulationValuationService } from "./simulation-valuation.service.js";
 import { SimulationValuationController } from "./simulation-valuation.controller.js";
+import { createSimulationOrderRateLimiter } from "./simulation-order.rate-limit.js";
+import type { RequestHandler } from "express";
 
 export function createSimulationRouter(
   marketController?: SimulationMarketController,
   sessionController?: SimulationSessionController,
   orderController?: SimulationOrderController,
   valuationController?: SimulationValuationController,
+  orderRateLimiter?: RequestHandler,
 ): Router {
   const router = Router();
   const repoContainer = createRepositoryContainer();
@@ -102,10 +105,18 @@ export function createSimulationRouter(
     sessionCtrl.resetSession(req, res, next);
   });
 
-  // FEAT-035: Market Order Submission & Execution
-  router.post("/api/simulation/sessions/:simulationId/orders", authenticate, (req, res, next) => {
-    orderCtrl.submitOrder(req, res, next);
-  });
+  const orderRateLimiterMiddleware =
+    orderRateLimiter ?? createSimulationOrderRateLimiter();
+
+  // FEAT-035 + FEAT-039: Market Order Submission & Execution (Rate-Limited)
+  router.post(
+    "/api/simulation/sessions/:simulationId/orders",
+    authenticate,
+    orderRateLimiterMiddleware,
+    (req, res, next) => {
+      orderCtrl.submitOrder(req, res, next);
+    },
+  );
 
   // FEAT-037: Portfolio Valuation, Orders & Trades Read Routes
   router.get(
