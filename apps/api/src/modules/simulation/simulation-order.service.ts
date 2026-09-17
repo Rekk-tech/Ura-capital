@@ -402,8 +402,10 @@ export class SimulationOrderService {
           sessionId,
           idempotencyKey,
         );
-        if (!winningOrder) {
-          await new Promise((resolve) => setTimeout(resolve, 50));
+        let retries = 0;
+        while (!winningOrder && retries < 3) {
+          retries++;
+          await new Promise((resolve) => setTimeout(resolve, 50 * retries));
           winningOrder = await this.orderRepo.findOrderByUserSessionIdempotencyKey(
             userId,
             sessionId,

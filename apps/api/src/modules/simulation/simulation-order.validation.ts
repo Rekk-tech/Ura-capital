@@ -49,6 +49,9 @@ export const FORBIDDEN_ORDER_AUTHORITY_FIELDS = new Set([
   "portfolio_id",
   "averagecost",
   "average_cost",
+  "fee",
+  "fees",
+  "slippage",
 ]);
 
 /**

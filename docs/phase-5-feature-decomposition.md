@@ -20,9 +20,9 @@ FEAT-031: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS, Git Check
 FEAT-032: DONE / INTEGRATED (Self-Verification: PASS; QA Independence: REDUCED)
 FEAT-033: DONE / INTEGRATED (Internal Feature Gate: PASS)
 FEAT-034: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
-FEAT-035: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
-FEAT-036: UNBLOCKED FOR IMPLEMENTATION
-FEAT-037: PLANNED / BLOCKED BY FEAT-036
+FEAT-035: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS, Git Checkpoint: PUBLISHED, CI: GREEN, Tag: feat-035-approved)
+FEAT-036: DONE (Implementation: COMPLETE, Self-Verification: PASS, QA Independence: REDUCED)
+FEAT-037: UNBLOCKED FOR IMPLEMENTATION
 FEAT-038: PLANNED / BLOCKED BY FEAT-037
 FEAT-039: PLANNED / BLOCKED BY FEAT-038
 FEAT-040: BLOCKED BY FEAT-039
@@ -67,8 +67,8 @@ Unresolved Human Decisions: ZERO for Phase 5 master planning decisions covered b
 | FEAT-033 | Simulation Session Lifecycle | Implementation | FEAT-031 | DONE / INTEGRATED |
 | FEAT-034 | Portfolio & Position Accounting Foundation | Implementation | FEAT-032 + FEAT-033 | DONE (Internal Feature Gate: PASS) |
 | FEAT-035 | Market Order Submission & Execution | Implementation | FEAT-034 | DONE (Internal Feature Gate: PASS) |
-| FEAT-036 | Order Idempotency & Concurrency Adversarial Hardening | Hardening | FEAT-035 | UNBLOCKED FOR IMPLEMENTATION |
-| FEAT-037 | Current PnL & Portfolio Valuation | Implementation | FEAT-036 | PLANNED / BLOCKED BY FEAT-036 |
+| FEAT-036 | Order Idempotency & Concurrency Adversarial Hardening | Hardening | FEAT-035 | DONE (Self-Verification: PASS) |
+| FEAT-037 | Current PnL & Portfolio Valuation | Implementation | FEAT-036 | UNBLOCKED FOR IMPLEMENTATION |
 | FEAT-038 | Simulation Learner UI | Implementation | FEAT-037 | PLANNED / BLOCKED BY FEAT-037 |
 | FEAT-039 | Simulation Authorization, Rate Limit & Audit-Deferral Hardening | Hardening / governance | FEAT-038 | PLANNED / BLOCKED BY FEAT-038 |
 | FEAT-040 | Phase 5 Simulation Integration Gate | Validation gate | FEAT-039 | BLOCKED BY FEAT-039 |
