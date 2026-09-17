@@ -9,11 +9,14 @@ import { SimulationSessionController } from "./simulation-session.controller.js"
 
 import { SimulationOrderService } from "./simulation-order.service.js";
 import { SimulationOrderController } from "./simulation-order.controller.js";
+import { SimulationValuationService } from "./simulation-valuation.service.js";
+import { SimulationValuationController } from "./simulation-valuation.controller.js";
 
 export function createSimulationRouter(
   marketController?: SimulationMarketController,
   sessionController?: SimulationSessionController,
   orderController?: SimulationOrderController,
+  valuationController?: SimulationValuationController,
 ): Router {
   const router = Router();
   const repoContainer = createRepositoryContainer();
@@ -48,6 +51,16 @@ export function createSimulationRouter(
   );
   const orderCtrl =
     orderController ?? new SimulationOrderController(orderService);
+
+  const valuationService = new SimulationValuationService(
+    repoContainer.simulationSessionRepo,
+    repoContainer.simulationPortfolioRepo,
+    repoContainer.simulationMarketSnapshotRepo,
+    repoContainer.simulationOrderRepo,
+    repoContainer.simulationTradeRepo,
+  );
+  const valuationCtrl =
+    valuationController ?? new SimulationValuationController(valuationService);
 
   // FEAT-032: Market Read Routes
   router.get("/api/simulation/assets", authenticate, (req, res, next) =>
@@ -93,6 +106,25 @@ export function createSimulationRouter(
   router.post("/api/simulation/sessions/:simulationId/orders", authenticate, (req, res, next) => {
     orderCtrl.submitOrder(req, res, next);
   });
+
+  // FEAT-037: Portfolio Valuation, Orders & Trades Read Routes
+  router.get(
+    "/api/simulation/sessions/:simulationId/portfolio",
+    authenticate,
+    (req, res, next) => valuationCtrl.getPortfolio(req, res, next),
+  );
+
+  router.get(
+    "/api/simulation/sessions/:simulationId/orders",
+    authenticate,
+    (req, res, next) => valuationCtrl.getOrders(req, res, next),
+  );
+
+  router.get(
+    "/api/simulation/sessions/:simulationId/trades",
+    authenticate,
+    (req, res, next) => valuationCtrl.getTrades(req, res, next),
+  );
 
   return router;
 }
