@@ -493,7 +493,7 @@ Phase 3 Completion State:
 - FEAT-018 is DONE / QA PASS / Human Final Gate APPROVED.
 - Phase 3 is DONE / QA PASS / Human Final Gate APPROVED.
 - HISTORICAL SNAPSHOT (at Phase 3 completion): Phase 4 was IN_PROGRESS / PLANNING; FEAT-019 was APPROVED FOR IMPLEMENTATION; FEAT-020 through FEAT-030 remained BLOCKED.
-- CURRENT CANONICAL STATE: Phase 4 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-019 through FEAT-030 retain their approved Phase 4 states; Phase 5 is READY FOR HUMAN PHASE FINAL GATE; FEAT-031 through FEAT-039 retain their completed internal feature states; FEAT-040 is QA TECHNICAL BASELINE PASS / GOVERNANCE CLOSURE PASS (DEF-001..DEF-005 CLOSED), Human Phase Final Gate NOT YET APPROVED.
+- CURRENT CANONICAL STATE: Phase 4 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-019 through FEAT-030 retain their approved Phase 4 states; Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-031 through FEAT-040 are DONE / QA PASS; Phase 6 is UNBLOCKED.
 
 Feature Decomposition:
 
@@ -1561,16 +1561,18 @@ FEAT-036: DONE (Implementation: COMPLETE, Self-Verification: PASS, QA Independen
 FEAT-037: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 FEAT-038: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 FEAT-039: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
-FEAT-040: QA TECHNICAL BASELINE PASS / GOVERNANCE CLOSURE PASS
-FEAT-040 QA History: QA Iteration 1 FAIL; Rework Iteration 1 COMPLETE; QA Iteration 2 FAIL; Rework Iteration 2 COMPLETE; QA Iteration 3 FAIL; Final DEF-005 Governance Correction COMPLETE; Human Governance Review PASS
-FEAT-040 Defects: DEF-001 FIXED; DEF-002 FIXED; DEF-003 FIXED; DEF-004 FIXED; DEF-005 CLOSED BY HUMAN GOVERNANCE REVIEW (P0=0, P1=0, P2=0, P3=0)
-FEAT-040 Acceptance Criteria: AC-001 PASS; AC-016 PASS; AC-001..AC-028 ALL 28 ACs PASS
-FEAT-040 Human Final Gate: NOT YET APPROVED
-Phase 5: READY FOR HUMAN PHASE FINAL GATE
-Application code changes: FEAT-031 persistence complete; FEAT-032 read model integrated; FEAT-033 session lifecycle integrated; FEAT-034 accounting foundation complete; FEAT-035 order execution complete; FEAT-036 adversarial hardening complete; FEAT-037 valuation read model complete; FEAT-038 frontend UI complete; FEAT-039 security & rate limit complete; FEAT-040 all rework verified with zero application/test/schema/migration/CI changes
-Governance Note: Final DEF-005 closure was performed by Human targeted governance review after Codex QA Iteration 3. No application behavior changed.
-Blocking evidence: ZERO (all defects closed; Phase 5 ready for Human Phase Final Gate)
-Unresolved Human decisions: ZERO; technical baseline PASS, governance closure PASS, ready for Human Phase Final Gate
+FEAT-040: DONE / QA PASS
+FEAT-040 QA History: QA Iteration 1 FAIL; Rework Iteration 1 COMPLETE; QA Iteration 2 FAIL; Rework Iteration 2 COMPLETE; QA Iteration 3 FAIL; Final DEF-005 Governance Correction COMPLETE; Human Governance Review PASS; Human Phase Final Gate APPROVED
+FEAT-040 Defects: DEF-001 FIXED; DEF-002 FIXED; DEF-003 FIXED; DEF-004 FIXED; DEF-005 CLOSED (P0=0, P1=0, P2=0, P3=0)
+FEAT-040 Acceptance Criteria: AC-001..AC-028 ALL 28 ACs PASS
+Human Phase Final Gate: APPROVED
+Phase 5: DONE
+Phase 5 QA: PASS
+Phase 6: UNBLOCKED
+Application code changes: FEAT-031 persistence complete; FEAT-032 read model integrated; FEAT-033 session lifecycle integrated; FEAT-034 accounting foundation complete; FEAT-035 order execution complete; FEAT-036 adversarial hardening complete; FEAT-037 valuation read model complete; FEAT-038 frontend UI complete; FEAT-039 security & rate limit complete; FEAT-040 complete with zero application/test/schema/migration/CI changes
+Governance Note: Phase 5 completion APPROVED by Human Phase Final Gate.
+Blocking evidence: ZERO (all defects closed, Phase 5 complete, Phase 6 unblocked)
+Unresolved Human decisions: ZERO
 ```
 
 Planning Artifacts:

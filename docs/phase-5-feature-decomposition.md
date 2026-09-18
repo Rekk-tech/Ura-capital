@@ -14,8 +14,8 @@ Human Master Planning Decision: APPROVED.
 
 ```text
 Phase 4: DONE / QA PASS / Human Phase Final Gate APPROVED
-Phase 5: READY FOR HUMAN PHASE FINAL GATE
-Implementation: IN_PROGRESS
+Phase 5: DONE / QA PASS / Human Phase Final Gate APPROVED
+Implementation: COMPLETE
 FEAT-031: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS, Git Checkpoint: PUBLISHED, CI: GREEN, Tag: feat-031-approved)
 FEAT-032: DONE / INTEGRATED (Self-Verification: PASS; QA Independence: REDUCED)
 FEAT-033: DONE / INTEGRATED (Internal Feature Gate: PASS)
@@ -25,7 +25,7 @@ FEAT-036: DONE (Implementation: COMPLETE, Self-Verification: PASS, QA Independen
 FEAT-037: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 FEAT-038: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 FEAT-039: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
-FEAT-040: QA TECHNICAL BASELINE PASS / GOVERNANCE CLOSURE PASS (Human Phase Final Gate: NOT YET APPROVED)
+FEAT-040: DONE / QA PASS (Human Phase Final Gate: APPROVED)
 ```
 
 ## 2. Human-Approved MVP Decisions
@@ -71,7 +71,7 @@ Unresolved Human Decisions: ZERO for Phase 5 master planning decisions covered b
 | FEAT-037 | Current PnL & Portfolio Valuation | Implementation | FEAT-036 | DONE (Internal Feature Gate: PASS) |
 | FEAT-038 | Simulation Learner UI | Implementation | FEAT-037 | DONE (Internal Feature Gate: PASS) |
 | FEAT-039 | Simulation Authorization, Rate Limit & Audit-Deferral Hardening | Hardening / governance | FEAT-038 | DONE (Internal Feature Gate: PASS) |
-| FEAT-040 | Phase 5 Simulation Integration Gate | Validation gate | FEAT-039 | QA TECHNICAL BASELINE PASS / GOVERNANCE CLOSURE PASS |
+| FEAT-040 | Phase 5 Simulation Integration Gate | Validation gate | FEAT-039 | DONE / QA PASS (Human Phase Final Gate: APPROVED) |
 
 ## 4. Dependency Graph
 
