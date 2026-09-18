@@ -21,7 +21,7 @@
 
 > [!NOTE]
 > **Post-Phase-5 QA Evidence Correction (Governance Rework Iteration 2)**:
-> This report was updated to remediate DEF-005 identified in `reports/qa/phase-5/PHASE-5-QA.md`. The update corrects stale aggregate test counts to reflect the reproduced QA Iteration 2 baseline (Web: 12 files / 147 tests, Standard: 83 files / 928 tests, Unit: 59 files / 738 tests, DB: 30 files / 389 tests, Redis: 5 files / 50 tests), clarifies that `POST /api/simulation/sessions` creates a session in `CREATED` status (with activation occurring explicitly via canonical `POST /api/simulation/sessions/:id/start`), aligns portfolio DTO field references to actual names (`marketValue`, `unrealizedPnl`), and removes any reference to nonexistent `advance` controls in AC-001. Application code was not modified.
+> This report was updated to remediate DEF-005 identified in `reports/qa/phase-5/PHASE-5-QA.md`. The update corrects stale aggregate test counts to reflect the reproduced QA Iteration 2 baseline (Web: 12 files / 147 tests, Standard: 83 files / 928 tests, Unit: 59 files / 738 tests, DB: 30 files / 389 tests, Redis: 5 files / 50 tests), clarifies that `POST /api/simulation/sessions` creates a session in `CREATED` status (with activation occurring explicitly via canonical `POST /api/simulation/sessions/:id/start`), aligns portfolio DTO field references to actual names (`marketValue`, `unrealizedPnl`), removes any reference to nonexistent `advance` controls in AC-001, and replaces false mentions of creation modals with direct session-creation controls in `SimulationDashboardPage` and `SimulationSessionBar`. Application code was not modified.
 
 ---
 
@@ -97,7 +97,7 @@ All implementation code is strictly isolated within `apps/web/src/features/simul
 - `OrdersTable.tsx` (AC-005): Displays recent order submissions (order ID, symbol, side, type, quantity, status badge, created timestamp).
 - `TradesTable.tsx` (AC-005): Displays executed trades log (trade ID, symbol, side, executed quantity, executed price, gross notional, executed timestamp).
 - `SimulationStates.tsx` (AC-011): Dedicated, accessible components for loading skeletons, unauthenticated prompt, session not found (IDOR-safe 404), and general error states.
-- `SimulationDashboardPage.tsx`: Integrated dashboard orchestrating all sub-components, managing session switching, complete/cancel lifecycle, and creation modals.
+- `SimulationDashboardPage.tsx`: Integrated dashboard orchestrating all sub-components, managing session switching, complete/cancel lifecycle, and direct session creation controls.
 
 ### 3.5 Routing & App Integration (`apps/web/src/app/router/simulation-routes.tsx`, `apps/web/src/app/App.tsx`)
 - Registered routes:
@@ -236,7 +236,7 @@ All 14 canonical commands executed cleanly with zero skips:
 | **AC-013** | UI does not rely on hidden controls as authorization. | Server enforces all access control and rejects unauthorized or inactive actions; UI disables gracefully. | **PASS** |
 | **AC-014** | FEAT-031..037 regressions remain green. | Full standard test suite passed (83 files / 928 tests green, 0 failures). | **PASS** |
 | **AC-015** | Canonical validation passes. | 14/14 canonical commands executed and passed. | **PASS** |
-| **AC-016** | Implementation report is complete and truthful. | Verified: `reports/implementation/phase-5/FEAT-038.md` reflects actual committed code, canonical routes, exact DTO fields (`marketValue`, `unrealizedPnl`), correct session lifecycle (`CREATED` -> `/start` -> `ACTIVE`), and QA Iteration 2 reproduced test counts without nonexistent routes or controls. | **PASS** |
+| **AC-016** | Implementation report is complete and truthful. | Verified: `reports/implementation/phase-5/FEAT-038.md` reflects actual committed code, canonical routes, exact DTO fields (`marketValue`, `unrealizedPnl`), correct session lifecycle (`CREATED` -> `/start` -> `ACTIVE`), direct session creation controls (no modals/dialogs), and QA Iteration 2 reproduced test counts without nonexistent routes or controls. | **PASS** |
 
 ---
 

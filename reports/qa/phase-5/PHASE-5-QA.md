@@ -3,11 +3,102 @@
 Feature: FEAT-040
 Phase: Phase 5 - Simulation Engine
 QA Owner: Codex
-QA Iteration: 2
+QA Iteration: 3
 Executed: 2026-09-18
 Final Verdict: FAIL
 Human Final Gate Readiness: NOT READY
 Application Code Changes By QA: ZERO
+
+## QA Iteration 3 Executive Summary
+
+This iteration is a targeted governance closure review for DEF-005 only. The rework commit changes governance/report artifacts only: application source, tests, Prisma schema, migrations, and CI workflow are unchanged. QA Iteration 2 technical evidence therefore remains valid and was not rerun.
+
+Four of the five reported contradictions are corrected: test counts, session creation lifecycle, portfolio DTO names, and AC-001 lifecycle-control evidence now match the repository. However, the current FEAT-038 implementation report still claims that `SimulationDashboardPage` manages "creation modals". Source inspection confirms there is no creation modal or dialog; session creation is initiated directly by buttons. Because FEAT-038 AC-016 requires a complete and truthful implementation report, DEF-005 remains OPEN.
+
+Defect count: P0 0, P1 0, P2 1, P3 0. Existing non-blocking advisories remain unchanged.
+
+## QA Iteration 3 Targeted Scope
+
+| Check | Evidence | Result |
+| --- | --- | --- |
+| Baseline technical commit | `df1fcf692399709c28ebcb03b10cb7537f773be0` | PASS |
+| Governance rework commit | `9f70d29` | PASS |
+| Working tree before QA3 edits | Clean | PASS |
+| `apps/api` changes | Zero | PASS |
+| `apps/web` changes | Zero | PASS |
+| `packages/shared` changes | Zero | PASS |
+| Test-code changes | Zero | PASS |
+| Prisma schema changes | Zero | PASS |
+| Migration changes | Zero | PASS |
+| CI workflow changes | Zero | PASS |
+| Rework artifact scope | Progress tracker, FEAT-038 report, FEAT-040 rework report, and preserved QA2 report | PASS |
+
+No contradictory technical evidence was found for DEF-001 through DEF-004, so their QA2 `FIXED` status is preserved.
+
+## QA Iteration 3 DEF-005 Verification
+
+| Required correction | Independent source/report comparison | Status |
+| --- | --- | --- |
+| Feature-local counts | `simulation.api.test.ts`: 15 tests; `SimulationDashboardPage.test.tsx`: 20 tests; combined 2 files / 35 tests | PASS |
+| Repository baseline counts | Web 12/147; standard 83/928; unit 59/738; DB 30/389; Redis 5/50 | PASS |
+| Session creation lifecycle | Report correctly states `{}` creates `CREATED`; activation occurs only through `POST /api/simulation/sessions/:id/start` | PASS |
+| Portfolio DTO names | Report and source use `marketValue` and `unrealizedPnl` | PASS |
+| FEAT-038 AC-001 evidence | No current AC-001 claim includes an advance control; implemented Start, Reset, Complete, Cancel, and New controls are represented | PASS |
+| FEAT-038 AC-016 truthfulness | Report claims nonexistent "creation modals" in `SimulationDashboardPage` | FAIL |
+| Post-QA2 audit trail | Governance correction note explicitly records that remediation followed FEAT-040 QA Iteration 2 | PASS |
+
+### Remaining DEF-005 Mismatch
+
+- File: `reports/implementation/phase-5/FEAT-038.md`.
+- Current claim: `SimulationDashboardPage.tsx` manages "creation modals".
+- Source reality: no modal/dialog exists in the Simulation UI. `SimulationDashboardPage` and `SimulationSessionBar` expose direct session-creation buttons that invoke the create-session mutation.
+- Affected criteria: FEAT-038 AC-016 and FEAT-040 AC-001.
+- Required fix: replace the fabricated modal claim with the actual direct-button/session-creation behavior. Preserve the post-QA2 correction audit trail and do not change application behavior.
+
+## QA Iteration 3 Acceptance Closure
+
+| Criterion | Status | Evidence |
+| --- | --- | --- |
+| FEAT-040 AC-001 | FAIL | Required report remains inaccurate because it claims a nonexistent creation modal. |
+| FEAT-040 AC-002 through AC-028 | PASS | QA2 PASS evidence is retained; no application, test, schema, migration, or CI change contradicts it. |
+| FEAT-038 AC-016 | FAIL | Implementation-report truthfulness is not yet complete. |
+
+## QA Iteration 3 Reused Technical Evidence
+
+The following QA Iteration 2 evidence remains valid because QA3 rework is documentation/governance-only:
+
+- Canonical 14: PASS.
+- Standard: 83 files / 928 tests PASS.
+- Unit: 59 files / 738 tests PASS.
+- PostgreSQL: 30 files / 389 tests PASS.
+- Redis: 5 files / 50 tests PASS.
+- FEAT-039 security: 1 file / 49 tests PASS.
+- CI run `#36`: GREEN / SUCCESS for corrected technical commit `df1fcf692399709c28ebcb03b10cb7537f773be0`.
+- Migration integrity: 8 migrations / 8 trusted digests PASS.
+
+Heavy regression was intentionally not rerun for this report-only rework, in accordance with the approved QA3 policy.
+
+## QA Iteration 3 Defect Decision
+
+DEF-005: OPEN
+
+The previous count, lifecycle, DTO-name, and advance-control contradictions are resolved. The remaining fabricated creation-modal claim prevents truthful closure.
+
+## QA Iteration 3 Final Verdict
+
+FAIL
+
+FEAT-040: QA FAIL - ITERATION 3.
+
+Phase 5: BLOCKED.
+
+Human Phase Final Gate: NOT READY / NOT APPROVED.
+
+QA independence: INDEPENDENT TARGETED GOVERNANCE REVIEW by Codex. Prior reduced-independence notes for FEAT-032 and FEAT-036 remain unchanged.
+
+## QA Iteration 2 Historical Record (Preserved)
+
+The following QA Iteration 2 content is preserved as historical evidence. Its verdict and statuses are superseded by the QA Iteration 3 section above.
 
 ## QA Iteration 2 Executive Summary
 

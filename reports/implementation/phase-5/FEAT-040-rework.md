@@ -4,8 +4,9 @@
 **Implementation Owner**: Antigravity / DEV-A  
 **QA Owner**: Codex  
 **Date**: 2026-09-18  
-**Status**: DEF-005 REWORK COMPLETE / READY FOR TARGETED GOVERNANCE RE-QA (ITERATION 3)  
-**Phase 5 Status**: BLOCKED / READY FOR RE-QA  
+**Status**: DEF-005: CORRECTION COMPLETE / READY FOR HUMAN GOVERNANCE REVIEW  
+**FEAT-040 Status**: TECHNICAL QA EVIDENCE REMAINS PASS / GOVERNANCE CLOSURE PENDING HUMAN REVIEW  
+**Phase 5 Status**: BLOCKED PENDING HUMAN GOVERNANCE REVIEW  
 **Human Phase Final Gate**: NOT READY / NOT APPROVED  
 **Baseline Defect Reports**:
 - Iteration 1: `reports/qa/phase-5/PHASE-5-QA.md` (QA FAIL, P1=2, P2=3)
@@ -52,6 +53,8 @@ In accordance with the QA Iteration 2 findings, `reports/implementation/phase-5/
    - AC-016 marked PASS with specific verification that all routes, controls, DTO fields, lifecycle behavior, and test counts reflect the committed codebase.
 6. **Preserved Historical Context**:
    - Added a clear governance note explaining that the post-Phase-5 QA evidence correction occurred after QA Iteration 2 without rewriting historical context.
+7. **Removed Creation Modal False Claim**:
+   - Replaced false claim that `SimulationDashboardPage` manages "creation modals" with accurate description of direct session-creation controls/buttons, verifying zero modal/dialog claims remain in the report.
 
 ---
 
@@ -67,8 +70,8 @@ In accordance with the QA Iteration 2 findings, `reports/implementation/phase-5/
 
 ## 4. Governance Status
 
-- **DEF-005**: `REWORK COMPLETE / READY FOR QA ITERATION 3`
-- **FEAT-040**: `READY FOR TARGETED GOVERNANCE RE-QA`
-- **Phase 5**: `BLOCKED / READY FOR RE-QA`
+- **DEF-005**: `CORRECTION COMPLETE / READY FOR HUMAN GOVERNANCE REVIEW`
+- **FEAT-040**: `TECHNICAL QA EVIDENCE REMAINS PASS / GOVERNANCE CLOSURE PENDING HUMAN REVIEW`
+- **Phase 5**: `BLOCKED PENDING HUMAN GOVERNANCE REVIEW`
 - **Human Phase Final Gate**: `NOT READY / NOT APPROVED`
-- **Next Step**: Handover to Codex for targeted governance re-QA (Iteration 3) to evaluate AC-001 and issue the final Phase 5 verdict.
+- **Next Step**: Awaiting Human Governance Review for final Phase 5 closure. Do NOT mark Phase 5 DONE.

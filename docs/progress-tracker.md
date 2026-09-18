@@ -493,7 +493,7 @@ Phase 3 Completion State:
 - FEAT-018 is DONE / QA PASS / Human Final Gate APPROVED.
 - Phase 3 is DONE / QA PASS / Human Final Gate APPROVED.
 - HISTORICAL SNAPSHOT (at Phase 3 completion): Phase 4 was IN_PROGRESS / PLANNING; FEAT-019 was APPROVED FOR IMPLEMENTATION; FEAT-020 through FEAT-030 remained BLOCKED.
-- CURRENT CANONICAL STATE: Phase 4 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-019 through FEAT-030 retain their approved Phase 4 states; Phase 5 is BLOCKED / READY FOR RE-QA; FEAT-031 through FEAT-039 retain their completed internal feature states; FEAT-040 is READY FOR TARGETED GOVERNANCE RE-QA (DEF-001..DEF-004 FIXED, DEF-005 REWORK COMPLETE), Human Phase Final Gate NOT READY.
+- CURRENT CANONICAL STATE: Phase 4 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-019 through FEAT-030 retain their approved Phase 4 states; Phase 5 is BLOCKED PENDING HUMAN GOVERNANCE REVIEW; FEAT-031 through FEAT-039 retain their completed internal feature states; FEAT-040 TECHNICAL QA EVIDENCE REMAINS PASS with DEF-001..DEF-005 CORRECTION COMPLETE, Human Phase Final Gate NOT READY.
 
 Feature Decomposition:
 
@@ -1561,14 +1561,14 @@ FEAT-036: DONE (Implementation: COMPLETE, Self-Verification: PASS, QA Independen
 FEAT-037: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 FEAT-038: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 FEAT-039: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
-FEAT-040: READY FOR TARGETED GOVERNANCE RE-QA
-FEAT-040 QA History: QA Iteration 1 FAIL; Rework Iteration 1 COMPLETE; QA Iteration 2 FAIL; Rework Iteration 2 COMPLETE
-FEAT-040 Defects: DEF-001 FIXED; DEF-002 FIXED; DEF-003 FIXED; DEF-004 FIXED; DEF-005 REWORK COMPLETE (FEAT-038 implementation-report evidence corrected)
+FEAT-040: TECHNICAL QA EVIDENCE REMAINS PASS / GOVERNANCE CLOSURE PENDING HUMAN REVIEW
+FEAT-040 QA History: QA Iteration 1 FAIL; Rework Iteration 1 COMPLETE; QA Iteration 2 FAIL; Rework Iteration 2 COMPLETE; QA Iteration 3 FAIL; Final Governance Correction COMPLETE
+FEAT-040 Defects: DEF-001 FIXED; DEF-002 FIXED; DEF-003 FIXED; DEF-004 FIXED; DEF-005 CORRECTION COMPLETE (creation modal claim removed, zero modal/dialog claims remain)
 FEAT-040 Human Final Gate: NOT READY / NOT APPROVED
-Phase 5: BLOCKED / READY FOR RE-QA
-Application code changes: FEAT-031 persistence complete; FEAT-032 read model integrated; FEAT-033 session lifecycle integrated; FEAT-034 accounting foundation complete; FEAT-035 order execution complete; FEAT-036 adversarial hardening complete; FEAT-037 valuation read model complete; FEAT-038 frontend UI complete; FEAT-039 security & rate limit complete; FEAT-040 Rework Iteration 1 (DEF-001..DEF-004 fixed) + Rework Iteration 2 (DEF-005 evidence report corrected)
-Blocking evidence: `reports/qa/phase-5/PHASE-5-QA.md` (QA Iteration 2 FAIL addressed in Rework Iteration 2; pending targeted QA Iteration 3 verification)
-Unresolved Human decisions: ZERO; FEAT-038 evidence correction complete, ready for Codex targeted governance QA Iteration 3
+Phase 5: BLOCKED PENDING HUMAN GOVERNANCE REVIEW
+Application code changes: FEAT-031 persistence complete; FEAT-032 read model integrated; FEAT-033 session lifecycle integrated; FEAT-034 accounting foundation complete; FEAT-035 order execution complete; FEAT-036 adversarial hardening complete; FEAT-037 valuation read model complete; FEAT-038 frontend UI complete; FEAT-039 security & rate limit complete; FEAT-040 final governance correction completed with zero application/test/schema/migration/CI changes
+Blocking evidence: `reports/qa/phase-5/PHASE-5-QA.md` (QA Iteration 3 DEF-005 resolved via final governance correction; pending Human Governance Review)
+Unresolved Human decisions: ZERO; technical evidence is PASS, governance correction complete, ready for Human Governance Review
 ```
 
 Planning Artifacts:
