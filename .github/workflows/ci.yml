@@ -2,13 +2,13 @@ name: Aura Capital CI
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, develop, "feat/**", "fix/**"]
   pull_request:
     branches: [main, develop]
 
 jobs:
   validate:
-    name: Lint, Typecheck, Build, and Test
+    name: Canonical Validation Pipeline
     runs-on: ubuntu-latest
 
     services:
@@ -65,20 +65,26 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: 1. Clean Build Artifacts (npm run clean)
+        run: npm run clean
+
       - name: Generate Prisma Client
         run: npx prisma generate --schema=apps/api/prisma/schema.prisma
 
-      - name: Run Lint
+      - name: 2. Prisma Schema Validation (prisma validate)
+        run: npx prisma validate --schema=apps/api/prisma/schema.prisma
+
+      - name: 3. Linting (npm run lint)
         run: npm run lint
 
-      - name: Run Typecheck
+      - name: 4. Typecheck (npm run typecheck)
         run: npm run typecheck
 
-      - name: Run Build
+      - name: 5. Build (npm run build)
         run: npm run build
 
-      - name: Run Migration Safety Guard
-        run: npm run guard:migrations
+      - name: 6. Migration Governance Guard (npm run guard:migration)
+        run: npm run guard:migration
 
       - name: Apply Database Migrations (Isolated Test Database)
         run: npx prisma migrate deploy --schema=apps/api/prisma/schema.prisma
@@ -86,10 +92,22 @@ jobs:
       - name: Verify Database Migration Status
         run: npx prisma migrate status --schema=apps/api/prisma/schema.prisma
 
-      - name: Run Standard Test Suites
+      - name: 7. Unit Test Suite (npm run test:unit)
         run: |
           set -o pipefail
+          if ! npm run test:unit 2>&1 | tee unit-test.log; then
+            {
+              echo "### Unit Test Failures"
+              echo '```text'
+              cat unit-test.log
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
 
+      - name: 8. Standard Test Suites (npm run test)
+        run: |
+          set -o pipefail
           if ! npm run test 2>&1 | tee test.log; then
             {
               echo "### Standard Test Failures"
@@ -97,14 +115,12 @@ jobs:
               cat test.log
               echo '```'
             } >> "$GITHUB_STEP_SUMMARY"
-
             exit 1
           fi
 
-      - name: Run PostgreSQL Database Constraints Test Suite
+      - name: 9. PostgreSQL Database & Integration Tests (npm run test:db)
         run: |
           set -o pipefail
-
           if ! npm run test:db 2>&1 | tee db-test.log; then
             {
               echo "### PostgreSQL DB Test Failures"
@@ -112,16 +128,27 @@ jobs:
               cat db-test.log
               echo '```'
             } >> "$GITHUB_STEP_SUMMARY"
-
             exit 1
           fi
 
-      - name: Run Redis Rate Limit Test Suite
+      - name: 10. Dedicated FEAT-039 Security Abuse Suite
+        run: |
+          set -o pipefail
+          if ! npm run test:security --workspace=@aura/api 2>&1 | tee security-test.log; then
+            {
+              echo "### FEAT-039 Security Abuse Test Failures"
+              echo '```text'
+              cat security-test.log
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+      - name: 11. Redis Rate Limit Test Suite (npm run test:redis)
         env:
           AUTH_RATE_LIMIT_ENABLED: "true"
         run: |
           set -o pipefail
-
           if ! npm run test:redis 2>&1 | tee redis-test.log; then
             {
               echo "### Redis Test Failures"
@@ -129,21 +156,57 @@ jobs:
               cat redis-test.log
               echo '```'
             } >> "$GITHUB_STEP_SUMMARY"
-
             exit 1
           fi
 
-      - name: Run Persistence Boundary Guard
+      - name: 12. Persistence Boundary Guard (npm run guard:persistence)
         run: |
           set -o pipefail
-
-          if ! npm run guard:persistence 2>&1 | tee guard.log; then
+          if ! npm run guard:persistence 2>&1 | tee guard-persistence.log; then
             {
               echo "### Persistence Guard Failures"
               echo '```text'
-              cat guard.log
+              cat guard-persistence.log
               echo '```'
             } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
 
+      - name: 13. Repository Boundary Guard (npm run guard:boundary)
+        run: |
+          set -o pipefail
+          if ! npm run guard:boundary 2>&1 | tee guard-boundary.log; then
+            {
+              echo "### Repository Boundary Guard Failures"
+              echo '```text'
+              cat guard-boundary.log
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+      - name: 14. Product Audit Governance Guard (npm run guard:audit-governance)
+        run: |
+          set -o pipefail
+          if ! npm run guard:audit-governance 2>&1 | tee guard-audit.log; then
+            {
+              echo "### Product Audit Governance Guard Failures"
+              echo '```text'
+              cat guard-audit.log
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+      - name: 15. Seed Safety Guard (npm run guard:seed-safety)
+        run: |
+          set -o pipefail
+          if ! npm run guard:seed-safety 2>&1 | tee guard-seed.log; then
+            {
+              echo "### Seed Safety Guard Failures"
+              echo '```text'
+              cat guard-seed.log
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi

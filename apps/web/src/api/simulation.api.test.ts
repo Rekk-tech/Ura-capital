@@ -74,14 +74,14 @@ describe("SimulationApiClient (Web API Client)", () => {
       expect(res).toEqual(mockResponse);
     });
 
-    it("calls POST /api/simulation/sessions", async () => {
+    it("calls POST /api/simulation/sessions with empty server-authoritative payload", async () => {
       const mockResponse = { data: { id: "sess-1", status: "CREATED" } };
       globalThis.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: async () => mockResponse,
       });
 
-      const res = await client.createSession({ startingCash: "100000.0000" }, "token-1");
+      const res = await client.createSession({}, "token-1");
       expect(globalThis.fetch).toHaveBeenCalledWith("/api/simulation/sessions", {
         method: "POST",
         headers: {
@@ -89,7 +89,7 @@ describe("SimulationApiClient (Web API Client)", () => {
           "Content-Type": "application/json",
           Authorization: "Bearer token-1",
         },
-        body: JSON.stringify({ startingCash: "100000.0000" }),
+        body: "{}",
       });
       expect(res).toEqual(mockResponse);
     });
@@ -101,10 +101,49 @@ describe("SimulationApiClient (Web API Client)", () => {
         json: async () => mockResponse,
       });
 
-      const res = await client.startSession("sess-1");
+      const res = await client.startSession("sess-1", "token-1");
       expect(globalThis.fetch).toHaveBeenCalledWith("/api/simulation/sessions/sess-1/start", {
         method: "POST",
-        headers: { Accept: "application/json" },
+        headers: {
+          Accept: "application/json",
+          Authorization: "Bearer token-1",
+        },
+      });
+      expect(res).toEqual(mockResponse);
+    });
+
+    it("calls POST /api/simulation/sessions/:id/complete", async () => {
+      const mockResponse = { data: { id: "sess-1", status: "COMPLETED" } };
+      globalThis.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => mockResponse,
+      });
+
+      const res = await client.completeSession("sess-1", "token-1");
+      expect(globalThis.fetch).toHaveBeenCalledWith("/api/simulation/sessions/sess-1/complete", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          Authorization: "Bearer token-1",
+        },
+      });
+      expect(res).toEqual(mockResponse);
+    });
+
+    it("calls POST /api/simulation/sessions/:id/cancel", async () => {
+      const mockResponse = { data: { id: "sess-1", status: "CANCELLED" } };
+      globalThis.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => mockResponse,
+      });
+
+      const res = await client.cancelSession("sess-1", "token-1");
+      expect(globalThis.fetch).toHaveBeenCalledWith("/api/simulation/sessions/sess-1/cancel", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          Authorization: "Bearer token-1",
+        },
       });
       expect(res).toEqual(mockResponse);
     });
@@ -116,10 +155,13 @@ describe("SimulationApiClient (Web API Client)", () => {
         json: async () => mockResponse,
       });
 
-      const res = await client.resetSession("sess-1");
+      const res = await client.resetSession("sess-1", "token-1");
       expect(globalThis.fetch).toHaveBeenCalledWith("/api/simulation/sessions/sess-1/reset", {
         method: "POST",
-        headers: { Accept: "application/json" },
+        headers: {
+          Accept: "application/json",
+          Authorization: "Bearer token-1",
+        },
       });
       expect(res).toEqual(mockResponse);
     });

@@ -62,12 +62,11 @@ export function useCreateSessionMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({
-      data,
       accessToken,
     }: {
-      data?: { scenarioId?: string; startingCash?: string };
+      data?: Record<string, never>;
       accessToken?: string;
-    }) => simulationApi.createSession(data, accessToken),
+    } = {}) => simulationApi.createSession({}, accessToken),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["simulation", "sessions"] });
     },
@@ -84,6 +83,42 @@ export function useStartSessionMutation() {
       simulationId: string;
       accessToken?: string;
     }) => simulationApi.startSession(simulationId, accessToken),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["simulation", "sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["simulation", "sessions", variables.simulationId] });
+      queryClient.invalidateQueries({ queryKey: ["simulation", "portfolio", variables.simulationId] });
+    },
+  });
+}
+
+export function useCompleteSessionMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      simulationId,
+      accessToken,
+    }: {
+      simulationId: string;
+      accessToken?: string;
+    }) => simulationApi.completeSession(simulationId, accessToken),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["simulation", "sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["simulation", "sessions", variables.simulationId] });
+      queryClient.invalidateQueries({ queryKey: ["simulation", "portfolio", variables.simulationId] });
+    },
+  });
+}
+
+export function useCancelSessionMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      simulationId,
+      accessToken,
+    }: {
+      simulationId: string;
+      accessToken?: string;
+    }) => simulationApi.cancelSession(simulationId, accessToken),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["simulation", "sessions"] });
       queryClient.invalidateQueries({ queryKey: ["simulation", "sessions", variables.simulationId] });

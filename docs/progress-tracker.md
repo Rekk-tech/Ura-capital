@@ -493,7 +493,7 @@ Phase 3 Completion State:
 - FEAT-018 is DONE / QA PASS / Human Final Gate APPROVED.
 - Phase 3 is DONE / QA PASS / Human Final Gate APPROVED.
 - HISTORICAL SNAPSHOT (at Phase 3 completion): Phase 4 was IN_PROGRESS / PLANNING; FEAT-019 was APPROVED FOR IMPLEMENTATION; FEAT-020 through FEAT-030 remained BLOCKED.
-- CURRENT CANONICAL STATE: Phase 4 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-019 is DONE (QA PASS — Emergency QA Ownership Transfer, Human Dual Review APPROVED, Human Final Gate APPROVED); FEAT-020 is DONE (QA PASS — Antigravity QA with Human Dual Review, Human Final Gate APPROVED); FEAT-021 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-022 is DONE (QA PASS — QA Iteration 2, Human Final Gate APPROVED); FEAT-023 is DONE (QA PASS, Human Final Gate APPROVED); FEAT-024 is DONE (QA PASS — QA Iteration 1, Human Final Gate APPROVED); FEAT-025 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-026 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-027 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-028 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-029 is IMPLEMENTATION COMPLETE / DEFER CLOSURE VERIFIED; FEAT-030 is DONE / QA PASS; Phase 5 is IN_PROGRESS; FEAT-031 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-032 is DONE / INTEGRATED (Self-Verification: PASS; QA Independence: REDUCED); FEAT-033 is DONE / INTEGRATED (Internal Feature Gate: PASS); FEAT-034 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-035 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS, Git Checkpoint: PUBLISHED, CI: GREEN, Tag: feat-035-approved); FEAT-036 is DONE (Implementation: COMPLETE, Self-Verification: PASS, QA Independence: REDUCED, Git Checkpoint: PUBLISHED, CI: GREEN, Tag: feat-036-approved); FEAT-037 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-038 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-039 is DONE (Implementation: COMPLETE, Internal Feature Gate: PASS); FEAT-040 is UNBLOCKED FOR FINAL PHASE QA.
+- CURRENT CANONICAL STATE: Phase 4 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-019 through FEAT-030 retain their approved Phase 4 states; Phase 5 is BLOCKED / READY FOR RE-QA; FEAT-031 through FEAT-039 retain their completed internal feature states; FEAT-040 is REWORK COMPLETE / READY FOR QA ITERATION 2 (Defects DEF-001..DEF-005 Resolved), Human Phase Final Gate NOT READY.
 
 Feature Decomposition:
 
@@ -1561,9 +1561,12 @@ FEAT-036: DONE (Implementation: COMPLETE, Self-Verification: PASS, QA Independen
 FEAT-037: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 FEAT-038: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 FEAT-039: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
-FEAT-040: UNBLOCKED FOR FINAL PHASE QA (Pre-QA Prepared)
-Application code changes: FEAT-031 persistence complete; FEAT-032 read model integrated; FEAT-033 session lifecycle integrated; FEAT-034 accounting foundation complete; FEAT-035 order execution complete; FEAT-036 adversarial hardening complete; FEAT-037 valuation read model complete; FEAT-038 frontend UI complete; FEAT-039 security & rate limit complete
-Unresolved Human decisions: ZERO
+FEAT-040: REWORK COMPLETE / READY FOR QA ITERATION 2 (Defects DEF-001..DEF-005 Resolved)
+FEAT-040 Human Final Gate: NOT READY / NOT APPROVED
+Phase 5: BLOCKED / READY FOR RE-QA
+Application code changes: FEAT-031 persistence complete; FEAT-032 read model integrated; FEAT-033 session lifecycle integrated; FEAT-034 accounting foundation complete; FEAT-035 order execution complete; FEAT-036 adversarial hardening complete; FEAT-037 valuation read model complete; FEAT-038 frontend UI complete; FEAT-039 security & rate limit complete; FEAT-040 Rework Iteration 1 complete (DEF-001..DEF-005)
+Blocking evidence: `reports/qa/phase-5/PHASE-5-QA.md` (addressed in Rework Iteration 1; pending QA Iteration 2 verification)
+Unresolved Human decisions: ZERO; technical rework complete, ready for Codex QA Iteration 2 before Human Phase Final Gate
 ```
 
 Planning Artifacts:

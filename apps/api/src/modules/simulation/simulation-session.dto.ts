@@ -1,4 +1,5 @@
 import type { SimulationSessionStatus } from "./simulation.types.js";
+import { toCurrencyDecimal } from "./simulation-accounting.js";
 
 type DecimalLike = {
   toFixed: (decimalPlaces?: number) => string;
@@ -55,11 +56,11 @@ export interface RawSimulationSession {
 
 function formatDecimal(val: DecimalLike | number | string | null | undefined, decimals = 4): string {
   if (val === null || val === undefined) return "0.0000";
-  if (typeof val === "object" && typeof val.toFixed === "function") {
-    return val.toFixed(decimals);
+  try {
+    return toCurrencyDecimal(val as string | number).toFixed(decimals);
+  } catch {
+    return "0.0000";
   }
-  const num = Number(val);
-  return isNaN(num) ? "0.0000" : num.toFixed(decimals);
 }
 
 export function toSimulationSessionDto(raw: RawSimulationSession): SimulationSessionDto {

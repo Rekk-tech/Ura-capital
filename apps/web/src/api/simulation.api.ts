@@ -14,7 +14,7 @@ export interface ISimulationApiClient {
   listAssets(accessToken?: string): Promise<{ data: SimulationAssetDto[] }>;
   listSnapshots(scenarioKey: string, cycle: number, accessToken?: string): Promise<{ data: SimulationMarketSnapshotDto[] }>;
   listSessions(accessToken?: string): Promise<{ data: SimulationSessionDto[] }>;
-  createSession(data?: { scenarioId?: string; startingCash?: string }, accessToken?: string): Promise<{ data: SimulationSessionDto }>;
+  createSession(data?: Record<string, never>, accessToken?: string): Promise<{ data: SimulationSessionDto }>;
   getSessionById(simulationId: string, accessToken?: string): Promise<{ data: SimulationSessionDto }>;
   startSession(simulationId: string, accessToken?: string): Promise<{ data: SimulationSessionDto }>;
   resetSession(simulationId: string, accessToken?: string): Promise<{ data: SimulationSessionDto }>;
@@ -63,7 +63,7 @@ export class SimulationApiClient implements ISimulationApiClient {
     return (await res.json()) as { data: SimulationSessionDto[] };
   }
 
-  async createSession(data?: { scenarioId?: string; startingCash?: string }, accessToken?: string): Promise<{ data: SimulationSessionDto }> {
+  async createSession(data?: Record<string, never>, accessToken?: string): Promise<{ data: SimulationSessionDto }> {
     const url = `${this.baseUrl}/sessions`;
     const headers: Record<string, string> = {
       Accept: "application/json",

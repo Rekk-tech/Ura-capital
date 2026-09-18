@@ -8,9 +8,13 @@ interface SimulationSessionBarProps {
   onSelectSession?: (sessionId: string) => void;
   onStartSession?: () => void;
   onResetSession?: () => void;
+  onCompleteSession?: () => void;
+  onCancelSession?: () => void;
   onCreateSession?: () => void;
   isStarting?: boolean;
   isResetting?: boolean;
+  isCompleting?: boolean;
+  isCancelling?: boolean;
   isCreating?: boolean;
 }
 
@@ -20,9 +24,13 @@ export const SimulationSessionBar: React.FC<SimulationSessionBarProps> = ({
   onSelectSession,
   onStartSession,
   onResetSession,
+  onCompleteSession,
+  onCancelSession,
   onCreateSession,
   isStarting = false,
   isResetting = false,
+  isCompleting = false,
+  isCancelling = false,
   isCreating = false,
 }) => {
   const getStatusBadge = (status: string) => {
@@ -121,6 +129,34 @@ export const SimulationSessionBar: React.FC<SimulationSessionBarProps> = ({
           >
             <Play size={16} style={{ marginRight: "6px" }} />
             {isStarting ? "Starting..." : "Start Session"}
+          </button>
+        )}
+
+        {session.status === "ACTIVE" && onCompleteSession && (
+          <button
+            type="button"
+            className="button button-info"
+            onClick={onCompleteSession}
+            disabled={isCompleting}
+            data-testid="complete-session-button"
+            title="Complete this simulation session"
+          >
+            <CheckCircle2 size={15} style={{ marginRight: "6px" }} />
+            {isCompleting ? "Completing..." : "Complete"}
+          </button>
+        )}
+
+        {(session.status === "ACTIVE" || session.status === "CREATED") && onCancelSession && (
+          <button
+            type="button"
+            className="button button-danger"
+            onClick={onCancelSession}
+            disabled={isCancelling}
+            data-testid="cancel-session-button"
+            title="Cancel this simulation session"
+          >
+            <XCircle size={15} style={{ marginRight: "6px" }} />
+            {isCancelling ? "Cancelling..." : "Cancel"}
           </button>
         )}
 

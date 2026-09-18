@@ -26,14 +26,14 @@
 Before implementing FEAT-038, the baseline was verified against `feat-037-approved`:
 - **Existing Backend Endpoints Reused**:
   - `GET /api/simulation/sessions`: list active and historical learner sessions.
-  - `POST /api/simulation/sessions`: create and activate a new session.
+  - `POST /api/simulation/sessions`: create and activate a new session (server-authoritative empty payload `{}`).
   - `GET /api/simulation/sessions/:id`: fetch session state, cycle, and scenario.
-  - `POST /api/simulation/sessions/:id/advance`: advance simulation cycle.
+  - `POST /api/simulation/sessions/:id/start`: start simulation session.
   - `POST /api/simulation/sessions/:id/complete`: complete simulation session.
   - `POST /api/simulation/sessions/:id/cancel`: cancel simulation session.
   - `POST /api/simulation/sessions/:id/reset`: reset session to initial cycle and cash.
   - `GET /api/simulation/assets`: read-only approved asset universe.
-  - `GET /api/simulation/scenarios/:scenarioId/snapshots/:cycle`: read cycle-accurate snapshot prices.
+  - `GET /api/simulation/scenarios/:scenarioKey/snapshots/:cycle`: read cycle-accurate snapshot prices.
   - `GET /api/simulation/sessions/:id/portfolio`: server-authoritative portfolio valuation and unrealized PnL.
   - `POST /api/simulation/sessions/:id/orders`: execute MARKET orders with idempotency key.
   - `GET /api/simulation/sessions/:id/orders`: fetch learner orders with safe DTO whitelist.
@@ -58,16 +58,16 @@ All implementation code is strictly isolated within `apps/web/src/features/simul
   - `SimulationApiError`: typed envelope error with status code and error details.
 
 ### 3.2 API Client Layer (`apps/web/src/api/simulation.api.ts`)
-- Complete HTTP client utilizing native `fetch`, with automatic `Authorization: Bearer <token>` injection.
+- Complete HTTP client utilizing native `fetch`, with Bearer access token support.
 - Uniform error wrapping mapping backend envelopes (`VALIDATION_ERROR`, `UNAUTHENTICATED`, `NOT_FOUND`, `INSUFFICIENT_FUNDS`, `INSUFFICIENT_POSITION`, `SESSION_INACTIVE`) to structured `SimulationApiError`.
-- Comprehensive client test suite in `apps/web/src/api/simulation.api.test.ts` (13 tests passing).
+- Comprehensive client test suite in `apps/web/src/api/simulation.api.test.ts` (15 tests passing).
 
 ### 3.3 Query & Mutation Hooks (`apps/web/src/features/simulation/hooks/use-simulation.ts`)
 - `@tanstack/react-query` hooks managing server-state synchronization:
-  - `useSimulationSessions`, `useSimulationSession`, `useCreateSimulationSession`, `useAdvanceSessionCycle`, `useResetSimulationSession`, `useCancelSimulationSession`
-  - `useSimulationAssets`, `useMarketSnapshots`
-  - `useSimulationPortfolio`, `useSimulationOrders`, `useSimulationTrades`
-  - `useSubmitMarketOrder`: executes order submission and **immediately invalidates** query keys for portfolio, positions, orders, trades, and session, ensuring real-time UI freshness after execution.
+  - `useSimulationSessionsQuery`, `useSimulationSessionQuery`, `useCreateSessionMutation`, `useStartSessionMutation`, `useResetSessionMutation`, `useCompleteSessionMutation`, `useCancelSessionMutation`
+  - `useSimulationAssetsQuery`, `useSimulationSnapshotsQuery`
+  - `useSimulationPortfolioQuery`, `useSimulationOrdersQuery`, `useSimulationTradesQuery`
+  - `useSubmitOrderMutation`: executes order submission and **immediately invalidates** query keys for portfolio, positions, orders, trades, and session, ensuring real-time UI freshness after execution.
 
 ### 3.4 Presentation Components
 - `SimulationDisclosureBanner.tsx` (AC-008, AC-009, AC-010): Persistent top-level banner rendering required copy:
@@ -75,7 +75,7 @@ All implementation code is strictly isolated within `apps/web/src/features/simul
   - `NO REAL MONEY`
   - `NO BROKERAGE EXECUTION`
   - Educational guidance explaining that all assets, transactions, and valuations are purely simulated.
-- `SimulationSessionBar.tsx` (AC-001): Cockpit header showing active session ID, scenario, status badge (`ACTIVE`, `COMPLETED`, `CANCELLED`), current cycle, starting cash, and lifecycle control buttons (Advance Cycle, Reset, Cancel).
+- `SimulationSessionBar.tsx` (AC-001): Cockpit header showing active session ID, scenario, status badge (`ACTIVE`, `CREATED`, `COMPLETED`, `CANCELLED`), current cycle, starting cash, and lifecycle control buttons (Start Session, Reset, Complete, Cancel, New).
 - `PortfolioSummaryCard.tsx` (AC-005, AC-007): Displays server-computed financial metrics:
   - Cash Balance (`cashBalance`)
   - Portfolio Market Value (`totalMarketValue`)
@@ -93,7 +93,7 @@ All implementation code is strictly isolated within `apps/web/src/features/simul
 - `OrdersTable.tsx` (AC-005): Displays recent order submissions (order ID, symbol, side, type, quantity, status badge, created timestamp).
 - `TradesTable.tsx` (AC-005): Displays executed trades log (trade ID, symbol, side, executed quantity, executed price, gross notional, executed timestamp).
 - `SimulationStates.tsx` (AC-011): Dedicated, accessible components for loading skeletons, unauthenticated prompt, session not found (IDOR-safe 404), and general error states.
-- `SimulationDashboardPage.tsx`: Integrated dashboard orchestrating all sub-components, managing session switching and creation modals.
+- `SimulationDashboardPage.tsx`: Integrated dashboard orchestrating all sub-components, managing session switching, complete/cancel lifecycle, and creation modals.
 
 ### 3.5 Routing & App Integration (`apps/web/src/app/router/simulation-routes.tsx`, `apps/web/src/app/App.tsx`)
 - Registered routes:
@@ -131,41 +131,47 @@ All implementation code is strictly isolated within `apps/web/src/features/simul
 
 ### 5.1 Unit Tests (`apps/web/src/api/simulation.api.test.ts`)
 ```text
- ✓ src/api/simulation.api.test.ts (13 tests) 212ms
-   ✓ SimulationApiClient > listSessions calls GET /api/simulation/sessions with auth token
-   ✓ SimulationApiClient > getSession calls GET /api/simulation/sessions/:id
-   ✓ SimulationApiClient > createSession calls POST /api/simulation/sessions with scenario
-   ✓ SimulationApiClient > advanceSessionCycle calls POST /api/simulation/sessions/:id/advance
-   ✓ SimulationApiClient > completeSession calls POST /api/simulation/sessions/:id/complete
-   ✓ SimulationApiClient > cancelSession calls POST /api/simulation/sessions/:id/cancel
-   ✓ SimulationApiClient > resetSession calls POST /api/simulation/sessions/:id/reset
-   ✓ SimulationApiClient > listAssets calls GET /api/simulation/assets
-   ✓ SimulationApiClient > getMarketSnapshots calls GET /api/simulation/scenarios/:scenarioId/snapshots/:cycle
-   ✓ SimulationApiClient > getPortfolioValuation calls GET /api/simulation/sessions/:id/portfolio
-   ✓ SimulationApiClient > submitOrder posts intent payload only with idempotencyKey
-   ✓ SimulationApiClient > listOrders calls GET /api/simulation/sessions/:id/orders
-   ✓ SimulationApiClient > listTrades calls GET /api/simulation/sessions/:id/trades
+ ✓ src/api/simulation.api.test.ts (15 tests)
+   ✓ SimulationApiClient > exports a default singleton instance
+   ✓ SimulationApiClient > listAssets > calls GET /api/simulation/assets with correct headers
+   ✓ SimulationApiClient > listSnapshots > calls GET /api/simulation/scenarios/:scenarioKey/snapshots/:cycle
+   ✓ SimulationApiClient > sessions > calls GET /api/simulation/sessions
+   ✓ SimulationApiClient > sessions > calls POST /api/simulation/sessions with empty server-authoritative payload
+   ✓ SimulationApiClient > sessions > calls POST /api/simulation/sessions/:id/start
+   ✓ SimulationApiClient > sessions > calls POST /api/simulation/sessions/:id/complete
+   ✓ SimulationApiClient > sessions > calls POST /api/simulation/sessions/:id/cancel
+   ✓ SimulationApiClient > sessions > calls POST /api/simulation/sessions/:id/reset
+   ✓ SimulationApiClient > orders and valuation > calls POST /api/simulation/sessions/:id/orders with trade intent payload
+   ✓ SimulationApiClient > orders and valuation > calls GET /api/simulation/sessions/:id/portfolio
+   ✓ SimulationApiClient > orders and valuation > calls GET /api/simulation/sessions/:id/orders
+   ✓ SimulationApiClient > orders and valuation > calls GET /api/simulation/sessions/:id/trades
+   ✓ SimulationApiClient > error handling > parses structured error response and throws SimulationApiError
+   ✓ SimulationApiClient > error handling > handles non-JSON error response with default fallback
 ```
 
 ### 5.2 Component & Dashboard Tests (`apps/web/src/features/simulation/pages/SimulationDashboardPage.test.tsx`)
 ```text
- ✓ src/features/simulation/pages/SimulationDashboardPage.test.tsx (16 tests) 2604ms
+ ✓ src/features/simulation/pages/SimulationDashboardPage.test.tsx (20 tests)
    ✓ AC-008, AC-009, AC-010: renders mandatory simulation disclosures: SIMULATION ONLY, NO REAL MONEY, NO BROKERAGE EXECUTION
    ✓ AC-001: renders session management header with cycle, status, and scenario name
-   ✓ AC-002: renders approved asset list options in the order ticket
-   ✓ AC-005, AC-007: renders server-authoritative portfolio summary with cash, equity, and PnL
-   ✓ AC-005: renders positions table with server-provided quantities and PnL
-   ✓ AC-005: renders empty state when no positions are held
-   ✓ AC-003, AC-004: submits MARKET order with ONLY approved intent fields
-   ✓ AC-007: displays estimated notional preview without submitting client-calculated price or notional
-   ✓ AC-005: renders orders history table with safe fields
-   ✓ AC-005: renders executed trades table with safe fields
-   ✓ AC-011: handles INSUFFICIENT_FUNDS domain rejection safely in the order ticket
+   ✓ AC-005, AC-007, AC-011: renders server-authoritative portfolio summary with exact Decimal string amounts
+   ✓ AC-005: renders open positions table with symbol, quantity, average cost, current price, and unrealized PnL
+   ✓ AC-005: renders clean empty positions state when portfolio holds 100% cash
+   ✓ AC-002, AC-003, AC-004: renders MARKET order ticket with only trade intent fields and rejects editable price/fee/status
+   ✓ AC-003, AC-005: submits MARKET BUY order with auto-generated idempotencyKey and displays filled feedback
+   ✓ AC-011: handles INSUFFICIENT_CASH domain rejection safely in the order ticket
    ✓ AC-011: handles INSUFFICIENT_POSITION domain rejection safely in the order ticket
-   ✓ AC-011: renders 404 session not found state on foreign/invalid session
-   ✓ AC-011: renders unauthenticated state when user is not logged in
-   ✓ AC-006: strictly does NOT render historical valuation charts or graphs
-   ✓ AC-001, AC-013: disables order ticket when session is not in ACTIVE status
+   ✓ AC-013: disables order submission when simulation session status is not ACTIVE
+   ✓ AC-005, AC-011: renders orders table omitting sensitive internal fields
+   ✓ AC-005: renders executed trades log with execution price, notional, and realized PnL
+   ✓ AC-006: strictly omits historical valuation charts or time-series endpoints
+   ✓ AC-009, AC-011: renders safe not-found state without resource enumeration when session returns 404
+   ✓ AC-011: renders auth-required card when session request returns 401 UNAUTHENTICATED
+   ✓ AC-012: preserves semantic headings h1 and h2, labels, and accessible table structures
+   ✓ DEF-003: renders auth-required card immediately when learner has no in-memory access token
+   ✓ DEF-004: calls createSession with empty object and bearer token, never submitting startingCash
+   ✓ DEF-005: renders Complete button for ACTIVE session and calls completeSession with auth token
+   ✓ DEF-005: renders Cancel button for ACTIVE session and calls cancelSession with auth token
 ```
 
 ### 5.3 Test Suite Aggregates

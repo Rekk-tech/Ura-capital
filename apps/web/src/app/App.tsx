@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Link, useLocation } from "react-router-do
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ShieldCheck, Cpu, BookOpen, TrendingUp, Users, Activity } from "lucide-react";
 import { APP_NAME } from "@aura/shared";
+import { AuthProvider } from "../features/auth/context/AuthContext";
 import { AcademyRoutes } from "./router/academy-routes";
 import { SimulationRoutes } from "./router/simulation-routes";
 
@@ -176,7 +177,9 @@ export const App: React.FC<{ queryClient?: QueryClient }> = ({ queryClient = def
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <AppContent />
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>
   );

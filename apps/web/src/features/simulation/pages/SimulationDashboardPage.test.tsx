@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AuthProvider } from "../../auth/context/AuthContext";
 import { SimulationDashboardPage } from "./SimulationDashboardPage";
 import { simulationApi } from "../../../api/simulation.api";
 import {
@@ -109,7 +110,7 @@ const mockTrades: SimulationTradeDto[] = [
   },
 ];
 
-function renderWithProviders(initialRoute = "/simulation") {
+function renderWithProviders(initialRoute = "/simulation", initialToken: string | null = "valid-mock-token") {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: { retry: false },
@@ -119,10 +120,12 @@ function renderWithProviders(initialRoute = "/simulation") {
   return render(
     <QueryClientProvider client={queryClient}>
       <MemoryRouter initialEntries={[initialRoute]}>
-        <Routes>
-          <Route path="/simulation" element={<SimulationDashboardPage />} />
-          <Route path="/simulation/sessions/:simulationId" element={<SimulationDashboardPage />} />
-        </Routes>
+        <AuthProvider initialToken={initialToken}>
+          <Routes>
+            <Route path="/simulation" element={<SimulationDashboardPage />} />
+            <Route path="/simulation/sessions/:simulationId" element={<SimulationDashboardPage />} />
+          </Routes>
+        </AuthProvider>
       </MemoryRouter>
     </QueryClientProvider>
   );
@@ -274,7 +277,7 @@ describe("SimulationDashboardPage (FEAT-038: AC-001..AC-016)", () => {
           quantity: 10,
           idempotencyKey: expect.any(String),
         }),
-        undefined,
+        "valid-mock-token",
       );
       expect(screen.getByTestId("order-success-banner")).toBeDefined();
       expect(screen.getByText(/Order FILLED!/i)).toBeDefined();
@@ -415,6 +418,73 @@ describe("SimulationDashboardPage (FEAT-038: AC-001..AC-016)", () => {
       expect(screen.getByRole("table", { name: /Open Positions/i })).toBeDefined();
       expect(screen.getByRole("table", { name: /Order History/i })).toBeDefined();
       expect(screen.getByRole("table", { name: /Executed Trades Log/i })).toBeDefined();
+    });
+  });
+
+  // DEF-003: Unauthenticated state renders Auth Required card
+  it("renders auth-required card immediately when learner has no in-memory access token (DEF-003)", async () => {
+    renderWithProviders("/simulation", null);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("simulation-auth-card")).toBeDefined();
+      expect(screen.getByText("Authentication Required")).toBeDefined();
+    });
+  });
+
+  // DEF-004: Create session sends empty body without startingCash
+  it("calls createSession with empty object and bearer token, never submitting startingCash (DEF-004)", async () => {
+    const createSpy = vi.spyOn(simulationApi, "createSession").mockResolvedValue({
+      data: { ...mockSessionCreated, id: "sess-created-new" },
+    });
+
+    renderWithProviders();
+
+    await waitFor(() => {
+      expect(screen.getByTestId("new-session-button")).toBeDefined();
+    });
+
+    fireEvent.click(screen.getByTestId("new-session-button"));
+
+    await waitFor(() => {
+      expect(createSpy).toHaveBeenCalledWith({}, "valid-mock-token");
+    });
+  });
+
+  // DEF-005: Lifecycle controls - Complete Session
+  it("renders Complete button for ACTIVE session and calls completeSession with auth token (DEF-005)", async () => {
+    const completeSpy = vi.spyOn(simulationApi, "completeSession").mockResolvedValue({
+      data: { ...mockSessionActive, status: "COMPLETED" },
+    });
+
+    renderWithProviders();
+
+    await waitFor(() => {
+      expect(screen.getByTestId("complete-session-button")).toBeDefined();
+    });
+
+    fireEvent.click(screen.getByTestId("complete-session-button"));
+
+    await waitFor(() => {
+      expect(completeSpy).toHaveBeenCalledWith(mockSessionActive.id, "valid-mock-token");
+    });
+  });
+
+  // DEF-005: Lifecycle controls - Cancel Session
+  it("renders Cancel button for ACTIVE session and calls cancelSession with auth token (DEF-005)", async () => {
+    const cancelSpy = vi.spyOn(simulationApi, "cancelSession").mockResolvedValue({
+      data: { ...mockSessionActive, status: "CANCELLED" },
+    });
+
+    renderWithProviders();
+
+    await waitFor(() => {
+      expect(screen.getByTestId("cancel-session-button")).toBeDefined();
+    });
+
+    fireEvent.click(screen.getByTestId("cancel-session-button"));
+
+    await waitFor(() => {
+      expect(cancelSpy).toHaveBeenCalledWith(mockSessionActive.id, "valid-mock-token");
     });
   });
 });

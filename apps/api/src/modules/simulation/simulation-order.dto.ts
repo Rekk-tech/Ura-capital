@@ -1,5 +1,6 @@
 import type { SimulationOrder, SimulationTrade, SimulationAsset } from "@prisma/client";
 import { SIMULATION_CONSTANTS, type SimulationOrderSide, type SimulationOrderType, type SimulationOrderStatus } from "./simulation.types.js";
+import { toPriceDecimal, toCurrencyDecimal } from "./simulation-accounting.js";
 
 export interface SubmitOrderRequestDto {
   side: SimulationOrderSide;
@@ -44,12 +45,16 @@ export function toSimulationOrderResponseDto(
   
   let executionPriceStr: string | null = null;
   if (order.executionPrice !== null && order.executionPrice !== undefined) {
-    executionPriceStr = Number(order.executionPrice).toFixed(SIMULATION_CONSTANTS.DECIMAL_SCALE_PRICE);
+    executionPriceStr = toPriceDecimal(order.executionPrice).toFixed(
+      SIMULATION_CONSTANTS.DECIMAL_SCALE_PRICE,
+    );
   }
 
   let realizedPnlStr = "0.0000";
   if (order.trade?.realizedPnl !== null && order.trade?.realizedPnl !== undefined) {
-    realizedPnlStr = Number(order.trade.realizedPnl).toFixed(SIMULATION_CONSTANTS.DECIMAL_SCALE_CURRENCY);
+    realizedPnlStr = toCurrencyDecimal(order.trade.realizedPnl).toFixed(
+      SIMULATION_CONSTANTS.DECIMAL_SCALE_CURRENCY,
+    );
   }
 
   const dto: SimulationOrderResponseDto = {

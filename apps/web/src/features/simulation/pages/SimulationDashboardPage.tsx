@@ -3,16 +3,19 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
   useSimulationSessionsQuery,
   useSimulationSessionQuery,
+  useSimulationAssetsQuery,
+  useSimulationSnapshotsQuery,
   useSimulationPortfolioQuery,
   useSimulationOrdersQuery,
   useSimulationTradesQuery,
-  useSimulationAssetsQuery,
-  useSimulationSnapshotsQuery,
   useCreateSessionMutation,
   useStartSessionMutation,
   useResetSessionMutation,
+  useCompleteSessionMutation,
+  useCancelSessionMutation,
   useSubmitOrderMutation,
 } from "../hooks/use-simulation";
+import { useAuth } from "../../auth/context/AuthContext";
 import { SimulationDisclosureBanner } from "../components/SimulationDisclosureBanner";
 import { SimulationSessionBar } from "../components/SimulationSessionBar";
 import { PortfolioSummaryCard } from "../components/PortfolioSummaryCard";
@@ -39,41 +42,45 @@ export const SimulationDashboardPage: React.FC = () => {
   const [selectedSymbol, setSelectedSymbol] = useState<string | undefined>(undefined);
   const [selectedSide, setSelectedSide] = useState<SimulationOrderSide>("BUY");
 
+  const { accessToken, isAuthenticated, isLoading: isAuthLoading } = useAuth();
+
   // 1. Fetch user's sessions list
-  const sessionsQuery = useSimulationSessionsQuery();
+  const sessionsQuery = useSimulationSessionsQuery(accessToken ?? undefined);
   const sessions = sessionsQuery.data?.data ?? [];
 
   // Determine active session ID: prefer URL param, fallback to first available session
   const activeSessionId = routeSessionId ?? (sessions.length > 0 ? sessions[0]!.id : undefined);
 
   // 2. Fetch specific session details
-  const sessionQuery = useSimulationSessionQuery(activeSessionId);
+  const sessionQuery = useSimulationSessionQuery(activeSessionId, accessToken ?? undefined);
   const session = sessionQuery.data?.data;
 
   // 3. Fetch assets universe and snapshots
-  const assetsQuery = useSimulationAssetsQuery();
+  const assetsQuery = useSimulationAssetsQuery(accessToken ?? undefined);
   const assets = assetsQuery.data?.data ?? [];
 
   const scenarioKey = session?.scenario?.key ?? "MVP_SCENARIO";
   const currentCycle = session?.currentCycle ?? 1;
-  const snapshotsQuery = useSimulationSnapshotsQuery(scenarioKey, currentCycle);
+  const snapshotsQuery = useSimulationSnapshotsQuery(scenarioKey, currentCycle, accessToken ?? undefined);
   const snapshots = snapshotsQuery.data?.data ?? [];
 
   // 4. Fetch authoritative portfolio, orders, and trades
-  const portfolioQuery = useSimulationPortfolioQuery(activeSessionId);
-  const ordersQuery = useSimulationOrdersQuery(activeSessionId);
-  const tradesQuery = useSimulationTradesQuery(activeSessionId);
+  const portfolioQuery = useSimulationPortfolioQuery(activeSessionId, accessToken ?? undefined);
+  const ordersQuery = useSimulationOrdersQuery(activeSessionId, accessToken ?? undefined);
+  const tradesQuery = useSimulationTradesQuery(activeSessionId, accessToken ?? undefined);
 
   // 5. Mutations
   const createSessionMutation = useCreateSessionMutation();
   const startSessionMutation = useStartSessionMutation();
   const resetSessionMutation = useResetSessionMutation();
+  const completeSessionMutation = useCompleteSessionMutation();
+  const cancelSessionMutation = useCancelSessionMutation();
   const submitOrderMutation = useSubmitOrderMutation();
 
   const handleCreateSession = async () => {
     try {
       const res = await createSessionMutation.mutateAsync({
-        data: { startingCash: "100000.0000" },
+        accessToken: accessToken ?? undefined,
       });
       if (res?.data?.id) {
         navigate(`/simulation/sessions/${res.data.id}`);
@@ -89,12 +96,22 @@ export const SimulationDashboardPage: React.FC = () => {
 
   const handleStartSession = () => {
     if (!activeSessionId) return;
-    startSessionMutation.mutate({ simulationId: activeSessionId });
+    startSessionMutation.mutate({ simulationId: activeSessionId, accessToken: accessToken ?? undefined });
   };
 
   const handleResetSession = () => {
     if (!activeSessionId) return;
-    resetSessionMutation.mutate({ simulationId: activeSessionId });
+    resetSessionMutation.mutate({ simulationId: activeSessionId, accessToken: accessToken ?? undefined });
+  };
+
+  const handleCompleteSession = () => {
+    if (!activeSessionId) return;
+    completeSessionMutation.mutate({ simulationId: activeSessionId, accessToken: accessToken ?? undefined });
+  };
+
+  const handleCancelSession = () => {
+    if (!activeSessionId) return;
+    cancelSessionMutation.mutate({ simulationId: activeSessionId, accessToken: accessToken ?? undefined });
   };
 
   const handleSelectAssetAction = (symbol: string, side: SimulationOrderSide = "BUY") => {
@@ -119,6 +136,7 @@ export const SimulationDashboardPage: React.FC = () => {
         quantity,
         idempotencyKey,
       },
+      accessToken: accessToken ?? undefined,
     });
 
     return result.data;
@@ -126,6 +144,7 @@ export const SimulationDashboardPage: React.FC = () => {
 
   // Auth Error Handler
   const isAuthError =
+    (!isAuthLoading && !isAuthenticated && !accessToken) ||
     (sessionsQuery.error instanceof SimulationApiError && sessionsQuery.error.status === 401) ||
     (sessionQuery.error instanceof SimulationApiError && sessionQuery.error.status === 401) ||
     (portfolioQuery.error instanceof SimulationApiError && portfolioQuery.error.status === 401);
@@ -231,9 +250,13 @@ export const SimulationDashboardPage: React.FC = () => {
         onSelectSession={handleSelectSession}
         onStartSession={handleStartSession}
         onResetSession={handleResetSession}
+        onCompleteSession={handleCompleteSession}
+        onCancelSession={handleCancelSession}
         onCreateSession={handleCreateSession}
         isStarting={startSessionMutation.isPending}
         isResetting={resetSessionMutation.isPending}
+        isCompleting={completeSessionMutation.isPending}
+        isCancelling={cancelSessionMutation.isPending}
         isCreating={createSessionMutation.isPending}
       />
 
