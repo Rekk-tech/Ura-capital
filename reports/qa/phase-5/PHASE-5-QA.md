@@ -3,13 +3,193 @@
 Feature: FEAT-040
 Phase: Phase 5 - Simulation Engine
 QA Owner: Codex
-QA Iteration: 1
+QA Iteration: 2
 Executed: 2026-09-18
 Final Verdict: FAIL
 Human Final Gate Readiness: NOT READY
 Application Code Changes By QA: ZERO
 
-## Executive Summary
+## QA Iteration 2 Executive Summary
+
+Targeted re-QA independently closes DEF-001 through DEF-004. Decimal values now retain exact approved scale and rounding across direct DTO probes and the live PostgreSQL-to-Prisma-to-DTO-to-JSON path. The exact corrected commit has a successful GitHub Actions run covering the canonical validation pipeline and the dedicated FEAT-039 security suite. The actual frontend clients complete an authenticated learner journey against the real API, and session creation now sends exactly `{}` while tampered `startingCash` is rejected with zero mutation.
+
+DEF-005 remains OPEN. `reports/implementation/phase-5/FEAT-038.md` still reports stale aggregate test counts and contains incorrect current-contract descriptions for session creation, portfolio fields, and AC-001. This is a P2 evidence-integrity blocker under AC-001. No new implementation defect was found.
+
+Defect count: P0 0, P1 0, P2 1, P3 0. Existing advisories: 2.
+
+## QA Iteration 2 Baseline And Scope
+
+| Item | Independent evidence | Result |
+| --- | --- | --- |
+| QA1 fixed point | `9922a804f18bc6b88a20f40bfe12d07c77cd9991` | PASS |
+| Corrected head | `df1fcf692399709c28ebcb03b10cb7537f773be0` | PASS |
+| Branch | `feat/FEAT-039-simulation-security-hardening` | PASS |
+| Rework scope | 22 files; changes trace to DEF-001 through DEF-005 | PASS |
+| Application worktree before QA artifacts | Clean | PASS |
+| FEAT-033+ scope creep | None detected | PASS |
+| Schema/migration changes during rework | Zero | PASS |
+| QA application-code changes | Zero | PASS |
+
+QA2 preserves QA1 PASS findings where current validation produced no contradictory evidence. All five QA1 defects were explicitly re-evaluated.
+
+## QA Iteration 2 Validation Suite
+
+| Validation | Actual result | Status |
+| --- | --- | --- |
+| `npm run clean` | Completed | PASS |
+| `npm run lint` | Completed without errors | PASS |
+| `prisma validate` | Schema valid | PASS |
+| `npm run typecheck` | Completed | PASS |
+| `npm run build` | Completed | PASS |
+| `npm run test` | 83 files / 928 tests | PASS |
+| `npm run test:unit` | 59 files / 738 tests | PASS |
+| `npm run test:db` | 30 files / 389 tests; 0 mandatory skips | PASS |
+| `npm run test:redis` | 5 files / 50 tests; 0 mandatory skips | PASS |
+| FEAT-039 security suite | 1 file / 49 tests | PASS |
+| `npm run guard:persistence` | Completed | PASS |
+| `npm run guard:migration` | 8 migrations / 8 trusted digests; no blocker or drift | PASS |
+| `npm run guard:boundary` | Completed | PASS |
+| `npm run guard:audit-governance` | Completed | PASS |
+| `npm run guard:seed-safety` | Completed | PASS |
+| Canonical 14 | 14/14 completed sequentially | PASS |
+
+Live PostgreSQL and Redis were available. No mandatory suite was skipped.
+
+## QA Iteration 2 Migration Evidence
+
+### Fresh Database
+
+- Database: `aura_capital_test_feat040_qa2_fresh`.
+- `prisma validate`, `prisma migrate deploy`, and `prisma migrate status` passed.
+- All 8 ordered migrations applied from zero state; schema reported up to date.
+
+### Phase 4 Upgrade Database
+
+- Database: `aura_capital_test_feat040_qa2_upgrade`.
+- The first 7 Phase 1-4 migrations were applied before representative User, Credential, Role/UserRole, RefreshSession, AuthSecurityAuditRecord, and Academy rows were inserted.
+- Migration 8, `20260914072000_feat031_simulation_foundation`, then applied successfully.
+- Before/after checks preserved representative row counts, stable relationships, identity uniqueness, and Academy foreign-key enforcement.
+- All expected Simulation tables were created without corrupting prior-phase data.
+
+## QA Iteration 2 Defect Closure
+
+| Defect | Severity | Status | Independent closure evidence |
+| --- | --- | --- | --- |
+| DEF-001 | P1 | FIXED | Exact Decimal conversion replaced unsafe native-number serialization. Direct boundary/rounding probes and live DB-to-JSON probes passed for session, order, replay, order history, trade history, valuation, and negative PnL. |
+| DEF-002 | P1 | FIXED | GitHub Actions run 36 for exact commit `df1fcf692399709c28ebcb03b10cb7537f773be0` completed SUCCESS and ran the canonical pipeline plus dedicated FEAT-039 security validation without ignored failures. |
+| DEF-003 | P2 | FIXED | Actual `AuthApiClient` and `SimulationApiClient` completed register/login, authenticated reads, BUY/SELL, valuation, lifecycle, and history against a real API and PostgreSQL. Tokens remain in React memory; refresh uses the HttpOnly cookie contract. |
+| DEF-004 | P2 | FIXED | Actual client request body for session creation is exactly `{}`. Injected `startingCash` returns safe `400 VALIDATION_ERROR` and leaves session/portfolio counts unchanged; the server creates the canonical `100000.0000` balance. |
+| DEF-005 | P2 | OPEN | FEAT-038 implementation report remains materially inaccurate; exact mismatches are listed below. |
+
+### DEF-001 Decimal Exactness
+
+Direct probes passed for:
+
+- price maximum `99999999999999.123456`;
+- currency maximum `9999999999999999.1234`;
+- zero and smallest supported price values;
+- negative PnL;
+- approved `ROUND_HALF_UP` boundaries;
+- exact JSON string serialization without scientific notation or native-number corruption.
+
+The live database probe independently covered fresh order response, idempotent replay, order history, trade history, session DTO, portfolio valuation, and PnL.
+
+### DEF-002 CI Evidence
+
+- Workflow: `Aura Capital CI`.
+- Run: `#36` / ID `35357196893`.
+- Commit: `df1fcf692399709c28ebcb03b10cb7537f773be0`.
+- Result: `GREEN / SUCCESS`.
+- Job: `Canonical Validation Pipeline`, success with no skipped or ignored mandatory step.
+- Evidence: `https://github.com/Rekk-tech/Ura-capital/actions/runs/35357196893`.
+
+### DEF-003 And DEF-004 Runtime Frontend Evidence
+
+The actual frontend API clients were executed against the real Express application and live PostgreSQL. The flow registered and logged in a learner, used the server-issued access token, created and started a session, read assets/snapshots/portfolio, executed BUY and SELL orders, read orders/trades/valuation, and completed the session. Missing or spoofed client authority was not accepted.
+
+The intercepted create-session body was exactly `{}`. A separate tampered request containing `startingCash` was rejected before persistence and produced zero session or portfolio mutation.
+
+### DEF-005 Remaining Mismatches
+
+`reports/implementation/phase-5/FEAT-038.md` must be corrected without changing implementation behavior:
+
+1. It reports web `12/141`, standard `81/908`, unit `57/718`, and DB `28/337`; QA2 reproduced web `12/147`, standard `83/928`, unit `59/738`, and DB `30/389`.
+2. It describes `POST /api/simulation/sessions` as creating and activating a session. The approved runtime creates a `CREATED` session; `/start` performs activation.
+3. It names portfolio properties `totalMarketValue` and `totalUnrealizedPnL`; current DTOs expose `marketValue` and `unrealizedPnl`.
+4. Its AC-001 evidence still names an `advance` control even though no advance operation exists in the approved Phase 5 contract.
+5. The report currently marks its truthfulness criterion PASS despite these contradictions.
+
+Required fix: update FEAT-038 report evidence and AC mapping to the current implemented contract and actual reproduced counts. Do not alter product behavior merely to match the report.
+
+## QA Iteration 2 Security And Integrity
+
+- Financial calculations, Decimal boundaries, BUY/SELL accounting, reconciliation, insufficient-cash and oversell rejection passed.
+- Atomicity, idempotent replay, same-key conflict, and concurrent overspend/oversell protections passed on live PostgreSQL.
+- JWT authentication, full ownership/IDOR matrix, client-authority tampering, malformed numeric input, and safe diagnostics passed.
+- Rate limits retained exact 60/600 policy, `429`/`Retry-After`, shared Redis counters, and fail-closed `503` outage behavior with zero business mutation.
+- PostgreSQL remains the durable Simulation authority; Redis remains transient-only.
+- Simulation product audit remains deferred and no Simulation event was written to `AuthSecurityAuditRecord`.
+- No real-money, brokerage, external market provider, or prohibited instrument behavior was introduced.
+
+## QA Iteration 2 Regression
+
+Phase 1-4 tests remained green within the standard, unit, PostgreSQL, Redis, and guard suites. FEAT-031 through FEAT-039 integration behavior was reproduced. No regression evidence contradicts the prior PASS findings.
+
+## QA Iteration 2 Acceptance Matrix
+
+| AC | Status | QA2 evidence |
+| --- | --- | --- |
+| AC-001 | FAIL | Required artifacts exist, but the FEAT-038 implementation report remains materially inaccurate. |
+| AC-002 | PASS | Fresh independent database deployed and validated all 8 migrations. |
+| AC-003 | PASS | Independent Phase 4 upgrade preserved representative rows, relationships, uniqueness, and FK constraints. |
+| AC-004 | PASS | Canonical 14 passed locally and the exact corrected commit has complete green CI evidence. |
+| AC-005 | PASS | Authenticated runtime covers create, start, complete, reset, and preserved history. |
+| AC-006 | PASS | Fixed active assets and persisted market snapshots remain server-authoritative. |
+| AC-007 | PASS | BUY/SELL execution and exact Decimal response serialization passed direct and live DB-to-JSON probes. |
+| AC-008 | PASS | Reset isolation and historical-session preservation remain green. |
+| AC-009 | PASS | Client authority fields, including `startingCash`, are rejected with zero mutation. |
+| AC-010 | PASS | Insufficient cash rejects atomically. |
+| AC-011 | PASS | Oversell rejects atomically. |
+| AC-012 | PASS | Same-key/same-fingerprint replay returns the original semantic result with one mutation. |
+| AC-013 | PASS | Same idempotency key with a different payload returns conflict. |
+| AC-014 | PASS | Live concurrency protects cash, positions, order uniqueness, and reconciliation. |
+| AC-015 | PASS | Cross-user IDOR matrix returns safe non-enumerating denial. |
+| AC-016 | PASS | Numeric abuse and tampering reject safely with zero mutation. |
+| AC-017 | PASS | Diagnostics do not expose DB/Redis URLs, credentials, tokens, SQL, or sensitive paths. |
+| AC-018 | PASS | Redis remains transient; PostgreSQL remains durable authority. |
+| AC-019 | PASS | Exact rate-limit, `Retry-After`, outage, and no-mutation behavior passed. |
+| AC-020 | PASS | Simulation product-audit deferral remains documented and unchanged. |
+| AC-021 | PASS | No Simulation misuse of `AuthSecurityAuditRecord`. |
+| AC-022 | PASS | Actual frontend clients complete the authenticated learner journey with safe DTOs and correct create payload. |
+| AC-023 | PASS | Phase 1-4 regression suites and all five governance guards passed. |
+| AC-024 | PASS | No Phase 6 or Phase 7 behavior was introduced. |
+| AC-025 | PASS | Real-money, brokerage, external-provider, margin, derivatives, and crypto boundaries remain intact. |
+| AC-026 | PASS | QA report is maintained at the approved Phase 5 path with QA1 history preserved. |
+| AC-027 | PASS | Verdict applies the approved hard-gate policy. |
+| AC-028 | PASS | The unresolved evidence-integrity blocker results in FAIL; no unsupported CONDITIONAL PASS is used. |
+
+## QA Iteration 2 Blocking Issues
+
+- DEF-005 remains OPEN at P2 and affects AC-001.
+- P0: 0; P1: 0; P2: 1; P3: 0.
+- FEAT-040 is not ready for Human Final Gate.
+- Phase 5 remains blocked.
+
+## QA Iteration 2 Final Verdict
+
+FAIL
+
+FEAT-040: QA FAIL - Iteration 2.
+
+Phase 5: BLOCKED pending truthful correction of the FEAT-038 implementation report and targeted governance/evidence re-QA.
+
+Human Phase Final Gate: NOT READY / NOT APPROVED.
+
+## QA Iteration 1 Historical Record (Preserved)
+
+The following content is the unchanged QA Iteration 1 record. Its verdict and statuses are historical and are superseded by the QA Iteration 2 sections above.
+
+### Historical Executive Summary
 
 The Phase 5 backend foundation is substantially healthy. Independent live validation passed for fresh and Phase 4 upgrade migrations, PostgreSQL accounting and transaction behavior, concurrency, idempotency, IDOR protection, Redis rate limiting, outage fail-closed behavior, audit deferral, and Phase 1-4 regression.
 

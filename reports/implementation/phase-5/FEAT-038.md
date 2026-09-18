@@ -19,6 +19,10 @@
 | **Client Authority Enforcements** | **STRICT** (Client submits intent only; zero authority over prices, cash, positions, or PnL) |
 | **Mandatory Simulation Disclosures** | **PRESENT ON EVERY VIEW** (`SIMULATION ONLY`, `NO REAL MONEY`, `NO BROKERAGE EXECUTION`) |
 
+> [!NOTE]
+> **Post-Phase-5 QA Evidence Correction (Governance Rework Iteration 2)**:
+> This report was updated to remediate DEF-005 identified in `reports/qa/phase-5/PHASE-5-QA.md`. The update corrects stale aggregate test counts to reflect the reproduced QA Iteration 2 baseline (Web: 12 files / 147 tests, Standard: 83 files / 928 tests, Unit: 59 files / 738 tests, DB: 30 files / 389 tests, Redis: 5 files / 50 tests), clarifies that `POST /api/simulation/sessions` creates a session in `CREATED` status (with activation occurring explicitly via canonical `POST /api/simulation/sessions/:id/start`), aligns portfolio DTO field references to actual names (`marketValue`, `unrealizedPnl`), and removes any reference to nonexistent `advance` controls in AC-001. Application code was not modified.
+
 ---
 
 ## 2. Post-FEAT-037 Baseline Compatibility & Architecture Review
@@ -26,7 +30,7 @@
 Before implementing FEAT-038, the baseline was verified against `feat-037-approved`:
 - **Existing Backend Endpoints Reused**:
   - `GET /api/simulation/sessions`: list active and historical learner sessions.
-  - `POST /api/simulation/sessions`: create and activate a new session (server-authoritative empty payload `{}`).
+  - `POST /api/simulation/sessions`: create a new session in `CREATED` status (server-authoritative empty payload `{}`). Session activation occurs explicitly via canonical `POST /api/simulation/sessions/:id/start`.
   - `GET /api/simulation/sessions/:id`: fetch session state, cycle, and scenario.
   - `POST /api/simulation/sessions/:id/start`: start simulation session.
   - `POST /api/simulation/sessions/:id/complete`: complete simulation session.
@@ -78,10 +82,10 @@ All implementation code is strictly isolated within `apps/web/src/features/simul
 - `SimulationSessionBar.tsx` (AC-001): Cockpit header showing active session ID, scenario, status badge (`ACTIVE`, `CREATED`, `COMPLETED`, `CANCELLED`), current cycle, starting cash, and lifecycle control buttons (Start Session, Reset, Complete, Cancel, New).
 - `PortfolioSummaryCard.tsx` (AC-005, AC-007): Displays server-computed financial metrics:
   - Cash Balance (`cashBalance`)
-  - Portfolio Market Value (`totalMarketValue`)
+  - Portfolio Market Value (`marketValue`)
   - Total Equity (`totalEquity`)
   - Realized PnL (`realizedPnl`)
-  - Unrealized PnL (`totalUnrealizedPnL`)
+  - Unrealized PnL (`unrealizedPnl`)
   - Formatted strictly using server-provided fixed-scale decimal strings with sign indicators (`+` / `-`).
 - `PositionsTable.tsx` (AC-005): Displays current positions table with symbol, asset name, quantity held, average cost, current price, market value, unrealized PnL, and "Quick Trade" action buttons. Includes friendly empty state when no positions are open.
 - `MarketOrderTicket.tsx` (AC-003, AC-004, AC-007, AC-011, AC-013):
@@ -175,10 +179,17 @@ All implementation code is strictly isolated within `apps/web/src/features/simul
 ```
 
 ### 5.3 Test Suite Aggregates
-- **`@aura/web` Suite**: 12 test files / 141 tests passing (**100% PASS**).
-- **Full Standard Test Suite (`npm run test`)**: 81 test files / 908 tests passing (**100% PASS**).
-- **Unit Test Suite (`npm run test:unit`)**: 57 test files / 718 tests passing (**100% PASS**).
-- **Database Test Suite (`npm run test:db`)**: 28 test files / 337 tests passing (**100% PASS**).
+
+#### Feature-Local FEAT-038 Tests
+- **API Client Suite (`apps/web/src/api/simulation.api.test.ts`)**: 1 test file / 15 tests passing (**100% PASS**).
+- **Dashboard Component & Page Suite (`apps/web/src/features/simulation/pages/SimulationDashboardPage.test.tsx`)**: 1 test file / 20 tests passing (**100% PASS**).
+- **Total Feature-Local FEAT-038 Tests**: 2 test files / 35 tests passing (**100% PASS**).
+
+#### Repository-Wide Phase-5 Regression Suite (Reproduced QA Iteration 2 Baseline)
+- **`@aura/web` Suite**: 12 test files / 147 tests passing (**100% PASS**).
+- **Full Standard Test Suite (`npm run test`)**: 83 test files / 928 tests passing (**100% PASS**).
+- **Unit Test Suite (`npm run test:unit`)**: 59 test files / 738 tests passing (**100% PASS**).
+- **Database Test Suite (`npm run test:db`)**: 30 test files / 389 tests passing (**100% PASS**).
 - **Redis Test Suite (`npm run test:redis`)**: 5 test files / 50 tests passing (**100% PASS**).
 
 ---
@@ -194,9 +205,9 @@ All 14 canonical commands executed cleanly with zero skips:
 | 3 | `npm run typecheck` | **PASS** | Zero TypeScript errors across shared, api, and web |
 | 4 | `npm run build` | **PASS** | Production bundles built successfully with Vite & tsc |
 | 5 | `npm run lint` | **PASS** | 0 errors, 0 warnings across all workspaces |
-| 6 | `npm run test` | **PASS** | 81 test files, 908 tests passed |
-| 7 | `npm run test:unit` | **PASS** | 57 test files, 718 tests passed |
-| 8 | `npm run test:db` | **PASS** | 28 test files, 337 tests passed |
+| 6 | `npm run test` | **PASS** | 83 test files, 928 tests passed (API: 70/751, Web: 12/147, Shared: 1/30) |
+| 7 | `npm run test:unit` | **PASS** | 59 test files, 738 tests passed (API: 47/562, Web: 11/146, Shared: 1/30) |
+| 8 | `npm run test:db` | **PASS** | 30 test files, 389 tests passed |
 | 9 | `npm run test:redis` | **PASS** | 5 test files, 50 tests passed |
 | 10 | `npm run guard:persistence` | **PASS** | 14 persistence guard tests passed |
 | 11 | `npm run guard:migration` | **PASS** | 8 migrations, 8 digests, 0 blocking risks |
@@ -210,7 +221,7 @@ All 14 canonical commands executed cleanly with zero skips:
 
 | AC # | Acceptance Criterion Description | Verification Method | Status |
 |---|---|---|---|
-| **AC-001** | UI includes session management (status, cycle, scenario, advance, reset, cancel). | Verified via `SimulationSessionBar.tsx`, dashboard tests, and API integration. | **PASS** |
+| **AC-001** | UI includes session management. | Verified via `SimulationSessionBar.tsx` (display of session ID, scenario, status badge `CREATED`/`ACTIVE`/`COMPLETED`/`CANCELLED`, current cycle, starting cash; canonical lifecycle controls for Start, Reset, Complete, Cancel, and New Session), dashboard tests, and API integration. | **PASS** |
 | **AC-002** | UI displays approved asset list (symbols, names, current prices). | Verified via `MarketOrderTicket.tsx` dropdown, asset list rendering, and snapshots query. | **PASS** |
 | **AC-003** | MARKET order ticket submits only approved intent fields (`side`, `type`, `assetSymbol`, `quantity`, `idempotencyKey`). | Verified via request body inspection in unit/component tests (`apps/web/src/features/simulation/pages/SimulationDashboardPage.test.tsx`). | **PASS** |
 | **AC-004** | UI cannot submit price/cash/position/PnL/status/cycle authority fields. | TypeScript type `SubmitOrderRequest` enforces intent fields only; test asserts payload keys. | **PASS** |
@@ -223,9 +234,9 @@ All 14 canonical commands executed cleanly with zero skips:
 | **AC-011** | Loading/empty/error/auth/forbidden/rate-limited states are handled. | Verified via `SimulationStates.tsx` and test assertions for 401, 404, insufficient funds, and empty states. | **PASS** |
 | **AC-012** | Responsive and accessibility baseline passes. | Semantic HTML, unique IDs, test IDs, aria labels, and mobile-friendly CSS grid. | **PASS** |
 | **AC-013** | UI does not rely on hidden controls as authorization. | Server enforces all access control and rejects unauthorized or inactive actions; UI disables gracefully. | **PASS** |
-| **AC-014** | FEAT-031..037 regressions remain green. | Full test suite passed (908 tests green, 0 failures). | **PASS** |
+| **AC-014** | FEAT-031..037 regressions remain green. | Full standard test suite passed (83 files / 928 tests green, 0 failures). | **PASS** |
 | **AC-015** | Canonical validation passes. | 14/14 canonical commands executed and passed. | **PASS** |
-| **AC-016** | Implementation report is complete and truthful. | `reports/implementation/phase-5/FEAT-038.md` published. | **PASS** |
+| **AC-016** | Implementation report is complete and truthful. | Verified: `reports/implementation/phase-5/FEAT-038.md` reflects actual committed code, canonical routes, exact DTO fields (`marketValue`, `unrealizedPnl`), correct session lifecycle (`CREATED` -> `/start` -> `ACTIVE`), and QA Iteration 2 reproduced test counts without nonexistent routes or controls. | **PASS** |
 
 ---
 
