@@ -493,7 +493,7 @@ Phase 3 Completion State:
 - FEAT-018 is DONE / QA PASS / Human Final Gate APPROVED.
 - Phase 3 is DONE / QA PASS / Human Final Gate APPROVED.
 - HISTORICAL SNAPSHOT (at Phase 3 completion): Phase 4 was IN_PROGRESS / PLANNING; FEAT-019 was APPROVED FOR IMPLEMENTATION; FEAT-020 through FEAT-030 remained BLOCKED.
-- CURRENT CANONICAL STATE: Phase 4 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-019 through FEAT-030 retain their approved Phase 4 states; Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-031 through FEAT-040 are DONE / QA PASS; Phase 6 is UNBLOCKED.
+- CURRENT CANONICAL STATE: Phase 4 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-019 through FEAT-030 retain their approved Phase 4 states; Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-031 through FEAT-040 are DONE / QA PASS; Phase Checkpoint: phase-5-approved PUBLISHED; Phase 6 is UNBLOCKED.
 
 Feature Decomposition:
 
@@ -875,8 +875,8 @@ FEAT-027: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 FEAT-028: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 FEAT-029: IMPLEMENTATION COMPLETE / DEFER CLOSURE VERIFIED
 FEAT-030: DONE / QA PASS
-Phase 5: MASTER PLANNING APPROVED
-Phase 5 Implementation: NOT_STARTED
+HISTORICAL SNAPSHOT (at Phase 4 completion): Phase 5 was MASTER PLANNING APPROVED; Phase 5 Implementation was NOT_STARTED
+CURRENT CANONICAL STATE: Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-031 through FEAT-040 are DONE / QA PASS; Phase Checkpoint: phase-5-approved PUBLISHED; Phase 6 is UNBLOCKED
 ```
 
 Feature Decomposition:
@@ -1516,23 +1516,23 @@ Redis is transient rate-limit/coordination only.
 
 ## Acceptance Criteria
 
-- [ ] User sessions are isolated
-- [ ] PostgreSQL-backed schema/migrations are reproducible
-- [ ] Client cannot manipulate scenario cycle, price, balance, position, PnL, or lifecycle state
-- [ ] MARKET orders execute at authoritative current snapshot price
-- [ ] Insufficient cash is rejected
-- [ ] Overselling is rejected
-- [ ] Idempotent replay and conflicts are deterministic
-- [ ] Concurrent order behavior is safe
-- [ ] Current valuation is derived from current snapshot only
-- [ ] Simulation rate limiting is transient Redis-only
-- [ ] Durable Simulation product audit remains deferred
-- [ ] Simulation integration gate passes
+- [x] User sessions are isolated
+- [x] PostgreSQL-backed schema/migrations are reproducible
+- [x] Client cannot manipulate scenario cycle, price, balance, position, PnL, or lifecycle state
+- [x] MARKET orders execute at authoritative current snapshot price
+- [x] Insufficient cash is rejected
+- [x] Overselling is rejected
+- [x] Idempotent replay and conflicts are deterministic
+- [x] Concurrent order behavior is safe
+- [x] Current valuation is derived from current snapshot only
+- [x] Simulation rate limiting is transient Redis-only
+- [x] Durable Simulation product audit remains deferred
+- [x] Simulation integration gate passes
 
 Status:
 
 ```text
-MASTER PLANNING APPROVED
+DONE
 ```
 
 Planning:
@@ -1544,13 +1544,32 @@ COMPLETE / HUMAN MASTER PLANNING APPROVED
 Implementation:
 
 ```text
-IN_PROGRESS
+COMPLETE
+```
+
+QA:
+
+```text
+PASS
+```
+
+Human Phase Final Gate:
+
+```text
+APPROVED
+```
+
+Phase Checkpoint:
+
+```text
+phase-5-approved — PUBLISHED
 ```
 
 Phase 5 State:
 
 ```text
 Baseline: phase-4-approved
+Phase Checkpoint: phase-5-approved — PUBLISHED
 Owner: DEV-A / Antigravity
 FEAT-031: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS, Git Checkpoint: PUBLISHED, CI: GREEN, Tag: feat-031-approved)
 FEAT-032: DONE / INTEGRATED (Self-Verification: PASS; QA Independence: REDUCED)
@@ -1566,8 +1585,9 @@ FEAT-040 QA History: QA Iteration 1 FAIL; Rework Iteration 1 COMPLETE; QA Iterat
 FEAT-040 Defects: DEF-001 FIXED; DEF-002 FIXED; DEF-003 FIXED; DEF-004 FIXED; DEF-005 CLOSED (P0=0, P1=0, P2=0, P3=0)
 FEAT-040 Acceptance Criteria: AC-001..AC-028 ALL 28 ACs PASS
 Human Phase Final Gate: APPROVED
-Phase 5: DONE
+Phase 5: DONE / QA PASS / HUMAN PHASE FINAL GATE APPROVED
 Phase 5 QA: PASS
+Phase Checkpoint: phase-5-approved PUBLISHED
 Phase 6: UNBLOCKED
 Application code changes: FEAT-031 persistence complete; FEAT-032 read model integrated; FEAT-033 session lifecycle integrated; FEAT-034 accounting foundation complete; FEAT-035 order execution complete; FEAT-036 adversarial hardening complete; FEAT-037 valuation read model complete; FEAT-038 frontend UI complete; FEAT-039 security & rate limit complete; FEAT-040 complete with zero application/test/schema/migration/CI changes
 Governance Note: Phase 5 completion APPROVED by Human Phase Final Gate.
