@@ -78,8 +78,13 @@ export function evaluateProductAuditGovernance(inputs: GovernanceGuardEvaluation
 
       for (const root of prohibitedDomainRoots) {
         if (normalizedModel === root || normalizedModel.startsWith(root) || normalizedModel.includes(root)) {
-          // Exempt approved AuthSecurityAuditRecord
-          if (modelName === "AuthSecurityAuditRecord") continue;
+          // Exempt approved models
+          if (
+            modelName === "AuthSecurityAuditRecord" ||
+            modelName === "CommunityPost" ||
+            modelName === "CommunityComment" ||
+            modelName === "CommunityPostLike"
+          ) continue;
           violations.push(`Prohibited product/domain model '${modelName}' detected in schema.prisma.`);
         }
       }
@@ -150,8 +155,12 @@ export function evaluateProductAuditGovernance(inputs: GovernanceGuardEvaluation
         for (const root of prohibitedRoots) {
           const normRoot = root.replace(/[^a-z0-9]/g, "");
           if (normalized === normRoot || normalized.startsWith(normRoot) || normalized.includes(normRoot)) {
-            // Exempt approved auth table
+            // Exempt approved tables
             if (rawTable === "auth_security_audit_records") continue;
+            if (
+              m.name.includes("feat041_community_foundation") &&
+              (rawTable === "community_posts" || rawTable === "community_comments" || rawTable === "community_post_likes")
+            ) continue;
             violations.push(`Prohibited table creation '${rawTable}' in migration ${m.name}.`);
           }
         }

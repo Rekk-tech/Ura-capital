@@ -45,6 +45,14 @@ import {
   PrismaSimulationOrderRepository,
   PrismaSimulationTradeRepository,
 } from "../../modules/simulation/simulation.repository.js";
+import {
+  type ICommunityPostRepository,
+  type ICommunityCommentRepository,
+  type ICommunityPostLikeRepository,
+  PrismaCommunityPostRepository,
+  PrismaCommunityCommentRepository,
+  PrismaCommunityPostLikeRepository,
+} from "../../modules/community/community.repository.js";
 
 /**
  * Shared container representing all domain repository instances bound to a specific
@@ -70,6 +78,10 @@ export interface IRepositoryContainer {
   readonly simulationPortfolioRepo: ISimulationPortfolioRepository;
   readonly simulationOrderRepo: ISimulationOrderRepository;
   readonly simulationTradeRepo: ISimulationTradeRepository;
+  // Phase 6 Community repositories
+  readonly communityPostRepo: ICommunityPostRepository;
+  readonly communityCommentRepo: ICommunityCommentRepository;
+  readonly communityPostLikeRepo: ICommunityPostLikeRepository;
 }
 
 /**
@@ -102,6 +114,10 @@ export function createRepositoryContainer(
     simulationPortfolioRepo: new PrismaSimulationPortfolioRepository(client),
     simulationOrderRepo: new PrismaSimulationOrderRepository(client),
     simulationTradeRepo: new PrismaSimulationTradeRepository(client),
+    // Phase 6 Community repositories
+    communityPostRepo: new PrismaCommunityPostRepository(client),
+    communityCommentRepo: new PrismaCommunityCommentRepository(client),
+    communityPostLikeRepo: new PrismaCommunityPostLikeRepository(client),
   };
 }
 
@@ -129,3 +145,8 @@ export const simulationSessionRepository = rootRepositoryContainer.simulationSes
 export const simulationPortfolioRepository = rootRepositoryContainer.simulationPortfolioRepo;
 export const simulationOrderRepository = rootRepositoryContainer.simulationOrderRepo;
 export const simulationTradeRepository = rootRepositoryContainer.simulationTradeRepo;
+
+// Phase 6 Community repository singletons
+export const communityPostRepository = rootRepositoryContainer.communityPostRepo;
+export const communityCommentRepository = rootRepositoryContainer.communityCommentRepo;
+export const communityPostLikeRepository = rootRepositoryContainer.communityPostLikeRepo;

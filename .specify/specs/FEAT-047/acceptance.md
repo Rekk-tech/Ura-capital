@@ -1,0 +1,44 @@
+# FEAT-047 Acceptance Criteria
+
+Status: HUMAN MASTER PLANNING APPROVED / DEPENDENCY BLOCKED
+
+- AC-001 FEAT-041..046 artifacts and QA histories are complete and truthful.
+- AC-002 Every implementation feature is QA PASS and Human-approved before gate execution.
+- AC-003 Integrated changes remain within approved Community scope.
+- AC-004 No Phase 7/8/9 or prohibited Community behavior exists.
+- AC-005 Fresh independent PostgreSQL deploy/status/validate passes from zero state.
+- AC-006 Independent Phase 5 upgrade validation is executed, not substituted with no-op compatibility.
+- AC-007 All ordered migration digests and applied integrity checks pass.
+- AC-008 Representative Identity, Academy, Simulation, and audit rows/relationships/constraints survive upgrade.
+- AC-009 Community tables, constraints, and indexes match FEAT-041.
+- AC-010 Database status/content/FK/unique checks reject invalid durable state.
+- AC-011 Approved restrict/cascade/logical-removal semantics pass live.
+- AC-012 Authenticated post feed/detail/create/remove lifecycle passes.
+- AC-013 Feed ordering, cursor continuity, and relational counts are exact.
+- AC-014 Post DTOs expose no sensitive identity/security/moderation data.
+- AC-015 Foreign/hidden/removed post access remains non-enumerating.
+- AC-016 Flat comment list/create/remove lifecycle passes.
+- AC-017 Comment ordering, cursor continuity, and visible count are exact.
+- AC-018 Cross-user comment removal and forged relation input are denied with zero mutation.
+- AC-019 Like PUT and unlike DELETE are naturally idempotent.
+- AC-020 Unlike affects only the authenticated caller.
+- AC-021 Feed/detail like state/count matches PostgreSQL.
+- AC-022 Five concurrent same-user likes produce exactly one durable row.
+- AC-023 Concurrent distinct-user likes each persist without count corruption.
+- AC-024 Status transition and visibility policies pass across all reads/interactions.
+- AC-025 No public moderation API/UI, implicit ADMIN power, or product audit persistence exists.
+- AC-026 All Community writes reject forged identity/role/admin/status/count/timestamp fields.
+- AC-027 IDOR and user-enumeration probes return safe contracts.
+- AC-028 Validation/DB/Redis diagnostics leak no content, IDs, credentials, URLs, tokens, SQL, or paths.
+- AC-029 Exact approved rate thresholds and shared quota behavior pass.
+- AC-030 429 code and `Retry-After` are accurate with zero mutation.
+- AC-031 Proxy spoofing cannot bypass source ceilings.
+- AC-032 Redis outage fails Community writes closed before DB mutation and reads remain available.
+- AC-033 PostgreSQL remains durable Community authority and Redis remains transient-only.
+- AC-034 Redis recovery, multi-instance sharing, TTL, and run/worker isolation pass.
+- AC-035 Real authenticated frontend journey passes against actual API/PostgreSQL/Redis.
+- AC-036 UI states, plain-text safety, no optimistic count drift, and accessibility baseline pass.
+- AC-037 Community product audit deferral is documented and `AuthSecurityAuditRecord` remains untouched.
+- AC-038 Phase 2 auth, Phase 3 data, Phase 4 Academy, and Phase 5 Simulation regressions pass.
+- AC-039 Canonical 14, targeted suites, and exact-commit CI pass with no mandatory skips.
+- AC-040 `PHASE-6-QA.md` truthfully reports evidence, defects, and exact PASS/FAIL; Phase 7 remains blocked pending Human approval.

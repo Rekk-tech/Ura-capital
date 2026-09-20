@@ -707,10 +707,11 @@ describe("FEAT-031 Simulation Domain Schema & Persistence Foundation (Integratio
   describe("AC-010, AC-011, AC-018, AC-019: Migration History & Integrity", () => {
     it("verifies actual timestamp migration naming convention and no edited historical migrations", async () => {
       const digests = computeMigrationDigests(migrationsDir);
-      expect(digests.length).toBe(8);
+      expect(digests.length).toBeGreaterThanOrEqual(8);
 
-      const latestMigration = digests[digests.length - 1];
-      expect(latestMigration.migration).toMatch(/^\d{14}_feat031_simulation_foundation$/);
+      const simMigration = digests.find((d) => d.migration.endsWith("_feat031_simulation_foundation"));
+      expect(simMigration).toBeDefined();
+      expect(simMigration?.migration).toMatch(/^\d{14}_feat031_simulation_foundation$/);
 
       // Verify all 7 historical migrations remain unmodified
       const historicalNames = [
@@ -733,11 +734,11 @@ describe("FEAT-031 Simulation Domain Schema & Persistence Foundation (Integratio
         Array<{ migration_name: string; finished_at: Date | null }>
       >`SELECT migration_name, finished_at FROM _prisma_migrations ORDER BY migration_name ASC;`;
 
-      expect(applied.length).toBe(8);
+      expect(applied.length).toBeGreaterThanOrEqual(8);
       for (const row of applied) {
         expect(row.finished_at).not.toBeNull();
       }
-      expect(applied[7].migration_name).toMatch(/^\d{14}_feat031_simulation_foundation$/);
+      expect(applied.some((row) => /^\d{14}_feat031_simulation_foundation$/.test(row.migration_name))).toBe(true);
     });
 
     it("verifies all 8 simulation tables exist in PostgreSQL information_schema", async () => {

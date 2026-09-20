@@ -1,162 +1,188 @@
 # Aura Capital - Phase 6 Feature Decomposition
 
-Status: HUMAN APPROVED / PLANNED  
-Phase: Phase 6 - Community  
-Owner: DEV-B  
-Date: 2026-09-07  
-Scope: Planning only. Application code changes: ZERO.
+Status: HUMAN MASTER PLANNING APPROVED
+Phase: Phase 6 - Community
+Planning / Architecture Owner: Codex
+Implementation Owner: DEV-B / Antigravity
+Human Owner: Planning Approval and Phase Final Gate
+Baseline: `phase-5-approved`
+Application Code Changes: ZERO
 
-Human Master Planning Approval: APPROVED.
-
-Implementation status:
+## 1. Governance State
 
 ```text
-Contract-first preparation AUTHORIZED
-Full production implementation pending Phase 6 Human product decisions
+Phase 5: DONE / QA PASS / Human Phase Final Gate APPROVED
+Phase Checkpoint: phase-5-approved PUBLISHED
+Phase 6 Planning: HUMAN MASTER PLANNING APPROVED
+Phase 6 Implementation: NOT_STARTED
+FEAT-041: APPROVED FOR IMPLEMENTATION
+FEAT-042: PLANNED / BLOCKED BY FEAT-041
+FEAT-043: PLANNED / BLOCKED BY FEAT-041 + FEAT-042
+FEAT-044: PLANNED / BLOCKED BY FEAT-041 + FEAT-042
+FEAT-045: PLANNED / BLOCKED BY FEAT-041..FEAT-044
+FEAT-046: PLANNED / BLOCKED BY FEAT-042..FEAT-045
+FEAT-047: PLANNED / BLOCKED BY FEAT-041..FEAT-046
+Phase 7: BLOCKED
 ```
 
-## 1. Earliest Safe Start
-
-PHASE 6 CONTRACT-FIRST PREPARATION is AUTHORIZED after Human Master Planning Approval.
-
-DEV-B may prepare Phase 6 because Human has approved this master plan and the frozen contracts in `docs/cross-phase-contracts.md`.
-
-Allowed preparation:
-
-- Reading frozen contracts.
-- Detailed feature planning.
-- Phase-local interfaces.
-- Mocks and fixtures.
-- Test design.
-- Isolated scaffolding that does not commit unresolved product policy.
-
-Constraints:
-
-- Use a separate `phase/6-community` branch.
-- Do not modify Phase 4/5 code.
-- Do not merge before sequential integration after Phase 5.
-- Use phase-local mocks only for SOFT/PROVISIONAL upstream contracts.
-- Full production implementation is not automatically approved by master planning.
-- Full production implementation requires Human decisions on public feed/read policy, Community UI scope, and moderation baseline.
+The titles below preserve the existing Human-approved repository naming. The detailed product decisions in this document are the binding Human-approved Phase 6 planning baseline.
 
 ## 2. Phase Boundary
 
-In scope:
+In scope: authenticated learner posts, flat comments, post likes, single-tier visibility with status moderation, safe owner removal, learner Community UI, Redis-backed write abuse protection, and a final integration gate.
 
-- Posts.
-- Comments.
-- Relational likes.
-- Moderation baseline.
-- Community UI if Human keeps it in Phase 6.
+Out of scope: anonymous/public feed, post/comment editing, nested replies, comment likes, private/follower/friend/premium visibility, private messaging, live chat, social trading, investment advice, creator monetization, recommendation/ranking, AI moderation, public moderation API/UI, and durable Community product audit.
 
-Out of scope:
+## 3. Human-Approved Decision Baseline
 
-- Simulation trading/social competition.
-- Subscription billing.
-- AI moderation or AI reply generation.
-- Product audit persistence unless approved in a feature.
-
-## 3. Dependency Classification
-
-| Dependency | Type | Reason |
-| --- | --- | --- |
-| Phase 2 auth/security | HARD | Community writes are authenticated and user-owned. |
-| Phase 3 data foundation | HARD | Requires PostgreSQL constraints, repositories, UoW, guards. |
-| Phase 4 Academy | INDEPENDENT | Community MVP does not consume Academy data. |
-| Phase 5 Simulation | INDEPENDENT | Community MVP does not consume Simulation data. |
-| Phase 7 entitlement | SOFT | Premium community features may integrate later. |
+| Decision | Approved lock |
+| --- | --- |
+| Read policy | Authenticated-only feed/detail/comments |
+| Write policy | Authenticated-only, server-derived user identity |
+| Visibility | One audience tier; `VISIBLE`, `HIDDEN`, `REMOVED` are moderation states |
+| Post editing | Deferred; no PATCH route |
+| Comment editing | Deferred; no PATCH route |
+| Comment nesting | Flat comments only; no parent/reply field |
+| Like scope | Posts only; one `(userId, postId)` relation |
+| Feed order | `createdAt DESC, id DESC` |
+| Comment order | `createdAt ASC, id ASC` |
+| Pagination | Opaque cursor; default 20, max 50; explicit load-more UI |
+| Counters | Relational aggregates; no materialized counters |
+| Delete semantics | Owner request logically transitions content to terminal `REMOVED`; no public physical delete |
+| Moderation | Option A: status policy and hardening, no public ADMIN API/UI |
+| Product audit | Deferred with accepted risk; FEAT-016 preserved; no auth-audit reuse |
+| Optimistic UI | Pending state allowed; authoritative counts are not optimistically mutated |
+| Rate limiting | Included for all Community writes; exact policy in FEAT-045 |
+| Redis outage | Writes fail closed 503 before DB mutation; reads remain available |
 
 ## 4. Feature Sequence
 
-| ID | Title | Type | Dependencies |
-| --- | --- | --- | --- |
-| FEAT-041 | Community Persistence Foundation | Implementation | Phase 2/3 frozen contracts |
-| FEAT-042 | Posts API & Feed Read Models | Implementation | FEAT-041 |
-| FEAT-043 | Comments API | Implementation | FEAT-041, FEAT-042 |
-| FEAT-044 | Like/Unlike Relational Semantics | Implementation | FEAT-041, FEAT-042 |
-| FEAT-045 | Moderation Baseline | Implementation | FEAT-041 through FEAT-044 |
-| FEAT-046 | Community UI | Implementation | FEAT-042 through FEAT-045; Human UI scope decision |
-| FEAT-047 | Phase 6 Community Integration Gate | Validation gate | FEAT-041 through FEAT-046 as applicable |
+| ID | Canonical title | Type | Dependencies | ACs | Tasks | Planning state |
+| --- | --- | --- | --- | ---: | ---: | --- |
+| FEAT-041 | Community Persistence Foundation | Implementation | Phase 2/3 and Phase 5 checkpoint | 28 | 20 | Approved for implementation |
+| FEAT-042 | Posts API & Feed Read Models | Implementation | FEAT-041 | 28 | 19 | Dependency blocked |
+| FEAT-043 | Comments API | Implementation | FEAT-041, FEAT-042 | 26 | 17 | Dependency blocked |
+| FEAT-044 | Like/Unlike Relational Semantics | Implementation | FEAT-041, FEAT-042 | 24 | 16 | Dependency blocked |
+| FEAT-045 | Moderation Baseline | Security/hardening | FEAT-041..044 | 33 | 19 | Dependency blocked |
+| FEAT-046 | Community UI | Frontend implementation | FEAT-042..045 | 31 | 19 | Dependency blocked |
+| FEAT-047 | Phase 6 Community Integration Gate | Validation gate | FEAT-041..046 | 40 | 24 | Dependency blocked |
 
-## 5. Feature Details
+Total approved baseline: 210 acceptance criteria and 134 implementation/validation tasks.
+
+## 5. Dependency Graph
+
+```text
+phase-5-approved + Phase 2/3 frozen contracts
+                    |
+                 FEAT-041
+                    |
+          +---------+---------+
+          |                   |
+       FEAT-042               |
+          |                   |
+    +-----+-----+             |
+    |           |             |
+ FEAT-043    FEAT-044 <-------+
+    |           |
+    +-----+-----+
+          |
+       FEAT-045
+          |
+       FEAT-046
+          |
+       FEAT-047
+          |
+ Human Phase Final Gate
+```
+
+## 6. Feature Responsibilities
 
 ### FEAT-041 - Community Persistence Foundation
 
-Goal: Create durable community schema and repositories.
-
-Scope: posts, comments, post likes, moderation status fields, ownership FKs.
-
-Acceptance: `post_likes` uses `(postId, userId)` unique; no `likedByUser` global mutable field; migrations fresh/upgrade pass.
+Owns the only expected Phase 6 production migration and the `community_posts`, `community_comments`, and `community_post_likes` models, constraints, indexes, deletion policies, and repository interfaces. It introduces no API/UI.
 
 ### FEAT-042 - Posts API & Feed Read Models
 
-Goal: Authenticated post creation and safe feed/detail reads.
-
-Scope: create/update/delete own post, list/detail DTOs, pagination, moderation visibility.
-
-Acceptance: Zod validation; owner-only writes; safe error envelopes; no client role trust.
+Owns authenticated feed/detail/create/owner-remove routes, safe DTOs, deterministic cursor pagination, relational counts, and post visibility. It adds no editing or moderation endpoint.
 
 ### FEAT-043 - Comments API
 
-Goal: Authenticated comment creation and owner/moderator controls.
-
-Scope: comment create/update/delete, nested or flat read model as approved.
-
-Acceptance: invalid parent rejected; owner isolation; deleted/hidden semantics deterministic.
+Owns authenticated flat comment list/create/owner-remove routes, safe DTOs, deterministic pagination, parent-post visibility, and visible comment counts.
 
 ### FEAT-044 - Like/Unlike Relational Semantics
 
-Goal: Correct per-user like/unlike behavior.
-
-Scope: `PUT like`, `DELETE like`, like count/read state.
-
-Acceptance: duplicate likes prevented; unlike affects only current user; concurrency safe.
+Owns naturally idempotent post-like PUT/DELETE, PostgreSQL uniqueness race handling, caller-scoped unlike, concurrent convergence, and canonical count/state responses.
 
 ### FEAT-045 - Moderation Baseline
 
-Goal: Provide minimal server-side moderation controls.
-
-Scope: status transitions, admin/moderator guard, optional reports if approved.
-
-Acceptance: non-admin cannot moderate; moderation state is auditable or explicitly deferred; hidden content visibility rules tested.
+Preserves the existing canonical title and incorporates Phase 6 authorization/abuse hardening: moderation status policy, spoof/IDOR protections, exact Redis write limits, proxy policy, outage semantics, audit deferral, and no public moderation surface.
 
 ### FEAT-046 - Community UI
 
-Goal: Build learner-facing community screens if Human keeps UI in Phase 6.
-
-Scope: feed, post detail, comments, like/unlike, loading/error/empty states.
-
-Acceptance: centralized API client; no hidden UI-only auth; accessibility baseline.
+Owns authenticated learner feed/detail/comments/like UI, explicit cursor loading, centralized API client/hooks, canonical mutation refetch, all UX states, and accessibility. No backend/schema changes.
 
 ### FEAT-047 - Phase 6 Community Integration Gate
 
-Goal: Validate integrated Community.
+Validation only. Independently verifies migrations, constraints, ownership, concurrency, moderation, rate limits, UI journey, authority boundaries, upstream regressions, canonical validation, and exact-commit CI. It adds no product behavior.
 
-Scope: validation only; ownership, likes, comments, moderation, migrations, UI if included, regression.
+## 7. Schema And Migration Ownership
 
-Acceptance: no P0/P1 security/integrity defects; full validation PASS; Phase 7 integration readiness assessed.
+- DEV-B owns Community tables only and may add required relations to `User`.
+- FEAT-041 owns one additive Community migration using the next real Prisma timestamp and descriptive `feat041_community_foundation` suffix.
+- The previously documented `20261006xxxxxx` names are planning reservations, not permission to forge timestamps.
+- FEAT-042..047 expect zero migrations; any discovered need returns to Human/Codex review.
+- Applied Phase 1-5 migrations remain immutable.
+- Fresh deploy and independent Phase 5 upgrade preservation are mandatory in FEAT-041 and FEAT-047.
 
-## 6. Feature Contract Matrix
+## 8. Authority And Security Boundaries
 
-| Feature | Requirements | Dependencies | Contracts / APIs | Schema Ownership | Acceptance Gate | Integration Requirements |
-| --- | --- | --- | --- | --- | --- | --- |
-| FEAT-041 | Durable community persistence | Phase 2/3 frozen contracts | Community repository interfaces | Owns `community_posts`, `community_comments`, `community_post_likes`, moderation status columns | Fresh/upgrade migrations; relational likes unique | Must not modify Academy/Simulation/Subscription/Auth schemas |
-| FEAT-042 | Posts and feed APIs | FEAT-041 | `GET/POST /community/posts`, `GET/PATCH/DELETE /community/posts/:id` | Post indexes/status fields | Owner-only writes; safe pagination; moderation visibility | May mock premium gates only through provisional entitlement contract |
-| FEAT-043 | Comments API | FEAT-041, FEAT-042 | `GET/POST /community/posts/:id/comments`, comment update/delete | Comment indexes/FKs | Invalid parent rejected; owner isolation | Must preserve post visibility rules |
-| FEAT-044 | Like/unlike semantics | FEAT-041, FEAT-042 | `PUT /community/posts/:id/like`, `DELETE /community/posts/:id/like` | `post_likes` unique `(postId,userId)` | Duplicate like safe; unlike current user only; concurrent like safe | Must not store global `likedByUser` on posts |
-| FEAT-045 | Moderation baseline | FEAT-041..044 | Admin/moderator routes only if approved | Moderation status/report tables if approved | Non-admin denied; hide/report semantics tested | Product audit activation or explicit deferral required |
-| FEAT-046 | Community UI | FEAT-042..045 | Central web API client and UI route contracts | No schema | UI smoke/accessibility/loading/error states PASS | Must not rely on UI-hidden authorization |
-| FEAT-047 | Final validation gate | FEAT-041..046 | Phase QA report | No schema | Full Phase 6 PASS/FAIL gate | Rebase onto latest Phase 5 main before merge |
+- PostgreSQL owns posts, comments, likes, status, ownership, and counts.
+- Redis owns only transient distributed rate-limit counters with TTL.
+- JWT/client input does not own identity, role, status, counts, timestamps, or relationships.
+- Controllers and ordinary services do not access Prisma directly.
+- `AuthSecurityAuditRecord` is unchanged and receives no Community product event.
+- Author DTOs expose display name only; email, user ID, roles, sessions, credentials, and audit data are prohibited.
 
-## 7. Human Decisions Required
+## 9. Parallelization And Merge Safety
 
-Blocking before implementation:
+| Work | Preparation parallelism | Implementation/integration rule | Shared-file risk |
+| --- | --- | --- | --- |
+| FEAT-041 | Exclusive first | Must merge/pass before dependent implementation | Prisma schema, migration, repository factory |
+| FEAT-042 | May prepare contracts after plan approval | Integrate after FEAT-041 | Community routes/module, post repository |
+| FEAT-043 | May prepare tests/DTOs with FEAT-044 after FEAT-042 visibility contract freezes | Integrate after FEAT-042 | Community routes, post projection counts |
+| FEAT-044 | May prepare tests/DTOs with FEAT-043 | Integrate after FEAT-042; coordinate route/repository files | Community routes, post projection likes |
+| FEAT-045 | Test/policy design may prepare early | Implement after 042..044 to cover final writes | Routes, env, Redis limiter infrastructure |
+| FEAT-046 | Visual/component planning may prepare against mocks | Implement/integrate after API/hardening contracts freeze | App router, nav, shared auth client |
+| FEAT-047 | QA plan may prepare early | Execute only after 041..046 QA/Human gates | QA/report/governance only |
 
-- Public read policy: anonymous read allowed or authenticated only.
-- Community UI in Phase 6 or deferred to Phase 9.
-- Moderation baseline: hide-only, report queue, admin actions, or deferred.
+DEV-B remains sole Phase 6 implementation owner. Parallel branches must not create multiple migrations or independently edit shared router/factory files without explicit integration order.
 
-Deferred until integration:
+## 10. Start And Completion Gates
 
-- Premium community features.
-- Product audit persistence activation for moderation events.
+- Phase planning gate: Human approval of all proposed decisions and packages.
+- FEAT-041 start: Phase 6 master planning Human-approved; clean checkpoint branch from `phase-5-approved`.
+- Each implementation feature: predecessor QA PASS plus Human Final Gate.
+- FEAT-047 start: FEAT-041..046 QA PASS and Human-approved.
+- Phase 6 completion: FEAT-047 PASS plus Human Phase Final Gate approval.
+- Phase 7 implementation remains blocked until the Human approves Phase 6 completion or explicitly grants a narrower contract-first exception.
+
+## 11. Human Decision Record
+
+Human master planning approval locks every decision in Section 3, including:
+
+1. Authenticated-only Community reads and writes.
+2. Post/comment editing deferred.
+3. Flat comments with no replies.
+4. Post-only likes.
+5. Moderation Option A with no public admin API/UI.
+6. Durable Community product audit deferred with the accepted Phase 6 risk.
+7. Exact FEAT-045 Redis rate-limit policy and fail-closed writes.
+8. Relational aggregate counters.
+9. Cursor pagination default 20/max 50.
+10. Logical removal and retained durable content.
+11. FEAT-046 Community UI included in Phase 6.
+12. No optimistic authoritative-count mutation.
+13. FEAT-041 owns the only expected Phase 6 production migration.
+14. DEV-B / Antigravity remains the implementation owner.
+
+FEAT-041 is approved for implementation. FEAT-042..047 remain planned and dependency-blocked according to Section 4; approval of this master plan does not bypass their predecessor gates.

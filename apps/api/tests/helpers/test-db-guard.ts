@@ -112,6 +112,9 @@ export function assertSafeTestDatabase(
 }
 
 export interface TestCleanupClient {
+  communityPostLike?: { deleteMany: () => Promise<unknown> };
+  communityComment?: { deleteMany: () => Promise<unknown> };
+  communityPost?: { deleteMany: () => Promise<unknown> };
   simulationTrade?: { deleteMany: () => Promise<unknown> };
   simulationOrder?: { deleteMany: () => Promise<unknown> };
   simulationPosition?: { deleteMany: () => Promise<unknown> };
@@ -142,6 +145,11 @@ export interface TestCleanupClient {
 
 export async function cleanAllTestTables(prisma: TestCleanupClient | null | undefined): Promise<void> {
   if (!prisma) return;
+  // Phase 6 Community tables (in reverse dependency order)
+  if (prisma.communityPostLike) await prisma.communityPostLike.deleteMany().catch(() => {});
+  if (prisma.communityComment) await prisma.communityComment.deleteMany().catch(() => {});
+  if (prisma.communityPost) await prisma.communityPost.deleteMany().catch(() => {});
+
   // Phase 5 Simulation tables (in reverse dependency order)
   if (prisma.simulationTrade) await prisma.simulationTrade.deleteMany().catch(() => {});
   if (prisma.simulationOrder) await prisma.simulationOrder.deleteMany().catch(() => {});

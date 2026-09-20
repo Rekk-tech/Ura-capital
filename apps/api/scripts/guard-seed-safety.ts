@@ -23,6 +23,7 @@ export interface SeedSafetyGuardInput {
   migrationSqls?: Array<{ name: string; sql: string }>;
   schemaContent?: string;
   codeFiles?: Array<{ path: string; content: string }>;
+  allowApprovedPhase6Models?: boolean;
 }
 
 /**
@@ -117,6 +118,12 @@ export function evaluateSeedSafety(inputs: SeedSafetyGuardInput): SeedSafetyGuar
 
       for (const root of prohibitedDomainRoots) {
         if (normalized === root || normalized.startsWith(root) || normalized.includes(root)) {
+          if (
+            inputs.allowApprovedPhase6Models &&
+            (modelName === "CommunityPost" || modelName === "CommunityComment" || modelName === "CommunityPostLike")
+          ) {
+            continue;
+          }
           violations.push(`Prohibited product domain model '${modelName}' detected in schema.prisma.`);
         }
       }
@@ -279,6 +286,7 @@ export function runSeedSafetyGuard(): SeedSafetyGuardResult {
     migrationSqls,
     schemaContent,
     codeFiles,
+    allowApprovedPhase6Models: true,
   });
 }
 

@@ -52,6 +52,9 @@ const KNOWN_PRISMA_MODELS = new Set([
   "simulationPosition",
   "simulationOrder",
   "simulationTrade",
+  "communityPost",
+  "communityComment",
+  "communityPostLike",
 ]);
 
 const KNOWN_PRISMA_ACTIONS = new Set([

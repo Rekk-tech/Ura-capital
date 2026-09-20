@@ -35,6 +35,11 @@ model User {
   simulationSessions  SimulationSession[]
   simulationOrders    SimulationOrder[]
 
+  // Phase 6 Community relations
+  communityPosts      CommunityPost[]
+  communityComments   CommunityComment[]
+  communityPostLikes  CommunityPostLike[]
+
   @@map("users")
 }
 
@@ -539,5 +544,64 @@ model SimulationTrade {
   @@index([assetId])
   @@index([orderId])
   @@map("simulation_trades")
+}
+
+// ============================================================================
+// Phase 6 — Community Models
+// ============================================================================
+
+model CommunityPost {
+  id        String              @id @default(uuid())
+  authorId  String              @map("author_id")
+  content   String              @db.Text
+  status    String              @default("VISIBLE") // VISIBLE, HIDDEN, REMOVED
+  createdAt DateTime            @default(now()) @map("created_at")
+  updatedAt DateTime            @updatedAt @map("updated_at")
+  removedAt DateTime?           @map("removed_at")
+
+  author    User                @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  comments  CommunityComment[]
+  likes     CommunityPostLike[]
+
+  @@index([status, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([authorId, createdAt(sort: Desc)])
+  @@index([authorId])
+  @@map("community_posts")
+}
+
+model CommunityComment {
+  id        String        @id @default(uuid())
+  postId    String        @map("post_id")
+  authorId  String        @map("author_id")
+  content   String        @db.Text
+  status    String        @default("VISIBLE") // VISIBLE, HIDDEN, REMOVED
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+  removedAt DateTime?     @map("removed_at")
+
+  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Restrict)
+  author    User          @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@index([postId, createdAt(sort: Asc), id(sort: Asc)])
+  @@index([authorId, createdAt(sort: Desc)])
+  @@index([postId, status])
+  @@index([postId])
+  @@index([authorId])
+  @@map("community_comments")
+}
+
+model CommunityPostLike {
+  id        String        @id @default(uuid())
+  postId    String        @map("post_id")
+  userId    String        @map("user_id")
+  createdAt DateTime      @default(now()) @map("created_at")
+
+  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@index([postId])
+  @@index([userId])
+  @@map("community_post_likes")
 }
 

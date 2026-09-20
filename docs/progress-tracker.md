@@ -493,7 +493,7 @@ Phase 3 Completion State:
 - FEAT-018 is DONE / QA PASS / Human Final Gate APPROVED.
 - Phase 3 is DONE / QA PASS / Human Final Gate APPROVED.
 - HISTORICAL SNAPSHOT (at Phase 3 completion): Phase 4 was IN_PROGRESS / PLANNING; FEAT-019 was APPROVED FOR IMPLEMENTATION; FEAT-020 through FEAT-030 remained BLOCKED.
-- CURRENT CANONICAL STATE: Phase 4 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-019 through FEAT-030 retain their approved Phase 4 states; Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-031 through FEAT-040 are DONE / QA PASS; Phase Checkpoint: phase-5-approved PUBLISHED; Phase 6 is UNBLOCKED.
+- CURRENT CANONICAL STATE: Phase 4 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-019 through FEAT-030 retain their approved Phase 4 states; Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-031 through FEAT-040 are DONE / QA PASS; Phase Checkpoint: phase-5-approved PUBLISHED; Phase 6 planning is HUMAN MASTER PLANNING APPROVED; FEAT-041 is APPROVED FOR IMPLEMENTATION; implementation NOT_STARTED.
 
 Feature Decomposition:
 
@@ -876,7 +876,7 @@ FEAT-028: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 FEAT-029: IMPLEMENTATION COMPLETE / DEFER CLOSURE VERIFIED
 FEAT-030: DONE / QA PASS
 HISTORICAL SNAPSHOT (at Phase 4 completion): Phase 5 was MASTER PLANNING APPROVED; Phase 5 Implementation was NOT_STARTED
-CURRENT CANONICAL STATE: Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-031 through FEAT-040 are DONE / QA PASS; Phase Checkpoint: phase-5-approved PUBLISHED; Phase 6 is UNBLOCKED
+CURRENT CANONICAL STATE: Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-031 through FEAT-040 are DONE / QA PASS; Phase Checkpoint: phase-5-approved PUBLISHED; Phase 6 planning is HUMAN MASTER PLANNING APPROVED; FEAT-041 is APPROVED FOR IMPLEMENTATION; implementation NOT_STARTED
 ```
 
 Feature Decomposition:
@@ -1631,7 +1631,7 @@ Planned Phase QA:
 
 ## Goal
 
-Rebuild multi-user community behavior correctly.
+Deliver a safe authenticated learner Community with durable posts, flat comments, relational post likes, moderation/abuse boundaries, learner UI, and a final integration gate.
 
 ## Scope
 
@@ -1639,6 +1639,9 @@ Rebuild multi-user community behavior correctly.
 - Comments
 - Likes
 - Moderation baseline
+- Community learner UI
+- Authorization and Redis-backed write abuse protection
+- Phase integration validation
 
 ## Acceptance Criteria
 
@@ -1647,12 +1650,85 @@ Rebuild multi-user community behavior correctly.
 - [ ] Unlike only affects current user
 - [ ] Authorization is enforced
 - [ ] Community state is correctly persisted
+- [ ] Feed/comments are bounded and deterministically paginated
+- [ ] Public moderation/admin surface is absent unless Human later approves it
+- [ ] Redis remains transient and PostgreSQL remains durable authority
+- [ ] Phase 2-5 regressions remain green
 
-Status:
+Planning Status:
 
 ```text
-TODO
+HUMAN MASTER PLANNING APPROVED
 ```
+
+Implementation:
+
+```text
+IN_PROGRESS
+```
+
+Phase 6 State:
+
+```text
+Baseline: phase-5-approved
+Planning / Architecture Owner: Codex
+Implementation Owner: DEV-B / Antigravity
+FEAT-041: IMPLEMENTATION COMPLETE / READY FOR QA (Internal Feature Gate: PASS)
+FEAT-042: PLANNED / BLOCKED BY FEAT-041 gate/checkpoint
+FEAT-043: PLANNED / BLOCKED BY FEAT-041 + FEAT-042
+FEAT-044: PLANNED / BLOCKED BY FEAT-041 + FEAT-042
+FEAT-045: PLANNED / BLOCKED BY FEAT-041..FEAT-044
+FEAT-046: PLANNED / BLOCKED BY FEAT-042..FEAT-045
+FEAT-047: PLANNED / BLOCKED BY FEAT-041..FEAT-046
+Phase 7: BLOCKED
+Application code changes: FEAT-041 Community persistence foundation complete; ZERO HTTP routes/controllers/UI; ZERO FEAT-042 changes
+```
+
+FEAT-041 Governance Fields:
+
+```text
+Lifecycle State: IMPLEMENTATION COMPLETE / READY FOR QA
+Planning Status: HUMAN MASTER PLANNING APPROVED
+Planning Owner: Codex
+Implementation: COMPLETE
+Implementation Owner: DEV-B / Antigravity
+Internal Feature Gate: PASS
+Canonical 14 Validation: PASS (14/14 commands with no skips)
+Implementation Report: reports/implementation/phase-6/FEAT-041.md
+Migration: 20260919201500_feat041_community_foundation
+Models: CommunityPost, CommunityComment, CommunityPostLike
+Constraints: Content lengths (post: 1..5000, comment: 1..2000, whitespace-trimmed), closed status ('VISIBLE', 'HIDDEN', 'REMOVED'), unique (user_id, post_id)
+Indexes: Composite feed, comment chronological, post likes, author indexes
+Repository Interfaces: ICommunityPostRepository, ICommunityCommentRepository, ICommunityPostLikeRepository
+Repository Implementations: Prisma implementations wired in repository-factory.ts with root/transaction client support
+Fresh DB Validation: PASS (aura_capital_test_feat041_fresh deployed from zero, 30 tables)
+Phase 5 Upgrade DB Validation: PASS (aura_capital_test_feat041_upgrade preserved 100% representative rows, 30 tables)
+Live DB Tests: 30 tests in community-persistence-db.test.ts (31 test files, 419 tests in test:db PASS)
+Redis Durable Authority: ZERO
+Product Audit Persistence: DEFERRED (ZERO schema/migration/API)
+Scope Boundary: ZERO Community HTTP routes, controllers, or frontend UI; ZERO FEAT-042 application changes
+Spec Package: .specify/specs/FEAT-041/
+Acceptance Criteria: 28 deterministic criteria (AC-001..AC-028, ALL PASS)
+Tasks: 20 implementation tasks completed (T001..T020)
+Dependencies: FEAT-042 BLOCKED pending FEAT-041 QA Pass and Human Final Gate
+```
+
+Planning Artifacts:
+
+- `docs/phase-6-feature-decomposition.md`
+- `.specify/specs/FEAT-041/`
+- `.specify/specs/FEAT-042/`
+- `.specify/specs/FEAT-043/`
+- `.specify/specs/FEAT-044/`
+- `.specify/specs/FEAT-045/`
+- `.specify/specs/FEAT-046/`
+- `.specify/specs/FEAT-047/`
+
+Implementation Artifacts:
+
+- `reports/implementation/phase-6/FEAT-041.md`
+
+Human Decision State: HUMAN MASTER PLANNING APPROVED. FEAT-041 implementation is complete and ready for QA; FEAT-042..FEAT-047 remain dependency-blocked pending FEAT-041 gate/checkpoint. Phase 6 implementation is IN_PROGRESS.
 
 ---
 
