@@ -3,12 +3,6 @@ export type CommunityModerationStatus = "VISIBLE" | "HIDDEN" | "REMOVED";
 export interface CreateCommunityPostInput {
   authorId: string;
   content: string;
-  status?: CommunityModerationStatus;
-}
-
-export interface UpdateCommunityPostStatusInput {
-  status: CommunityModerationStatus;
-  removedAt?: Date | null;
 }
 
 export interface ListCommunityPostsFilter {
@@ -21,12 +15,6 @@ export interface CreateCommunityCommentInput {
   postId: string;
   authorId: string;
   content: string;
-  status?: CommunityModerationStatus;
-}
-
-export interface UpdateCommunityCommentStatusInput {
-  status: CommunityModerationStatus;
-  removedAt?: Date | null;
 }
 
 export interface ListCommunityCommentsFilter {

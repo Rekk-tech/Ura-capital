@@ -8,10 +8,8 @@ import type {
 
 import type {
   CreateCommunityPostInput,
-  UpdateCommunityPostStatusInput,
   ListCommunityPostsFilter,
   CreateCommunityCommentInput,
-  UpdateCommunityCommentStatusInput,
   ListCommunityCommentsFilter,
   CreateCommunityPostLikeInput,
 } from "./community.types.js";
@@ -30,8 +28,8 @@ export interface ICommunityPostRepository {
   findPostById(id: string): Promise<CommunityPost | null>;
   listPosts(filter?: ListCommunityPostsFilter): Promise<CommunityPost[]>;
   listPostsByAuthor(authorId: string, limit?: number): Promise<CommunityPost[]>;
-  updatePostStatus(id: string, data: UpdateCommunityPostStatusInput): Promise<CommunityPost>;
-  deletePost(id: string): Promise<CommunityPost>;
+  markPostRemoved(id: string): Promise<CommunityPost>;
+  updatePostStatus(id: string, status: "VISIBLE" | "HIDDEN"): Promise<CommunityPost>;
 }
 
 export class PrismaCommunityPostRepository implements ICommunityPostRepository {
@@ -47,7 +45,8 @@ export class PrismaCommunityPostRepository implements ICommunityPostRepository {
         data: {
           authorId: data.authorId,
           content: data.content,
-          status: data.status ?? "VISIBLE",
+          status: "VISIBLE",
+          removedAt: null,
         },
       });
     } catch (err) {
@@ -84,7 +83,7 @@ export class PrismaCommunityPostRepository implements ICommunityPostRepository {
     try {
       return await this.client.communityPost.findMany({
         where: { authorId },
-        orderBy: [{ createdAt: "desc" }],
+        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
         take: limit,
       });
     } catch (err) {
@@ -92,27 +91,31 @@ export class PrismaCommunityPostRepository implements ICommunityPostRepository {
     }
   }
 
-  async updatePostStatus(id: string, data: UpdateCommunityPostStatusInput): Promise<CommunityPost> {
+  async markPostRemoved(id: string): Promise<CommunityPost> {
     try {
       return await this.client.communityPost.update({
         where: { id },
         data: {
-          status: data.status,
-          removedAt: data.removedAt !== undefined ? data.removedAt : (data.status === "REMOVED" ? new Date() : null),
+          status: "REMOVED",
+          removedAt: new Date(),
+        },
+      });
+    } catch (err) {
+      throw mapDatabaseError(err, "Failed to mark community post as removed");
+    }
+  }
+
+  async updatePostStatus(id: string, status: "VISIBLE" | "HIDDEN"): Promise<CommunityPost> {
+    try {
+      return await this.client.communityPost.update({
+        where: { id },
+        data: {
+          status,
+          removedAt: null,
         },
       });
     } catch (err) {
       throw mapDatabaseError(err, "Failed to update community post status");
-    }
-  }
-
-  async deletePost(id: string): Promise<CommunityPost> {
-    try {
-      return await this.client.communityPost.delete({
-        where: { id },
-      });
-    } catch (err) {
-      throw mapDatabaseError(err, "Failed to delete community post");
     }
   }
 }
@@ -126,8 +129,8 @@ export interface ICommunityCommentRepository {
   findCommentById(id: string): Promise<CommunityComment | null>;
   listCommentsByPost(postId: string, filter?: ListCommunityCommentsFilter): Promise<CommunityComment[]>;
   listCommentsByAuthor(authorId: string, limit?: number): Promise<CommunityComment[]>;
-  updateCommentStatus(id: string, data: UpdateCommunityCommentStatusInput): Promise<CommunityComment>;
-  deleteComment(id: string): Promise<CommunityComment>;
+  markCommentRemoved(id: string): Promise<CommunityComment>;
+  updateCommentStatus(id: string, status: "VISIBLE" | "HIDDEN"): Promise<CommunityComment>;
 }
 
 export class PrismaCommunityCommentRepository implements ICommunityCommentRepository {
@@ -144,7 +147,8 @@ export class PrismaCommunityCommentRepository implements ICommunityCommentReposi
           postId: data.postId,
           authorId: data.authorId,
           content: data.content,
-          status: data.status ?? "VISIBLE",
+          status: "VISIBLE",
+          removedAt: null,
         },
       });
     } catch (err) {
@@ -181,7 +185,7 @@ export class PrismaCommunityCommentRepository implements ICommunityCommentReposi
     try {
       return await this.client.communityComment.findMany({
         where: { authorId },
-        orderBy: [{ createdAt: "desc" }],
+        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
         take: limit,
       });
     } catch (err) {
@@ -189,27 +193,31 @@ export class PrismaCommunityCommentRepository implements ICommunityCommentReposi
     }
   }
 
-  async updateCommentStatus(id: string, data: UpdateCommunityCommentStatusInput): Promise<CommunityComment> {
+  async markCommentRemoved(id: string): Promise<CommunityComment> {
     try {
       return await this.client.communityComment.update({
         where: { id },
         data: {
-          status: data.status,
-          removedAt: data.removedAt !== undefined ? data.removedAt : (data.status === "REMOVED" ? new Date() : null),
+          status: "REMOVED",
+          removedAt: new Date(),
+        },
+      });
+    } catch (err) {
+      throw mapDatabaseError(err, "Failed to mark community comment as removed");
+    }
+  }
+
+  async updateCommentStatus(id: string, status: "VISIBLE" | "HIDDEN"): Promise<CommunityComment> {
+    try {
+      return await this.client.communityComment.update({
+        where: { id },
+        data: {
+          status,
+          removedAt: null,
         },
       });
     } catch (err) {
       throw mapDatabaseError(err, "Failed to update community comment status");
-    }
-  }
-
-  async deleteComment(id: string): Promise<CommunityComment> {
-    try {
-      return await this.client.communityComment.delete({
-        where: { id },
-      });
-    } catch (err) {
-      throw mapDatabaseError(err, "Failed to delete community comment");
     }
   }
 }
@@ -288,16 +296,13 @@ export class PrismaCommunityPostLikeRepository implements ICommunityPostLikeRepo
 
   async hasUserLikedPost(postId: string, userId: string): Promise<boolean> {
     try {
-      const like = await this.client.communityPostLike.findUnique({
+      const count = await this.client.communityPostLike.count({
         where: {
-          userId_postId: {
-            userId,
-            postId,
-          },
+          postId,
+          userId,
         },
-        select: { id: true },
       });
-      return like !== null;
+      return count > 0;
     } catch (err) {
       throw mapDatabaseError(err, "Failed to check if user liked community post");
     }

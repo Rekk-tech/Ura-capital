@@ -493,7 +493,7 @@ Phase 3 Completion State:
 - FEAT-018 is DONE / QA PASS / Human Final Gate APPROVED.
 - Phase 3 is DONE / QA PASS / Human Final Gate APPROVED.
 - HISTORICAL SNAPSHOT (at Phase 3 completion): Phase 4 was IN_PROGRESS / PLANNING; FEAT-019 was APPROVED FOR IMPLEMENTATION; FEAT-020 through FEAT-030 remained BLOCKED.
-- CURRENT CANONICAL STATE: Phase 4 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-019 through FEAT-030 retain their approved Phase 4 states; Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-031 through FEAT-040 are DONE / QA PASS; Phase Checkpoint: phase-5-approved PUBLISHED; Phase 6 planning is HUMAN MASTER PLANNING APPROVED; FEAT-041 is APPROVED FOR IMPLEMENTATION; implementation NOT_STARTED.
+- CURRENT CANONICAL STATE: Phase 4 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-019 through FEAT-030 retain their approved Phase 4 states; Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-031 through FEAT-040 are DONE / QA PASS; Phase Checkpoint: phase-5-approved PUBLISHED; Phase 6 planning is HUMAN MASTER PLANNING APPROVED; Phase 6 implementation is IN_PROGRESS; FEAT-041 is REWORK COMPLETE / READY FOR QA ITERATION 2; FEAT-042 remains BLOCKED.
 
 Feature Decomposition:
 
@@ -876,7 +876,7 @@ FEAT-028: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 FEAT-029: IMPLEMENTATION COMPLETE / DEFER CLOSURE VERIFIED
 FEAT-030: DONE / QA PASS
 HISTORICAL SNAPSHOT (at Phase 4 completion): Phase 5 was MASTER PLANNING APPROVED; Phase 5 Implementation was NOT_STARTED
-CURRENT CANONICAL STATE: Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-031 through FEAT-040 are DONE / QA PASS; Phase Checkpoint: phase-5-approved PUBLISHED; Phase 6 planning is HUMAN MASTER PLANNING APPROVED; FEAT-041 is APPROVED FOR IMPLEMENTATION; implementation NOT_STARTED
+CURRENT CANONICAL STATE: Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-031 through FEAT-040 are DONE / QA PASS; Phase Checkpoint: phase-5-approved PUBLISHED; Phase 6 planning is HUMAN MASTER PLANNING APPROVED; Phase 6 implementation is IN_PROGRESS; FEAT-041 is REWORK COMPLETE / READY FOR QA ITERATION 2; FEAT-042 remains BLOCKED
 ```
 
 Feature Decomposition:
@@ -1673,7 +1673,7 @@ Phase 6 State:
 Baseline: phase-5-approved
 Planning / Architecture Owner: Codex
 Implementation Owner: DEV-B / Antigravity
-FEAT-041: IMPLEMENTATION COMPLETE / READY FOR QA (Internal Feature Gate: PASS)
+FEAT-041: REWORK COMPLETE / READY FOR QA ITERATION 2
 FEAT-042: PLANNED / BLOCKED BY FEAT-041 gate/checkpoint
 FEAT-043: PLANNED / BLOCKED BY FEAT-041 + FEAT-042
 FEAT-044: PLANNED / BLOCKED BY FEAT-041 + FEAT-042
@@ -1681,35 +1681,39 @@ FEAT-045: PLANNED / BLOCKED BY FEAT-041..FEAT-044
 FEAT-046: PLANNED / BLOCKED BY FEAT-042..FEAT-045
 FEAT-047: PLANNED / BLOCKED BY FEAT-041..FEAT-046
 Phase 7: BLOCKED
-Application code changes: FEAT-041 Community persistence foundation complete; ZERO HTTP routes/controllers/UI; ZERO FEAT-042 changes
+Application code changes: FEAT-041 Community persistence foundation complete (DEF-001..DEF-004 REWORKED); ZERO HTTP routes/controllers/UI; ZERO FEAT-042 changes
 ```
 
 FEAT-041 Governance Fields:
 
 ```text
-Lifecycle State: IMPLEMENTATION COMPLETE / READY FOR QA
+Lifecycle State: REWORK COMPLETE / READY FOR QA ITERATION 2
 Planning Status: HUMAN MASTER PLANNING APPROVED
 Planning Owner: Codex
-Implementation: COMPLETE
+Implementation: COMPLETE (QA Iteration 1 Reworked)
 Implementation Owner: DEV-B / Antigravity
 Internal Feature Gate: PASS
+Latest QA: FAIL - Codex QA Iteration 1 (DEF-001..DEF-004 REWORKED)
+QA Report: reports/qa/phase-6/FEAT-041-QA.md
+Defects: DEF-001 P1 (REWORKED); DEF-002 P2 (REWORKED); DEF-003 P2 (REWORKED); DEF-004 P2 (REWORKED)
+Human Final Gate: NOT READY
 Canonical 14 Validation: PASS (14/14 commands with no skips)
 Implementation Report: reports/implementation/phase-6/FEAT-041.md
 Migration: 20260919201500_feat041_community_foundation
 Models: CommunityPost, CommunityComment, CommunityPostLike
-Constraints: Content lengths (post: 1..5000, comment: 1..2000, whitespace-trimmed), closed status ('VISIBLE', 'HIDDEN', 'REMOVED'), unique (user_id, post_id)
-Indexes: Composite feed, comment chronological, post likes, author indexes
-Repository Interfaces: ICommunityPostRepository, ICommunityCommentRepository, ICommunityPostLikeRepository
-Repository Implementations: Prisma implementations wired in repository-factory.ts with root/transaction client support
+Constraints: Content lengths (post: 1..5000, comment: 1..2000, whitespace-trimmed), closed status ('VISIBLE', 'HIDDEN', 'REMOVED'), removal timestamp coherence, unique (user_id, post_id)
+Indexes: Composite feed (status, created_at DESC, id DESC), comments (post_id, created_at ASC, id ASC), author posts (author_id, created_at DESC, id DESC), author comments (author_id, created_at DESC, id DESC), post likes (post_id, created_at DESC), user likes (user_id, created_at DESC)
+Repository Interfaces: ICommunityPostRepository, ICommunityCommentRepository, ICommunityPostLikeRepository (Zero physical delete methods)
+Repository Implementations: Prisma implementations wired in repository-factory.ts with root/transaction client support; markPostRemoved & markCommentRemoved atomic logical removal
 Fresh DB Validation: PASS (aura_capital_test_feat041_fresh deployed from zero, 30 tables)
 Phase 5 Upgrade DB Validation: PASS (aura_capital_test_feat041_upgrade preserved 100% representative rows, 30 tables)
-Live DB Tests: 30 tests in community-persistence-db.test.ts (31 test files, 419 tests in test:db PASS)
+Live DB Tests: 37 tests in community-persistence-db.test.ts (31 test files, 426 tests in test:db PASS)
 Redis Durable Authority: ZERO
 Product Audit Persistence: DEFERRED (ZERO schema/migration/API)
 Scope Boundary: ZERO Community HTTP routes, controllers, or frontend UI; ZERO FEAT-042 application changes
 Spec Package: .specify/specs/FEAT-041/
-Acceptance Criteria: 28 deterministic criteria (AC-001..AC-028, ALL PASS)
-Tasks: 20 implementation tasks completed (T001..T020)
+Acceptance Criteria: 28 PASS / 0 FAIL (All criteria met with live evidence)
+Tasks: 20 COMPLETE / 0 OPEN
 Dependencies: FEAT-042 BLOCKED pending FEAT-041 QA Pass and Human Final Gate
 ```
 
@@ -1728,7 +1732,7 @@ Implementation Artifacts:
 
 - `reports/implementation/phase-6/FEAT-041.md`
 
-Human Decision State: HUMAN MASTER PLANNING APPROVED. FEAT-041 implementation is complete and ready for QA; FEAT-042..FEAT-047 remain dependency-blocked pending FEAT-041 gate/checkpoint. Phase 6 implementation is IN_PROGRESS.
+Human Decision State: HUMAN MASTER PLANNING APPROVED. FEAT-041 QA Iteration 1 defects DEF-001..DEF-004 REWORKED. FEAT-041 is REWORK COMPLETE / READY FOR QA ITERATION 2; Human Final Gate is NOT READY; FEAT-042..FEAT-047 remain dependency-blocked pending FEAT-041 QA PASS and Human Final Gate. Phase 6 remains IN_PROGRESS.
 
 ---
 

@@ -563,9 +563,8 @@ model CommunityPost {
   comments  CommunityComment[]
   likes     CommunityPostLike[]
 
-  @@index([status, createdAt(sort: Desc), id(sort: Desc)])
-  @@index([authorId, createdAt(sort: Desc)])
-  @@index([authorId])
+  @@index([status, createdAt(sort: Desc), id(sort: Desc)], map: "community_posts_status_created_at_id_idx")
+  @@index([authorId, createdAt(sort: Desc), id(sort: Desc)], map: "community_posts_author_id_created_at_id_idx")
   @@map("community_posts")
 }
 
@@ -582,11 +581,8 @@ model CommunityComment {
   post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Restrict)
   author    User          @relation(fields: [authorId], references: [id], onDelete: Restrict)
 
-  @@index([postId, createdAt(sort: Asc), id(sort: Asc)])
-  @@index([authorId, createdAt(sort: Desc)])
-  @@index([postId, status])
-  @@index([postId])
-  @@index([authorId])
+  @@index([postId, createdAt(sort: Asc), id(sort: Asc)], map: "community_comments_post_id_created_at_id_idx")
+  @@index([authorId, createdAt(sort: Desc), id(sort: Desc)], map: "community_comments_author_id_created_at_id_idx")
   @@map("community_comments")
 }
 
@@ -599,9 +595,9 @@ model CommunityPostLike {
   post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
   user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, postId])
-  @@index([postId])
-  @@index([userId])
+  @@unique([userId, postId], map: "community_post_likes_user_id_post_id_key")
+  @@index([postId, createdAt(sort: Desc)], map: "community_post_likes_post_id_created_at_idx")
+  @@index([userId, createdAt(sort: Desc)], map: "community_post_likes_user_id_created_at_idx")
   @@map("community_post_likes")
 }
 

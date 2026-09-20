@@ -243,58 +243,139 @@ describe("FEAT-041 Community Domain Schema & Persistence Foundation (Integration
   });
 
   // ============================================================================
-  // AC-012: Moderation Status Closed Set & Logical Removal
+  // AC-012: Moderation Status Closed Set & Logical Removal (DEF-002)
   // ============================================================================
-  describe("AC-012: Moderation Status Closed Set & Removal Transitions", () => {
-    it("accepts exact status values VISIBLE, HIDDEN, and REMOVED", async () => {
+  describe("AC-012: Moderation Status Closed Set & Removal Transitions (DEF-002)", () => {
+    it("accepts exact status values VISIBLE, HIDDEN, and REMOVED through governed lifecycle", async () => {
       const user = await createTestUser("status_tester");
 
+      // Post 1: Default VISIBLE with removedAt null
       const pVisible = await repos.communityPostRepo.createPost({
         authorId: user.id,
         content: "Visible content",
-        status: "VISIBLE",
       });
       expect(pVisible.status).toBe("VISIBLE");
+      expect(pVisible.removedAt).toBeNull();
 
+      // Post 2: Transition to HIDDEN with removedAt null
       const pHidden = await repos.communityPostRepo.createPost({
         authorId: user.id,
         content: "Hidden content",
-        status: "HIDDEN",
       });
-      expect(pHidden.status).toBe("HIDDEN");
+      const updatedHidden = await repos.communityPostRepo.updatePostStatus(pHidden.id, "HIDDEN");
+      expect(updatedHidden.status).toBe("HIDDEN");
+      expect(updatedHidden.removedAt).toBeNull();
 
+      // Post 3: Transition to REMOVED with atomic server timestamp
       const pRemoved = await repos.communityPostRepo.createPost({
         authorId: user.id,
         content: "Removed content",
-        status: "REMOVED",
       });
-      expect(pRemoved.status).toBe("REMOVED");
+      const updatedRemoved = await repos.communityPostRepo.markPostRemoved(pRemoved.id);
+      expect(updatedRemoved.status).toBe("REMOVED");
+      expect(updatedRemoved.removedAt).toBeInstanceOf(Date);
     });
 
     it("rejects invalid status values outside the closed set via database check", async () => {
-      const user = await createTestUser("status_tester");
+      const user = await createTestUser("status_check_tester");
 
       await expect(
         prisma.$executeRaw`
-          INSERT INTO "community_posts" ("id", "author_id", "content", "status", "updated_at")
-          VALUES (gen_random_uuid(), ${user.id}, 'Invalid status post', 'ARCHIVED', NOW())
+          INSERT INTO "community_posts" ("id", "author_id", "content", "status", "updated_at", "removed_at")
+          VALUES (gen_random_uuid()::text, ${user.id}, 'Invalid status post', 'ARCHIVED', NOW(), NULL)
         `,
       ).rejects.toThrow();
     });
 
-    it("supports logical transition to REMOVED with removedAt timestamp", async () => {
-      const user = await createTestUser("removal_tester");
+    it("rejects REMOVED posts with removed_at = NULL via PostgreSQL check constraint (DEF-002)", async () => {
+      const user = await createTestUser("removed_null_post_tester");
+
+      await expect(
+        prisma.$executeRaw`
+          INSERT INTO "community_posts" ("id", "author_id", "content", "status", "updated_at", "removed_at")
+          VALUES (gen_random_uuid()::text, ${user.id}, 'Removed post without timestamp', 'REMOVED', NOW(), NULL)
+        `,
+      ).rejects.toThrow();
+    });
+
+    it("rejects non-REMOVED posts with removed_at != NULL via PostgreSQL check constraint (DEF-002)", async () => {
+      const user = await createTestUser("non_removed_ts_post_tester");
+
+      // VISIBLE with removed_at must be rejected
+      await expect(
+        prisma.$executeRaw`
+          INSERT INTO "community_posts" ("id", "author_id", "content", "status", "updated_at", "removed_at")
+          VALUES (gen_random_uuid()::text, ${user.id}, 'Visible post with timestamp', 'VISIBLE', NOW(), NOW())
+        `,
+      ).rejects.toThrow();
+
+      // HIDDEN with removed_at must be rejected
+      await expect(
+        prisma.$executeRaw`
+          INSERT INTO "community_posts" ("id", "author_id", "content", "status", "updated_at", "removed_at")
+          VALUES (gen_random_uuid()::text, ${user.id}, 'Hidden post with timestamp', 'HIDDEN', NOW(), NOW())
+        `,
+      ).rejects.toThrow();
+    });
+
+    it("rejects REMOVED comments with removed_at = NULL via PostgreSQL check constraint (DEF-002)", async () => {
+      const user = await createTestUser("removed_null_comment_tester");
       const post = await repos.communityPostRepo.createPost({
         authorId: user.id,
-        content: "Post to be removed",
+        content: "Post for comment check test",
       });
 
-      const updated = await repos.communityPostRepo.updatePostStatus(post.id, {
-        status: "REMOVED",
+      await expect(
+        prisma.$executeRaw`
+          INSERT INTO "community_comments" ("id", "post_id", "author_id", "content", "status", "updated_at", "removed_at")
+          VALUES (gen_random_uuid()::text, ${post.id}, ${user.id}, 'Removed comment without timestamp', 'REMOVED', NOW(), NULL)
+        `,
+      ).rejects.toThrow();
+    });
+
+    it("rejects non-REMOVED comments with removed_at != NULL via PostgreSQL check constraint (DEF-002)", async () => {
+      const user = await createTestUser("non_removed_ts_comment_tester");
+      const post = await repos.communityPostRepo.createPost({
+        authorId: user.id,
+        content: "Post for comment check test",
       });
 
-      expect(updated.status).toBe("REMOVED");
-      expect(updated.removedAt).toBeInstanceOf(Date);
+      // VISIBLE with removed_at must be rejected
+      await expect(
+        prisma.$executeRaw`
+          INSERT INTO "community_comments" ("id", "post_id", "author_id", "content", "status", "updated_at", "removed_at")
+          VALUES (gen_random_uuid()::text, ${post.id}, ${user.id}, 'Visible comment with timestamp', 'VISIBLE', NOW(), NOW())
+        `,
+      ).rejects.toThrow();
+
+      // HIDDEN with removed_at must be rejected
+      await expect(
+        prisma.$executeRaw`
+          INSERT INTO "community_comments" ("id", "post_id", "author_id", "content", "status", "updated_at", "removed_at")
+          VALUES (gen_random_uuid()::text, ${post.id}, ${user.id}, 'Hidden comment with timestamp', 'HIDDEN', NOW(), NOW())
+        `,
+      ).rejects.toThrow();
+    });
+
+    it("supports atomic logical removal with server timestamp via repositories (DEF-001, DEF-002)", async () => {
+      const user = await createTestUser("removal_repo_tester");
+      const post = await repos.communityPostRepo.createPost({
+        authorId: user.id,
+        content: "Post to be removed logically",
+      });
+      const comment = await repos.communityCommentRepo.createComment({
+        postId: post.id,
+        authorId: user.id,
+        content: "Comment to be removed logically",
+      });
+
+      const removedPost = await repos.communityPostRepo.markPostRemoved(post.id);
+      expect(removedPost.status).toBe("REMOVED");
+      expect(removedPost.removedAt).toBeInstanceOf(Date);
+
+      const removedComment = await repos.communityCommentRepo.markCommentRemoved(comment.id);
+      expect(removedComment.status).toBe("REMOVED");
+      expect(removedComment.removedAt).toBeInstanceOf(Date);
     });
   });
 
@@ -578,6 +659,124 @@ describe("FEAT-041 Community Domain Schema & Persistence Foundation (Integration
       expect((rawPost as unknown as Record<string, unknown>).likeCount).toBeUndefined();
       expect((rawPost as unknown as Record<string, unknown>).commentCount).toBeUndefined();
       expect((rawPost as unknown as Record<string, unknown>).likedByUser).toBeUndefined();
+    });
+
+    it("verifies exact canonical PostgreSQL index metadata and ordering (DEF-003, AC-013)", async () => {
+      interface IndexDefRow {
+        index_name: string;
+        table_name: string;
+        is_unique: boolean;
+        index_def: string;
+      }
+
+      const rows = await prisma.$queryRaw<IndexDefRow[]>`
+        SELECT
+          c.relname AS index_name,
+          t.relname AS table_name,
+          ix.indisunique AS is_unique,
+          pg_get_indexdef(c.oid) AS index_def
+        FROM pg_class c
+        JOIN pg_index ix ON c.oid = ix.indexrelid
+        JOIN pg_class t ON ix.indrelid = t.oid
+        JOIN pg_namespace n ON t.relnamespace = n.oid
+        WHERE n.nspname = 'public'
+          AND t.relname IN ('community_posts', 'community_comments', 'community_post_likes')
+        ORDER BY t.relname, c.relname;
+      `;
+
+      const indexMap = new Map(rows.map((r) => [r.index_name, r]));
+
+      // 1. community_posts feed index: (status, created_at DESC, id DESC)
+      const postFeed = indexMap.get("community_posts_status_created_at_id_idx");
+      expect(postFeed).toBeDefined();
+      expect(postFeed!.index_def).toMatch(/status.*created_at.*DESC.*id.*DESC/i);
+
+      // 2. community_posts author index: (author_id, created_at DESC, id DESC)
+      const postAuthor = indexMap.get("community_posts_author_id_created_at_id_idx");
+      expect(postAuthor).toBeDefined();
+      expect(postAuthor!.index_def).toMatch(/author_id.*created_at.*DESC.*id.*DESC/i);
+
+      // 3. community_comments post index: (post_id, created_at ASC, id ASC)
+      const commentPost = indexMap.get("community_comments_post_id_created_at_id_idx");
+      expect(commentPost).toBeDefined();
+      expect(commentPost!.index_def).toMatch(/post_id.*created_at.*id/i);
+
+      // 4. community_comments author index: (author_id, created_at DESC, id DESC)
+      const commentAuthor = indexMap.get("community_comments_author_id_created_at_id_idx");
+      expect(commentAuthor).toBeDefined();
+      expect(commentAuthor!.index_def).toMatch(/author_id.*created_at.*DESC.*id.*DESC/i);
+
+      // 5. community_post_likes unique constraint: (user_id, post_id)
+      const likeUnique = indexMap.get("community_post_likes_user_id_post_id_key");
+      expect(likeUnique).toBeDefined();
+      expect(likeUnique!.is_unique).toBe(true);
+      expect(likeUnique!.index_def).toMatch(/user_id.*post_id/i);
+
+      // 6. community_post_likes post index: (post_id, created_at DESC)
+      const likePost = indexMap.get("community_post_likes_post_id_created_at_idx");
+      expect(likePost).toBeDefined();
+      expect(likePost!.index_def).toMatch(/post_id.*created_at.*DESC/i);
+
+      // 7. community_post_likes user index: (user_id, created_at DESC)
+      const likeUser = indexMap.get("community_post_likes_user_id_created_at_idx");
+      expect(likeUser).toBeDefined();
+      expect(likeUser!.index_def).toMatch(/user_id.*created_at.*DESC/i);
+    });
+
+    it("verifies exact PostgreSQL check constraints metadata (DEF-002)", async () => {
+      interface ConstraintRow {
+        constraint_name: string;
+        table_name: string;
+        constraint_def: string;
+      }
+
+      const rows = await prisma.$queryRaw<ConstraintRow[]>`
+        SELECT
+          con.conname AS constraint_name,
+          rel.relname AS table_name,
+          pg_get_constraintdef(con.oid) AS constraint_def
+        FROM pg_constraint con
+        JOIN pg_class rel ON con.conrelid = rel.oid
+        JOIN pg_namespace nsp ON rel.relnamespace = nsp.oid
+        WHERE nsp.nspname = 'public'
+          AND rel.relname IN ('community_posts', 'community_comments')
+          AND con.contype = 'c'
+        ORDER BY con.conname;
+      `;
+
+      const constraintNames = rows.map((r) => r.constraint_name);
+      expect(constraintNames).toContain("community_posts_status_check");
+      expect(constraintNames).toContain("community_posts_content_length_check");
+      expect(constraintNames).toContain("community_posts_removed_at_check");
+      expect(constraintNames).toContain("community_comments_status_check");
+      expect(constraintNames).toContain("community_comments_content_length_check");
+      expect(constraintNames).toContain("community_comments_removed_at_check");
+
+      const postRemovedCheck = rows.find((r) => r.constraint_name === "community_posts_removed_at_check");
+      expect(postRemovedCheck!.constraint_def).toContain("REMOVED");
+      expect(postRemovedCheck!.constraint_def).toContain("removed_at");
+
+      const commentRemovedCheck = rows.find((r) => r.constraint_name === "community_comments_removed_at_check");
+      expect(commentRemovedCheck!.constraint_def).toContain("REMOVED");
+      expect(commentRemovedCheck!.constraint_def).toContain("removed_at");
+    });
+
+    it("proves ordinary repositories isolate physical delete and expose only logical removal (DEF-001, AC-018)", () => {
+      // Ordinary post repository must NOT have physical delete methods
+      expect("deletePost" in repos.communityPostRepo).toBe(false);
+      expect("delete" in repos.communityPostRepo).toBe(false);
+      expect((repos.communityPostRepo as unknown as Record<string, unknown>).deletePost).toBeUndefined();
+      expect((repos.communityPostRepo as unknown as Record<string, unknown>).delete).toBeUndefined();
+
+      // Ordinary comment repository must NOT have physical delete methods
+      expect("deleteComment" in repos.communityCommentRepo).toBe(false);
+      expect("delete" in repos.communityCommentRepo).toBe(false);
+      expect((repos.communityCommentRepo as unknown as Record<string, unknown>).deleteComment).toBeUndefined();
+      expect((repos.communityCommentRepo as unknown as Record<string, unknown>).delete).toBeUndefined();
+
+      // Logical removal methods must exist
+      expect(typeof repos.communityPostRepo.markPostRemoved).toBe("function");
+      expect(typeof repos.communityCommentRepo.markCommentRemoved).toBe("function");
     });
   });
 

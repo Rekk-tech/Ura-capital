@@ -10,7 +10,11 @@ CREATE TABLE "community_posts" (
 
     CONSTRAINT "community_posts_pkey" PRIMARY KEY ("id"),
     CONSTRAINT "community_posts_status_check" CHECK ("status" IN ('VISIBLE', 'HIDDEN', 'REMOVED')),
-    CONSTRAINT "community_posts_content_length_check" CHECK (char_length(trim(both E' \t\r\n' from "content")) >= 1 AND char_length("content") <= 5000)
+    CONSTRAINT "community_posts_content_length_check" CHECK (char_length(trim(both E' \t\r\n' from "content")) >= 1 AND char_length("content") <= 5000),
+    CONSTRAINT "community_posts_removed_at_check" CHECK (
+        ("status" = 'REMOVED' AND "removed_at" IS NOT NULL) OR
+        ("status" <> 'REMOVED' AND "removed_at" IS NULL)
+    )
 );
 
 -- CreateTable: community_comments
@@ -26,7 +30,11 @@ CREATE TABLE "community_comments" (
 
     CONSTRAINT "community_comments_pkey" PRIMARY KEY ("id"),
     CONSTRAINT "community_comments_status_check" CHECK ("status" IN ('VISIBLE', 'HIDDEN', 'REMOVED')),
-    CONSTRAINT "community_comments_content_length_check" CHECK (char_length(trim(both E' \t\r\n' from "content")) >= 1 AND char_length("content") <= 2000)
+    CONSTRAINT "community_comments_content_length_check" CHECK (char_length(trim(both E' \t\r\n' from "content")) >= 1 AND char_length("content") <= 2000),
+    CONSTRAINT "community_comments_removed_at_check" CHECK (
+        ("status" = 'REMOVED' AND "removed_at" IS NOT NULL) OR
+        ("status" <> 'REMOVED' AND "removed_at" IS NULL)
+    )
 );
 
 -- CreateTable: community_post_likes
@@ -43,20 +51,16 @@ CREATE TABLE "community_post_likes" (
 
 -- community_posts indexes
 CREATE INDEX "community_posts_status_created_at_id_idx" ON "community_posts"("status", "created_at" DESC, "id" DESC);
-CREATE INDEX "community_posts_author_id_created_at_idx" ON "community_posts"("author_id", "created_at" DESC);
-CREATE INDEX "community_posts_author_id_idx" ON "community_posts"("author_id");
+CREATE INDEX "community_posts_author_id_created_at_id_idx" ON "community_posts"("author_id", "created_at" DESC, "id" DESC);
 
 -- community_comments indexes
 CREATE INDEX "community_comments_post_id_created_at_id_idx" ON "community_comments"("post_id", "created_at" ASC, "id" ASC);
-CREATE INDEX "community_comments_author_id_created_at_idx" ON "community_comments"("author_id", "created_at" DESC);
-CREATE INDEX "community_comments_post_id_status_idx" ON "community_comments"("post_id", "status");
-CREATE INDEX "community_comments_post_id_idx" ON "community_comments"("post_id");
-CREATE INDEX "community_comments_author_id_idx" ON "community_comments"("author_id");
+CREATE INDEX "community_comments_author_id_created_at_id_idx" ON "community_comments"("author_id", "created_at" DESC, "id" DESC);
 
 -- community_post_likes unique constraint & indexes
 CREATE UNIQUE INDEX "community_post_likes_user_id_post_id_key" ON "community_post_likes"("user_id", "post_id");
-CREATE INDEX "community_post_likes_post_id_idx" ON "community_post_likes"("post_id");
-CREATE INDEX "community_post_likes_user_id_idx" ON "community_post_likes"("user_id");
+CREATE INDEX "community_post_likes_post_id_created_at_idx" ON "community_post_likes"("post_id", "created_at" DESC);
+CREATE INDEX "community_post_likes_user_id_created_at_idx" ON "community_post_likes"("user_id", "created_at" DESC);
 
 -- Foreign Keys
 

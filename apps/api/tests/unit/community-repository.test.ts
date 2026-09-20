@@ -1,4 +1,5 @@
 import { type PrismaClient, Prisma } from "@prisma/client";
+import { describe, it, expect, vi } from "vitest";
 import { createRepositoryContainer } from "../../src/infrastructure/database/repository-factory.js";
 import {
   PrismaCommunityPostRepository,
@@ -29,10 +30,27 @@ describe("FEAT-041 Community Repositories & Factory Unit Tests", () => {
       expect(container.communityCommentRepo).toBeInstanceOf(PrismaCommunityCommentRepository);
       expect(container.communityPostLikeRepo).toBeInstanceOf(PrismaCommunityPostLikeRepository);
     });
+
+    it("proves ordinary Community repositories expose zero physical post/comment delete capability (DEF-001, AC-018)", () => {
+      const mockPrisma = {} as unknown as PrismaClient;
+      const container = createRepositoryContainer(mockPrisma);
+
+      // Ordinary post repo must NOT have physical delete methods
+      expect("deletePost" in container.communityPostRepo).toBe(false);
+      expect("delete" in container.communityPostRepo).toBe(false);
+      expect(typeof (container.communityPostRepo as Record<string, unknown>).deletePost).toBe("undefined");
+      expect(typeof (container.communityPostRepo as Record<string, unknown>).delete).toBe("undefined");
+
+      // Ordinary comment repo must NOT have physical delete methods
+      expect("deleteComment" in container.communityCommentRepo).toBe(false);
+      expect("delete" in container.communityCommentRepo).toBe(false);
+      expect(typeof (container.communityCommentRepo as Record<string, unknown>).deleteComment).toBe("undefined");
+      expect(typeof (container.communityCommentRepo as Record<string, unknown>).delete).toBe("undefined");
+    });
   });
 
   describe("Community Post Repository (AC-018, AC-019, AC-021)", () => {
-    it("creates a post successfully and returns the entity", async () => {
+    it("creates a post successfully and defaults status to VISIBLE and removedAt to null", async () => {
       const mockPost = {
         id: "post-uuid-1",
         authorId: "author-uuid-1",
@@ -61,6 +79,7 @@ describe("FEAT-041 Community Repositories & Factory Unit Tests", () => {
           authorId: "author-uuid-1",
           content: "Hello community!",
           status: "VISIBLE",
+          removedAt: null,
         },
       });
     });
@@ -103,15 +122,16 @@ describe("FEAT-041 Community Repositories & Factory Unit Tests", () => {
       }
     });
 
-    it("updates post status with removedAt timestamp when transition to REMOVED", async () => {
+    it("marks post as removed with atomic server timestamp (DEF-001, DEF-002, AC-018)", async () => {
+      const now = new Date();
       const mockUpdated = {
         id: "post-uuid-1",
         authorId: "author-uuid-1",
         content: "Hello community!",
         status: "REMOVED",
         createdAt: new Date(),
-        updatedAt: new Date(),
-        removedAt: new Date(),
+        updatedAt: now,
+        removedAt: now,
       };
 
       const mockClient = {
@@ -121,17 +141,55 @@ describe("FEAT-041 Community Repositories & Factory Unit Tests", () => {
       } as unknown as PrismaClient;
 
       const repo = new PrismaCommunityPostRepository(mockClient);
-      const result = await repo.updatePostStatus("post-uuid-1", {
-        status: "REMOVED",
-      });
+      const result = await repo.markPostRemoved("post-uuid-1");
 
       expect(result.status).toBe("REMOVED");
-      expect(mockClient.communityPost.update).toHaveBeenCalled();
+      expect(result.removedAt).toEqual(now);
+      expect(mockClient.communityPost.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: "post-uuid-1" },
+          data: {
+            status: "REMOVED",
+            removedAt: expect.any(Date),
+          },
+        }),
+      );
+    });
+
+    it("updates post status to HIDDEN or VISIBLE and ensures removedAt is null (DEF-002)", async () => {
+      const mockUpdated = {
+        id: "post-uuid-1",
+        authorId: "author-uuid-1",
+        content: "Hello community!",
+        status: "HIDDEN",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        removedAt: null,
+      };
+
+      const mockClient = {
+        communityPost: {
+          update: vi.fn().mockResolvedValue(mockUpdated),
+        },
+      } as unknown as PrismaClient;
+
+      const repo = new PrismaCommunityPostRepository(mockClient);
+      const result = await repo.updatePostStatus("post-uuid-1", "HIDDEN");
+
+      expect(result.status).toBe("HIDDEN");
+      expect(result.removedAt).toBeNull();
+      expect(mockClient.communityPost.update).toHaveBeenCalledWith({
+        where: { id: "post-uuid-1" },
+        data: {
+          status: "HIDDEN",
+          removedAt: null,
+        },
+      });
     });
   });
 
   describe("Community Comment Repository (AC-018, AC-019)", () => {
-    it("creates a flat comment successfully", async () => {
+    it("creates a flat comment successfully defaulting status to VISIBLE and removedAt to null", async () => {
       const mockComment = {
         id: "comment-uuid-1",
         postId: "post-uuid-1",
@@ -163,8 +221,44 @@ describe("FEAT-041 Community Repositories & Factory Unit Tests", () => {
           authorId: "author-uuid-2",
           content: "Nice post!",
           status: "VISIBLE",
+          removedAt: null,
         },
       });
+    });
+
+    it("marks comment as removed with atomic server timestamp (DEF-001, DEF-002)", async () => {
+      const now = new Date();
+      const mockUpdated = {
+        id: "comment-uuid-1",
+        postId: "post-uuid-1",
+        authorId: "author-uuid-2",
+        content: "Nice post!",
+        status: "REMOVED",
+        createdAt: new Date(),
+        updatedAt: now,
+        removedAt: now,
+      };
+
+      const mockClient = {
+        communityComment: {
+          update: vi.fn().mockResolvedValue(mockUpdated),
+        },
+      } as unknown as PrismaClient;
+
+      const repo = new PrismaCommunityCommentRepository(mockClient);
+      const result = await repo.markCommentRemoved("comment-uuid-1");
+
+      expect(result.status).toBe("REMOVED");
+      expect(result.removedAt).toEqual(now);
+      expect(mockClient.communityComment.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: "comment-uuid-1" },
+          data: {
+            status: "REMOVED",
+            removedAt: expect.any(Date),
+          },
+        }),
+      );
     });
 
     it("finds a comment by id and returns null when not found", async () => {
@@ -275,7 +369,7 @@ describe("FEAT-041 Community Repositories & Factory Unit Tests", () => {
     it("checks if user has liked a post", async () => {
       const mockClient = {
         communityPostLike: {
-          findUnique: vi.fn().mockResolvedValue({ id: "like-1" }),
+          count: vi.fn().mockResolvedValue(1),
         },
       } as unknown as PrismaClient;
 
