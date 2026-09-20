@@ -3,8 +3,10 @@
 Feature: FEAT-041
 Phase: Phase 6 - Community
 QA Owner: Codex
-QA Iteration: 1
+QA Iteration: 2
 Final Verdict: FAIL
+
+> Historical record: the original QA Iteration 1 evidence and verdict are preserved below through the first Final Verdict section. The current QA Iteration 2 assessment begins at `QA Iteration 2 - Targeted Re-QA` and is authoritative for the present lifecycle state.
 
 ## Executive Summary
 
@@ -285,3 +287,220 @@ DEF-001 through DEF-004 block FEAT-041 Human Final Gate. FEAT-042 remains blocke
 FAIL
 
 FEAT-041 is not ready for Human Final Gate. DEV-B / Antigravity must resolve DEF-001 through DEF-004 and return the feature for targeted re-QA. FEAT-042 must not begin.
+
+---
+
+## QA Iteration 2 - Targeted Re-QA
+
+QA Iteration 1 above is preserved as the historical baseline. Iteration 2 reviewed rework commit `b9f9e60892683b361d910f3855d5318851acb344` against QA1-reviewed commit `fa8dde76dd977a5d66875b59d45f975c05f3cc79`.
+
+### Rework Scope
+
+| Previous defect | Changed files | QA2 result |
+| --- | --- | --- |
+| DEF-001 | `community.repository.ts`, `community.types.ts`, repository unit/DB tests | FIXED |
+| DEF-002 | Prisma schema, FEAT-041 migration, repository/types, unit/DB tests | FIXED |
+| DEF-003 | Prisma schema, FEAT-041 migration, DB metadata tests | FIXED |
+| DEF-004 | FEAT-041 implementation report | OPEN |
+
+No FEAT-042 route, controller, service, UI, rate limiter, moderation API, product-audit persistence, or Community Redis authority was introduced.
+
+### DEF-001 Closure - Physical Delete Boundary
+
+FIXED.
+
+- `ICommunityPostRepository` and `ICommunityCommentRepository` expose no `deletePost`, `deleteComment`, generic `delete`, or equivalent physical-delete capability.
+- Root and transaction repository containers expose the same safe interfaces.
+- `markPostRemoved` and `markCommentRemoved` are the product-facing removal operations.
+- Unit and live DB assertions confirm physical post/comment deletion is unreachable through ordinary repository contracts.
+
+### DEF-002 Closure - Removal Coherence
+
+FIXED.
+
+- PostgreSQL contains `community_posts_removed_at_check` and `community_comments_removed_at_check` with the required bidirectional invariant.
+- Direct PostgreSQL probes rejected all six invalid combinations: `REMOVED/NULL`, `VISIBLE/timestamp`, and `HIDDEN/timestamp` for both posts and comments.
+- Direct PostgreSQL probes accepted all six valid combinations: `REMOVED/timestamp`, `VISIBLE/NULL`, and `HIDDEN/NULL` for both entities.
+- Create input types expose neither `status` nor `removedAt`; adversarial runtime objects were ignored and persisted as `VISIBLE` plus `NULL`.
+- Root and transaction-bound repositories both produced server-timestamped `REMOVED` records.
+
+### DEF-003 Closure - Index Metadata
+
+FIXED.
+
+Direct `pg_indexes` / `pg_get_indexdef` inspection on the fresh QA2 database confirmed:
+
+| Index purpose | Actual PostgreSQL definition | Result |
+| --- | --- | --- |
+| Post feed | `(status, created_at DESC, id DESC)` | PASS |
+| Post author | `(author_id, created_at DESC, id DESC)` | PASS |
+| Comment post | `(post_id, created_at ASC, id ASC)` | PASS |
+| Comment author | `(author_id, created_at DESC, id DESC)` | PASS |
+| Like post | `(post_id, created_at DESC)` | PASS |
+| Like user | `(user_id, created_at DESC)` | PASS |
+| Like uniqueness | UNIQUE `(user_id, post_id)` | PASS |
+
+PostgreSQL omits explicit `ASC` from `pg_get_indexdef` because it is the default ordering; metadata and Prisma schema both represent the required ascending comment order.
+
+### DEF-004 Verification - Report Truthfulness
+
+OPEN.
+
+The migration inventory, SQL column types, ID generation description, constraint names, index definitions, `removed_at` fields, QA1 history, and validation counts are now accurate. However, the report's section "Actual Repository Layer & Boundary Contracts" still invents interfaces that do not exist in source:
+
+- Post report methods such as `findById`, `findPostsFeed`, `updatePostContent`, and `countByAuthor` do not match the actual interface.
+- Comment report methods such as `findRepliesByParent`, `updateCommentContent`, `countByPost`, and `countByAuthor` do not exist. `findRepliesByParent` also contradicts the approved flat-comment boundary.
+- Like report methods/signatures such as `createLike(postId, userId)`, `countLikesByUser`, and `findLikedPostIdsByUser` do not match source.
+- T010 evidence repeats the nonexistent `countLikesByUser` method.
+- The report claims it is "100% truthful" and marks AC-028/T020 PASS despite these material mismatches.
+
+Required fix: replace the invented interface snippets and T010 evidence with the exact current TypeScript contracts, preserve all verified technical evidence and QA history, and mark QA Iteration 2 FAIL / DEF-004 OPEN until re-QA closes the report defect.
+
+### Migration History
+
+PASS.
+
+- The eight Phase 1-5 migration files remain unchanged.
+- Exactly one FEAT-041 migration exists.
+- No `feat-041-approved` checkpoint tag exists; the unapproved FEAT-041 migration could be corrected in place under the recorded governance rule.
+- Migration remains additive, forward-only, DDL-only, and seed-free.
+
+### Fresh Database Evidence
+
+PASS.
+
+- Independent DB: `aura_capital_test_feat041_qa2_fresh`.
+- `prisma migrate deploy`: 9/9 migrations applied.
+- `prisma migrate status`: schema up to date.
+- `prisma validate`: PASS.
+- Community constraints, FKs, and exact index metadata were queried directly.
+
+### Phase 5 Upgrade Evidence
+
+PASS.
+
+- Independent upgrade run recreated `aura_capital_test_feat041_upgrade`.
+- Eight Phase 5 migrations were applied first.
+- Representative Auth, Academy, and Simulation rows were inserted.
+- FEAT-041 migration applied as migration 9.
+- All representative rows and relationships were preserved; Community constraints and indexes were active.
+- The verifier used an isolated temporary migration workspace and left the worktree clean.
+
+### Repository, UoW, FK, And Concurrency Evidence
+
+PASS.
+
+- Root and transaction clients use the same Community repository implementations.
+- Logical removal invariants are identical through root and transaction containers.
+- Multi-write commit and forced rollback passed in the DB suite.
+- An independent FK-triggered transaction failure left zero partial posts.
+- FK `RESTRICT` and `CASCADE` policies passed live regression.
+- Five concurrent duplicate likes produced one success, four PostgreSQL rejections, and exactly one durable row.
+- Safe database error mapping remained green.
+
+### QA2 Canonical 14
+
+| # | Command | QA2 result |
+| ---: | --- | --- |
+| 1 | `npm run clean` | PASS |
+| 2 | `npm run lint` | PASS |
+| 3 | `npx prisma validate --schema=apps/api/prisma/schema.prisma` | PASS |
+| 4 | `npm run typecheck` | PASS |
+| 5 | `npm run build` | PASS; existing Vite chunk advisory only |
+| 6 | `npm run test` | PASS - 84 files / 943 tests |
+| 7 | `npm run test:unit` | PASS - 60 files / 753 tests |
+| 8 | `npm run test:db` | PASS - 31 files / 426 tests, 0 skips |
+| 9 | `npm run test:redis` | PASS - 5 files / 50 tests, 0 skips |
+| 10 | `npm run guard:persistence` | PASS - 1 file / 14 tests |
+| 11 | `npm run guard:migration` | PASS - 9 migrations / 9 digests |
+| 12 | `npm run guard:boundary` | PASS - 15 controllers / 20 services / 8 repositories |
+| 13 | `npm run guard:audit-governance` | PASS |
+| 14 | `npm run guard:seed-safety` | PASS |
+
+Result: 14/14 PASS with no mandatory skip.
+
+### QA2 Acceptance Criteria Matrix
+
+| AC | QA2 verdict | Evidence |
+| --- | --- | --- |
+| AC-001 | PASS | Report now records the exact eight-migration Phase 5 baseline. |
+| AC-002 | PASS | Prior migrations unchanged. |
+| AC-003 | PASS | Prisma-generated UUID IDs verified. |
+| AC-004 | PASS | Required post ownership. |
+| AC-005 | PASS | Required comment ownership. |
+| AC-006 | PASS | Author FKs are `RESTRICT`. |
+| AC-007 | PASS | Comment-post FK is required and `RESTRICT`. |
+| AC-008 | PASS | Like FKs are `CASCADE`. |
+| AC-009 | PASS | Blank post rejected. |
+| AC-010 | PASS | Oversized post rejected. |
+| AC-011 | PASS | Invalid comment lengths rejected. |
+| AC-012 | PASS | Closed status set and removal coherence verified. |
+| AC-013 | PASS | Exact required index metadata verified. |
+| AC-014 | PASS | Sequential and concurrent uniqueness verified. |
+| AC-015 | PASS | No counters, liked flag, or nested-comment schema. |
+| AC-016 | PASS | Exactly one additive FEAT-041 migration. |
+| AC-017 | PASS | Migration is seed/destructive/API-free. |
+| AC-018 | PASS | Safe repository interfaces with no physical post/comment delete. |
+| AC-019 | PASS | Root/transaction implementations and safe mapping verified. |
+| AC-020 | PASS | Repository factory boundary verified. |
+| AC-021 | PASS | Diagnostics remain sanitized. |
+| AC-022 | PASS | Live FK/delete policy suite passed. |
+| AC-023 | PASS | Five-way like race converged to one row. |
+| AC-024 | PASS | Prior domains, Redis, and auth audit unchanged. |
+| AC-025 | PASS | Fresh QA2 DB reproducible. |
+| AC-026 | PASS | Phase 5 upgrade preservation reproduced. |
+| AC-027 | PASS | Canonical 14 passed. |
+| AC-028 | FAIL | Implementation report still contains invented repository contracts and overclaims truthfulness. |
+
+Result: 27 PASS, 1 FAIL.
+
+### QA2 Task Verification
+
+| Task | Verdict |
+| --- | --- |
+| T001 | PASS |
+| T002 | PASS |
+| T003 | PASS |
+| T004 | PASS |
+| T005 | PASS |
+| T006 | PASS |
+| T007 | PASS |
+| T008 | PASS |
+| T009 | PASS |
+| T010 | PASS - implementation is correct; its report description must be corrected under T020 |
+| T011 | PASS |
+| T012 | PASS |
+| T013 | PASS |
+| T014 | PASS |
+| T015 | PASS |
+| T016 | PASS |
+| T017 | PASS |
+| T018 | PASS |
+| T019 | PASS |
+| T020 | FAIL |
+
+Result: 19 PASS, 1 FAIL.
+
+### QA2 Defect Closure Matrix
+
+| Defect | Status | Closure rationale |
+| --- | --- | --- |
+| DEF-001 | FIXED | Physical post/comment deletion is absent from ordinary root/UoW repository contracts. |
+| DEF-002 | FIXED | DB checks plus narrowed repository inputs prevent all tested null/timestamp bypasses. |
+| DEF-003 | FIXED | All seven required indexes match direct PostgreSQL metadata. |
+| DEF-004 | OPEN | Report still materially misstates the repository interfaces and T010 evidence. |
+
+No new implementation defect was identified.
+
+### QA2 Severity Summary
+
+- P0: 0
+- P1: 0
+- P2: 1 (`DEF-004`)
+- P3: 0
+
+### QA Iteration 2 Final Verdict
+
+FAIL
+
+FEAT-041 is not ready for Human Final Gate. DEV-B / Antigravity must correct only the remaining report-truthfulness defect and return FEAT-041 for targeted governance/report re-QA. FEAT-042 remains blocked.
