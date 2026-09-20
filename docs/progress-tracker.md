@@ -1674,14 +1674,14 @@ Baseline: phase-5-approved
 Planning / Architecture Owner: Codex
 Implementation Owner: DEV-B / Antigravity
 FEAT-041: DONE / QA PASS / HUMAN TARGETED GOVERNANCE REVIEW APPROVED (Checkpoint: feat-041-approved PUBLISHED)
-FEAT-042: UNBLOCKED FOR IMPLEMENTATION
-FEAT-043: PLANNED / BLOCKED BY FEAT-042
-FEAT-044: PLANNED / BLOCKED BY FEAT-042
+FEAT-042: DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-042-approved)
+FEAT-043: UNBLOCKED FOR IMPLEMENTATION
+FEAT-044: PLANNED / BLOCKED BY FEAT-042 (Parallel contract prep permitted)
 FEAT-045: PLANNED / BLOCKED BY FEAT-042..FEAT-044
 FEAT-046: PLANNED / BLOCKED BY FEAT-042..FEAT-045
 FEAT-047: PLANNED / BLOCKED BY FEAT-042..FEAT-046
 Phase 7: BLOCKED
-Application code changes: FEAT-041 Community persistence foundation complete; ZERO HTTP routes/controllers/UI; ZERO FEAT-042 changes
+Application code changes: FEAT-041 Community persistence foundation complete; FEAT-042 Community posts API & feed read models complete; ZERO FEAT-043 application changes
 ```
 
 FEAT-041 Governance Fields:
@@ -1718,6 +1718,36 @@ Tasks: 20 PASS / 0 FAIL (T001..T020 PASS)
 Dependencies: FEAT-042 UNBLOCKED FOR IMPLEMENTATION
 ```
 
+FEAT-042 Governance Fields:
+
+```text
+Lifecycle State: DONE / APPROVED FOR CHECKPOINT
+Planning Status: HUMAN MASTER PLANNING APPROVED
+Planning Owner: Codex
+Implementation: COMPLETE
+Implementation Owner: DEV-B / Antigravity
+Internal Feature Gate: PASS
+Latest QA: FAST-TRACK DELIVERY (Internal Feature Gate PASS; Zero blocking defects; Canonical 14 PASS)
+Canonical 14 Validation: PASS (14/14 commands with no skips)
+Implementation Report: reports/implementation/phase-6/FEAT-042.md
+Checkpoint Tag: feat-042-approved
+Routes: GET /api/community/posts, GET /api/community/posts/:postId, POST /api/community/posts, DELETE /api/community/posts/:postId (4 exact routes, authenticated only)
+Ordering: Deterministic (createdAt DESC, id DESC) with opaque versioned cursor (v: 1)
+Safe DTO: CommunityPostDto (exact 8 fields, fallback to 'Aura Learner', zero sensitive/security leaks)
+Visibility: Normal learner feed returns only VISIBLE; HIDDEN and REMOVED return safe non-enumerating 404
+Removal: Atomic logical removal via markPostRemoved / removePostIfOwner; zero physical deletions
+Ownership: Strict owner authorization; foreign delete attempts return safe 404 NOT_FOUND
+Relational Counts: likeCount, commentCount, likedByCurrentUser derived relationally from PostgreSQL
+Migration: ZERO new migrations (remains 9 migrations)
+Redis Durable Authority: ZERO (no feed cache, no durable state)
+Product Audit Persistence: DEFERRED (zero schema/API changes)
+Boundary Guard: PASS (16 controllers, 21 services, 8 repositories clean)
+Spec Package: .specify/specs/FEAT-042/
+Acceptance Criteria: 28 PASS / 0 FAIL (AC-001..AC-028 PASS)
+Tasks: 19 PASS / 0 FAIL (T001..T019 PASS)
+Dependencies: FEAT-043 UNBLOCKED FOR IMPLEMENTATION
+```
+
 Planning Artifacts:
 
 - `docs/phase-6-feature-decomposition.md`
@@ -1732,8 +1762,10 @@ Planning Artifacts:
 Implementation Artifacts:
 
 - `reports/implementation/phase-6/FEAT-041.md`
+- `reports/implementation/phase-6/FEAT-042.md`
 
-Human Decision State: HUMAN MASTER PLANNING APPROVED. FEAT-041 Human Targeted Governance Review APPROVED (DEF-004 CLOSED, AC 28/28 PASS, Tasks 20/20 PASS, Checkpoint: feat-041-approved). FEAT-041 is DONE; FEAT-042 is UNBLOCKED FOR IMPLEMENTATION. Phase 6 remains IN_PROGRESS.
+Human Decision State: HUMAN MASTER PLANNING APPROVED. FEAT-041 Human Targeted Governance Review APPROVED (Checkpoint: feat-041-approved). FEAT-042 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (AC 28/28 PASS, Tasks 19/19 PASS, Checkpoint: feat-042-approved). FEAT-042 is DONE; FEAT-043 is UNBLOCKED FOR IMPLEMENTATION. Phase 6 remains IN_PROGRESS.
+
 
 ---
 

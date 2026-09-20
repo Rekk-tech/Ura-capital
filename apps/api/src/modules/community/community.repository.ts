@@ -12,6 +12,8 @@ import type {
   CreateCommunityCommentInput,
   ListCommunityCommentsFilter,
   CreateCommunityPostLikeInput,
+  CommunityPostRecord,
+  ListVisibleFeedParams,
 } from "./community.types.js";
 
 import { getPrismaClient } from "../../infrastructure/database/prisma.js";
@@ -26,9 +28,12 @@ type DbClient = PrismaClient | Prisma.TransactionClient;
 export interface ICommunityPostRepository {
   createPost(data: CreateCommunityPostInput): Promise<CommunityPost>;
   findPostById(id: string): Promise<CommunityPost | null>;
+  findVisiblePostDetail(id: string, currentUserId?: string): Promise<CommunityPostRecord | null>;
   listPosts(filter?: ListCommunityPostsFilter): Promise<CommunityPost[]>;
   listPostsByAuthor(authorId: string, limit?: number): Promise<CommunityPost[]>;
+  listVisibleFeed(params: ListVisibleFeedParams): Promise<CommunityPostRecord[]>;
   markPostRemoved(id: string): Promise<CommunityPost>;
+  removePostIfOwner(id: string, authorId: string): Promise<CommunityPost | null>;
   updatePostStatus(id: string, status: "VISIBLE" | "HIDDEN"): Promise<CommunityPost>;
 }
 
@@ -64,6 +69,50 @@ export class PrismaCommunityPostRepository implements ICommunityPostRepository {
     }
   }
 
+  async findVisiblePostDetail(id: string, currentUserId?: string): Promise<CommunityPostRecord | null> {
+    try {
+      const post = await this.client.communityPost.findFirst({
+        where: {
+          id,
+          status: "VISIBLE",
+        },
+        select: {
+          id: true,
+          authorId: true,
+          content: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
+          removedAt: true,
+          author: {
+            select: {
+              displayName: true,
+            },
+          },
+          _count: {
+            select: {
+              comments: {
+                where: { status: "VISIBLE" },
+              },
+              likes: true,
+            },
+          },
+          likes: currentUserId
+            ? {
+                where: { userId: currentUserId },
+                select: { id: true },
+                take: 1,
+              }
+            : false,
+        },
+      });
+
+      return post as CommunityPostRecord | null;
+    } catch (err) {
+      throw mapDatabaseError(err, "Failed to find visible community post detail");
+    }
+  }
+
   async listPosts(filter?: ListCommunityPostsFilter): Promise<CommunityPost[]> {
     try {
       return await this.client.communityPost.findMany({
@@ -91,6 +140,69 @@ export class PrismaCommunityPostRepository implements ICommunityPostRepository {
     }
   }
 
+  async listVisibleFeed(params: ListVisibleFeedParams): Promise<CommunityPostRecord[]> {
+    try {
+      const where: Prisma.CommunityPostWhereInput = {
+        status: "VISIBLE",
+      };
+
+      if (params.cursor) {
+        where.OR = [
+          {
+            createdAt: {
+              lt: params.cursor.createdAt,
+            },
+          },
+          {
+            createdAt: params.cursor.createdAt,
+            id: {
+              lt: params.cursor.id,
+            },
+          },
+        ];
+      }
+
+      const posts = await this.client.communityPost.findMany({
+        where,
+        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+        take: params.limit,
+        select: {
+          id: true,
+          authorId: true,
+          content: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
+          removedAt: true,
+          author: {
+            select: {
+              displayName: true,
+            },
+          },
+          _count: {
+            select: {
+              comments: {
+                where: { status: "VISIBLE" },
+              },
+              likes: true,
+            },
+          },
+          likes: params.currentUserId
+            ? {
+                where: { userId: params.currentUserId },
+                select: { id: true },
+                take: 1,
+              }
+            : false,
+        },
+      });
+
+      return posts as CommunityPostRecord[];
+    } catch (err) {
+      throw mapDatabaseError(err, "Failed to list visible community posts feed");
+    }
+  }
+
   async markPostRemoved(id: string): Promise<CommunityPost> {
     try {
       return await this.client.communityPost.update({
@@ -102,6 +214,32 @@ export class PrismaCommunityPostRepository implements ICommunityPostRepository {
       });
     } catch (err) {
       throw mapDatabaseError(err, "Failed to mark community post as removed");
+    }
+  }
+
+  async removePostIfOwner(id: string, authorId: string): Promise<CommunityPost | null> {
+    try {
+      const post = await this.client.communityPost.findFirst({
+        where: {
+          id,
+          authorId,
+          status: "VISIBLE",
+        },
+      });
+
+      if (!post) {
+        return null;
+      }
+
+      return await this.client.communityPost.update({
+        where: { id },
+        data: {
+          status: "REMOVED",
+          removedAt: new Date(),
+        },
+      });
+    } catch (err) {
+      throw mapDatabaseError(err, "Failed to remove community post");
     }
   }
 
