@@ -493,7 +493,7 @@ Phase 3 Completion State:
 - FEAT-018 is DONE / QA PASS / Human Final Gate APPROVED.
 - Phase 3 is DONE / QA PASS / Human Final Gate APPROVED.
 - HISTORICAL SNAPSHOT (at Phase 3 completion): Phase 4 was IN_PROGRESS / PLANNING; FEAT-019 was APPROVED FOR IMPLEMENTATION; FEAT-020 through FEAT-030 remained BLOCKED.
-- CURRENT CANONICAL STATE: Phase 4 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-019 through FEAT-030 retain their approved Phase 4 states; Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-031 through FEAT-040 are DONE / QA PASS; Phase Checkpoint: phase-5-approved PUBLISHED; Phase 6 planning is HUMAN MASTER PLANNING APPROVED; Phase 6 implementation is IN_PROGRESS; FEAT-041 is DONE / QA PASS / Human Final Gate APPROVED (Checkpoint: feat-041-approved PUBLISHED); FEAT-042 is UNBLOCKED FOR IMPLEMENTATION.
+- CURRENT CANONICAL STATE: Phase 4 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-019 through FEAT-030 retain their approved Phase 4 states; Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-031 through FEAT-040 are DONE / QA PASS; Phase Checkpoint: phase-5-approved PUBLISHED; Phase 6 planning is HUMAN MASTER PLANNING APPROVED; Phase 6 implementation is IN_PROGRESS; FEAT-041 is DONE / QA PASS / Human Final Gate APPROVED (Checkpoint: feat-041-approved PUBLISHED); FEAT-042 is DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-042-approved PUBLISHED); FEAT-043 is DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-043-approved); FEAT-044 is UNBLOCKED FOR IMPLEMENTATION.
 
 Feature Decomposition:
 
@@ -876,7 +876,7 @@ FEAT-028: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 FEAT-029: IMPLEMENTATION COMPLETE / DEFER CLOSURE VERIFIED
 FEAT-030: DONE / QA PASS
 HISTORICAL SNAPSHOT (at Phase 4 completion): Phase 5 was MASTER PLANNING APPROVED; Phase 5 Implementation was NOT_STARTED
-CURRENT CANONICAL STATE: Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-031 through FEAT-040 are DONE / QA PASS; Phase Checkpoint: phase-5-approved PUBLISHED; Phase 6 planning is HUMAN MASTER PLANNING APPROVED; Phase 6 implementation is IN_PROGRESS; FEAT-041 is DONE / QA PASS / Human Final Gate APPROVED (Checkpoint: feat-041-approved PUBLISHED); FEAT-042 is UNBLOCKED FOR IMPLEMENTATION
+CURRENT CANONICAL STATE: Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-031 through FEAT-040 are DONE / QA PASS; Phase Checkpoint: phase-5-approved PUBLISHED; Phase 6 planning is HUMAN MASTER PLANNING APPROVED; Phase 6 implementation is IN_PROGRESS; FEAT-041 is DONE / QA PASS / Human Final Gate APPROVED (Checkpoint: feat-041-approved PUBLISHED); FEAT-042 is DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-042-approved PUBLISHED); FEAT-043 is DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-043-approved); FEAT-044 is UNBLOCKED FOR IMPLEMENTATION
 ```
 
 Feature Decomposition:
@@ -1674,14 +1674,14 @@ Baseline: phase-5-approved
 Planning / Architecture Owner: Codex
 Implementation Owner: DEV-B / Antigravity
 FEAT-041: DONE / QA PASS / HUMAN TARGETED GOVERNANCE REVIEW APPROVED (Checkpoint: feat-041-approved PUBLISHED)
-FEAT-042: DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-042-approved)
-FEAT-043: UNBLOCKED FOR IMPLEMENTATION
-FEAT-044: PLANNED / BLOCKED BY FEAT-042 (Parallel contract prep permitted)
-FEAT-045: PLANNED / BLOCKED BY FEAT-042..FEAT-044
-FEAT-046: PLANNED / BLOCKED BY FEAT-042..FEAT-045
-FEAT-047: PLANNED / BLOCKED BY FEAT-042..FEAT-046
+FEAT-042: DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-042-approved PUBLISHED)
+FEAT-043: DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-043-approved)
+FEAT-044: UNBLOCKED FOR IMPLEMENTATION
+FEAT-045: PLANNED / BLOCKED BY FEAT-043..FEAT-044
+FEAT-046: PLANNED / BLOCKED BY FEAT-043..FEAT-045
+FEAT-047: PLANNED / BLOCKED BY FEAT-043..FEAT-046
 Phase 7: BLOCKED
-Application code changes: FEAT-041 Community persistence foundation complete; FEAT-042 Community posts API & feed read models complete; ZERO FEAT-043 application changes
+Application code changes: FEAT-041 Community persistence foundation complete; FEAT-042 Community posts API & feed read models complete; FEAT-043 Community comments API complete; ZERO FEAT-044 application changes
 ```
 
 FEAT-041 Governance Fields:
@@ -1741,11 +1741,41 @@ Relational Counts: likeCount, commentCount, likedByCurrentUser derived relationa
 Migration: ZERO new migrations (remains 9 migrations)
 Redis Durable Authority: ZERO (no feed cache, no durable state)
 Product Audit Persistence: DEFERRED (zero schema/API changes)
-Boundary Guard: PASS (16 controllers, 21 services, 8 repositories clean)
+Boundary Guard: PASS (17 controllers, 22 services, 8 repositories clean)
 Spec Package: .specify/specs/FEAT-042/
 Acceptance Criteria: 28 PASS / 0 FAIL (AC-001..AC-028 PASS)
 Tasks: 19 PASS / 0 FAIL (T001..T019 PASS)
 Dependencies: FEAT-043 UNBLOCKED FOR IMPLEMENTATION
+```
+
+FEAT-043 Governance Fields:
+
+```text
+Lifecycle State: DONE / APPROVED FOR CHECKPOINT
+Planning Status: HUMAN MASTER PLANNING APPROVED
+Planning Owner: Codex
+Implementation: COMPLETE
+Implementation Owner: DEV-B / Antigravity
+Internal Feature Gate: PASS
+Latest QA: FAST-TRACK DELIVERY (Internal Feature Gate PASS; Zero blocking defects; Canonical 14 PASS)
+Canonical 14 Validation: PASS (14/14 commands with no skips)
+Implementation Report: reports/implementation/phase-6/FEAT-043.md
+Checkpoint Tag: feat-043-approved
+Routes: GET /api/community/posts/:postId/comments, POST /api/community/posts/:postId/comments, DELETE /api/community/comments/:commentId (3 exact routes, authenticated only)
+Ordering: Deterministic ascending (createdAt ASC, id ASC) with opaque versioned cursor (v: 1)
+Safe DTO: CommunityCommentDto (exact 5 fields, fallback to 'Aura Learner', zero sensitive/security leaks)
+Parent Visibility Gate: Missing, hidden, or removed parent posts return safe uniform 404 NOT_FOUND
+Removal: Atomic logical removal via removeCommentIfOwner; zero physical deletions
+Ownership: Strict owner authorization; foreign delete attempts return safe 404 NOT_FOUND
+Relational Counts: Post commentCount dynamically reflects visible comments only; increments on create and decrements on logical removal
+Migration: ZERO new migrations (remains 9 migrations)
+Redis Durable Authority: ZERO (no comment cache, no durable state)
+Product Audit Persistence: DEFERRED (zero schema/API changes)
+Boundary Guard: PASS (17 controllers, 22 services, 8 repositories clean)
+Spec Package: .specify/specs/FEAT-043/
+Acceptance Criteria: 26 PASS / 0 FAIL (AC-001..AC-026 PASS)
+Tasks: 17 PASS / 0 FAIL (T001..T017 PASS)
+Dependencies: FEAT-044 UNBLOCKED FOR IMPLEMENTATION
 ```
 
 Planning Artifacts:
@@ -1763,8 +1793,9 @@ Implementation Artifacts:
 
 - `reports/implementation/phase-6/FEAT-041.md`
 - `reports/implementation/phase-6/FEAT-042.md`
+- `reports/implementation/phase-6/FEAT-043.md`
 
-Human Decision State: HUMAN MASTER PLANNING APPROVED. FEAT-041 Human Targeted Governance Review APPROVED (Checkpoint: feat-041-approved). FEAT-042 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (AC 28/28 PASS, Tasks 19/19 PASS, Checkpoint: feat-042-approved). FEAT-042 is DONE; FEAT-043 is UNBLOCKED FOR IMPLEMENTATION. Phase 6 remains IN_PROGRESS.
+Human Decision State: HUMAN MASTER PLANNING APPROVED. FEAT-041 Human Targeted Governance Review APPROVED (Checkpoint: feat-041-approved). FEAT-042 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (AC 28/28 PASS, Tasks 19/19 PASS, Checkpoint: feat-042-approved). FEAT-043 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (AC 26/26 PASS, Tasks 17/17 PASS, Checkpoint: feat-043-approved). FEAT-043 is DONE; FEAT-044 is UNBLOCKED FOR IMPLEMENTATION. Phase 6 remains IN_PROGRESS.
 
 
 ---

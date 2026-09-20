@@ -82,3 +82,49 @@ export interface ListVisibleFeedParams {
   };
   currentUserId?: string;
 }
+
+// ============================================================================
+// FEAT-043: Comments API & Read Model Types
+// ============================================================================
+
+export interface CommunityCommentDto {
+  id: string;
+  author: SafeAuthorDto;
+  content: string;
+  createdAt: string;
+  ownedByCurrentUser: boolean;
+}
+
+export interface CommunityCommentFeedPageInfo {
+  nextCursor: string | null;
+  hasNextPage: boolean;
+}
+
+export interface CommunityCommentFeedResponse {
+  data: CommunityCommentDto[];
+  pageInfo: CommunityCommentFeedPageInfo;
+}
+
+export interface CommunityCommentRecord {
+  id: string;
+  postId: string;
+  authorId: string;
+  content: string;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  removedAt: Date | null;
+  author: {
+    displayName: string | null;
+  };
+}
+
+export interface ListVisibleCommentsParams {
+  postId: string;
+  limit: number;
+  cursor?: {
+    createdAt: Date;
+    id: string;
+  };
+}
+

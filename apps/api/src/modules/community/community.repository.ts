@@ -14,6 +14,8 @@ import type {
   CreateCommunityPostLikeInput,
   CommunityPostRecord,
   ListVisibleFeedParams,
+  CommunityCommentRecord,
+  ListVisibleCommentsParams,
 } from "./community.types.js";
 
 import { getPrismaClient } from "../../infrastructure/database/prisma.js";
@@ -267,7 +269,9 @@ export interface ICommunityCommentRepository {
   findCommentById(id: string): Promise<CommunityComment | null>;
   listCommentsByPost(postId: string, filter?: ListCommunityCommentsFilter): Promise<CommunityComment[]>;
   listCommentsByAuthor(authorId: string, limit?: number): Promise<CommunityComment[]>;
+  listVisibleCommentsByPost(params: ListVisibleCommentsParams): Promise<CommunityCommentRecord[]>;
   markCommentRemoved(id: string): Promise<CommunityComment>;
+  removeCommentIfOwner(commentId: string, authorId: string): Promise<CommunityComment | null>;
   updateCommentStatus(id: string, status: "VISIBLE" | "HIDDEN"): Promise<CommunityComment>;
 }
 
@@ -331,6 +335,56 @@ export class PrismaCommunityCommentRepository implements ICommunityCommentReposi
     }
   }
 
+  async listVisibleCommentsByPost(params: ListVisibleCommentsParams): Promise<CommunityCommentRecord[]> {
+    try {
+      const where: Prisma.CommunityCommentWhereInput = {
+        postId: params.postId,
+        status: "VISIBLE",
+      };
+
+      if (params.cursor) {
+        where.OR = [
+          {
+            createdAt: {
+              gt: params.cursor.createdAt,
+            },
+          },
+          {
+            createdAt: params.cursor.createdAt,
+            id: {
+              gt: params.cursor.id,
+            },
+          },
+        ];
+      }
+
+      const comments = await this.client.communityComment.findMany({
+        where,
+        orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+        take: params.limit,
+        select: {
+          id: true,
+          postId: true,
+          authorId: true,
+          content: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
+          removedAt: true,
+          author: {
+            select: {
+              displayName: true,
+            },
+          },
+        },
+      });
+
+      return comments as CommunityCommentRecord[];
+    } catch (err) {
+      throw mapDatabaseError(err, "Failed to list visible community comments");
+    }
+  }
+
   async markCommentRemoved(id: string): Promise<CommunityComment> {
     try {
       return await this.client.communityComment.update({
@@ -342,6 +396,32 @@ export class PrismaCommunityCommentRepository implements ICommunityCommentReposi
       });
     } catch (err) {
       throw mapDatabaseError(err, "Failed to mark community comment as removed");
+    }
+  }
+
+  async removeCommentIfOwner(commentId: string, authorId: string): Promise<CommunityComment | null> {
+    try {
+      const comment = await this.client.communityComment.findFirst({
+        where: {
+          id: commentId,
+          authorId,
+          status: "VISIBLE",
+        },
+      });
+
+      if (!comment) {
+        return null;
+      }
+
+      return await this.client.communityComment.update({
+        where: { id: commentId },
+        data: {
+          status: "REMOVED",
+          removedAt: new Date(),
+        },
+      });
+    } catch (err) {
+      throw mapDatabaseError(err, "Failed to remove community comment");
     }
   }
 
