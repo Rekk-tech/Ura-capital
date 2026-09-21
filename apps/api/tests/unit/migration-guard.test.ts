@@ -24,7 +24,7 @@ describe("FEAT-012 Migration Reproducibility & Schema Governance Guard (Unit)", 
 
     it("verifies exact migration count and deterministic ordering of approved Phase 2 / FEAT-011 migrations", () => {
       const digests = computeMigrationDigests(migrationsDir);
-      expect(digests.length).toBe(9);
+      expect(digests.length).toBe(10);
 
       const migrationNames = digests.map((m) => m.migration);
       expect(migrationNames).toEqual([
@@ -37,6 +37,7 @@ describe("FEAT-012 Migration Reproducibility & Schema Governance Guard (Unit)", 
         "20260909000000_feat025_grading_state_constraint_fix",
         "20260914072000_feat031_simulation_foundation",
         "20260919201500_feat041_community_foundation",
+        "20260922000000_feat048_subscription_foundation",
       ]);
 
 

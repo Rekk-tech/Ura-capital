@@ -55,6 +55,9 @@ const KNOWN_PRISMA_MODELS = new Set([
   "communityPost",
   "communityComment",
   "communityPostLike",
+  "userSubscription",
+  "subscriptionProviderEvent",
+  "subscriptionTransitionRecord",
 ]);
 
 const KNOWN_PRISMA_ACTIONS = new Set([

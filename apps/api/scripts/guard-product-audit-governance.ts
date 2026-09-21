@@ -83,7 +83,10 @@ export function evaluateProductAuditGovernance(inputs: GovernanceGuardEvaluation
             modelName === "AuthSecurityAuditRecord" ||
             modelName === "CommunityPost" ||
             modelName === "CommunityComment" ||
-            modelName === "CommunityPostLike"
+            modelName === "CommunityPostLike" ||
+            modelName === "UserSubscription" ||
+            modelName === "SubscriptionProviderEvent" ||
+            modelName === "SubscriptionTransitionRecord"
           ) continue;
           violations.push(`Prohibited product/domain model '${modelName}' detected in schema.prisma.`);
         }
@@ -160,6 +163,10 @@ export function evaluateProductAuditGovernance(inputs: GovernanceGuardEvaluation
             if (
               m.name.includes("feat041_community_foundation") &&
               (rawTable === "community_posts" || rawTable === "community_comments" || rawTable === "community_post_likes")
+            ) continue;
+            if (
+              m.name.includes("feat048_subscription_foundation") &&
+              (rawTable === "user_subscriptions" || rawTable === "subscription_provider_events" || rawTable === "subscription_transition_records")
             ) continue;
             violations.push(`Prohibited table creation '${rawTable}' in migration ${m.name}.`);
           }

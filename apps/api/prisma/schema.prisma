@@ -40,6 +40,10 @@ model User {
   communityComments   CommunityComment[]
   communityPostLikes  CommunityPostLike[]
 
+  // Phase 7 Subscription relations
+  subscriptions                 UserSubscription[]
+  subscriptionTransitionRecords SubscriptionTransitionRecord[]
+
   @@map("users")
 }
 
@@ -600,4 +604,88 @@ model CommunityPostLike {
   @@index([userId, createdAt(sort: Desc)], map: "community_post_likes_user_id_created_at_idx")
   @@map("community_post_likes")
 }
+
+// ============================================================================
+// Phase 7 — Subscription Models
+// ============================================================================
+
+model UserSubscription {
+  id                     String                        @id @default(uuid())
+  userId                 String                        @map("user_id")
+  planKey                String                        @default("FREE") @map("plan_key")
+  status                 String                        @default("ACTIVE")
+  providerKey            String                        @default("INTERNAL") @map("provider_key")
+  externalSubscriptionId String?                       @map("external_subscription_id")
+  currentPeriodStart     DateTime                      @map("current_period_start")
+  currentPeriodEnd       DateTime                      @map("current_period_end")
+  cancelAtPeriodEnd      Boolean                       @default(false) @map("cancel_at_period_end")
+  providerSequence       String?                       @map("provider_sequence")
+  createdAt              DateTime                      @default(now()) @map("created_at")
+  updatedAt              DateTime                      @updatedAt @map("updated_at")
+
+  user                   User                          @relation(fields: [userId], references: [id], onDelete: Restrict)
+  providerEvents         SubscriptionProviderEvent[]
+  transitionRecords      SubscriptionTransitionRecord[]
+
+  @@index([userId], map: "user_subscriptions_user_id_idx")
+  @@index([status], map: "user_subscriptions_status_idx")
+  @@index([providerKey], map: "user_subscriptions_provider_key_idx")
+  @@index([currentPeriodEnd], map: "user_subscriptions_period_end_idx")
+  @@map("user_subscriptions")
+}
+
+model SubscriptionProviderEvent {
+  id              String            @id @default(uuid())
+  providerKey     String            @map("provider_key")
+  providerEventId String            @map("provider_event_id")
+  eventType       String            @map("event_type")
+  outcome         String            @default("RECEIVED")
+  occurredAt      DateTime          @map("occurred_at")
+  receivedAt      DateTime          @default(now()) @map("received_at")
+  processedAt     DateTime?         @map("processed_at")
+  payloadDigest   String?           @map("payload_digest")
+  metadata        Json?             @map("metadata")
+  subscriptionId  String?           @map("subscription_id")
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+
+  subscription    UserSubscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  @@unique([providerKey, providerEventId], map: "subscription_provider_events_provider_event_uidx")
+  @@index([subscriptionId], map: "subscription_provider_events_subscription_id_idx")
+  @@index([occurredAt(sort: Desc)], map: "subscription_provider_events_occurred_at_idx")
+  @@index([receivedAt(sort: Desc)], map: "subscription_provider_events_received_at_idx")
+  @@index([outcome], map: "subscription_provider_events_outcome_idx")
+  @@map("subscription_provider_events")
+}
+
+model SubscriptionTransitionRecord {
+  id                  String           @id @default(uuid())
+  subscriptionId      String           @map("subscription_id")
+  userId              String           @map("user_id")
+  fromStatus          String?          @map("from_status")
+  toStatus            String           @map("to_status")
+  fromPlan            String?          @map("from_plan")
+  toPlan              String           @map("to_plan")
+  source              String           @map("source")
+  transactionStrategy String           @map("transaction_strategy")
+  reason              String?          @map("reason")
+  providerEventId     String?          @map("provider_event_id")
+  actorId             String?          @map("actor_id")
+  subjectId           String?          @map("subject_id")
+  requestId           String?          @map("request_id")
+  correlationId       String?          @map("correlation_id")
+  metadata            Json?            @map("metadata")
+  createdAt           DateTime         @default(now()) @map("created_at")
+
+  subscription        UserSubscription @relation(fields: [subscriptionId], references: [id], onDelete: Restrict)
+  user                User             @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([subscriptionId, createdAt(sort: Asc)], map: "subscription_transition_records_subscription_created_idx")
+  @@index([userId, createdAt(sort: Asc)], map: "subscription_transition_records_user_created_idx")
+  @@index([correlationId], map: "subscription_transition_records_correlation_idx")
+  @@index([providerEventId], map: "subscription_transition_records_provider_event_idx")
+  @@map("subscription_transition_records")
+}
+
 

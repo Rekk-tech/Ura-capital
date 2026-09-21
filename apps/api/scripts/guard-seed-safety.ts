@@ -24,6 +24,7 @@ export interface SeedSafetyGuardInput {
   schemaContent?: string;
   codeFiles?: Array<{ path: string; content: string }>;
   allowApprovedPhase6Models?: boolean;
+  allowApprovedPhase7Models?: boolean;
 }
 
 /**
@@ -121,6 +122,12 @@ export function evaluateSeedSafety(inputs: SeedSafetyGuardInput): SeedSafetyGuar
           if (
             inputs.allowApprovedPhase6Models &&
             (modelName === "CommunityPost" || modelName === "CommunityComment" || modelName === "CommunityPostLike")
+          ) {
+            continue;
+          }
+          if (
+            inputs.allowApprovedPhase7Models &&
+            (modelName === "UserSubscription" || modelName === "SubscriptionProviderEvent" || modelName === "SubscriptionTransitionRecord")
           ) {
             continue;
           }
@@ -287,6 +294,7 @@ export function runSeedSafetyGuard(): SeedSafetyGuardResult {
     schemaContent,
     codeFiles,
     allowApprovedPhase6Models: true,
+    allowApprovedPhase7Models: true,
   });
 }
 

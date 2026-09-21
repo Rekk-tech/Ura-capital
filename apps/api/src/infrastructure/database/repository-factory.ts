@@ -53,6 +53,14 @@ import {
   PrismaCommunityCommentRepository,
   PrismaCommunityPostLikeRepository,
 } from "../../modules/community/community.repository.js";
+import {
+  type ISubscriptionRepository,
+  type ISubscriptionProviderEventRepository,
+  type ISubscriptionTransitionRepository,
+  PrismaSubscriptionRepository,
+  PrismaSubscriptionProviderEventRepository,
+  PrismaSubscriptionTransitionRepository,
+} from "../../modules/subscription/subscription.repository.js";
 
 /**
  * Shared container representing all domain repository instances bound to a specific
@@ -82,6 +90,10 @@ export interface IRepositoryContainer {
   readonly communityPostRepo: ICommunityPostRepository;
   readonly communityCommentRepo: ICommunityCommentRepository;
   readonly communityPostLikeRepo: ICommunityPostLikeRepository;
+  // Phase 7 Subscription repositories
+  readonly subscriptionRepo: ISubscriptionRepository;
+  readonly subscriptionProviderEventRepo: ISubscriptionProviderEventRepository;
+  readonly subscriptionTransitionRepo: ISubscriptionTransitionRepository;
 }
 
 /**
@@ -118,6 +130,10 @@ export function createRepositoryContainer(
     communityPostRepo: new PrismaCommunityPostRepository(client),
     communityCommentRepo: new PrismaCommunityCommentRepository(client),
     communityPostLikeRepo: new PrismaCommunityPostLikeRepository(client),
+    // Phase 7 Subscription repositories
+    subscriptionRepo: new PrismaSubscriptionRepository(client),
+    subscriptionProviderEventRepo: new PrismaSubscriptionProviderEventRepository(client),
+    subscriptionTransitionRepo: new PrismaSubscriptionTransitionRepository(client),
   };
 }
 
@@ -150,3 +166,9 @@ export const simulationTradeRepository = rootRepositoryContainer.simulationTrade
 export const communityPostRepository = rootRepositoryContainer.communityPostRepo;
 export const communityCommentRepository = rootRepositoryContainer.communityCommentRepo;
 export const communityPostLikeRepository = rootRepositoryContainer.communityPostLikeRepo;
+
+// Phase 7 Subscription repository singletons
+export const subscriptionRepository = rootRepositoryContainer.subscriptionRepo;
+export const subscriptionProviderEventRepository = rootRepositoryContainer.subscriptionProviderEventRepo;
+export const subscriptionTransitionRepository = rootRepositoryContainer.subscriptionTransitionRepo;
+
