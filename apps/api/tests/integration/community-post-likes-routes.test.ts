@@ -24,7 +24,7 @@ describe("FEAT-044 Community post-like HTTP contract", () => {
   const unusedPostController = {} as CommunityPostController;
   const app = express();
   app.use(express.json());
-  app.use(createCommunityRouter(unusedPostController, likeController));
+  app.use(createCommunityRouter(unusedPostController, undefined, likeController));
   app.use(errorHandlerMiddleware);
 
   beforeEach(() => {
