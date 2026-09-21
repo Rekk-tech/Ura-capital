@@ -148,7 +148,20 @@ All UI components reside in `apps/web/src/features/community/`:
    - Like toggle on post detail.
    - Plain text rendering security for comments.
 4. **`apps/web/tests/e2e/community-learner-journey.spec.tsx`** (1 test PASS):
-   - Full integrated learner runtime journey: authenticate -> view feed -> create post -> navigate to detail -> like post -> unlike post -> create comment -> remove comment -> remove post.
+   - **Historical QA Iteration 1 Note (DEF-003)**: The initial FEAT-046 submission utilized mocked `communityApi` methods (`vi.spyOn`), which Codex QA Iteration 1 correctly identified as synthetic and failing integrated traversal.
+   - **Post-Rework Real Runtime E2E Evidence (DEF-003 Closure)**: Replaced with an authentic, unmocked integrated runtime journey. Traverses real browser JSDOM -> real Express HTTP server -> PostgreSQL -> Redis:
+     - Boots real HTTP server dynamically on an isolated port (`http://127.0.0.1:{port}`).
+     - Authenticates real learner via `POST /api/auth/register` and `POST /api/auth/login`.
+     - Opens `/community` feed and renders real data from `GET /api/community/posts`.
+     - Creates post via real `POST /api/community/posts` (rate-limited via Redis).
+     - Navigates to created post detail (`GET /api/community/posts/:id`).
+     - Likes post via real `PUT /api/community/posts/:id/like` -> verified count `1` and `aria-label="Unlike post"`.
+     - Unlikes post via real `DELETE /api/community/posts/:id/like` -> verified count `0` and `aria-label="Like post"`.
+     - Creates comment via real `POST /api/community/posts/:id/comments` (rate-limited via Redis) -> verified count `1`.
+     - Removes comment via real `DELETE /api/community/comments/:id` (canonical 204 No Content).
+     - Removes post via real `DELETE /api/community/posts/:id` (canonical 204 No Content) -> navigates back to feed.
+     - Authoritative PostgreSQL assertions: post and comment records persist with `status = "REMOVED"` and non-null `removedAt`; post like row is deleted.
+     - Authoritative Redis assertions: transient rate-limit keys created under `*community-rl*` namespace without PII; zero durable business entities stored in Redis.
 
 ---
 

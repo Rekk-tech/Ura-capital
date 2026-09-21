@@ -159,9 +159,7 @@ describe("PostDetailPage (Component & State - AC-001..AC-028)", () => {
       pageInfo: { nextCursor: null, hasNextPage: false },
     };
     vi.spyOn(communityApi, "listComments").mockResolvedValue(commentsResponse);
-    const removeCommentSpy = vi.spyOn(communityApi, "removeComment").mockResolvedValue({
-      data: { id: "c-2", removed: true },
-    });
+    const removeCommentSpy = vi.spyOn(communityApi, "removeComment").mockResolvedValue(undefined);
     vi.spyOn(window, "confirm").mockReturnValue(true);
 
     renderWithProviders("post-100");

@@ -12,11 +12,22 @@ export class CommunityPostLikeService implements ICommunityPostLikeService {
   constructor(private readonly txRunner: ITransactionRunner) {}
 
   async likePost(postId: string, userId: string): Promise<CommunityPostLikeStateDto> {
-    return this.txRunner.run(async (ctx) => {
-      await this.assertVisiblePost(ctx.repositories.communityPostRepo, postId, userId);
-      await ctx.repositories.communityPostLikeRepo.ensureLike(postId, userId);
-      return ctx.repositories.communityPostLikeRepo.getLikeState(postId, userId);
-    });
+    try {
+      return await this.txRunner.run(async (ctx) => {
+        await this.assertVisiblePost(ctx.repositories.communityPostRepo, postId, userId);
+        await ctx.repositories.communityPostLikeRepo.ensureLike(postId, userId);
+        return ctx.repositories.communityPostLikeRepo.getLikeState(postId, userId);
+      });
+    } catch (err) {
+      if (err instanceof AppError && err.statusCode === HTTP_STATUS.CONFLICT) {
+        // Unique race: concurrent request already inserted the like relation
+        // Safely map the unique race and query canonical count afterward (FEAT-044 AC-022, Section 14)
+        return this.txRunner.run(async (ctx) => {
+          return ctx.repositories.communityPostLikeRepo.getLikeState(postId, userId);
+        });
+      }
+      throw err;
+    }
   }
 
   async unlikePost(postId: string, userId: string): Promise<CommunityPostLikeStateDto> {

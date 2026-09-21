@@ -122,11 +122,10 @@ describe("CommunityApiClient (Web API Client)", () => {
   });
 
   describe("removePost", () => {
-    it("calls DELETE /api/community/posts/:postId with Auth header", async () => {
-      const mockResponse = { data: { id: "p1", removed: true } };
+    it("calls DELETE /api/community/posts/:postId with Auth header and resolves void on 204 No Content (DEF-002)", async () => {
       globalThis.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse,
+        status: 204,
       });
 
       const res = await client.removePost("p1", "token");
@@ -138,7 +137,7 @@ describe("CommunityApiClient (Web API Client)", () => {
         },
         signal: undefined,
       });
-      expect(res).toEqual(mockResponse);
+      expect(res).toBeUndefined();
     });
   });
 
@@ -202,11 +201,10 @@ describe("CommunityApiClient (Web API Client)", () => {
   });
 
   describe("removeComment", () => {
-    it("calls DELETE /api/community/comments/:commentId", async () => {
-      const mockResponse = { data: { id: "c1", removed: true } };
+    it("calls DELETE /api/community/comments/:commentId and resolves void on 204 No Content (DEF-002)", async () => {
       globalThis.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse,
+        status: 204,
       });
 
       const res = await client.removeComment("c1", "token");
@@ -218,7 +216,7 @@ describe("CommunityApiClient (Web API Client)", () => {
         },
         signal: undefined,
       });
-      expect(res).toEqual(mockResponse);
+      expect(res).toBeUndefined();
     });
   });
 

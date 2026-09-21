@@ -69,3 +69,10 @@ export const CommunityCommentParamSchema = z
   .strict();
 
 export type CommunityCommentParam = z.infer<typeof CommunityCommentParamSchema>;
+
+/**
+ * Validates request body for DELETE /api/community/comments/:commentId.
+ * Strictly empty object. Rejects any identity, status, timestamp, count, or moderator fields.
+ */
+export const DeleteCommunityCommentBodySchema = z.object({}).strict();
+

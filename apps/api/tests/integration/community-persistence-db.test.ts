@@ -606,7 +606,9 @@ describe("FEAT-041 Community Domain Schema & Persistence Foundation (Integration
       const user = await createTestUser("feed_poster");
 
       const p1 = await repos.communityPostRepo.createPost({ authorId: user.id, content: "Post 1" });
+      await new Promise((r) => setTimeout(r, 25));
       const p2 = await repos.communityPostRepo.createPost({ authorId: user.id, content: "Post 2" });
+      await new Promise((r) => setTimeout(r, 25));
       const p3 = await repos.communityPostRepo.createPost({ authorId: user.id, content: "Post 3" });
 
       const posts = await repos.communityPostRepo.listPosts({ status: "VISIBLE" });
@@ -625,7 +627,9 @@ describe("FEAT-041 Community Domain Schema & Persistence Foundation (Integration
       const post = await repos.communityPostRepo.createPost({ authorId: author.id, content: "Post for comments" });
 
       const c1 = await repos.communityCommentRepo.createComment({ postId: post.id, authorId: commenter.id, content: "First comment" });
+      await new Promise((r) => setTimeout(r, 25));
       const c2 = await repos.communityCommentRepo.createComment({ postId: post.id, authorId: commenter.id, content: "Second comment" });
+      await new Promise((r) => setTimeout(r, 25));
       const c3 = await repos.communityCommentRepo.createComment({ postId: post.id, authorId: commenter.id, content: "Third comment" });
 
       const comments = await repos.communityCommentRepo.listCommentsByPost(post.id);

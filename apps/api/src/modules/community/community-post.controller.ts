@@ -5,6 +5,7 @@ import {
   CreateCommunityPostBodySchema,
   GetCommunityPostsQuerySchema,
   CommunityPostParamSchema,
+  DeleteCommunityPostBodySchema,
 } from "./community.validation.js";
 import { HTTP_STATUS } from "@aura/shared";
 
@@ -83,6 +84,7 @@ export class CommunityPostController {
     next: NextFunction,
   ): Promise<void> {
     try {
+      DeleteCommunityPostBodySchema.parse(req.body ?? {});
       const params = CommunityPostParamSchema.parse(req.params);
       const user = req.user!;
 

@@ -6,6 +6,7 @@ import {
   GetCommunityCommentsQuerySchema,
   CommunityCommentPostParamSchema,
   CommunityCommentParamSchema,
+  DeleteCommunityCommentBodySchema,
 } from "./community-comment.validation.js";
 import { HTTP_STATUS } from "@aura/shared";
 
@@ -69,6 +70,7 @@ export class CommunityCommentController {
     next: NextFunction,
   ): Promise<void> {
     try {
+      DeleteCommunityCommentBodySchema.parse(req.body ?? {});
       const params = CommunityCommentParamSchema.parse(req.params);
       const user = req.user!;
 

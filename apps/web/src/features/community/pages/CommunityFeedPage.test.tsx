@@ -159,7 +159,7 @@ describe("CommunityFeedPage (Component & State - AC-001..AC-028)", () => {
       pageInfo: { nextCursor: null, hasNextPage: false },
     };
     vi.spyOn(communityApi, "listPosts").mockResolvedValue(feedResponse);
-    const removeSpy = vi.spyOn(communityApi, "removePost").mockResolvedValue({ data: { id: "p-1111", removed: true } });
+    const removeSpy = vi.spyOn(communityApi, "removePost").mockResolvedValue(undefined);
     vi.spyOn(window, "confirm").mockReturnValue(true);
 
     renderWithProviders(<CommunityFeedPage />);

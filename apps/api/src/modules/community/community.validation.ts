@@ -64,3 +64,10 @@ export type CommunityPostParam = z.infer<typeof CommunityPostParamSchema>;
  * come from the authenticated request context and validated route parameter.
  */
 export const EmptyCommunityMutationBodySchema = z.object({}).strict();
+
+/**
+ * Validates request body for DELETE /api/community/posts/:postId.
+ * Strictly empty object. Rejects any identity, status, timestamp, count, or moderator fields.
+ */
+export const DeleteCommunityPostBodySchema = z.object({}).strict();
+

@@ -37,7 +37,7 @@ export interface ICommunityApiClient {
     postId: string,
     accessToken: string,
     options?: RequestOptions,
-  ): Promise<{ data: { id: string; removed: boolean } }>;
+  ): Promise<void>;
 
   listComments(
     postId: string,
@@ -57,7 +57,7 @@ export interface ICommunityApiClient {
     commentId: string,
     accessToken: string,
     options?: RequestOptions,
-  ): Promise<{ data: { id: string; removed: boolean } }>;
+  ): Promise<void>;
 
   likePost(
     postId: string,
@@ -73,10 +73,18 @@ export interface ICommunityApiClient {
 }
 
 export class CommunityApiClient implements ICommunityApiClient {
-  private readonly baseUrl: string;
+  private baseUrl: string;
 
   constructor(baseUrl = "/api/community") {
     this.baseUrl = baseUrl;
+  }
+
+  setBaseUrl(baseUrl: string): void {
+    this.baseUrl = baseUrl;
+  }
+
+  getBaseUrl(): string {
+    return this.baseUrl;
   }
 
   async listPosts(
@@ -139,7 +147,7 @@ export class CommunityApiClient implements ICommunityApiClient {
     postId: string,
     accessToken: string,
     options?: RequestOptions,
-  ): Promise<{ data: { id: string; removed: boolean } }> {
+  ): Promise<void> {
     const url = `${this.baseUrl}/posts/${encodeURIComponent(postId)}`;
     const headers: Record<string, string> = {
       Accept: "application/json",
@@ -148,7 +156,7 @@ export class CommunityApiClient implements ICommunityApiClient {
 
     const res = await fetch(url, { method: "DELETE", headers, signal: options?.signal });
     if (!res.ok) await this.handleError(res);
-    return (await res.json()) as { data: { id: string; removed: boolean } };
+    // 204 No Content resolves successfully with empty body
   }
 
   async listComments(
@@ -199,7 +207,7 @@ export class CommunityApiClient implements ICommunityApiClient {
     commentId: string,
     accessToken: string,
     options?: RequestOptions,
-  ): Promise<{ data: { id: string; removed: boolean } }> {
+  ): Promise<void> {
     const url = `${this.baseUrl}/comments/${encodeURIComponent(commentId)}`;
     const headers: Record<string, string> = {
       Accept: "application/json",
@@ -208,7 +216,7 @@ export class CommunityApiClient implements ICommunityApiClient {
 
     const res = await fetch(url, { method: "DELETE", headers, signal: options?.signal });
     if (!res.ok) await this.handleError(res);
-    return (await res.json()) as { data: { id: string; removed: boolean } };
+    // 204 No Content resolves successfully with empty body
   }
 
   async likePost(

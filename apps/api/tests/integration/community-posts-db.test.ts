@@ -509,5 +509,66 @@ describe("FEAT-042 Community Posts API Live PostgreSQL (Integration)", () => {
       expect(dbPost!.status).toBe("VISIBLE");
       expect(dbPost!.removedAt).toBeNull();
     });
+
+    it("DEF-001: strictly rejects forbidden request body fields and proves ZERO database mutation on DELETE post", async () => {
+      const user = await createTestUser("strict_delete_user");
+      const authHeader = getAuthHeaderForUser(user.id);
+
+      const post = await prisma.communityPost.create({
+        data: {
+          authorId: user.id,
+          content: "Post with strict delete zero-mutation proof",
+          status: "VISIBLE",
+        },
+      });
+
+      // Capture pre-mutation state
+      const prePost = await prisma.communityPost.findUniqueOrThrow({
+        where: { id: post.id },
+      });
+      expect(prePost.status).toBe("VISIBLE");
+      expect(prePost.removedAt).toBeNull();
+
+      // Probe multiple classes of forbidden fields:
+      // 1. Identity field: authorId, userId
+      // 2. Moderation field: status, moderatorId, reviewNotes
+      // 3. Role/admin field: role, roles, isAdmin
+      // 4. Count field: likeCount, commentCount
+      // 5. Timestamp field: removedAt, createdAt, updatedAt
+      const forbiddenPayloads = [
+        { status: "REMOVED" },
+        { moderatorId: "mod-uuid-1234" },
+        { isAdmin: true },
+        { role: "ADMIN" },
+        { roles: ["ADMIN"] },
+        { likeCount: 999 },
+        { commentCount: 50 },
+        { authorId: "fake-author-id" },
+        { userId: "fake-user-id" },
+        { createdAt: "2026-09-21T00:00:00Z" },
+        { updatedAt: "2026-09-21T00:00:00Z" },
+        { removedAt: "2026-09-21T00:00:00Z" },
+        { reviewNotes: "malicious note" },
+        { status: "REMOVED", moderatorId: "mod-1", isAdmin: true, likeCount: 10 },
+      ];
+
+      for (const payload of forbiddenPayloads) {
+        const res = await request(app)
+          .delete(`/api/community/posts/${post.id}`)
+          .set("Authorization", authHeader)
+          .send(payload)
+          .expect(HTTP_STATUS.BAD_REQUEST);
+
+        expect(res.body.error.code).toBe(ERROR_CODES.VALIDATION_ERROR);
+
+        // Verify ZERO DB mutation: row exists, status unchanged, removedAt unchanged
+        const dbPost = await prisma.communityPost.findUniqueOrThrow({
+          where: { id: post.id },
+        });
+        expect(dbPost.status).toBe("VISIBLE");
+        expect(dbPost.removedAt).toBeNull();
+        expect(dbPost.content).toBe("Post with strict delete zero-mutation proof");
+      }
+    });
   });
 });

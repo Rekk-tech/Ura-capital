@@ -466,5 +466,71 @@ describe("FEAT-043 Community Comments API Live PostgreSQL (Integration)", () => 
 
       expect(res.body.error.code).toBe(ERROR_CODES.NOT_FOUND);
     });
+
+    it("DEF-001: strictly rejects forbidden request body fields and proves ZERO database mutation on DELETE comment", async () => {
+      const author = await createTestUser("post_author_strict");
+      const post = await createTestPost(author.id, "VISIBLE");
+
+      const commenter = await createTestUser("commenter_strict");
+      const authHeader = getAuthHeaderForUser(commenter.id);
+
+      const comment = await prisma.communityComment.create({
+        data: {
+          postId: post.id,
+          authorId: commenter.id,
+          content: "Comment with strict delete zero-mutation proof",
+          status: "VISIBLE",
+        },
+      });
+
+      // Capture pre-mutation state
+      const preComment = await prisma.communityComment.findUniqueOrThrow({
+        where: { id: comment.id },
+      });
+      expect(preComment.status).toBe("VISIBLE");
+      expect(preComment.removedAt).toBeNull();
+
+      // Probe multiple classes of forbidden fields:
+      // 1. Identity field: authorId, userId, postId
+      // 2. Moderation field: status, moderatorId, reviewNotes
+      // 3. Role/admin field: role, roles, isAdmin
+      // 4. Count field: likeCount, commentCount
+      // 5. Timestamp field: removedAt, createdAt, updatedAt
+      const forbiddenPayloads = [
+        { status: "REMOVED" },
+        { moderatorId: "mod-uuid-1234" },
+        { isAdmin: true },
+        { role: "ADMIN" },
+        { roles: ["ADMIN"] },
+        { likeCount: 10 },
+        { commentCount: 5 },
+        { authorId: "fake-author-id" },
+        { userId: "fake-user-id" },
+        { postId: "fake-post-id" },
+        { createdAt: "2026-09-21T00:00:00Z" },
+        { updatedAt: "2026-09-21T00:00:00Z" },
+        { removedAt: "2026-09-21T00:00:00Z" },
+        { reviewNotes: "comment tamper" },
+        { status: "REMOVED", moderatorId: "mod-1", isAdmin: true },
+      ];
+
+      for (const payload of forbiddenPayloads) {
+        const res = await request(app)
+          .delete(`/api/community/comments/${comment.id}`)
+          .set("Authorization", authHeader)
+          .send(payload)
+          .expect(HTTP_STATUS.BAD_REQUEST);
+
+        expect(res.body.error.code).toBe(ERROR_CODES.VALIDATION_ERROR);
+
+        // Verify ZERO DB mutation: row exists, status unchanged, removedAt unchanged
+        const dbComment = await prisma.communityComment.findUniqueOrThrow({
+          where: { id: comment.id },
+        });
+        expect(dbComment.status).toBe("VISIBLE");
+        expect(dbComment.removedAt).toBeNull();
+        expect(dbComment.content).toBe("Comment with strict delete zero-mutation proof");
+      }
+    });
   });
 });

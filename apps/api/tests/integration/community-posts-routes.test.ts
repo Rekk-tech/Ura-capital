@@ -195,5 +195,15 @@ describe("FEAT-042 Community Posts HTTP Routes (Integration)", () => {
 
       expect(res.body.error.code).toBe(ERROR_CODES.NOT_FOUND);
     });
+
+    it("returns 400 VALIDATION_ERROR on DELETE /api/community/posts/:postId with non-empty body (DEF-001)", async () => {
+      const res = await request(app)
+        .delete(`/api/community/posts/${validUuid}`)
+        .set("Authorization", authHeader)
+        .send({ status: "REMOVED", moderatorId: "mod-1" })
+        .expect(HTTP_STATUS.BAD_REQUEST);
+
+      expect(res.body.error.code).toBe(ERROR_CODES.VALIDATION_ERROR);
+    });
   });
 });
