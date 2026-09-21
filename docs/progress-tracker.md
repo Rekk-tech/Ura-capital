@@ -493,7 +493,7 @@ Phase 3 Completion State:
 - FEAT-018 is DONE / QA PASS / Human Final Gate APPROVED.
 - Phase 3 is DONE / QA PASS / Human Final Gate APPROVED.
 - HISTORICAL SNAPSHOT (at Phase 3 completion): Phase 4 was IN_PROGRESS / PLANNING; FEAT-019 was APPROVED FOR IMPLEMENTATION; FEAT-020 through FEAT-030 remained BLOCKED.
-- CURRENT CANONICAL STATE: Phase 4 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-019 through FEAT-030 retain their approved Phase 4 states; Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-031 through FEAT-040 are DONE / QA PASS; Phase Checkpoint: phase-5-approved PUBLISHED; Phase 6 planning is HUMAN MASTER PLANNING APPROVED; Phase 6 implementation is IN_PROGRESS; FEAT-041 is DONE / QA PASS / Human Final Gate APPROVED (Checkpoint: feat-041-approved PUBLISHED); FEAT-042 is DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-042-approved PUBLISHED); FEAT-043 is DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-043-approved PUBLISHED); FEAT-044 is DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-044-approved PUBLISHED); FEAT-045 is DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-045-approved PUBLISHED); FEAT-046 is UNBLOCKED FOR IMPLEMENTATION.
+- CURRENT CANONICAL STATE: Phase 4 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-019 through FEAT-030 retain their approved Phase 4 states; Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-031 through FEAT-040 are DONE / QA PASS; Phase Checkpoint: phase-5-approved PUBLISHED; Phase 6 planning is HUMAN MASTER PLANNING APPROVED; Phase 6 implementation is IN_PROGRESS; FEAT-041 is DONE / QA PASS / Human Final Gate APPROVED (Checkpoint: feat-041-approved PUBLISHED); FEAT-042 is DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-042-approved PUBLISHED); FEAT-043 is DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-043-approved PUBLISHED); FEAT-044 is DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-044-approved PUBLISHED); FEAT-045 is DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-045-approved PUBLISHED); FEAT-046 is DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-046-approved PUBLISHED); FEAT-047 is UNBLOCKED FOR INDEPENDENT PHASE QA.
 
 Feature Decomposition:
 
@@ -876,7 +876,7 @@ FEAT-028: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 FEAT-029: IMPLEMENTATION COMPLETE / DEFER CLOSURE VERIFIED
 FEAT-030: DONE / QA PASS
 HISTORICAL SNAPSHOT (at Phase 4 completion): Phase 5 was MASTER PLANNING APPROVED; Phase 5 Implementation was NOT_STARTED
-CURRENT CANONICAL STATE: Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-031 through FEAT-040 are DONE / QA PASS; Phase Checkpoint: phase-5-approved PUBLISHED; Phase 6 planning is HUMAN MASTER PLANNING APPROVED; Phase 6 implementation is IN_PROGRESS; FEAT-041 is DONE / QA PASS / Human Final Gate APPROVED (Checkpoint: feat-041-approved PUBLISHED); FEAT-042 is DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-042-approved PUBLISHED); FEAT-043 is DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-043-approved PUBLISHED); FEAT-044 is DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-044-approved PUBLISHED); FEAT-045 is DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-045-approved PUBLISHED); FEAT-046 is UNBLOCKED FOR IMPLEMENTATION
+CURRENT CANONICAL STATE: Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-031 through FEAT-040 are DONE / QA PASS; Phase Checkpoint: phase-5-approved PUBLISHED; Phase 6 planning is HUMAN MASTER PLANNING APPROVED; Phase 6 implementation is IN_PROGRESS; FEAT-041 is DONE / QA PASS / Human Final Gate APPROVED (Checkpoint: feat-041-approved PUBLISHED); FEAT-042 is DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-042-approved PUBLISHED); FEAT-043 is DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-043-approved PUBLISHED); FEAT-044 is DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-044-approved PUBLISHED); FEAT-045 is DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-045-approved PUBLISHED); FEAT-046 is DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-046-approved PUBLISHED); FEAT-047 is UNBLOCKED FOR INDEPENDENT PHASE QA
 ```
 
 Feature Decomposition:
@@ -1679,10 +1679,10 @@ FEAT-043: DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-043-approved PUBLI
 FEAT-044: DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-044-approved PUBLISHED)
 Parallel Integration Gate (FEAT-043 + FEAT-044): PASS
 FEAT-045: DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-045-approved PUBLISHED)
-FEAT-046: UNBLOCKED FOR IMPLEMENTATION
-FEAT-047: PLANNED / BLOCKED BY FEAT-046
+FEAT-046: DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-046-approved PUBLISHED)
+FEAT-047: UNBLOCKED FOR INDEPENDENT PHASE QA
 Phase 7: BLOCKED
-Application code changes: FEAT-041 Community persistence foundation complete; FEAT-042 Community posts API & feed read models complete; FEAT-043 Community comments API complete; FEAT-044 Community post likes complete; FEAT-045 Community moderation baseline & write abuse protection complete; ZERO FEAT-046 UI changes
+Application code changes: FEAT-041 Community persistence foundation complete; FEAT-042 Community posts API & feed read models complete; FEAT-043 Community comments API complete; FEAT-044 Community post likes complete; FEAT-045 Community moderation baseline & write abuse protection complete; FEAT-046 Community learner UI complete
 ```
 
 FEAT-041 Governance Fields:
@@ -1836,6 +1836,34 @@ Tasks: 19 PASS / 0 FAIL (T001..T019 PASS)
 Dependencies: FEAT-046 UNBLOCKED FOR IMPLEMENTATION
 ```
 
+FEAT-046 Governance Fields:
+
+```text
+Lifecycle State: DONE / APPROVED FOR CHECKPOINT
+Planning Status: HUMAN MASTER PLANNING APPROVED
+Planning Owner: Codex
+Implementation: COMPLETE
+Implementation Owner: DEV-B / Antigravity
+Internal Feature Gate: PASS
+Latest QA: FAST-TRACK DELIVERY (Internal Feature Gate PASS; Zero blocking defects; Canonical 14 PASS)
+Canonical 14 Validation: PASS (14/14 commands with no skips)
+Implementation Report: reports/implementation/phase-6/FEAT-046.md
+Checkpoint Tag: feat-046-approved
+Routes: /community, /community/posts/:postId
+Surfaces: Feed, Post Composer, Post Cards, Post Detail, Comments List, Comment Composer, Like/Unlike, Owner Removal Controls
+Server Authority: Strict server authority; zero optimistic count mutations; authoritative counts refreshed from server
+Security & Rendering: User content plain text only; zero dangerouslySetInnerHTML; zero XSS
+Resilience & Errors: Safe 401 auth-required (zero requests), 404 not-found, 429 rate-limited banner with Retry-After, 503 fail-closed write outage guidance
+Database / Migrations: ZERO new migrations (remains 9 migrations total); ZERO Prisma schema changes
+Redis Usage: ZERO frontend Redis code/imports
+Product Audit: DEFERRED (zero schema/migration/API/UI changes)
+Admin UI: ZERO admin moderation UI
+Spec Package: .specify/specs/FEAT-046/
+Acceptance Criteria: 31 PASS / 0 FAIL (AC-001..AC-031 PASS)
+Tasks: 19 PASS / 0 FAIL (T001..T019 PASS)
+Dependencies: FEAT-047 UNBLOCKED FOR INDEPENDENT PHASE QA
+```
+
 Planning Artifacts:
 
 - `docs/phase-6-feature-decomposition.md`
@@ -1854,8 +1882,9 @@ Implementation Artifacts:
 - `reports/implementation/phase-6/FEAT-043.md`
 - `reports/implementation/phase-6/FEAT-044.md`
 - `reports/implementation/phase-6/FEAT-045.md`
+- `reports/implementation/phase-6/FEAT-046.md`
 
-Human Decision State: HUMAN MASTER PLANNING APPROVED. FEAT-041 Human Targeted Governance Review APPROVED (Checkpoint: feat-041-approved). FEAT-042 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (Checkpoint: feat-042-approved). FEAT-043 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (Checkpoint: feat-043-approved). FEAT-044 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (Checkpoint: feat-044-approved). Parallel Feature Integration (FEAT-043 + FEAT-044) PASS. FEAT-045 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (Checkpoint: feat-045-approved). FEAT-046 is UNBLOCKED FOR IMPLEMENTATION. Phase 6 remains IN_PROGRESS.
+Human Decision State: HUMAN MASTER PLANNING APPROVED. FEAT-041 Human Targeted Governance Review APPROVED (Checkpoint: feat-041-approved). FEAT-042 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (Checkpoint: feat-042-approved). FEAT-043 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (Checkpoint: feat-043-approved). FEAT-044 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (Checkpoint: feat-044-approved). Parallel Feature Integration (FEAT-043 + FEAT-044) PASS. FEAT-045 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (Checkpoint: feat-045-approved). FEAT-046 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (Checkpoint: feat-046-approved). FEAT-047 is UNBLOCKED FOR INDEPENDENT PHASE QA. Phase 6 remains IN_PROGRESS.
 
 
 ---

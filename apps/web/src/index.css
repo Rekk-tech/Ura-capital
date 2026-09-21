@@ -1906,6 +1906,46 @@ a {
   margin: 2rem auto;
 }
 
+/* Phase 6 Community UI Styles */
+.community-page-container {
+  max-width: 840px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.community-hero {
+  margin-bottom: 1.5rem;
+}
+
+.community-state-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 3rem 1.5rem;
+  max-width: 540px;
+  margin: 2rem auto;
+}
+
+.community-post-card {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.community-post-card:hover {
+  border-color: var(--border-active);
+}
+
+.composer-textarea:focus {
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+@media (max-width: 640px) {
+  .community-page-container {
+    padding: 0.5rem 0;
+  }
+}
+
 /* Footer */
 .footer {
   text-align: center;

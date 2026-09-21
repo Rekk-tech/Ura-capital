@@ -6,6 +6,7 @@ import { APP_NAME } from "@aura/shared";
 import { AuthProvider } from "../features/auth/context/AuthContext";
 import { AcademyRoutes } from "./router/academy-routes";
 import { SimulationRoutes } from "./router/simulation-routes";
+import { CommunityRoutes } from "./router/community-routes";
 
 const defaultQueryClient = new QueryClient({
   defaultOptions: {
@@ -86,7 +87,9 @@ const LandingView: React.FC = () => (
           Relational like mechanics, moderated discussion threads, and collaborative investment
           insights with full data integrity.
         </p>
-        <span className="badge badge-success">Ready for Phase 6</span>
+        <Link to="/community" className="badge badge-success" style={{ textDecoration: "none", display: "inline-block" }}>
+          Open Community →
+        </Link>
       </div>
 
       <div className="card">
@@ -150,6 +153,9 @@ export const AppContent: React.FC = () => {
           <Link to="/simulation" className="nav-link">
             Simulation
           </Link>
+          <Link to="/community" className="nav-link">
+            Community
+          </Link>
         </nav>
 
         <div className="status-pill">
@@ -163,6 +169,7 @@ export const AppContent: React.FC = () => {
           <Route path="/" element={<LandingView />} />
           <Route path="/academy/*" element={<AcademyRoutes />} />
           <Route path="/simulation/*" element={<SimulationRoutes />} />
+          <Route path="/community/*" element={<CommunityRoutes />} />
         </Routes>
       </div>
 

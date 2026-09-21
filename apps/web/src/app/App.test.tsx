@@ -14,7 +14,7 @@ describe("App Shell (Unit/Component)", () => {
     expect(screen.getByText("Identity & Security")).toBeDefined();
     expect(screen.getByText("Academy")).toBeDefined();
     expect(screen.getByText("Simulation Engine")).toBeDefined();
-    expect(screen.getByText("Community")).toBeDefined();
+    expect(screen.getAllByText("Community").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("Aura Intelligence")).toBeDefined();
     expect(screen.getByText("Observability & Health")).toBeDefined();
   });
