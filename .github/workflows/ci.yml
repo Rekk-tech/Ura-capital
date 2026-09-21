@@ -50,6 +50,8 @@ jobs:
       AUTH_RATE_LIMIT_ENABLED: "false"
       AUTH_RATE_LIMIT_KEY_SECRET: ci-test-rate-limit-key-secret-at-least-32-chars
       AUTH_TRUST_PROXY: "false"
+      COMMUNITY_RATE_LIMIT_ENABLED: "true"
+      COMMUNITY_RATE_LIMIT_KEY_SECRET: ci-test-community-rate-limit-secret-32ch
       CORS_ORIGIN: http://localhost:5173
 
     steps:
