@@ -141,8 +141,6 @@ describe("FEAT-048 Subscription Migration Validation & Phase 6 Upgrade Preservat
           AND tc.table_name IN ('user_subscriptions', 'subscription_provider_events', 'subscription_transition_records');
       `;
 
-      const rules = new Map(foreignKeys.map((f) => [`${f.table_name}.${f.constraint_name}`, f.delete_rule]));
-
       // user_subscriptions -> users (RESTRICT)
       const userSubFk = foreignKeys.find((f) => f.table_name === "user_subscriptions" && f.constraint_name.includes("user_id"));
       expect(userSubFk?.delete_rule).toBe("RESTRICT");
