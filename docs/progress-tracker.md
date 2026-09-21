@@ -493,7 +493,7 @@ Phase 3 Completion State:
 - FEAT-018 is DONE / QA PASS / Human Final Gate APPROVED.
 - Phase 3 is DONE / QA PASS / Human Final Gate APPROVED.
 - HISTORICAL SNAPSHOT (at Phase 3 completion): Phase 4 was IN_PROGRESS / PLANNING; FEAT-019 was APPROVED FOR IMPLEMENTATION; FEAT-020 through FEAT-030 remained BLOCKED.
-- CURRENT CANONICAL STATE: Phase 4 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-019 through FEAT-030 retain their approved Phase 4 states; Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-031 through FEAT-040 are DONE / QA PASS; Phase Checkpoint: phase-5-approved PUBLISHED; Phase 6 planning is HUMAN MASTER PLANNING APPROVED; Phase 6 implementation is complete through FEAT-046; FEAT-041 through FEAT-046 are DONE at their approved checkpoints; FEAT-047 QA Iteration 2 established technical PASS for DEF-001..DEF-004, governance rework for DEF-005/DEF-006 is COMPLETE, and Human Targeted Governance Review is PENDING; Phase 6 is IN_PROGRESS / READY FOR TARGETED GOVERNANCE CLOSURE; Human Phase Final Gate is NOT YET APPROVED; Phase 7 remains BLOCKED.
+- CURRENT CANONICAL STATE: Phase 4 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-019 through FEAT-030 retain their approved Phase 4 states; Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-031 through FEAT-040 are DONE / QA PASS; Phase Checkpoint: phase-5-approved PUBLISHED; Phase 6 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-041 through FEAT-047 are DONE; DEF-001..DEF-006 are resolved or Human-closed; FEAT-047 AC-001..AC-040 and T001..T024 PASS; Phase 7 is UNBLOCKED FOR PLANNING with implementation NOT STARTED.
 
 Feature Decomposition:
 
@@ -876,7 +876,7 @@ FEAT-028: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 FEAT-029: IMPLEMENTATION COMPLETE / DEFER CLOSURE VERIFIED
 FEAT-030: DONE / QA PASS
 HISTORICAL SNAPSHOT (at Phase 4 completion): Phase 5 was MASTER PLANNING APPROVED; Phase 5 Implementation was NOT_STARTED
-CURRENT CANONICAL STATE: Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-031 through FEAT-040 are DONE / QA PASS; Phase Checkpoint: phase-5-approved PUBLISHED; Phase 6 planning is HUMAN MASTER PLANNING APPROVED; FEAT-041 through FEAT-046 are DONE at their approved checkpoints; FEAT-047 QA Iteration 2 established technical PASS for DEF-001..DEF-004, governance rework for DEF-005/DEF-006 is COMPLETE, and Human Targeted Governance Review is PENDING; Phase 6 is IN_PROGRESS / READY FOR TARGETED GOVERNANCE CLOSURE; Human Phase Final Gate is NOT YET APPROVED; Phase 7 remains BLOCKED
+CURRENT CANONICAL STATE: Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-031 through FEAT-040 are DONE / QA PASS; Phase Checkpoint: phase-5-approved PUBLISHED; Phase 6 is DONE / QA PASS / Human Phase Final Gate APPROVED; FEAT-041 through FEAT-047 are DONE; DEF-001..DEF-006 are resolved or Human-closed; FEAT-047 AC-001..AC-040 and T001..T024 PASS; Phase 7 is UNBLOCKED FOR PLANNING with implementation NOT STARTED
 ```
 
 Feature Decomposition:
@@ -1645,15 +1645,15 @@ Deliver a safe authenticated learner Community with durable posts, flat comments
 
 ## Acceptance Criteria
 
-- [ ] Likes are per user
-- [ ] Duplicate likes are prevented
-- [ ] Unlike only affects current user
-- [ ] Authorization is enforced
-- [ ] Community state is correctly persisted
-- [ ] Feed/comments are bounded and deterministically paginated
-- [ ] Public moderation/admin surface is absent unless Human later approves it
-- [ ] Redis remains transient and PostgreSQL remains durable authority
-- [ ] Phase 2-5 regressions remain green
+- [x] Likes are per user
+- [x] Duplicate likes are prevented
+- [x] Unlike only affects current user
+- [x] Authorization is enforced
+- [x] Community state is correctly persisted
+- [x] Feed/comments are bounded and deterministically paginated
+- [x] Public moderation/admin surface is absent unless Human later approves it
+- [x] Redis remains transient and PostgreSQL remains durable authority
+- [x] Phase 2-5 regressions remain green
 
 Planning Status:
 
@@ -1664,7 +1664,7 @@ HUMAN MASTER PLANNING APPROVED
 Implementation:
 
 ```text
-IN_PROGRESS
+COMPLETE
 ```
 
 Phase 6 State:
@@ -1680,10 +1680,11 @@ FEAT-044: DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-044-approved PUBLI
 Parallel Integration Gate (FEAT-043 + FEAT-044): PASS
 FEAT-045: DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-045-approved PUBLISHED)
 FEAT-046: DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-046-approved PUBLISHED)
-FEAT-047: QA ITERATION 2 TECHNICAL PASS / GOVERNANCE REWORK COMPLETE / HUMAN TARGETED GOVERNANCE REVIEW PENDING
-Phase 6: IN_PROGRESS / READY FOR TARGETED GOVERNANCE CLOSURE
-Human Phase Final Gate: NOT YET APPROVED
-Phase 7: BLOCKED
+FEAT-047: DONE / QA PASS
+Phase 6 QA: PASS
+Phase 6: DONE
+Human Phase Final Gate: APPROVED
+Phase 7: UNBLOCKED FOR PLANNING / IMPLEMENTATION NOT STARTED
 Application code changes: FEAT-041 Community persistence foundation complete; FEAT-042 Community posts API & feed read models complete; FEAT-043 Community comments API complete; FEAT-044 Community post likes complete; FEAT-045 Community moderation baseline & write abuse protection complete; FEAT-046 Community learner UI complete
 ```
 
@@ -1886,27 +1887,29 @@ Implementation Artifacts:
 - `reports/implementation/phase-6/FEAT-045.md`
 - `reports/implementation/phase-6/FEAT-046.md`
 
-Human Decision State: HUMAN MASTER PLANNING APPROVED. FEAT-041 Human Targeted Governance Review APPROVED (Checkpoint: feat-041-approved). FEAT-042 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (Checkpoint: feat-042-approved). FEAT-043 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (Checkpoint: feat-043-approved). FEAT-044 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (Checkpoint: feat-044-approved). Parallel Feature Integration (FEAT-043 + FEAT-044) PASS. FEAT-045 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (Checkpoint: feat-045-approved). FEAT-046 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (Checkpoint: feat-046-approved). FEAT-047 QA Iteration 2 established technical closure of DEF-001..DEF-004. Human-authorized governance rework for DEF-005/DEF-006 is COMPLETE and awaits Human Targeted Governance Review. Phase 6 remains IN_PROGRESS / READY FOR TARGETED GOVERNANCE CLOSURE. Human Phase Final Gate is NOT YET APPROVED. Phase 7 remains BLOCKED.
+Human Decision State: HUMAN PHASE FINAL GATE APPROVED. FEAT-041 Human Targeted Governance Review APPROVED (Checkpoint: feat-041-approved). FEAT-042 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (Checkpoint: feat-042-approved). FEAT-043 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (Checkpoint: feat-043-approved). FEAT-044 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (Checkpoint: feat-044-approved). Parallel Feature Integration (FEAT-043 + FEAT-044) PASS. FEAT-045 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (Checkpoint: feat-045-approved). FEAT-046 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (Checkpoint: feat-046-approved). FEAT-047 QA Iteration 2 established technical closure of DEF-001..DEF-004; Human Targeted Governance Review closed DEF-005/DEF-006 and accepted AC-001/T001. FEAT-047 is DONE / QA PASS. Phase 6 is DONE / QA PASS / HUMAN PHASE FINAL GATE APPROVED. Phase 7 is UNBLOCKED FOR PLANNING with implementation NOT STARTED.
 
 FEAT-047 Governance Fields:
 
 ```text
-Lifecycle State: READY FOR HUMAN TARGETED GOVERNANCE CLOSURE
+Lifecycle State: DONE / QA PASS
 QA Owner: Codex
-Latest QA: QA Iteration 2 FAIL - governance/report findings only
-QA History: QA Iteration 1 FAIL; Rework Iteration 1 COMPLETE; QA Iteration 2 FAIL; Governance Rework After QA Iteration 2 COMPLETE
+Latest Closure: HUMAN PHASE FINAL GATE APPROVED
+QA History: QA Iteration 1 FAIL; Batch Rework Iteration 1 COMPLETE; QA Iteration 2 FAIL; Governance Rework After QA Iteration 2 COMPLETE; Human Targeted Governance Closure PASS; Human Phase Final Gate APPROVED
 Technical Status: PASS - DEF-001..DEF-004 FIXED
-Governance Rework: DEF-005 REWORK COMPLETE; DEF-006 REWORK COMPLETE
+Governance Status: DEF-005 CLOSED BY HUMAN GOVERNANCE REVIEW; DEF-006 CLOSED BY HUMAN GOVERNANCE REVIEW
 Integrated Commit: 3f135f682521cbe01ead44d9acf05cd5ff7cc7e7
 Local Canonical 14: PASS (standard 96 files / 1110 tests; unit 68 / 881; PostgreSQL 36 / 484; Redis 5 / 50)
 Exact-Commit CI: SUCCESS - GitHub Actions run #55 / 35565795983
-Acceptance Criteria: AC-026 PASS; AC-035 PASS; AC-039 PASS; AC-001 READY FOR HUMAN TARGETED GOVERNANCE REVIEW
-Task T001: READY FOR HUMAN TARGETED GOVERNANCE REVIEW
+Acceptance Criteria: AC-001..AC-040 PASS
+Tasks: T001..T024 PASS
 Application Defects Open: ZERO
+Blocking Defects: ZERO (P0=0, P1=0, P2=0, P3=0 blocking)
 QA Report: reports/qa/phase-6/PHASE-6-QA.md
-Human Phase Final Gate: NOT YET APPROVED
-Phase 6: IN_PROGRESS / READY FOR TARGETED GOVERNANCE CLOSURE
-Phase 7: BLOCKED
+Human Phase Final Gate: APPROVED
+Phase 6 QA: PASS
+Phase 6: DONE
+Phase 7: UNBLOCKED FOR PLANNING / IMPLEMENTATION NOT STARTED
 ```
 
 

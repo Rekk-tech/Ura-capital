@@ -10,21 +10,21 @@ Application Code Changes: ZERO
 
 ## 1. Governance State
 
-### Current Execution State (Governance Rework After QA Iteration 2)
+### Current Execution State (Human Phase Final Gate Approved)
 
 ```text
 Phase 5: DONE / QA PASS / Human Phase Final Gate APPROVED
 Phase Checkpoint: phase-5-approved PUBLISHED
-Phase 6: IN_PROGRESS / READY FOR TARGETED GOVERNANCE CLOSURE
+Phase 6: DONE / QA PASS / HUMAN PHASE FINAL GATE APPROVED
 FEAT-041: DONE / feat-041-approved PUBLISHED
 FEAT-042: DONE / feat-042-approved PUBLISHED
 FEAT-043: DONE / feat-043-approved PUBLISHED
 FEAT-044: DONE / feat-044-approved PUBLISHED
 FEAT-045: DONE / feat-045-approved PUBLISHED
 FEAT-046: DONE / feat-046-approved PUBLISHED
-FEAT-047: QA ITERATION 2 TECHNICAL PASS / GOVERNANCE REWORK COMPLETE / HUMAN TARGETED GOVERNANCE REVIEW PENDING
-Human Phase Final Gate: NOT YET APPROVED
-Phase 7: BLOCKED
+FEAT-047: DONE / QA PASS
+Human Phase Final Gate: APPROVED
+Phase 7: UNBLOCKED FOR PLANNING / IMPLEMENTATION NOT STARTED
 ```
 
 ### HISTORICAL PLANNING SNAPSHOT (Human Master Planning Approved)
@@ -76,7 +76,7 @@ Out of scope: anonymous/public feed, post/comment editing, nested replies, comme
 
 ## 4. Feature Sequence
 
-| ID | Canonical title | Type | Dependencies | ACs | Tasks | Planning state |
+| ID | Canonical title | Type | Dependencies | ACs | Tasks | Planning state at master approval (historical) |
 | --- | --- | --- | --- | ---: | ---: | --- |
 | FEAT-041 | Community Persistence Foundation | Implementation | Phase 2/3 and Phase 5 checkpoint | 28 | 20 | Approved for implementation |
 | FEAT-042 | Posts API & Feed Read Models | Implementation | FEAT-041 | 28 | 19 | Dependency blocked |
@@ -183,7 +183,7 @@ DEV-B remains sole Phase 6 implementation owner. Parallel branches must not crea
 - Each implementation feature: predecessor QA PASS plus Human Final Gate.
 - FEAT-047 start: FEAT-041..046 QA PASS and Human-approved.
 - Phase 6 completion: FEAT-047 PASS plus Human Phase Final Gate approval.
-- Phase 7 implementation remains blocked until the Human approves Phase 6 completion or explicitly grants a narrower contract-first exception.
+- Phase 7 is unblocked for planning by the approved Phase 6 Human Final Gate; Phase 7 implementation has not started.
 
 ## 11. Human Decision Record
 
@@ -204,4 +204,4 @@ Human master planning approval locks every decision in Section 3, including:
 13. FEAT-041 owns the only expected Phase 6 production migration.
 14. DEV-B / Antigravity remains the implementation owner.
 
-FEAT-041 is approved for implementation. FEAT-042..047 remain planned and dependency-blocked according to Section 4; approval of this master plan does not bypass their predecessor gates.
+Historical master-planning activation record: FEAT-041 was approved for implementation while FEAT-042..047 remained dependency-blocked according to Section 4. Subsequent execution and final-gate outcomes are recorded in the current execution state above.
