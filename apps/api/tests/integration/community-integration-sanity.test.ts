@@ -9,6 +9,7 @@ import {
   cleanAllTestTables,
 } from "../helpers/test-db-guard.js";
 import { HTTP_STATUS } from "@aura/shared";
+import type { CommunityPostDto } from "../../src/modules/community/community.types.js";
 
 describe("Phase 6 Parallel Integration Sanity Gate (FEAT-043 + FEAT-044)", () => {
   const testDbUrl =
@@ -190,7 +191,7 @@ describe("Phase 6 Parallel Integration Sanity Gate (FEAT-043 + FEAT-044)", () =>
         .set("Authorization", learnerAAuth)
         .expect(HTTP_STATUS.OK);
 
-      const feedPost = feedRes.body.data.find((p: any) => p.id === postId);
+      const feedPost = feedRes.body.data.find((p: CommunityPostDto) => p.id === postId);
       expect(feedPost).toBeDefined();
       expect(feedPost.commentCount).toBe(0);
       expect(feedPost.likeCount).toBe(0);
