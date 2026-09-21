@@ -12,6 +12,7 @@ import type {
   CreateCommunityCommentInput,
   ListCommunityCommentsFilter,
   CreateCommunityPostLikeInput,
+  CommunityPostLikeStateDto,
   CommunityPostRecord,
   ListVisibleFeedParams,
 } from "./community.types.js";
@@ -366,10 +367,12 @@ export class PrismaCommunityCommentRepository implements ICommunityCommentReposi
 
 export interface ICommunityPostLikeRepository {
   createLike(data: CreateCommunityPostLikeInput): Promise<CommunityPostLike>;
+  ensureLike(postId: string, userId: string): Promise<void>;
   deleteLike(postId: string, userId: string): Promise<boolean>;
   findLike(postId: string, userId: string): Promise<CommunityPostLike | null>;
   countLikesByPost(postId: string): Promise<number>;
   hasUserLikedPost(postId: string, userId: string): Promise<boolean>;
+  getLikeState(postId: string, userId: string): Promise<CommunityPostLikeStateDto>;
   listLikesByPost(postId: string, limit?: number): Promise<CommunityPostLike[]>;
 }
 
@@ -390,6 +393,26 @@ export class PrismaCommunityPostLikeRepository implements ICommunityPostLikeRepo
       });
     } catch (err) {
       throw mapDatabaseError(err, "Failed to create community post like");
+    }
+  }
+
+  async ensureLike(postId: string, userId: string): Promise<void> {
+    try {
+      await this.client.communityPostLike.upsert({
+        where: {
+          userId_postId: {
+            userId,
+            postId,
+          },
+        },
+        create: {
+          userId,
+          postId,
+        },
+        update: {},
+      });
+    } catch (err) {
+      throw mapDatabaseError(err, "Failed to ensure community post like");
     }
   }
 
@@ -443,6 +466,33 @@ export class PrismaCommunityPostLikeRepository implements ICommunityPostLikeRepo
       return count > 0;
     } catch (err) {
       throw mapDatabaseError(err, "Failed to check if user liked community post");
+    }
+  }
+
+  async getLikeState(postId: string, userId: string): Promise<CommunityPostLikeStateDto> {
+    try {
+      const [likeCount, currentUserLike] = await Promise.all([
+        this.client.communityPostLike.count({
+          where: { postId },
+        }),
+        this.client.communityPostLike.findUnique({
+          where: {
+            userId_postId: {
+              userId,
+              postId,
+            },
+          },
+          select: { id: true },
+        }),
+      ]);
+
+      return {
+        postId,
+        likedByCurrentUser: currentUserLike !== null,
+        likeCount,
+      };
+    } catch (err) {
+      throw mapDatabaseError(err, "Failed to read community post like state");
     }
   }
 

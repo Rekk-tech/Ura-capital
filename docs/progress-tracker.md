@@ -1676,12 +1676,12 @@ Implementation Owner: DEV-B / Antigravity
 FEAT-041: DONE / QA PASS / HUMAN TARGETED GOVERNANCE REVIEW APPROVED (Checkpoint: feat-041-approved PUBLISHED)
 FEAT-042: DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-042-approved)
 FEAT-043: UNBLOCKED FOR IMPLEMENTATION
-FEAT-044: PLANNED / BLOCKED BY FEAT-042 (Parallel contract prep permitted)
-FEAT-045: PLANNED / BLOCKED BY FEAT-042..FEAT-044
+FEAT-044: DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-044-approved)
+FEAT-045: PLANNED / BLOCKED BY FEAT-043
 FEAT-046: PLANNED / BLOCKED BY FEAT-042..FEAT-045
 FEAT-047: PLANNED / BLOCKED BY FEAT-042..FEAT-046
 Phase 7: BLOCKED
-Application code changes: FEAT-041 Community persistence foundation complete; FEAT-042 Community posts API & feed read models complete; ZERO FEAT-043 application changes
+Application code changes: FEAT-041 Community persistence foundation complete; FEAT-042 Community posts API & feed read models complete; FEAT-044 post like/unlike semantics complete; ZERO FEAT-043 application changes on the isolated FEAT-044 branch
 ```
 
 FEAT-041 Governance Fields:
