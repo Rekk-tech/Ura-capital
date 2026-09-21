@@ -81,6 +81,48 @@ describe("@aura/shared package", () => {
     expect(parsed.success).toBe(false);
   });
 
+  it("validates EnvConfigSchema and rejects short or reused COMMUNITY_RATE_LIMIT_KEY_SECRET (FEAT-045, AC-015)", () => {
+    const baseValidEnv = {
+      NODE_ENV: "development",
+      JWT_SECRET: "11111111-2222-3333-4444-555555555555-jwt-secret-min32",
+      DATABASE_URL: "postgresql://postgres:postgrespassword@localhost:5432/aura_capital_dev",
+      AUTH_ACCESS_TOKEN_SECRET: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee-access-secret-32",
+      AUTH_REFRESH_TOKEN_SECRET: "11112222-3333-4444-5555-666677778888-refresh-secret-32",
+      AUTH_ACCESS_TOKEN_ISSUER: "aura-capital",
+      AUTH_ACCESS_TOKEN_AUDIENCE: "aura-client",
+      AUTH_RATE_LIMIT_ENABLED: "false",
+      COMMUNITY_RATE_LIMIT_ENABLED: "true",
+    };
+
+    // 1. Missing or short secret (< 32 chars)
+    const shortSecretResult = EnvConfigSchema.safeParse({
+      ...baseValidEnv,
+      COMMUNITY_RATE_LIMIT_KEY_SECRET: "too-short",
+    });
+    expect(shortSecretResult.success).toBe(false);
+
+    // 2. Reusing JWT_SECRET
+    const reusedJwtResult = EnvConfigSchema.safeParse({
+      ...baseValidEnv,
+      COMMUNITY_RATE_LIMIT_KEY_SECRET: baseValidEnv.JWT_SECRET,
+    });
+    expect(reusedJwtResult.success).toBe(false);
+
+    // 3. Reusing AUTH_ACCESS_TOKEN_SECRET
+    const reusedAccessResult = EnvConfigSchema.safeParse({
+      ...baseValidEnv,
+      COMMUNITY_RATE_LIMIT_KEY_SECRET: baseValidEnv.AUTH_ACCESS_TOKEN_SECRET,
+    });
+    expect(reusedAccessResult.success).toBe(false);
+
+    // 4. Valid distinct secret (>= 32 chars)
+    const validDistinctResult = EnvConfigSchema.safeParse({
+      ...baseValidEnv,
+      COMMUNITY_RATE_LIMIT_KEY_SECRET: "completely-distinct-community-rate-limit-secret-32-chars-long",
+    });
+    expect(validDistinctResult.success).toBe(true);
+  });
+
   describe("Product Audit Governance Contracts (FEAT-016 / DEF-001 & DEF-002)", () => {
     it("exports approved operation sources and transaction strategies", () => {
       expect(PRODUCT_AUDIT_OPERATION_SOURCES).toContain("USER_REQUEST");

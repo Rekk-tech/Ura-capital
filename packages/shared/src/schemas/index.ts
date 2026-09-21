@@ -91,6 +91,19 @@ export const EnvConfigSchema = z
       if (val === undefined || val === null || val === "") return false;
       return val;
     }, z.boolean().default(false)),
+
+    // FEAT-045 Community Rate Limiting Configuration
+    COMMUNITY_RATE_LIMIT_ENABLED: z.preprocess((val) => {
+      if (typeof val === "string") {
+        const lower = val.trim().toLowerCase();
+        if (lower === "false" || lower === "0") return false;
+        if (lower === "true" || lower === "1") return true;
+      }
+      if (typeof val === "boolean") return val;
+      if (process.env.NODE_ENV === "test") return false;
+      return true;
+    }, z.boolean().default(true)),
+    COMMUNITY_RATE_LIMIT_KEY_SECRET: z.string().optional(),
   })
   .superRefine((data, ctx) => {
     // Production requirement: Refresh cookie MUST be Secure in production
@@ -124,6 +137,34 @@ export const EnvConfigSchema = z
             code: z.ZodIssueCode.custom,
             path: ["AUTH_RATE_LIMIT_KEY_SECRET"],
             message: "AUTH_RATE_LIMIT_KEY_SECRET must not reuse JWT_SECRET, AUTH_ACCESS_TOKEN_SECRET, or AUTH_REFRESH_TOKEN_SECRET",
+          });
+        }
+      }
+    }
+
+    // FEAT-045: Validate community rate-limit HMAC secret when enabled or outside test
+    if (data.COMMUNITY_RATE_LIMIT_ENABLED && data.NODE_ENV !== "test") {
+      if (!data.COMMUNITY_RATE_LIMIT_KEY_SECRET || data.COMMUNITY_RATE_LIMIT_KEY_SECRET.length < 32) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["COMMUNITY_RATE_LIMIT_KEY_SECRET"],
+          message: "COMMUNITY_RATE_LIMIT_KEY_SECRET is required and must be at least 32 characters when rate limiting is enabled",
+        });
+      }
+
+      // Must not reuse JWT, auth, or auth-rate-limit secrets
+      if (data.COMMUNITY_RATE_LIMIT_KEY_SECRET) {
+        const forbiddenSecrets = [
+          data.JWT_SECRET,
+          data.AUTH_ACCESS_TOKEN_SECRET,
+          data.AUTH_REFRESH_TOKEN_SECRET,
+          data.AUTH_RATE_LIMIT_KEY_SECRET,
+        ];
+        if (forbiddenSecrets.includes(data.COMMUNITY_RATE_LIMIT_KEY_SECRET)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["COMMUNITY_RATE_LIMIT_KEY_SECRET"],
+            message: "COMMUNITY_RATE_LIMIT_KEY_SECRET must not reuse JWT_SECRET, AUTH_ACCESS_TOKEN_SECRET, AUTH_REFRESH_TOKEN_SECRET, or AUTH_RATE_LIMIT_KEY_SECRET",
           });
         }
       }
