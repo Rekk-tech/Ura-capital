@@ -3,10 +3,14 @@
 Feature: FEAT-047
 Phase: Phase 6 - Community
 QA Owner: Codex
-QA Iteration: 1
+QA Iteration: 2
 Final Verdict: FAIL
-Integrated Commit: `c12c6ace95f8314d5d464646d444045eb5e04e2e`
+Integrated Commit: `3f135f682521cbe01ead44d9acf05cd5ff7cc7e7`
 QA Date: 2026-09-21
+
+QA Iteration 1 historical result: **FAIL** at `c12c6ace95f8314d5d464646d444045eb5e04e2e`. The original QA Iteration 1 evidence below is preserved unchanged. The current targeted QA Iteration 2 record is appended after that historical record.
+
+# QA Iteration 1 - Historical Record
 
 ## Executive Summary
 
@@ -307,3 +311,180 @@ Phase 6: BLOCKED
 Human Phase Final Gate: NOT READY / NOT APPROVED
 
 Phase 7: BLOCKED
+
+---
+
+# QA Iteration 2 - Targeted Re-QA
+
+## Scope And Independence
+
+- Scope was limited to closure of QA1 defects DEF-001 through DEF-005, the previously failing AC-001/AC-026/AC-035/AC-039 and T001/T012/T015/T021, exact-SHA CI, and canonical regression.
+- Rework owner: DEV-B / Antigravity. Independent QA owner: Codex.
+- QA compared `c12c6ace95f8314d5d464646d444045eb5e04e2e` to corrected commit `3f135f682521cbe01ead44d9acf05cd5ff7cc7e7` (20 files, 1,051 insertions, 199 deletions).
+- No implementation code, tests, Prisma schema, migration, or runtime behavior was modified by QA. A disposable DELETE probe was removed after execution; the working tree was clean before this report update.
+
+## Executive Result
+
+The implementation/security rework is technically successful. DEF-001 through DEF-004 are independently FIXED, the real runtime journey passes, corrected exact-SHA CI is green, and canonical 14 is 14/14 PASS. The iteration remains **FAIL** because the governance lifecycle artifact required by DEF-005 is still stale and the rework/FEAT-046 reports overstate standard-suite accuracy by recording 1,108 instead of the independently reproduced 1,110 tests.
+
+## Defect Closure Matrix
+
+| Defect | QA1 failure | Independent QA2 evidence | Status |
+| --- | --- | --- | --- |
+| DEF-001 (P1) | DELETE post/comment accepted forged bodies and mutated PostgreSQL | Six forged field classes (`status`, `isAdmin`, `moderatorId`, `likeCount`, `authorId`, `removedAt`) returned `400 VALIDATION_ERROR` for both resources; before/after `status`, `removedAt`, and `updatedAt` were unchanged; canonical `{}` returned 204 | **FIXED** |
+| DEF-002 (P1) | Frontend parsed JSON from canonical 204 | `removePost` and `removeComment` return `Promise<void>` and do not call `res.json()` on success; API/UI suite passed 3 files / 35 tests; real owner-removal flow passed | **FIXED** |
+| DEF-003 (P1) | Mocked E2E omitted unlike and infrastructure | Source contains no Community API method spy/mock; independently executed real React -> HTTP Express -> PostgreSQL -> Redis journey, including like, unlike, comment/post removal and durable final-state assertions | **FIXED** |
+| DEF-004 (P1) | Exact integrated SHA CI red | Root causes independently matched GitHub annotations for #53 and #54; 10/10 consecutive five-request concurrency runs passed; deterministic same-timestamp ordering passed; exact corrected SHA run #55 completed successfully with every mandatory step green | **FIXED** |
+| DEF-005 (P2) | Phase 6 lifecycle state stale | Current decomposition still says `FEAT-047: QA FAIL Iteration 1 / REWORK IN PROGRESS`; active tracker fields still say QA1 with blocking defects open. Required state was Rework Complete / QA2 in progress (or the resulting QA2 verdict). Historical planning block is correctly labeled, but current lifecycle blocks are not current | **OPEN** |
+
+## New Defect
+
+### DEF-006 - P2 - Rework evidence reports an incorrect standard-suite count
+
+- Files: `reports/implementation/phase-6/FEAT-047-rework.md`, `reports/implementation/phase-6/FEAT-046.md`
+- Affected criterion/task: AC-001, T001
+- Expected: implementation and rework evidence records the actual validation result for the corrected integrated SHA.
+- Actual: both reports claim `96 files / 1,108 tests`; QA2 independently reproduced `79/896` API + `16/183` web + `1/31` shared = **96 files / 1,110 tests**, exit 0. The two added 204 API-client tests account for the corrected total.
+- Required fix: correct the two report counts without changing technical evidence or QA history, and reconcile all active FEAT-047 lifecycle fields to the current QA state.
+
+## DEF-001 Strict DELETE Evidence
+
+- Post and comment strict-body schemas are `z.object({}).strict()` and execute before service mutation.
+- Independent live probe result for each forged payload: HTTP 400, `VALIDATION_ERROR`.
+- PostgreSQL before/after comparison: row existence, `status`, `removedAt`, and `updatedAt` unchanged for both post and comment.
+- Canonical owner DELETE with `{}`: post 204; comment 204.
+- Result: strict-body and zero-mutation requirements PASS.
+
+## DEF-002 Frontend 204 Evidence
+
+- `CommunityApiClient.removePost()` and `removeComment()` return void after a successful response and never parse the empty 204 body.
+- Targeted API/UI validation: 3 files / 35 tests PASS.
+- Real UI flow completed comment removal and post removal through canonical 204 responses, including query-driven refetch/state update and post-detail navigation back to the feed.
+
+## DEF-003 Real E2E Evidence
+
+- Test: `apps/web/tests/e2e/community-learner-journey.spec.tsx`.
+- Independently executed: 1 file / 1 test PASS.
+- Flow: real registration and login -> Community feed -> create post -> detail -> like (count 1) -> unlike (count 0) -> create comment -> remove comment -> remove post.
+- Durable PostgreSQL assertions: post and comment retained with `status=REMOVED` and non-null `removedAt`; post-like relation absent after unlike.
+- Redis assertion: only transient Community rate-limit keys were observed; keys excluded raw user ID/email and no durable Community business state was introduced.
+- The sole `vi.spyOn` targets browser `window.confirm`; no `communityApi` method is mocked.
+
+## DEF-004 CI And Concurrency Evidence
+
+### CI Root Causes
+
+- Run #53 (`35557079443`, SHA `c12c6ace...`) annotation identifies `community-persistence-db.test.ts:617`: an assumption about creation order failed when timestamps collided. Production ordering remained `createdAt DESC, id DESC`; the rework separated the test fixture timestamps. A separate live same-timestamp cursor/tie-breaker test remains and passed, so sleep is not the sole correctness proof.
+- Run #54 (`35565325245`, SHA `6df31674...`) annotation identifies `community-post-likes-db.test.ts:101`: not all five concurrent responses were 200 because the unique race surfaced as conflict. The service now queries canonical state after the mapped unique conflict.
+- Rework diff removes no test files, adds no `.skip`/`.only`, adds no `continue-on-error`, retains the five-request concurrency assertion, and does not reduce ordering assertions.
+
+### Reproduction
+
+- FEAT-044 post-like DB suite: 10 consecutive runs PASS, 8 tests per run. Every run asserted five concurrent same-user PUTs return canonical success and converge to exactly one durable relation.
+- Feed ordering: live `community-persistence-db.test.ts` and `community-posts-db.test.ts` PASS, including exact same-`createdAt` ordering/cursor traversal by `id DESC`.
+
+### Exact-SHA CI
+
+- Corrected integrated SHA: `3f135f682521cbe01ead44d9acf05cd5ff7cc7e7`.
+- GitHub Actions: run #55 / `35565795983`.
+- Status: `completed`; conclusion: `success`.
+- Canonical Validation Pipeline and every mandatory migration, standard, unit, DB, Redis, security and governance step: SUCCESS.
+
+## Acceptance Closure
+
+| AC | QA2 evidence | Status |
+| --- | --- | --- |
+| AC-001 | Technical history is preserved, but current decomposition/tracker state is stale and report count is inaccurate | **FAIL** |
+| AC-026 | All probed forged authority/status/count/timestamp fields rejected with 400 and zero durable mutation | **PASS** |
+| AC-035 | Real authenticated frontend journey reached Express/PostgreSQL/Redis and completed unlike/removal/final-state assertions | **PASS** |
+| AC-039 | Canonical 14 PASS and exact corrected SHA CI run #55 SUCCESS with no mandatory skip | **PASS** |
+
+Previously unaffected AC-002..AC-025, AC-027..AC-034 and AC-036..AC-038 retain QA1 PASS; no contradictory evidence was found. AC-040 continues to require truthful gate reporting and is satisfied by this QA report's FAIL state. Current acceptance result: **39 PASS / 1 FAIL**.
+
+## Task Closure
+
+| Task | Result | Evidence |
+| --- | --- | --- |
+| T001 | **FAIL** | Current governance state and exact implementation-report counts remain unreconciled |
+| T012 | **PASS** | Independent forged DELETE and zero-mutation probes |
+| T015 | **PASS** | Real authenticated frontend/API/DB/Redis journey |
+| T021 | **PASS** | Exact corrected SHA CI #55 SUCCESS |
+
+Other tasks retain QA1 PASS. Current task result: **23 PASS / 1 FAIL**.
+
+## Canonical 14 - QA Iteration 2
+
+| # | Command | Result | Actual evidence |
+| --- | --- | --- | --- |
+| 1 | `npm run clean` | PASS | Clean completed |
+| 2 | `npm run lint` | PASS | Zero lint errors |
+| 3 | `npx prisma validate --schema=apps/api/prisma/schema.prisma` | PASS | Schema valid |
+| 4 | `npm run typecheck` | PASS | All workspaces |
+| 5 | `npm run build` | PASS | API/shared/web; Vite chunk advisory only |
+| 6 | `npm run test` | PASS | 96 files / **1,110 tests** |
+| 7 | `npm run test:unit` | PASS | 68 files / 881 tests |
+| 8 | `npm run test:db` | PASS | 36 files / 484 tests; no mandatory skips |
+| 9 | `npm run test:redis` | PASS | 5 files / 50 tests; no skips |
+| 10 | `npm run guard:persistence` | PASS | 1 file / 14 tests |
+| 11 | `npm run guard:migration` | PASS | 9 migrations / 9 digests |
+| 12 | `npm run guard:boundary` | PASS | 18 controllers / 23 services / 8 repositories |
+| 13 | `npm run guard:audit-governance` | PASS | No premature product audit persistence/API |
+| 14 | `npm run guard:seed-safety` | PASS | No unsafe seed/backdoor |
+
+Canonical result: **14/14 PASS**. Phase 2-5 regression coverage within standard, DB, Redis and guard suites remained green.
+
+## Severity And Advisories
+
+- P0: 0
+- P1: 0 open (four prior P1 defects fixed)
+- P2: 2 open (DEF-005, DEF-006)
+- P3: 0
+- Advisories: 3
+  1. Vite reports a non-blocking chunk larger than 500 kB.
+  2. FEAT-044 reduced QA independence remains recorded; QA2 independently stress-tested its concurrency behavior.
+  3. GitHub Actions warns that Node.js 20 actions are being forced onto Node.js 24; non-blocking for run #55 but CI dependencies should be upgraded deliberately.
+
+## QA Iteration 2 Final Verdict
+
+**FAIL**
+
+- DEF-001: FIXED
+- DEF-002: FIXED
+- DEF-003: FIXED
+- DEF-004: FIXED
+- DEF-005: OPEN
+- DEF-006: OPEN (new P2 report-accuracy defect)
+
+FEAT-047: **QA FAIL - ITERATION 2**
+
+Phase 6: **BLOCKED**
+
+Human Phase Final Gate: **NOT READY / NOT APPROVED**
+
+Phase 7: **BLOCKED**
+
+---
+
+## Governance Rework After QA Iteration 2
+
+- Authorization: Human-authorized governance/documentation-only correction by Codex.
+- Independence note: Codex also performed QA Iteration 2; this correction does **not** claim independent QA PASS. Final closure authority remains Human Targeted Governance Review.
+- DEF-005: **REWORK COMPLETE**. Active Phase 6 lifecycle fields were reconciled to QA2 technical PASS / governance closure pending Human review.
+- DEF-006: **REWORK COMPLETE**. Corrected current integrated standard-suite evidence is **96 files / 1110 tests PASS**.
+- Technical evidence: **UNCHANGED**.
+- Canonical 14 baseline: **14/14 PASS**.
+- Unit: **68 files / 881 tests PASS**.
+- PostgreSQL: **36 files / 484 tests PASS**.
+- Redis: **5 files / 50 tests PASS**.
+- Exact corrected SHA: `3f135f682521cbe01ead44d9acf05cd5ff7cc7e7`.
+- Exact-SHA CI: GitHub Actions run #55 / `35565795983` SUCCESS.
+- Application changes: ZERO.
+- Test changes: ZERO.
+- Schema/migration changes: ZERO.
+- CI changes: ZERO.
+- AC-001: **READY FOR HUMAN TARGETED GOVERNANCE REVIEW**.
+- T001: **READY FOR HUMAN TARGETED GOVERNANCE REVIEW**.
+- FEAT-047: **READY FOR HUMAN TARGETED GOVERNANCE CLOSURE**.
+- Phase 6: **IN_PROGRESS**.
+- Human Phase Final Gate: **NOT YET APPROVED**.
+- Phase 7: **BLOCKED**.

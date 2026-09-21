@@ -174,9 +174,9 @@ All UI components reside in `apps/web/src/features/community/`:
 | 3 | `npx prisma validate --schema=apps/api/prisma/schema.prisma` | PASS | The schema is valid |
 | 4 | `npm run typecheck` | PASS | Exit code 0 across `@aura/api`, `@aura/web`, `@aura/shared` |
 | 5 | `npm run build` | PASS | Exit code 0 (all packages and production bundles built) |
-| 6 | `npm run test` | PASS | 96 files, 1108 tests PASS across all workspaces |
+| 6 | `npm run test` | PASS | 96 files, 1110 tests PASS across all workspaces (corrected integrated SHA QA2 evidence) |
 | 7 | `npm run test:unit` | PASS | 68 files, 881 unit tests PASS |
-| 8 | `npm run test:db` | PASS | 36 files, 482 integration tests PASS against PostgreSQL |
+| 8 | `npm run test:db` | PASS | 36 files, 484 integration tests PASS against PostgreSQL (corrected integrated SHA QA2 evidence) |
 | 9 | `npm run test:redis` | PASS | 5 files, 50 Redis integration tests PASS |
 | 10 | `npm run guard:persistence` | PASS | 14 tests PASS |
 | 11 | `npm run guard:migration` | PASS | Exactly 9 migrations, digests=9 |

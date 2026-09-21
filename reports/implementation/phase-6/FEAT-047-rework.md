@@ -8,9 +8,9 @@ Phase 6 Community Integration Gate
 - **Independent QA Owner**: CODEX
 - **Scope**: Closed all five defects (DEF-001 through DEF-005) in ONE consolidated batch.
 - **Rework Verdict**: **DEF-001..DEF-005 REWORK COMPLETE**
-- **Feature Gate State**: **READY FOR TARGETED QA ITERATION 2**
-- **Phase 6 State**: **IN_PROGRESS / BLOCKED BY FEAT-047**
-- **Human Phase Final Gate**: **NOT READY**
+- **Feature Gate State**: **QA ITERATION 2 TECHNICAL PASS / GOVERNANCE REWORK COMPLETE / HUMAN TARGETED GOVERNANCE REVIEW PENDING**
+- **Phase 6 State**: **IN_PROGRESS / READY FOR TARGETED GOVERNANCE CLOSURE**
+- **Human Phase Final Gate**: **NOT YET APPROVED**
 - **Phase 7 State**: **BLOCKED**
 
 ---
@@ -89,9 +89,10 @@ Phase 6 Community Integration Gate
   - Preserved the Human Master Planning decisions as explicitly historical.
   - Updated Section 1 to include the current execution state:
     - FEAT-041 through FEAT-046: DONE / Approved checkpoints published.
-    - FEAT-047: QA FAIL Iteration 1 / REWORK IN PROGRESS.
-    - Phase 6: IN_PROGRESS / BLOCKED BY FEAT-047.
-    - Human Phase Final Gate: NOT READY.
+    - Historical handoff after implementation rework: FEAT-047 QA FAIL Iteration 1 / rework submitted for QA2.
+    - Current state after QA2 governance correction: technical PASS / governance rework COMPLETE / Human Targeted Governance Review pending.
+    - Phase 6: IN_PROGRESS / READY FOR TARGETED GOVERNANCE CLOSURE.
+    - Human Phase Final Gate: NOT YET APPROVED.
     - Phase 7: BLOCKED.
 
 ---
@@ -117,7 +118,7 @@ Phase 6 Community Integration Gate
 | `apps/web/tests/e2e/community-learner-journey.spec.tsx` | Rewrote into real unmocked integrated runtime E2E test with unlike and durable DB/Redis verification |
 | `reports/implementation/phase-6/FEAT-046.md` | Updated Section 6 with truthful historical QA finding and real E2E evidence |
 | `docs/phase-6-feature-decomposition.md` | Governance cleanup: added current execution state, preserved historical planning baseline |
-| `docs/progress-tracker.md` | Synchronized with current QA FAIL Iteration 1 / rework state |
+| `docs/progress-tracker.md` | Synchronized with QA2 technical PASS / governance rework complete / Human review pending state |
 
 ---
 
@@ -149,7 +150,7 @@ All targeted suites executed and passed before the canonical suite:
 | 3 | `npx prisma validate --schema=apps/api/prisma/schema.prisma` | **PASS** | Schema valid |
 | 4 | `npm run typecheck` | **PASS** | Zero TypeScript compiler errors across all packages |
 | 5 | `npm run build` | **PASS** | Production bundles built successfully |
-| 6 | `npm run test` | **PASS** | Standard test suite: 96 files, 1108 tests PASS |
+| 6 | `npm run test` | **PASS** | Standard test suite: 96 files, 1110 tests PASS |
 | 7 | `npm run test:unit` | **PASS** | Unit test suite: 68 files, 881 tests PASS |
 | 8 | `npm run test:db` | **PASS** | Database integration suite: 36 files, 484 tests PASS |
 | 9 | `npm run test:redis` | **PASS** | Redis integration suite: 5 files, 50 tests PASS |
@@ -167,10 +168,10 @@ All targeted suites executed and passed before the canonical suite:
 
 | AC | Requirement | Previous QA1 Finding | Rework Closure Evidence | Status |
 |---|---|---|---|---|
-| **AC-001** | Artifact reconciliation & truthful history | FEAT-046 overclaimed real E2E; phase decomposition current state stale | Updated `FEAT-046.md` with truthful historical finding DEF-003 and real E2E evidence; updated `phase-6-feature-decomposition.md` Section 1 with current execution state while preserving historical planning decisions | **PASS** |
+| **AC-001** | Artifact reconciliation & truthful history | FEAT-046 overclaimed real E2E; phase decomposition current state stale | QA2 technical evidence preserved; lifecycle state and corrected validation counts reconciled by Human-authorized governance rework | **READY FOR HUMAN TARGETED GOVERNANCE REVIEW** |
 | **AC-026** | Reject forged authority fields on all writes | DELETE post/comment live probes accepted forbidden fields and mutated state | Enforced `z.object({}).strict()` on DELETE post/comment; added live PostgreSQL tests proving 400 `VALIDATION_ERROR` and zero mutation across identity, moderation, role/admin, count, and timestamp fields | **PASS** |
 | **AC-035** | Real authenticated frontend journey | Only mocked component test existed; delete client broke on 204 | Implemented real runtime E2E in `community-learner-journey.spec.tsx` traversing browser -> API -> PostgreSQL -> Redis, including like and unlike; fixed 204 handling in `community.api.ts` | **PASS** |
-| **AC-039** | Canonical 14 & exact-SHA CI green | CI run #53 failed at `npm run test:db` on commit `c12c6ace` | Diagnosed and fixed sub-millisecond timestamp collision in `community-persistence-db.test.ts:617`; verified canonical 14 locally; publishing corrected integrated commit for green CI | **PASS** |
+| **AC-039** | Canonical 14 & exact-SHA CI green | CI run #53 failed at `npm run test:db` on commit `c12c6ace` | Diagnosed and fixed the timestamp collision; corrected SHA `3f135f68...` passed exact-SHA GitHub Actions run #55 / `35565795983` | **PASS** |
 
 ---
 
@@ -178,10 +179,10 @@ All targeted suites executed and passed before the canonical suite:
 
 | Task ID | Description | Previous QA1 Finding | Rework Closure Evidence | Status |
 |---|---|---|---|---|
-| **T001** | Truthful artifact reconciliation | Failed due to FEAT-046 overclaim and stale decomposition | Reconciled `FEAT-046.md` and `phase-6-feature-decomposition.md` with exact truthful evidence | **COMPLETE** |
+| **T001** | Truthful artifact reconciliation | Failed due to FEAT-046 overclaim and stale decomposition | Reconciled `FEAT-046.md`, `FEAT-047-rework.md`, tracker and decomposition with exact truthful evidence | **READY FOR HUMAN TARGETED GOVERNANCE REVIEW** |
 | **T012** | DELETE tampering rejection | Failed due to DELETE routes accepting forbidden fields | Implemented strict empty body validation and live DB zero-mutation proof tests | **COMPLETE** |
 | **T015** | Real frontend journey | Failed due to mocked E2E and 204 JSON parsing bug | Implemented real runtime E2E test and fixed 204 No Content handling in `community.api.ts` | **COMPLETE** |
-| **T021** | Exact-SHA CI green | Failed due to run #53 failure on `test:db` | Resolved sub-millisecond race condition in DB test suite; verified clean run; ready for CI push | **COMPLETE** |
+| **T021** | Exact-SHA CI green | Failed due to run #53 failure on `test:db` | Resolved the DB test race; exact corrected SHA passed GitHub Actions run #55 / `35565795983` | **COMPLETE** |
 
 ---
 
@@ -191,8 +192,24 @@ All targeted suites executed and passed before the canonical suite:
 - **DEF-002**: REWORK COMPLETE
 - **DEF-003**: REWORK COMPLETE
 - **DEF-004**: REWORK COMPLETE
-- **DEF-005**: REWORK COMPLETE
-- **FEAT-047 Gate State**: **READY FOR TARGETED QA ITERATION 2**
-- **Phase 6 State**: **IN_PROGRESS / BLOCKED BY FEAT-047**
-- **Human Phase Final Gate**: **NOT READY**
+- **DEF-005**: GOVERNANCE REWORK COMPLETE AFTER QA ITERATION 2
+- **DEF-006**: REPORT-ACCURACY REWORK COMPLETE AFTER QA ITERATION 2
+- **FEAT-047 Gate State**: **READY FOR HUMAN TARGETED GOVERNANCE CLOSURE**
+- **Phase 6 State**: **IN_PROGRESS / READY FOR TARGETED GOVERNANCE CLOSURE**
+- **Human Phase Final Gate**: **NOT YET APPROVED**
 - **Phase 7 State**: **BLOCKED**
+
+---
+
+## 9. Governance Rework After QA Iteration 2
+
+- Authorization: Human-authorized governance/documentation correction performed by Codex.
+- Independence: this correction does **not** claim independent QA because Codex also owned QA Iteration 2.
+- QA chronology preserved: QA Iteration 1 FAIL; implementation Rework Iteration 1 COMPLETE; QA Iteration 2 FAIL on DEF-005/DEF-006 only.
+- QA2 technical result preserved: DEF-001..DEF-004 FIXED; application defects open = ZERO.
+- DEF-005: REWORK COMPLETE. Active decomposition/tracker lifecycle fields now show QA2 technical PASS, governance closure pending Human review, Phase 6 IN_PROGRESS, Human Final Gate not approved, and Phase 7 blocked.
+- DEF-006: REWORK COMPLETE. Corrected integrated validation evidence is standard 96 files / 1110 tests, unit 68 / 881, PostgreSQL 36 / 484, and Redis 5 / 50.
+- Exact corrected SHA and CI remain unchanged: `3f135f682521cbe01ead44d9acf05cd5ff7cc7e7`; GitHub Actions run #55 / `35565795983` SUCCESS.
+- Application/test/schema/migration/CI changes: ZERO.
+- AC-001 and T001: READY FOR HUMAN TARGETED GOVERNANCE REVIEW.
+- Closure authority: HUMAN TARGETED GOVERNANCE REVIEW REQUIRED.
