@@ -272,6 +272,98 @@ describe("FEAT-041 Community Repositories & Factory Unit Tests", () => {
       const result = await repo.findCommentById("unknown-id");
       expect(result).toBeNull();
     });
+
+    it("lists visible comments by post with author display name and status = VISIBLE", async () => {
+      const mockComments = [
+        {
+          id: "comment-1",
+          postId: "post-1",
+          authorId: "author-1",
+          content: "Great insight",
+          status: "VISIBLE",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          removedAt: null,
+          author: { displayName: "Investor A" },
+        },
+      ];
+
+      const mockClient = {
+        communityComment: {
+          findMany: vi.fn().mockResolvedValue(mockComments),
+        },
+      } as unknown as PrismaClient;
+
+      const repo = new PrismaCommunityCommentRepository(mockClient);
+      const result = await repo.listVisibleCommentsByPost({
+        postId: "post-1",
+        limit: 10,
+      });
+
+      expect(result).toEqual(mockComments);
+      expect(mockClient.communityComment.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            postId: "post-1",
+            status: "VISIBLE",
+          },
+          orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+          take: 10,
+        }),
+      );
+    });
+
+    it("removes comment if owner and returns updated record", async () => {
+      const mockComment = {
+        id: "comment-1",
+        authorId: "author-1",
+        status: "VISIBLE",
+      };
+
+      const mockUpdated = {
+        ...mockComment,
+        status: "REMOVED",
+        removedAt: new Date(),
+      };
+
+      const mockClient = {
+        communityComment: {
+          findFirst: vi.fn().mockResolvedValue(mockComment),
+          update: vi.fn().mockResolvedValue(mockUpdated),
+        },
+      } as unknown as PrismaClient;
+
+      const repo = new PrismaCommunityCommentRepository(mockClient);
+      const result = await repo.removeCommentIfOwner("comment-1", "author-1");
+
+      expect(result).toEqual(mockUpdated);
+      expect(mockClient.communityComment.findFirst).toHaveBeenCalledWith({
+        where: {
+          id: "comment-1",
+          authorId: "author-1",
+          status: "VISIBLE",
+        },
+      });
+      expect(mockClient.communityComment.update).toHaveBeenCalledWith({
+        where: { id: "comment-1" },
+        data: {
+          status: "REMOVED",
+          removedAt: expect.any(Date),
+        },
+      });
+    });
+
+    it("returns null when removeCommentIfOwner is called for non-existent or foreign comment", async () => {
+      const mockClient = {
+        communityComment: {
+          findFirst: vi.fn().mockResolvedValue(null),
+        },
+      } as unknown as PrismaClient;
+
+      const repo = new PrismaCommunityCommentRepository(mockClient);
+      const result = await repo.removeCommentIfOwner("comment-1", "foreign-user");
+      expect(result).toBeNull();
+    });
   });
 
   describe("Community Post Like Repository (AC-014, AC-018, AC-019)", () => {
