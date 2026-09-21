@@ -1675,13 +1675,14 @@ Planning / Architecture Owner: Codex
 Implementation Owner: DEV-B / Antigravity
 FEAT-041: DONE / QA PASS / HUMAN TARGETED GOVERNANCE REVIEW APPROVED (Checkpoint: feat-041-approved PUBLISHED)
 FEAT-042: DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-042-approved PUBLISHED)
-FEAT-043: DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-043-approved)
-FEAT-044: UNBLOCKED FOR IMPLEMENTATION
-FEAT-045: PLANNED / BLOCKED BY FEAT-043..FEAT-044
-FEAT-046: PLANNED / BLOCKED BY FEAT-043..FEAT-045
-FEAT-047: PLANNED / BLOCKED BY FEAT-043..FEAT-046
+FEAT-043: DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-043-approved PUBLISHED)
+FEAT-044: DONE / INTERNAL FEATURE GATE PASS (Checkpoint: feat-044-approved PUBLISHED)
+Parallel Integration Gate (FEAT-043 + FEAT-044): PASS
+FEAT-045: UNBLOCKED FOR IMPLEMENTATION
+FEAT-046: PLANNED / BLOCKED BY FEAT-045
+FEAT-047: PLANNED / BLOCKED BY FEAT-045..FEAT-046
 Phase 7: BLOCKED
-Application code changes: FEAT-041 Community persistence foundation complete; FEAT-042 Community posts API & feed read models complete; FEAT-043 Community comments API complete; ZERO FEAT-044 application changes
+Application code changes: FEAT-041 Community persistence foundation complete; FEAT-042 Community posts API & feed read models complete; FEAT-043 Community comments API complete; FEAT-044 Community post likes complete; ZERO FEAT-045 application changes
 ```
 
 FEAT-041 Governance Fields:
@@ -1778,6 +1779,35 @@ Tasks: 17 PASS / 0 FAIL (T001..T017 PASS)
 Dependencies: FEAT-044 UNBLOCKED FOR IMPLEMENTATION
 ```
 
+FEAT-044 Governance Fields:
+
+```text
+Lifecycle State: DONE / APPROVED FOR CHECKPOINT
+Planning Status: HUMAN MASTER PLANNING APPROVED
+Planning Owner: Codex
+Implementation: COMPLETE
+Implementation Owner: Codex (Temporary Implementation Owner)
+Internal Feature Gate: PASS
+Latest QA: FAST-TRACK DELIVERY (Internal Feature Gate PASS; Zero blocking defects; Canonical 14 PASS)
+QA Independence: REDUCED (Compensating control: FEAT-047 independent Phase integration QA)
+Canonical 14 Validation: PASS (14/14 commands with no skips)
+Implementation Report: reports/implementation/phase-6/FEAT-044.md
+Checkpoint Tag: feat-044-approved
+Routes: PUT /api/community/posts/:postId/like, DELETE /api/community/posts/:postId/like (2 exact routes, authenticated only)
+Semantics: Naturally idempotent post likes via atomic PostgreSQL upsert on UNIQUE(userId, postId)
+Safe DTO: { postId: string, likedByCurrentUser: boolean, likeCount: number }
+Visibility: Normal learner can only like VISIBLE posts; HIDDEN and REMOVED return safe uniform 404 NOT_FOUND
+Isolation: User cannot manipulate another user's like; unlike uses caller-scoped deleteMany
+Relational Counts: likeCount derived relationally from count of active likes
+Migration: ZERO new migrations (remains 9 migrations)
+Redis Durable Authority: ZERO (no like counters in Redis, no cache)
+Product Audit Persistence: DEFERRED (zero schema/API changes)
+Boundary Guard: PASS (17 controllers, 22 services, 8 repositories clean)
+Spec Package: .specify/specs/FEAT-044/
+Acceptance Criteria: PASS
+Dependencies: Parallel Integration Gate PASS; FEAT-045 UNBLOCKED FOR IMPLEMENTATION
+```
+
 Planning Artifacts:
 
 - `docs/phase-6-feature-decomposition.md`
@@ -1794,8 +1824,9 @@ Implementation Artifacts:
 - `reports/implementation/phase-6/FEAT-041.md`
 - `reports/implementation/phase-6/FEAT-042.md`
 - `reports/implementation/phase-6/FEAT-043.md`
+- `reports/implementation/phase-6/FEAT-044.md`
 
-Human Decision State: HUMAN MASTER PLANNING APPROVED. FEAT-041 Human Targeted Governance Review APPROVED (Checkpoint: feat-041-approved). FEAT-042 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (AC 28/28 PASS, Tasks 19/19 PASS, Checkpoint: feat-042-approved). FEAT-043 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (AC 26/26 PASS, Tasks 17/17 PASS, Checkpoint: feat-043-approved). FEAT-043 is DONE; FEAT-044 is UNBLOCKED FOR IMPLEMENTATION. Phase 6 remains IN_PROGRESS.
+Human Decision State: HUMAN MASTER PLANNING APPROVED. FEAT-041 Human Targeted Governance Review APPROVED (Checkpoint: feat-041-approved). FEAT-042 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (Checkpoint: feat-042-approved). FEAT-043 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (Checkpoint: feat-043-approved). FEAT-044 Fast-Track Implementation COMPLETE / Internal Feature Gate PASS (Checkpoint: feat-044-approved). Parallel Feature Integration (FEAT-043 + FEAT-044) PASS. FEAT-045 is UNBLOCKED FOR IMPLEMENTATION. Phase 6 remains IN_PROGRESS.
 
 
 ---

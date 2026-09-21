@@ -27,6 +27,12 @@ export interface CreateCommunityPostLikeInput {
   userId: string;
 }
 
+export interface CommunityPostLikeStateDto {
+  postId: string;
+  likedByCurrentUser: boolean;
+  likeCount: number;
+}
+
 // ============================================================================
 // FEAT-042: Posts API & Feed Read Model Types
 // ============================================================================

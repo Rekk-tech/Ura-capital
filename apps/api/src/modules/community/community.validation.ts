@@ -58,3 +58,9 @@ export const CommunityPostParamSchema = z
   .strict();
 
 export type CommunityPostParam = z.infer<typeof CommunityPostParamSchema>;
+
+/**
+ * Like/unlike mutations carry no client-owned state. Identity and target post
+ * come from the authenticated request context and validated route parameter.
+ */
+export const EmptyCommunityMutationBodySchema = z.object({}).strict();
