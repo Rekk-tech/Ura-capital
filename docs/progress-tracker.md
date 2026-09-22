@@ -493,7 +493,7 @@ Phase 3 Completion State:
 - FEAT-018 is DONE / QA PASS / Human Final Gate APPROVED.
 - Phase 3 is DONE / QA PASS / Human Final Gate APPROVED.
 - HISTORICAL SNAPSHOT (at Phase 3 completion): Phase 4 was IN_PROGRESS / PLANNING; FEAT-019 was APPROVED FOR IMPLEMENTATION; FEAT-020 through FEAT-030 remained BLOCKED.
-- CURRENT CANONICAL STATE: Phase 4 is DONE / QA PASS / Human Phase Final Gate APPROVED; Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; Phase 6 is DONE / QA PASS / Human Phase Final Gate APPROVED; Phase Checkpoint: phase-6-approved PUBLISHED; Phase 7 is IN_PROGRESS with D1..D10 locked; FEAT-048 and FEAT-049 are DONE at published checkpoints; FEAT-054 implementation and internal gate are complete with checkpoint publication pending; remaining Phase 7 features follow the approved dependency graph; Phase 8 remains BLOCKED.
+- CURRENT CANONICAL STATE: Phase 4 is DONE / QA PASS / Human Phase Final Gate APPROVED; Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; Phase 6 is DONE / QA PASS / Human Phase Final Gate APPROVED; Phase Checkpoint: phase-6-approved PUBLISHED; Phase 7 is IN_PROGRESS with D1..D10 locked; FEAT-048, FEAT-049, and FEAT-054 are DONE at published checkpoints; remaining Phase 7 features follow the approved dependency graph; Phase 8 remains BLOCKED.
 
 Feature Decomposition:
 
@@ -876,7 +876,7 @@ FEAT-028: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 FEAT-029: IMPLEMENTATION COMPLETE / DEFER CLOSURE VERIFIED
 FEAT-030: DONE / QA PASS
 HISTORICAL SNAPSHOT (at Phase 4 completion): Phase 5 was MASTER PLANNING APPROVED; Phase 5 Implementation was NOT_STARTED
-CURRENT CANONICAL STATE: Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; Phase 6 is DONE / QA PASS / Human Phase Final Gate APPROVED; Phase Checkpoint: phase-6-approved PUBLISHED; Phase 7 is IN_PROGRESS with D1..D10 locked; FEAT-048 and FEAT-049 are DONE at published checkpoints; FEAT-054 implementation and internal gate are complete with checkpoint publication pending; remaining Phase 7 features follow the approved dependency graph; Phase 8 remains BLOCKED
+CURRENT CANONICAL STATE: Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; Phase 6 is DONE / QA PASS / Human Phase Final Gate APPROVED; Phase Checkpoint: phase-6-approved PUBLISHED; Phase 7 is IN_PROGRESS with D1..D10 locked; FEAT-048, FEAT-049, and FEAT-054 are DONE at published checkpoints; remaining Phase 7 features follow the approved dependency graph; Phase 8 remains BLOCKED
 ```
 
 Feature Decomposition:
@@ -1889,7 +1889,7 @@ Implementation Artifacts:
 - `reports/implementation/phase-6/FEAT-045.md`
 - `reports/implementation/phase-6/FEAT-046.md`
 
-Human Decision State: HUMAN PHASE FINAL GATE APPROVED. FEAT-041 through FEAT-047 are DONE at the approved Phase 6 checkpoints. Phase 6 is DONE / QA PASS / HUMAN PHASE FINAL GATE APPROVED and `phase-6-approved` is published. Phase 7 is IN_PROGRESS with D1..D10 locked; FEAT-048 and FEAT-049 are DONE at published checkpoints; FEAT-054 implementation and internal gate are complete with checkpoint publication pending; remaining Phase 7 features follow the approved dependency graph. Phase 8 remains BLOCKED.
+Human Decision State: HUMAN PHASE FINAL GATE APPROVED. FEAT-041 through FEAT-047 are DONE at the approved Phase 6 checkpoints. Phase 6 is DONE / QA PASS / HUMAN PHASE FINAL GATE APPROVED and `phase-6-approved` is published. Phase 7 is IN_PROGRESS with D1..D10 locked; FEAT-048, FEAT-049, and FEAT-054 are DONE at published checkpoints; remaining Phase 7 features follow the approved dependency graph. Phase 8 remains BLOCKED.
 
 FEAT-047 Governance Fields:
 
@@ -1957,7 +1957,7 @@ Provider/Checkout Decision: PRODUCTION PROVIDER AND REAL CHECKOUT DEFERRED
 FEAT-048: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-048-approved PUBLISHED
 FEAT-049: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-049-approved PUBLISHED
 FEAT-051: UNBLOCKED FOR IMPLEMENTATION (dependency graph permits)
-FEAT-054: IMPLEMENTATION COMPLETE / SELF-VERIFICATION PASS / CHECKPOINT PUBLICATION PENDING
+FEAT-054: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-054-approved PUBLISHED
 FEAT-050, FEAT-052, FEAT-053, FEAT-055..FEAT-057: PLANNED / DEPENDENCY CONTROLLED
 Phase 8: BLOCKED
 ```
@@ -2022,7 +2022,7 @@ Dependencies: FEAT-050 UNBLOCKED FOR IMPLEMENTATION; FEAT-054 UNBLOCKED FOR IMPL
 Status:
 
 ```text
-FEAT-054: IMPLEMENTATION COMPLETE / INTERNAL FEATURE GATE PASS
+FEAT-054: DONE / INTERNAL FEATURE GATE PASS
 Planning: HUMAN MASTER PLANNING APPROVED
 Implementation Owner: CODEX / TEMPORARY IMPLEMENTATION AGENT
 Self-Verification: PASS
@@ -2038,7 +2038,9 @@ Existing Domain Gating: ZERO
 Public API/UI Changes: ZERO
 Redis Entitlement Authority: ZERO
 Implementation Report: reports/implementation/phase-7/FEAT-054.md
-Checkpoint Target: feat-054-approved (publication pending exact-source CI)
+Implementation Commit: 29f0720ed13b45e4ce7a80319316e39af9cb9ffc
+Exact-Source CI: GitHub Actions #64 SUCCESS
+Checkpoint Tag: feat-054-approved PUBLISHED
 Acceptance Criteria: 20 PASS / 0 FAIL (AC-001..AC-020 PASS)
 Tasks: 14 COMPLETE / 0 OPEN (T001..T014 COMPLETE)
 FEAT-056: DEPENDENCY CONTROLLED pending FEAT-050 and FEAT-053 prerequisites

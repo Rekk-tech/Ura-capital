@@ -4,13 +4,16 @@ Feature: FEAT-054
 Phase: Phase 7 - Subscription / Premium
 Implementation Agent: Codex (temporary implementation owner)
 Target QA Reviewer: FEAT-057 independent Phase QA
-Status: IMPLEMENTATION COMPLETE / SELF-VERIFICATION PASS / CHECKPOINT PUBLICATION PENDING
+Status: DONE / INTERNAL FEATURE GATE PASS / CHECKPOINT PUBLISHED
 
 ## Delivery Summary
 
 - Baseline: `feat-049-approved` (`f7a899fb50d13caed2d23042d948302f9fe2cc2b`)
 - Branch: `feat/FEAT-054-entitlement-guard`
 - Internal Feature Gate: PASS
+- Implementation commit: `29f0720ed13b45e4ce7a80319316e39af9cb9ffc`
+- Exact-source CI: GitHub Actions #64 SUCCESS
+- Checkpoint: `feat-054-approved` PUBLISHED
 - Acceptance Criteria: 20/20 PASS
 - Tasks: 14/14 COMPLETE
 - QA Independence: REDUCED because Codex is the temporary implementation owner
@@ -124,6 +127,6 @@ T001 through T014 are complete exactly as mapped in `.specify/specs/FEAT-054/tas
 
 ## Dependency State
 
-- FEAT-054: implementation complete; self-verification PASS; checkpoint publication waits for exact-source CI.
+- FEAT-054: DONE; internal feature gate PASS; `feat-054-approved` published after exact-source CI #64 succeeded.
 - FEAT-056: remains dependency-controlled until FEAT-050 and FEAT-053 are complete; FEAT-054 alone does not unblock implementation.
 - Phase 7: IN_PROGRESS.
