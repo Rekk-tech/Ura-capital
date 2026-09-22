@@ -1955,10 +1955,14 @@ Task Baseline: 152 tasks LOCKED
 Human Decisions: D1..D10 APPROVED
 Provider/Checkout Decision: PRODUCTION PROVIDER AND REAL CHECKOUT DEFERRED
 FEAT-048: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-048-approved PUBLISHED
-FEAT-049: UNBLOCKED FOR IMPLEMENTATION
-FEAT-051: DONE / INTERNAL FEATURE GATE PASS / Checkpoint publication in progress
-FEAT-052: BLOCKED pending FEAT-049 completion; FEAT-051 prerequisite satisfied
-FEAT-050, FEAT-053..FEAT-057: PLANNED / DEPENDENCY CONTROLLED
+FEAT-049: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-049-approved PUBLISHED
+FEAT-051: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-051-approved PUBLISHED
+FEAT-050: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-050-approved PUBLISHED
+FEAT-052: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-052-approved PUBLISHED
+FEAT-054: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-054-approved PUBLISHED
+FEAT-053: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-053-approved PUBLISHED
+FEAT-055, FEAT-056: UNBLOCKED FOR IMPLEMENTATION
+FEAT-057: PLANNED / DEPENDENCY CONTROLLED
 Phase 8: BLOCKED
 ```
 
@@ -2039,6 +2043,30 @@ Targeted Tests: 3 files / 43 tests PASS
 Acceptance Criteria: 20 PASS / 0 FAIL (AC-001..AC-020 PASS)
 Tasks: 14 COMPLETE / 0 OPEN (T001..T014 COMPLETE)
 Dependencies: FEAT-049 satisfied; FEAT-051 prerequisite satisfied; FEAT-052 UNBLOCKED FOR IMPLEMENTATION; FEAT-050 remains UNBLOCKED; FEAT-054 remains UNBLOCKED
+```
+
+### FEAT-053: Subscription Lifecycle Commands
+
+Status:
+
+```text
+FEAT-053: DONE
+Planning: HUMAN MASTER PLANNING APPROVED
+Implementation: COMPLETE
+Implementation Owner: DEV-B / Antigravity
+Internal Feature Gate: PASS
+Latest QA: FAST-TRACK DELIVERY (Internal Feature Gate PASS; Zero blocking defects; Canonical 14 PASS)
+Canonical 14 Validation: PASS (14/14 commands with no skips)
+Implementation Report: reports/implementation/phase-7/FEAT-053.md
+Checkpoint Tag: feat-053-approved
+Migration Impact: ZERO (10 existing migrations preserved)
+Production Provider: DEFERRED by D1
+Production Checkout: DEFERRED by D10
+Scope Guards: Production SDK ZERO, Public API ZERO, UI ZERO, Schema/Migration ZERO, Entitlement Mutation ZERO, Redis Durable Authority ZERO
+Targeted Tests: 3 files / 23 tests PASS
+Acceptance Criteria: 24 PASS / 0 FAIL (AC-001..AC-024 PASS)
+Tasks: 16 COMPLETE / 0 OPEN (T001..T016 COMPLETE)
+Dependencies: FEAT-055 UNBLOCKED FOR IMPLEMENTATION; FEAT-056 UNBLOCKED FOR IMPLEMENTATION
 ```
 
 ---
