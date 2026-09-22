@@ -2,7 +2,7 @@ name: Aura Capital CI
 
 on:
   push:
-    branches: [main, develop, "feat/**", "fix/**"]
+    branches: [main, develop, "feat/**", "fix/**", "integration/**"]
   pull_request:
     branches: [main, develop]
 
