@@ -11,6 +11,13 @@ import {
   AccessTokenClaimsSchema,
   AuthMeResponseSchema,
   RefreshResponseSchema,
+  SubscriptionPlanKeySchema,
+  EffectiveSubscriptionStatusSchema,
+  EntitlementKeySchema,
+  SubscriptionPlanDtoSchema,
+  SubscriptionPlansResponseSchema,
+  SubscriptionMeDtoSchema,
+  SubscriptionMeResponseSchema,
 } from "../schemas/index.js";
 
 export * from "./product-audit.types.js";
@@ -207,5 +214,15 @@ export function deriveRewardIdempotencyKey(
 ): string {
   return `academy:reward:${userId}:${sourceType}:${sourceId}:${rewardType}`;
 }
+
+// FEAT-050 Subscription Read DTOs
+export type SubscriptionPlanKey = z.infer<typeof SubscriptionPlanKeySchema>;
+export type EffectiveSubscriptionStatus = z.infer<typeof EffectiveSubscriptionStatusSchema>;
+export type EntitlementKey = z.infer<typeof EntitlementKeySchema>;
+export type SubscriptionPlanDto = z.infer<typeof SubscriptionPlanDtoSchema>;
+export type SubscriptionPlansResponse = z.infer<typeof SubscriptionPlansResponseSchema>;
+export type SubscriptionMeDto = z.infer<typeof SubscriptionMeDtoSchema>;
+export type SubscriptionMeResponse = z.infer<typeof SubscriptionMeResponseSchema>;
+
 
 

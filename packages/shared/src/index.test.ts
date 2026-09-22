@@ -25,6 +25,13 @@ import {
   SaveDraftAnswerBodySchema,
   QuizAttemptParamSchema,
   QuizDraftAnswerParamSchema,
+  SubscriptionPlanKeySchema,
+  EffectiveSubscriptionStatusSchema,
+  EntitlementKeySchema,
+  SubscriptionPlanDtoSchema,
+  SubscriptionPlansResponseSchema,
+  SubscriptionMeDtoSchema,
+  SubscriptionMeResponseSchema,
 } from "./index.js";
 
 describe("@aura/shared package", () => {
@@ -501,6 +508,110 @@ describe("@aura/shared package", () => {
       expect(ERROR_CODES.INTERNAL_ERROR).toBe("INTERNAL_ERROR");
     });
   });
+
+  describe("FEAT-050 Subscription Read Schemas", () => {
+    it("validates SubscriptionPlanKeySchema", () => {
+      expect(SubscriptionPlanKeySchema.safeParse("FREE").success).toBe(true);
+      expect(SubscriptionPlanKeySchema.safeParse("PREMIUM").success).toBe(true);
+      expect(SubscriptionPlanKeySchema.safeParse("ENTERPRISE").success).toBe(false);
+      expect(SubscriptionPlanKeySchema.safeParse("").success).toBe(false);
+    });
+
+    it("validates EffectiveSubscriptionStatusSchema", () => {
+      for (const status of ["ACTIVE", "PAST_DUE", "CANCELLED", "EXPIRED", "NONE"]) {
+        expect(EffectiveSubscriptionStatusSchema.safeParse(status).success).toBe(true);
+      }
+      expect(EffectiveSubscriptionStatusSchema.safeParse("TRIAL").success).toBe(false);
+      expect(EffectiveSubscriptionStatusSchema.safeParse("PENDING").success).toBe(false);
+    });
+
+    it("validates EntitlementKeySchema", () => {
+      expect(EntitlementKeySchema.safeParse("PREMIUM_ACCESS").success).toBe(true);
+      expect(EntitlementKeySchema.safeParse("SIMULATION_PRO").success).toBe(false);
+    });
+
+    it("validates SubscriptionPlanDtoSchema with strict fields", () => {
+      const validPlan = {
+        planKey: "PREMIUM",
+        name: "Premium Plan",
+        description: "Full access to advanced platform capabilities.",
+        entitlements: ["PREMIUM_ACCESS"],
+        available: true,
+      };
+      expect(SubscriptionPlanDtoSchema.safeParse(validPlan).success).toBe(true);
+
+      // Rejects extra/unauthorized fields (strict)
+      expect(
+        SubscriptionPlanDtoSchema.safeParse({ ...validPlan, providerPriceId: "price_123" }).success,
+      ).toBe(false);
+      expect(
+        SubscriptionPlanDtoSchema.safeParse({ ...validPlan, secret: "super_secret" }).success,
+      ).toBe(false);
+    });
+
+    it("validates SubscriptionPlansResponseSchema", () => {
+      const validResponse = {
+        data: [
+          {
+            planKey: "FREE",
+            name: "Free Plan",
+            description: "Standard access.",
+            entitlements: [],
+            available: true,
+          },
+          {
+            planKey: "PREMIUM",
+            name: "Premium Plan",
+            description: "Full access.",
+            entitlements: ["PREMIUM_ACCESS"],
+            available: true,
+          },
+        ],
+      };
+      expect(SubscriptionPlansResponseSchema.safeParse(validResponse).success).toBe(true);
+      expect(SubscriptionPlansResponseSchema.safeParse({ data: [] }).success).toBe(true);
+      expect(SubscriptionPlansResponseSchema.safeParse({}).success).toBe(false);
+    });
+
+    it("validates SubscriptionMeDtoSchema with strict fields", () => {
+      const validMe = {
+        plan: "PREMIUM",
+        planKey: "PREMIUM",
+        status: "ACTIVE",
+        entitlements: ["PREMIUM_ACCESS"],
+        isEntitled: true,
+        currentPeriodStart: new Date().toISOString(),
+        currentPeriodEnd: new Date(Date.now() + 86400000).toISOString(),
+        cancelAtPeriodEnd: false,
+      };
+      expect(SubscriptionMeDtoSchema.safeParse(validMe).success).toBe(true);
+
+      // Rejects extra authority or provider fields
+      expect(SubscriptionMeDtoSchema.safeParse({ ...validMe, userId: "user-123" }).success).toBe(
+        false,
+      );
+      expect(
+        SubscriptionMeDtoSchema.safeParse({ ...validMe, providerSubscriptionId: "sub_123" }).success,
+      ).toBe(false);
+    });
+
+    it("validates SubscriptionMeResponseSchema for missing subscription (FREE projection)", () => {
+      const freeProjection = {
+        data: {
+          plan: "FREE",
+          planKey: "FREE",
+          status: "NONE",
+          entitlements: [],
+          isEntitled: false,
+          currentPeriodStart: null,
+          currentPeriodEnd: null,
+          cancelAtPeriodEnd: false,
+        },
+      };
+      expect(SubscriptionMeResponseSchema.safeParse(freeProjection).success).toBe(true);
+    });
+  });
 });
+
 
 
