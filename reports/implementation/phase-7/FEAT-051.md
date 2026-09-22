@@ -135,4 +135,10 @@ Production provider choice, SDK integration, real checkout/cancellation, and pro
 
 PASS
 
-The feature is eligible for checkpoint publication. This is self-verification by the temporary implementation owner, not an independent QA verdict.
+The checkpoint was published only after the internal gate and exact implementation commit CI passed. This remains self-verification by the temporary implementation owner, not an independent QA verdict.
+
+## Published Checkpoint
+
+- Implementation commit: `6ad66041fc9f881bc174265e62bbe3b975730316`
+- GitHub Actions: `Aura Capital CI` run `35683264330` - SUCCESS
+- Annotated tag: `feat-051-approved` - PUBLISHED
