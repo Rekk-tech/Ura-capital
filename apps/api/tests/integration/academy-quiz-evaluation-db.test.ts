@@ -32,7 +32,7 @@ import { resetEnvCache } from "../../src/infrastructure/config/env.js";
 import { disconnectPrisma } from "../../src/infrastructure/database/prisma.js";
 import { accessTokenService } from "../../src/modules/auth/access-token.service.js";
 import { HTTP_STATUS, ERROR_CODES } from "@aura/shared";
-import { assertSafeTestDatabase } from "../helpers/test-db-guard.js";
+import { assertSafeTestDatabase, cleanAllTestTables } from "../helpers/test-db-guard.js";
 import { PrismaAcademyQuizRepository } from "../../src/modules/academy/academy.repository.js";
 
 const testDbUrl =
@@ -117,29 +117,7 @@ describe("FEAT-025 Quiz Evaluation & Secure Submission (Live PostgreSQL Integrat
       },
     });
 
-    async function cleanupTestData(client: PrismaClient): Promise<void> {
-      await client.$transaction(async (tx) => {
-        await tx.academyRewardLedger.deleteMany();
-        await tx.academyUserXp.deleteMany();
-        await tx.academyUserLessonProgress.deleteMany();
-        await tx.academyUserCourseProgress.deleteMany();
-        await tx.academyQuizAnswer.deleteMany();
-        await tx.academyQuizAttempt.deleteMany();
-        await tx.academyQuizOption.deleteMany();
-        await tx.academyQuizQuestion.deleteMany();
-        await tx.academyQuiz.deleteMany();
-        await tx.academyFlashcard.deleteMany();
-        await tx.academyLesson.deleteMany();
-        await tx.academyCourse.deleteMany();
-        await tx.userRole.deleteMany();
-        await tx.credential.deleteMany();
-        await tx.refreshSession.deleteMany();
-        await tx.authSecurityAuditRecord.deleteMany();
-        await tx.user.deleteMany();
-      });
-    }
-
-    await cleanupTestData(prisma);
+    await cleanAllTestTables(prisma);
 
     const userA = await prisma.user.create({
       data: {
@@ -164,25 +142,7 @@ describe("FEAT-025 Quiz Evaluation & Secure Submission (Live PostgreSQL Integrat
 
   afterAll(async () => {
     if (prisma) {
-      await prisma.$transaction(async (tx) => {
-        await tx.academyRewardLedger.deleteMany();
-        await tx.academyUserXp.deleteMany();
-        await tx.academyUserLessonProgress.deleteMany();
-        await tx.academyUserCourseProgress.deleteMany();
-        await tx.academyQuizAnswer.deleteMany();
-        await tx.academyQuizAttempt.deleteMany();
-        await tx.academyQuizOption.deleteMany();
-        await tx.academyQuizQuestion.deleteMany();
-        await tx.academyQuiz.deleteMany();
-        await tx.academyFlashcard.deleteMany();
-        await tx.academyLesson.deleteMany();
-        await tx.academyCourse.deleteMany();
-        await tx.userRole.deleteMany();
-        await tx.credential.deleteMany();
-        await tx.refreshSession.deleteMany();
-        await tx.authSecurityAuditRecord.deleteMany();
-        await tx.user.deleteMany();
-      });
+      await cleanAllTestTables(prisma);
       await prisma.$disconnect();
     }
   });

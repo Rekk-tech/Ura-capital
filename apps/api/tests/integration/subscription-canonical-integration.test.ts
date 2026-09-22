@@ -26,6 +26,7 @@ import { requireEntitlement } from "../../src/modules/subscription/entitlement-a
 import type { EntitlementAuthorizedRequest } from "../../src/modules/subscription/entitlement-authorization.types.js";
 
 import { MockSubscriptionProvider } from "../../src/modules/subscription/provider/mock-subscription-provider.js";
+import type { ProviderSubscriptionSnapshot } from "../../src/modules/subscription/provider/subscription-provider.types.js";
 import { validateSubscriptionProviderEnvironment } from "../../src/modules/subscription/provider/subscription-provider.config.js";
 import { SubscriptionEventProcessorService } from "../../src/modules/subscription/subscription-event-processor.service.js";
 import { SubscriptionWebhookController } from "../../src/modules/subscription/subscription-webhook.controller.js";
@@ -98,7 +99,7 @@ describe("Phase 7 Canonical Subscription Integration Suite (FEAT-050 + FEAT-052 
     });
   });
 
-  function initServices(fixtures: any[] = []) {
+  function initServices(fixtures: ProviderSubscriptionSnapshot[] = []) {
     mockProvider = new MockSubscriptionProvider({
       config: safeConfig,
       fixtures: [
