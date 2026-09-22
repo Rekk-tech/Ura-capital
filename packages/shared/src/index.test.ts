@@ -33,6 +33,7 @@ describe("@aura/shared package", () => {
     expect(API_VERSION).toBe("v1");
     expect(HTTP_STATUS.OK).toBe(200);
     expect(ERROR_CODES.INTERNAL_ERROR).toBe("INTERNAL_ERROR");
+    expect(ERROR_CODES.ENTITLEMENT_REQUIRED).toBe("ENTITLEMENT_REQUIRED");
   });
 
   it("validates HealthStatusSchema successfully", () => {
@@ -502,5 +503,4 @@ describe("@aura/shared package", () => {
     });
   });
 });
-
 
