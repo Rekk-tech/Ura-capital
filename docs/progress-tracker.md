@@ -493,7 +493,7 @@ Phase 3 Completion State:
 - FEAT-018 is DONE / QA PASS / Human Final Gate APPROVED.
 - Phase 3 is DONE / QA PASS / Human Final Gate APPROVED.
 - HISTORICAL SNAPSHOT (at Phase 3 completion): Phase 4 was IN_PROGRESS / PLANNING; FEAT-019 was APPROVED FOR IMPLEMENTATION; FEAT-020 through FEAT-030 remained BLOCKED.
-- CURRENT CANONICAL STATE: Phase 4 is DONE / QA PASS / Human Phase Final Gate APPROVED; Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; Phase 6 is DONE / QA PASS / Human Phase Final Gate APPROVED; Phase Checkpoint: phase-6-approved PUBLISHED; Phase 7 Human Master Planning is APPROVED with D1..D10 locked; FEAT-048 is APPROVED FOR IMPLEMENTATION / NOT_STARTED; FEAT-049 through FEAT-057 are PLANNED / DEPENDENCY CONTROLLED; Phase 8 remains BLOCKED.
+- CURRENT CANONICAL STATE: Phase 4 is DONE / QA PASS / Human Phase Final Gate APPROVED; Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; Phase 6 is DONE / QA PASS / Human Phase Final Gate APPROVED; Phase Checkpoint: phase-6-approved PUBLISHED; Phase 7 is IN_PROGRESS; FEAT-048, FEAT-049, FEAT-050, FEAT-051, and FEAT-054 are DONE; the FEAT-049 + FEAT-051 Core Integration Gate is PASS with `phase-7-subscription-core-051-integrated` published; FEAT-052 is UNBLOCKED FOR IMPLEMENTATION; Phase 8 remains BLOCKED.
 
 Feature Decomposition:
 
@@ -876,7 +876,7 @@ FEAT-028: DONE (Implementation: COMPLETE, Internal Feature Gate: PASS)
 FEAT-029: IMPLEMENTATION COMPLETE / DEFER CLOSURE VERIFIED
 FEAT-030: DONE / QA PASS
 HISTORICAL SNAPSHOT (at Phase 4 completion): Phase 5 was MASTER PLANNING APPROVED; Phase 5 Implementation was NOT_STARTED
-CURRENT CANONICAL STATE: Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; Phase 6 is DONE / QA PASS / Human Phase Final Gate APPROVED; Phase Checkpoint: phase-6-approved PUBLISHED; Phase 7 Human Master Planning is APPROVED with D1..D10 locked; FEAT-048 is APPROVED FOR IMPLEMENTATION / NOT_STARTED; FEAT-049 through FEAT-057 are PLANNED / DEPENDENCY CONTROLLED; Phase 8 remains BLOCKED
+CURRENT CANONICAL STATE: Phase 5 is DONE / QA PASS / Human Phase Final Gate APPROVED; Phase 6 is DONE / QA PASS / Human Phase Final Gate APPROVED; Phase Checkpoint: phase-6-approved PUBLISHED; Phase 7 is IN_PROGRESS; FEAT-048, FEAT-049, FEAT-050, FEAT-051, and FEAT-054 are DONE; the FEAT-049 + FEAT-051 Core Integration Gate is PASS with `phase-7-subscription-core-051-integrated` published; FEAT-052 is UNBLOCKED FOR IMPLEMENTATION; Phase 8 remains BLOCKED
 ```
 
 Feature Decomposition:
@@ -1685,7 +1685,7 @@ Phase 6 QA: PASS
 Phase 6: DONE
 Human Phase Final Gate: APPROVED
 Phase 7 Planning: HUMAN MASTER PLANNING APPROVED
-Phase 7 Implementation: NOT_STARTED
+HISTORICAL SNAPSHOT (at Phase 6 completion): Phase 7 Implementation was NOT_STARTED
 Phase 8: BLOCKED
 Application code changes: FEAT-041 Community persistence foundation complete; FEAT-042 Community posts API & feed read models complete; FEAT-043 Community comments API complete; FEAT-044 Community post likes complete; FEAT-045 Community moderation baseline & write abuse protection complete; FEAT-046 Community learner UI complete
 ```
@@ -1889,7 +1889,7 @@ Implementation Artifacts:
 - `reports/implementation/phase-6/FEAT-045.md`
 - `reports/implementation/phase-6/FEAT-046.md`
 
-Human Decision State: HUMAN PHASE FINAL GATE APPROVED. FEAT-041 through FEAT-047 are DONE at the approved Phase 6 checkpoints. Phase 6 is DONE / QA PASS / HUMAN PHASE FINAL GATE APPROVED and `phase-6-approved` is published. Phase 7 Human Master Planning is APPROVED with D1..D10 locked; FEAT-048 is APPROVED FOR IMPLEMENTATION / NOT_STARTED; FEAT-049 through FEAT-057 are PLANNED / DEPENDENCY CONTROLLED. Phase 8 remains BLOCKED.
+Human Decision State: HUMAN PHASE FINAL GATE APPROVED. FEAT-041 through FEAT-047 are DONE at the approved Phase 6 checkpoints. Phase 6 is DONE / QA PASS / HUMAN PHASE FINAL GATE APPROVED and `phase-6-approved` is published. Phase 7 is IN_PROGRESS; FEAT-048, FEAT-049, FEAT-050, FEAT-051, and FEAT-054 are DONE; the FEAT-049 + FEAT-051 Core Integration Gate is PASS with `phase-7-subscription-core-051-integrated` published; FEAT-052 is UNBLOCKED FOR IMPLEMENTATION. Phase 8 remains BLOCKED.
 
 FEAT-047 Governance Fields:
 
@@ -1912,7 +1912,7 @@ Human Phase Final Gate: APPROVED
 Phase 6 QA: PASS
 Phase 6: DONE
 Phase 7 Planning: HUMAN MASTER PLANNING APPROVED
-Phase 7 Implementation: NOT_STARTED
+HISTORICAL SNAPSHOT (at Phase 6 completion): Phase 7 Implementation was NOT_STARTED
 Phase 8: BLOCKED
 ```
 
@@ -1955,10 +1955,13 @@ Task Baseline: 152 tasks LOCKED
 Human Decisions: D1..D10 APPROVED
 Provider/Checkout Decision: PRODUCTION PROVIDER AND REAL CHECKOUT DEFERRED
 FEAT-048: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-048-approved PUBLISHED
-FEAT-049: UNBLOCKED FOR IMPLEMENTATION
-FEAT-051: DONE / INTERNAL FEATURE GATE PASS / Checkpoint publication in progress
-FEAT-052: BLOCKED pending FEAT-049 completion; FEAT-051 prerequisite satisfied
-FEAT-050, FEAT-053..FEAT-057: PLANNED / DEPENDENCY CONTROLLED
+FEAT-049: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-049-approved PUBLISHED
+FEAT-050: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-050-approved PUBLISHED
+FEAT-051: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-051-approved PUBLISHED
+FEAT-054: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-054-approved PUBLISHED
+Core Integration Gate (FEAT-049 + FEAT-051): PASS / Checkpoint: phase-7-subscription-core-051-integrated PUBLISHED
+FEAT-052: UNBLOCKED FOR IMPLEMENTATION
+FEAT-053, FEAT-055..FEAT-057: PLANNED / DEPENDENCY CONTROLLED
 Phase 8: BLOCKED
 ```
 
@@ -2014,7 +2017,7 @@ Boundary Guard: PASS (18 controllers, 24 services, 9 repositories clean)
 Spec Package: .specify/specs/FEAT-049/
 Acceptance Criteria: 18 PASS / 0 FAIL (AC-001..AC-018 PASS)
 Tasks: 12 PASS / 0 FAIL (T001..T012 PASS)
-Dependencies: FEAT-050 UNBLOCKED FOR IMPLEMENTATION; FEAT-054 UNBLOCKED FOR IMPLEMENTATION
+Dependencies: FEAT-050 DONE; FEAT-054 DONE; FEAT-052 core prerequisite satisfied through the approved FEAT-049 + FEAT-051 integrated baseline
 ```
 
 ### FEAT-051: Provider Abstraction & Development Mock Isolation
@@ -2038,7 +2041,36 @@ Scope Guards: Production SDK ZERO, Public API ZERO, UI ZERO, Schema/Migration ZE
 Targeted Tests: 3 files / 43 tests PASS
 Acceptance Criteria: 20 PASS / 0 FAIL (AC-001..AC-020 PASS)
 Tasks: 14 COMPLETE / 0 OPEN (T001..T014 COMPLETE)
-Dependencies: FEAT-049 satisfied; FEAT-051 prerequisite satisfied; FEAT-052 UNBLOCKED FOR IMPLEMENTATION; FEAT-050 remains UNBLOCKED; FEAT-054 remains UNBLOCKED
+Dependencies: FEAT-049 satisfied; FEAT-051 prerequisite satisfied; Core Integration Gate PASS; FEAT-052 UNBLOCKED FOR IMPLEMENTATION; FEAT-050 DONE; FEAT-054 DONE
+```
+
+### Phase 7 Core Integration Gate: FEAT-049 + FEAT-051
+
+Status:
+
+```text
+Core Integration Gate: PASS
+Baseline: feat-048-approved @ 48105db89656793d5d9efae76bb1e7a3bb750f94
+FEAT-049 Source: feat-049-approved @ f7a899fb50d13caed2d23042d948302f9fe2cc2b
+FEAT-051 Source: feat-051-approved @ 6ad66041fc9f881bc174265e62bbe3b975730316
+Integrated Commit: 3edb9b462f7f7caaffcf70eaf73ae4b45db22172
+Integration Tag: phase-7-subscription-core-051-integrated PUBLISHED
+Exact-Source CI: SUCCESS - GitHub Actions run 35687440400
+Canonical 14: PASS
+Security Suite: PASS (1 file / 49 tests)
+Standard Tests: PASS (101 files / 1183 tests)
+Unit Tests: PASS (73 files / 954 tests)
+PostgreSQL Tests: PASS (40 files / 534 tests)
+Redis Tests: PASS (5 files / 50 tests)
+Targeted Core Integration: PASS (1 file / 8 tests)
+Migration Count: 10; no FEAT-049 or FEAT-051 migration
+Provider Authority: Provider results do not grant PREMIUM_ACCESS; PostgreSQL subscription state remains authoritative
+Mock Isolation: Development/test/CI approved predicates only; staging/production/production-like/unknown/conflicting inputs fail closed
+Future Scope: FEAT-052 event processing, FEAT-053 lifecycle routes, FEAT-055 reconciliation, and FEAT-056 UI remain absent
+QA Report: reports/qa/phase-7/PHASE-7-CORE-INTEGRATION-QA.md
+FEAT-052: UNBLOCKED FOR IMPLEMENTATION
+Phase 7: IN_PROGRESS
+Phase 8: BLOCKED
 ```
 
 ---
