@@ -1988,6 +1988,34 @@ Tasks: 16 PASS / 0 FAIL (T001..T016 PASS)
 Dependencies: FEAT-049 UNBLOCKED FOR IMPLEMENTATION; FEAT-051 UNBLOCKED FOR IMPLEMENTATION
 ```
 
+### FEAT-049: Plan Catalog & Entitlement Resolution
+
+Status:
+
+```text
+FEAT-049: DONE
+Planning: HUMAN MASTER PLANNING APPROVED
+Implementation: COMPLETE
+Implementation Owner: DEV-B / Antigravity
+Internal Feature Gate: PASS
+Latest QA: FAST-TRACK DELIVERY (Internal Feature Gate PASS; Zero blocking defects; Canonical 14 PASS)
+Canonical 14 Validation: PASS (14/14 commands with no skips)
+Implementation Report: reports/implementation/phase-7/FEAT-049.md
+Checkpoint Tag: feat-049-approved
+Migration Total: ZERO (current total: 10 migrations)
+Taxonomies & Plans: FREE and PREMIUM only; initial entitlement set contains only PREMIUM_ACCESS
+Durable Authority: PostgreSQL facts + server-owned plan catalog + server clock (ZERO client/JWT/Redis authority)
+Status Evaluation: PAST_DUE grants no premium & no grace; cancel-at-period-end remains ACTIVE through currentPeriodEnd then EXPIRED; CANCELLED/EXPIRED deny
+No Subscription Semantics: Resolves to FREE with status NONE and 0 entitlements
+Domain Boundary: Pure non-Prisma IEntitlementResolver & EntitlementContext interfaces
+Scope Guards: Public APIs ZERO, Provider SDKs ZERO, Checkout/Cancel Actions ZERO, UI ZERO, Redis Authority ZERO, Existing Domain Gating ZERO
+Boundary Guard: PASS (18 controllers, 24 services, 9 repositories clean)
+Spec Package: .specify/specs/FEAT-049/
+Acceptance Criteria: 18 PASS / 0 FAIL (AC-001..AC-018 PASS)
+Tasks: 12 PASS / 0 FAIL (T001..T012 PASS)
+Dependencies: FEAT-050 UNBLOCKED FOR IMPLEMENTATION; FEAT-054 UNBLOCKED FOR IMPLEMENTATION
+```
+
 ---
 
 # Phase 8 - Aura Intelligence
