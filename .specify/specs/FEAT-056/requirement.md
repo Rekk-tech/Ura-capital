@@ -1,6 +1,6 @@
 # FEAT-056 Requirement: Subscription Learner UI
 
-Status: IMPLEMENTED / INTERNAL FEATURE GATE PASS / CHECKPOINT PUBLICATION PENDING
+Status: DONE / INTERNAL FEATURE GATE PASS / CHECKPOINT PUBLISHED
 Phase: Phase 7 - Subscription / Premium
 Type: Learner-facing UI
 

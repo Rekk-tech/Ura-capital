@@ -4,7 +4,7 @@ Feature: FEAT-056
 Phase: Phase 7 - Subscription / Premium
 Implementation Agent: Codex (temporary implementation owner)
 Target QA Reviewer: FEAT-057 independent Phase QA
-Status: IMPLEMENTATION COMPLETE / SELF-VERIFICATION PASS / CHECKPOINT PUBLICATION PENDING
+Status: DONE / INTERNAL FEATURE GATE PASS / CHECKPOINT PUBLISHED
 
 ## Delivery Context
 
@@ -156,4 +156,4 @@ Self-Verification: PASS
 
 Independent QA Pass: NOT CLAIMED
 
-Checkpoint publication remains pending exact-source CI success and publication of the non-overwriting `feat-056-approved` tag.
+Exact-source CI run `35752190484` completed successfully for implementation commit `81e209ddd27ed4ee1cb9705d18dff829966b361b`. The non-overwriting annotated checkpoint tag is `feat-056-approved`.

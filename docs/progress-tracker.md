@@ -1962,7 +1962,7 @@ FEAT-052: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-052-approved PUBL
 FEAT-054: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-054-approved PUBLISHED
 FEAT-053: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-053-approved PUBLISHED
 FEAT-055: UNBLOCKED FOR IMPLEMENTATION
-FEAT-056: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-056-approved PUBLICATION PENDING
+FEAT-056: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-056-approved PUBLISHED
 FEAT-057: PLANNED / DEPENDENCY CONTROLLED
 Phase 8: BLOCKED
 ```
@@ -2124,7 +2124,7 @@ Client Entitlement Authority: ZERO
 Payment Data Handling: ZERO
 Existing Domain Premium Gating: ZERO
 Implementation Report: reports/implementation/phase-7/FEAT-056.md
-Checkpoint Tag: feat-056-approved PUBLICATION PENDING
+Checkpoint Tag: feat-056-approved PUBLISHED
 Acceptance Criteria: 20 PASS / 0 FAIL (AC-001..AC-020 PASS)
 Tasks: 14 COMPLETE / 0 OPEN (T001..T014 COMPLETE)
 Dependencies: FEAT-050, FEAT-053, FEAT-054 satisfied; FEAT-057 remains dependency-controlled by all FEAT-048..056 checkpoints
