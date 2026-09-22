@@ -300,4 +300,51 @@ export type SubmitQuizAttemptBody = z.infer<typeof SubmitQuizAttemptBodySchema>;
 export const CompleteLessonBodySchema = z.object({}).strict();
 export type CompleteLessonBody = z.infer<typeof CompleteLessonBodySchema>;
 
+// FEAT-050 Subscription Read Schemas
+export const SubscriptionPlanKeySchema = z.enum(["FREE", "PREMIUM"]);
+export const EffectiveSubscriptionStatusSchema = z.enum([
+  "ACTIVE",
+  "PAST_DUE",
+  "CANCELLED",
+  "EXPIRED",
+  "NONE",
+]);
+export const EntitlementKeySchema = z.enum(["PREMIUM_ACCESS"]);
+
+export const SubscriptionPlanDtoSchema = z
+  .object({
+    planKey: SubscriptionPlanKeySchema,
+    name: z.string(),
+    description: z.string(),
+    entitlements: z.array(EntitlementKeySchema),
+    available: z.boolean(),
+  })
+  .strict();
+
+export const SubscriptionPlansResponseSchema = z
+  .object({
+    data: z.array(SubscriptionPlanDtoSchema),
+  })
+  .strict();
+
+export const SubscriptionMeDtoSchema = z
+  .object({
+    plan: SubscriptionPlanKeySchema,
+    planKey: SubscriptionPlanKeySchema,
+    status: EffectiveSubscriptionStatusSchema,
+    entitlements: z.array(EntitlementKeySchema),
+    isEntitled: z.boolean(),
+    currentPeriodStart: z.string().datetime().nullable(),
+    currentPeriodEnd: z.string().datetime().nullable(),
+    cancelAtPeriodEnd: z.boolean(),
+  })
+  .strict();
+
+export const SubscriptionMeResponseSchema = z
+  .object({
+    data: SubscriptionMeDtoSchema,
+  })
+  .strict();
+
+
 
