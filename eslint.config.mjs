@@ -12,7 +12,8 @@ export default tseslint.config(
       "**/coverage/**",
       "**/*.d.ts",
       "**/.specify/**",
-      "**/.agents/**"
+      "**/.agents/**",
+      "**/tmp/**"
     ]
   },
   js.configs.recommended,
