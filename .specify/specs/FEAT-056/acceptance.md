@@ -1,6 +1,6 @@
 # FEAT-056 Acceptance Criteria
 
-Status: HUMAN MASTER PLANNING APPROVED / PLANNED / DEPENDENCY CONTROLLED
+Status: INTERNAL FEATURE GATE PASS / AC-001..AC-020 PASS / CHECKPOINT PUBLISHED
 
 - AC-001 Approved D8 locks canonical learner route `/subscription`, information hierarchy, safe copy, and no admin UI.
 - AC-002 Approved D10 deferral is enforced: production UI is read-only and has no commerce APIs or commerce CTAs.

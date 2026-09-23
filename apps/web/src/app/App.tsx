@@ -1,12 +1,13 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Link, useLocation } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ShieldCheck, Cpu, BookOpen, TrendingUp, Users, Activity } from "lucide-react";
+import { ShieldCheck, Cpu, BookOpen, TrendingUp, Users, Activity, BadgeDollarSign } from "lucide-react";
 import { APP_NAME } from "@aura/shared";
 import { AuthProvider } from "../features/auth/context/AuthContext";
 import { AcademyRoutes } from "./router/academy-routes";
 import { SimulationRoutes } from "./router/simulation-routes";
 import { CommunityRoutes } from "./router/community-routes";
+import { SubscriptionRoutes } from "./router/subscription-routes";
 
 const defaultQueryClient = new QueryClient({
   defaultOptions: {
@@ -156,6 +157,10 @@ export const AppContent: React.FC = () => {
           <Link to="/community" className="nav-link">
             Community
           </Link>
+          <Link to="/subscription" className="nav-link">
+            <BadgeDollarSign size={17} aria-hidden="true" />
+            Subscription
+          </Link>
         </nav>
 
         <div className="status-pill">
@@ -170,6 +175,7 @@ export const AppContent: React.FC = () => {
           <Route path="/academy/*" element={<AcademyRoutes />} />
           <Route path="/simulation/*" element={<SimulationRoutes />} />
           <Route path="/community/*" element={<CommunityRoutes />} />
+          <Route path="/subscription/*" element={<SubscriptionRoutes />} />
         </Routes>
       </div>
 

@@ -1961,9 +1961,9 @@ FEAT-050: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-050-approved PUBL
 FEAT-052: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-052-approved PUBLISHED
 FEAT-054: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-054-approved PUBLISHED
 FEAT-053: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-053-approved PUBLISHED
-FEAT-055: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-055-approved PENDING PUBLICATION
-FEAT-056: UNBLOCKED FOR IMPLEMENTATION
-FEAT-057: BLOCKED BY FEAT-056
+FEAT-055: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-055-approved PUBLISHED
+FEAT-056: DONE / INTERNAL FEATURE GATE PASS / Checkpoint: feat-056-approved PUBLISHED
+FEAT-057: UNBLOCKED FOR INDEPENDENT PHASE QA
 Phase 8: BLOCKED
 ```
 
@@ -2067,7 +2067,7 @@ Scope Guards: Production SDK ZERO, Public API ZERO, UI ZERO, Schema/Migration ZE
 Targeted Tests: 3 files / 23 tests PASS
 Acceptance Criteria: 24 PASS / 0 FAIL (AC-001..AC-024 PASS)
 Tasks: 16 COMPLETE / 0 OPEN (T001..T016 COMPLETE)
-Dependencies: FEAT-055 DONE / INTERNAL FEATURE GATE PASS; FEAT-056 UNBLOCKED FOR IMPLEMENTATION
+Dependencies: FEAT-055 DONE / INTERNAL FEATURE GATE PASS; FEAT-056 DONE / INTERNAL FEATURE GATE PASS
 ```
 
 ### FEAT-054: Premium Entitlement Authorization Guard
@@ -2094,7 +2094,7 @@ Implementation Report: reports/implementation/phase-7/FEAT-054.md
 Checkpoint Tag: feat-054-approved
 Acceptance Criteria: 20 PASS / 0 FAIL (AC-001..AC-020 PASS)
 Tasks: 14 COMPLETE / 0 OPEN (T001..T014 COMPLETE)
-Dependencies: FEAT-050, FEAT-052, FEAT-053 satisfied; FEAT-055 DONE / INTERNAL FEATURE GATE PASS; FEAT-056 UNBLOCKED
+Dependencies: FEAT-050, FEAT-052, FEAT-053 satisfied; FEAT-055 DONE; FEAT-056 DONE
 Phase 7: IN_PROGRESS
 ```
 
@@ -2126,11 +2126,45 @@ Redis Audit/Reconciliation Authority: ZERO
 Public Repair/Audit API: ZERO
 FEAT-056 Application Changes: ZERO
 Implementation Report: reports/implementation/phase-7/FEAT-055.md
-Checkpoint Tag: feat-055-approved (PENDING PUBLICATION)
+Checkpoint Tag: feat-055-approved PUBLISHED
 Acceptance Criteria: 22 PASS / 0 FAIL (AC-001..AC-022 PASS)
 Tasks: 15 COMPLETE / 0 OPEN (T001..T015 COMPLETE)
-Dependencies: FEAT-052 and FEAT-053 satisfied; FEAT-057 remains BLOCKED BY FEAT-056
+Dependencies: FEAT-052 and FEAT-053 satisfied; FEAT-057 UNBLOCKED FOR INDEPENDENT PHASE QA
 Phase 7: IN_PROGRESS
+```
+
+### FEAT-056: Subscription Learner UI
+
+Status:
+
+```text
+FEAT-056: DONE / INTERNAL FEATURE GATE PASS
+Planning: HUMAN MASTER PLANNING APPROVED
+Implementation: COMPLETE
+Implementation Owner: Codex / Temporary Implementation Agent
+Self-Verification: PASS
+Independent QA: NOT CLAIMED
+QA Independence: REDUCED
+Compensating Control: FEAT-057 independent Phase QA
+Canonical 14 Validation: PASS
+Targeted FEAT-056 Tests: 4 files / 31 tests PASS
+Standard Regression: 113 files / 1301 tests PASS
+Unit Regression: 82 files / 1056 tests PASS
+PostgreSQL Regression: 45 files / 572 tests PASS on fresh isolated database
+Redis Regression: 6 files / 53 tests PASS
+Migration Impact: ZERO (current total remains 10)
+Production Commerce: READ-ONLY; real checkout and cancellation remain deferred by D10
+Development/Test Cancellation: FEAT-053 contract with confirmation and authoritative refetch
+Client Entitlement Authority: ZERO
+Payment Data Handling: ZERO
+Existing Domain Premium Gating: ZERO
+Implementation Report: reports/implementation/phase-7/FEAT-056.md
+Checkpoint Tag: feat-056-approved PUBLISHED
+Acceptance Criteria: 20 PASS / 0 FAIL (AC-001..AC-020 PASS)
+Tasks: 14 COMPLETE / 0 OPEN (T001..T014 COMPLETE)
+Dependencies: FEAT-050, FEAT-053, FEAT-054 satisfied; FEAT-057 remains dependency-controlled by all FEAT-048..056 checkpoints
+Phase 7: IN_PROGRESS
+Phase 8: BLOCKED
 ```
 
 ---

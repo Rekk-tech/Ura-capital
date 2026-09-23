@@ -24,9 +24,9 @@ FEAT-050: DONE / INTERNAL FEATURE GATE PASS / feat-050-approved PUBLISHED
 FEAT-052: DONE / INTERNAL FEATURE GATE PASS / feat-052-approved PUBLISHED
 FEAT-054: DONE / INTERNAL FEATURE GATE PASS / feat-054-approved PUBLISHED
 FEAT-053: DONE / INTERNAL FEATURE GATE PASS / feat-053-approved PUBLISHED
-FEAT-055: DONE / INTERNAL FEATURE GATE PASS / CHECKPOINT PUBLICATION PENDING
-FEAT-056: UNBLOCKED FOR IMPLEMENTATION
-FEAT-057: BLOCKED BY FEAT-056
+FEAT-055: DONE / INTERNAL FEATURE GATE PASS / feat-055-approved PUBLISHED
+FEAT-056: DONE / INTERNAL FEATURE GATE PASS / feat-056-approved PUBLISHED
+FEAT-057: UNBLOCKED FOR INDEPENDENT PHASE QA
 Phase 8: BLOCKED
 ```
 
@@ -271,7 +271,7 @@ The graph is acyclic. FEAT-057 remains last.
 - FEAT-054 may proceed after FEAT-049 without waiting for provider ingestion.
 - FEAT-053 follows FEAT-052 and may coordinate provider commands/reconciliation.
 - FEAT-055 follows lifecycle/event behavior so its event taxonomy and failure policy are concrete.
-- FEAT-056 may prepare visual states after FEAT-050 contracts freeze and must enforce the approved D8 `/subscription` route plus D10 production-commerce deferral; it adds no checkout/cancel integration.
+- FEAT-056 consumes FEAT-050 reads and the approved FEAT-053 development/test cancellation contract, enforces D8 `/subscription`, and preserves D10 by adding no production checkout or cancellation integration.
 - FEAT-057 executes only after FEAT-048..056 gates complete and branches are integrated on the latest approved baseline.
 
 No parallel feature may create or edit a Phase 7 migration.
