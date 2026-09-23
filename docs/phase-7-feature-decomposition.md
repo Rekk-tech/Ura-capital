@@ -1,6 +1,6 @@
 # Aura Capital - Phase 7 Feature Decomposition
 
-Status: HUMAN MASTER PLANNING APPROVED
+Status: HUMAN PHASE FINAL GATE APPROVED
 Phase: Phase 7 - Subscription / Premium
 Planning Rework Iteration: 1 - B-01 through B-06 addressed
 Planning / Architecture Owner: Codex
@@ -15,7 +15,8 @@ Scope: Planning only; application, test, schema, and migration changes are zero.
 Phase 6: DONE / QA PASS / HUMAN PHASE FINAL GATE APPROVED
 Phase Checkpoint: phase-6-approved PUBLISHED
 Phase 7 Planning: HUMAN MASTER PLANNING APPROVED
-Phase 7 Implementation: IN_PROGRESS
+Phase 7: DONE / QA PASS / HUMAN PHASE FINAL GATE APPROVED
+Phase Checkpoint: phase-7-approved PUBLISHED
 Human Decisions D1..D10: APPROVED
 FEAT-048: DONE / INTERNAL FEATURE GATE PASS / feat-048-approved PUBLISHED
 FEAT-049: DONE / INTERNAL FEATURE GATE PASS / feat-049-approved PUBLISHED
@@ -26,8 +27,8 @@ FEAT-054: DONE / INTERNAL FEATURE GATE PASS / feat-054-approved PUBLISHED
 FEAT-053: DONE / INTERNAL FEATURE GATE PASS / feat-053-approved PUBLISHED
 FEAT-055: DONE / INTERNAL FEATURE GATE PASS / feat-055-approved PUBLISHED
 FEAT-056: DONE / INTERNAL FEATURE GATE PASS / feat-056-approved PUBLISHED
-FEAT-057: UNBLOCKED FOR INDEPENDENT PHASE QA
-Phase 8: BLOCKED
+FEAT-057: DONE / QA PASS / phase-7-final-integrated PUBLISHED
+Phase 8: UNBLOCKED FOR PLANNING
 ```
 
 Historical planning snapshot: the earlier FEAT-048..FEAT-054 contract-first roadmap was recorded as `HUMAN APPROVED / PLANNED`. Human Master Planning now approves the detailed FEAT-048..FEAT-057 map in this document, which supersedes that preliminary feature map as implementation authority.
@@ -317,5 +318,6 @@ All ten Human decisions are approved and locked. No implementation agent may rei
 - This detailed approved decomposition supersedes preliminary Phase 7 feature references in cross-phase planning documents.
 - Each feature requires its own approved spec and predecessor gate before implementation.
 - FEAT-048 is the only migration owner; its migration is additive, forward-only, fresh-deploy reproducible, and upgrade-safe from `phase-6-approved`.
-- FEAT-057 PASS plus Human Phase Final Gate approval is required to close Phase 7.
-- Phase 8 remains blocked throughout planning and implementation until the Phase 7 Human Final Gate.
+- FEAT-057 PASS plus Human Phase Final Gate approval closes Phase 7 (`phase-7-approved` published).
+- Phase 7 is DONE / QA PASS.
+- Phase 8 is UNBLOCKED FOR PLANNING (master planning remains separate; Phase 8 planning approval is NOT automatic; implementation remains BLOCKED).
