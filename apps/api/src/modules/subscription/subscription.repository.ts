@@ -9,7 +9,9 @@ import {
 import type {
   ISubscriptionRepository,
   ISubscriptionProviderEventRepository,
+  ISubscriptionAuditProviderEventRepository,
   ISubscriptionTransitionRepository,
+  ISubscriptionAuditTransitionRepository,
   CreateUserSubscriptionInput,
   UpdateUserSubscriptionInput,
   CreateSubscriptionProviderEventInput,
@@ -148,7 +150,7 @@ export class PrismaSubscriptionRepository implements ISubscriptionRepository {
 // ============================================================================
 
 export class PrismaSubscriptionProviderEventRepository
-  implements ISubscriptionProviderEventRepository
+  implements ISubscriptionProviderEventRepository, ISubscriptionAuditProviderEventRepository
 {
   private readonly client: DbClient;
 
@@ -229,6 +231,34 @@ export class PrismaSubscriptionProviderEventRepository
       throw mapDatabaseError(err, `Failed to update provider event outcome: ${id}`);
     }
   }
+
+  async findAuditPending(limit: number): Promise<SubscriptionProviderEvent[]> {
+    try {
+      return await this.client.subscriptionProviderEvent.findMany({
+        where: {
+          metadata: {
+            path: ["auditPending"],
+            equals: true,
+          },
+        },
+        orderBy: { createdAt: "asc" },
+        take: Math.max(1, Math.min(limit, 100)),
+      });
+    } catch (err) {
+      throw mapDatabaseError(err, "Failed to discover pending subscription audit evidence");
+    }
+  }
+
+  async lockById(id: string): Promise<SubscriptionProviderEvent | null> {
+    try {
+      await this.client.$queryRaw(
+        Prisma.sql`SELECT id FROM subscription_provider_events WHERE id = ${id} FOR UPDATE`,
+      );
+      return await this.client.subscriptionProviderEvent.findUnique({ where: { id } });
+    } catch (err) {
+      throw mapDatabaseError(err, "Failed to lock subscription audit reconciliation target");
+    }
+  }
 }
 
 // ============================================================================
@@ -236,7 +266,7 @@ export class PrismaSubscriptionProviderEventRepository
 // ============================================================================
 
 export class PrismaSubscriptionTransitionRepository
-  implements ISubscriptionTransitionRepository
+  implements ISubscriptionTransitionRepository, ISubscriptionAuditTransitionRepository
 {
   private readonly client: DbClient;
 
@@ -324,6 +354,26 @@ export class PrismaSubscriptionTransitionRepository
       throw mapDatabaseError(
         err,
         `Failed to find subscription transitions for correlationId: ${correlationId}`,
+      );
+    }
+  }
+
+  async findReconciliationByProviderEventId(
+    providerEventId: string,
+  ): Promise<SubscriptionTransitionRecord | null> {
+    try {
+      return await this.client.subscriptionTransitionRecord.findFirst({
+        where: {
+          providerEventId,
+          source: "RECONCILIATION",
+          reason: "SUBSCRIPTION_RECONCILED",
+        },
+        orderBy: { createdAt: "asc" },
+      });
+    } catch (err) {
+      throw mapDatabaseError(
+        err,
+        "Failed to find subscription audit reconciliation evidence",
       );
     }
   }

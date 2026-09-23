@@ -229,7 +229,7 @@ export class SubscriptionLifecycleService {
         actorId: input.userId,
         subjectId: activeSub.id,
         requestId: input.requestId,
-        reason: input.reason ?? "User requested cancellation at period end",
+        reason: "SUBSCRIPTION_CANCELLATION_REQUESTED",
         metadata: {
           cancelAtPeriodEnd: nextCancelAtPeriodEnd,
         },
@@ -354,17 +354,19 @@ export class SubscriptionLifecycleService {
         actorId: null, // internal server-controlled reconciliation
         subjectId: existingSub.id,
         requestId: input.requestId,
-        reason: "Canonical provider reconciliation",
+        reason: "SUBSCRIPTION_RECONCILED",
         metadata: {
-          strategy,
-          reconciled: true,
+          reconciliationReasonCode: "CANONICAL_PROVIDER_STATE_CHANGE",
+          originSource: "RECONCILIATION",
+          originTransactionStrategy: strategy,
+          providerKey: existingSub.providerKey,
         },
       });
     });
 
     return {
       reconciled: true,
-      reason: "RECONCILED",
+      reason: "SUBSCRIPTION_RECONCILED",
       status: toStatus,
       planKey: toPlan,
     };

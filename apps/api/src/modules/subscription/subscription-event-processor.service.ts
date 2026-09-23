@@ -28,6 +28,10 @@ import {
   type SubscriptionStatus,
   type SubscriptionTransactionStrategy,
 } from "./subscription.types.js";
+import {
+  createAuditPendingMetadata,
+  deriveSubscriptionAuditEventType,
+} from "./subscription-audit.types.js";
 
 export type ProviderResolver = (providerKey: string) => ISubscriptionProvider;
 
@@ -262,6 +266,15 @@ export class SubscriptionEventProcessorService {
     const toStatus = snapshot.status;
     const fromPlan = (existingSub?.planKey as SubscriptionPlan) ?? null;
     const toPlan = snapshot.planKey;
+    const auditEventType = deriveSubscriptionAuditEventType({
+      providerEventType: eventType,
+      fromStatus,
+      toStatus,
+      fromPlan,
+      toPlan,
+      previousCancelAtPeriodEnd: existingSub?.cancelAtPeriodEnd ?? false,
+      cancelAtPeriodEnd: snapshot.cancelAtPeriodEnd,
+    });
 
     const isActivationOrUpgrade =
       (fromPlan !== "PREMIUM" && toPlan === "PREMIUM") ||
@@ -334,6 +347,17 @@ export class SubscriptionEventProcessorService {
       // Attempt transition audit record write outside or secondary
       let auditPending = false;
       try {
+        if (!auditEventType) {
+          return {
+            outcome: "PROCESSED",
+            duplicate: false,
+            providerEventId,
+            subscriptionId: committedSubId!,
+            status: toStatus,
+            planKey: toPlan,
+            auditPending: false,
+          };
+        }
         await this.transitionRepo.create({
           subscriptionId: committedSubId!,
           userId: snapshot.userId,
@@ -344,9 +368,9 @@ export class SubscriptionEventProcessorService {
           source: "PROVIDER_WEBHOOK",
           transactionStrategy: "STATE_FIRST",
           providerEventId,
-          reason: `Provider event ${eventType}`,
+          reason: auditEventType,
         });
-      } catch (auditErr: unknown) {
+      } catch {
         // Revocation remains committed! Record durable audit-pending evidence (AC-015, AC-016)
         auditPending = true;
         logger.warn(
@@ -354,17 +378,23 @@ export class SubscriptionEventProcessorService {
           {
             eventId: committedEventId!,
             subscriptionId: committedSubId!,
-            error: auditErr instanceof Error ? auditErr.message : String(auditErr),
           },
         );
 
         await this.providerEventRepo.updateOutcome(
           committedEventId!,
           "PROCESSED",
-          {
-            auditPending: true,
-            auditError: "AUDIT_PERSISTENCE_FAILED",
-          },
+          createAuditPendingMetadata({
+            auditEventType: auditEventType!,
+            subscriptionId: committedSubId!,
+            userId: snapshot.userId,
+            providerKey: provider.providerKey,
+            providerEventId,
+            fromStatus,
+            toStatus,
+            fromPlan,
+            toPlan,
+          }),
           new Date(),
         );
       }
@@ -422,18 +452,20 @@ export class SubscriptionEventProcessorService {
         },
       });
 
-      await ctx.repositories.subscriptionTransitionRepo.create({
-        subscriptionId: subRecord.id,
-        userId: snapshot.userId,
-        fromStatus,
-        toStatus,
-        fromPlan,
-        toPlan,
-        source: "PROVIDER_WEBHOOK",
-        transactionStrategy: "TRANSACTIONALLY_COUPLED",
-        providerEventId,
-        reason: `Provider event ${eventType}`,
-      });
+      if (auditEventType) {
+        await ctx.repositories.subscriptionTransitionRepo.create({
+          subscriptionId: subRecord.id,
+          userId: snapshot.userId,
+          fromStatus,
+          toStatus,
+          fromPlan,
+          toPlan,
+          source: "PROVIDER_WEBHOOK",
+          transactionStrategy: "TRANSACTIONALLY_COUPLED",
+          providerEventId,
+          reason: auditEventType,
+        });
+      }
 
       return {
         outcome: "PROCESSED",

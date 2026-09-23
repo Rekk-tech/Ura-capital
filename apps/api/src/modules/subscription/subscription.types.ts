@@ -140,10 +140,25 @@ export interface ISubscriptionProviderEventRepository {
   ): Promise<SubscriptionProviderEvent>;
 }
 
+/**
+ * Low-level persistence capabilities used only by the internal FEAT-055
+ * reconciliation worker. The row lock must be called inside an active UoW.
+ */
+export interface ISubscriptionAuditProviderEventRepository {
+  findAuditPending(limit: number): Promise<SubscriptionProviderEvent[]>;
+  lockById(id: string): Promise<SubscriptionProviderEvent | null>;
+}
+
 export interface ISubscriptionTransitionRepository {
   create(data: CreateSubscriptionTransitionInput): Promise<SubscriptionTransitionRecord>;
   findById(id: string): Promise<SubscriptionTransitionRecord | null>;
   findBySubscriptionId(subscriptionId: string): Promise<SubscriptionTransitionRecord[]>;
   findByUserId(userId: string): Promise<SubscriptionTransitionRecord[]>;
   findByCorrelationId(correlationId: string): Promise<SubscriptionTransitionRecord[]>;
+}
+
+export interface ISubscriptionAuditTransitionRepository {
+  findReconciliationByProviderEventId(
+    providerEventId: string,
+  ): Promise<SubscriptionTransitionRecord | null>;
 }

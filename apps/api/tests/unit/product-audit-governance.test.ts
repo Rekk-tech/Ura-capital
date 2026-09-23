@@ -192,6 +192,30 @@ describe("FEAT-016 Product Audit Governance & Abstraction Unit Tests", () => {
       expect(probeTaxonomy.violations.some((v) => v.includes("SIMULATION_ORDER_SUBMITTED"))).toBe(true);
       expect(probeTaxonomy.violations.some((v) => v.includes("ACADEMY_LESSON_COMPLETED"))).toBe(true);
     });
+
+    it("blocks public subscription repair surfaces and auth-audit reuse", () => {
+      const routeProbe = evaluateProductAuditGovernance({
+        codeFiles: [
+          {
+            path: "apps/api/src/modules/subscription/subscription-audit.routes.ts",
+            content: 'router.post("/api/subscriptions/reconcile", handler);',
+          },
+        ],
+      });
+      expect(routeProbe.passed).toBe(false);
+      expect(routeProbe.violations.some((value) => value.includes("subscription audit/repair"))).toBe(true);
+
+      const authAuditProbe = evaluateProductAuditGovernance({
+        codeFiles: [
+          {
+            path: "apps/api/src/modules/subscription/subscription-audit.service.ts",
+            content: "await repositories.authSecurityAuditRecord.create(input);",
+          },
+        ],
+      });
+      expect(authAuditProbe.passed).toBe(false);
+      expect(authAuditProbe.violations.some((value) => value.includes("auth/security audit reuse"))).toBe(true);
+    });
   });
 
   describe("FEAT-009 Auth/Security Audit Taxonomy Invariance", () => {

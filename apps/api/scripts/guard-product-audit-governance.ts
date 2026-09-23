@@ -189,6 +189,24 @@ export function evaluateProductAuditGovernance(inputs: GovernanceGuardEvaluation
         violations.push(`Prohibited product audit HTTP route detected in ${file.path}.`);
       }
 
+      if (
+        /(?:\.|\b)(?:post|get|put|delete|patch|use)\s*\(\s*["'`]\/?(?:api\/)?subscriptions?\/(?:audit|repair|reconcile|grant|set-plan)/i.test(
+          content,
+        )
+      ) {
+        violations.push(`Prohibited public subscription audit/repair route detected in ${file.path}.`);
+      }
+
+      const normalizedPath = file.path.replace(/\\/g, "/").toLowerCase();
+      if (
+        normalizedPath.includes("/modules/subscription/") &&
+        /AuthSecurityAuditRecord|authSecurityAuditRecord|\.authSecurityAuditRecord\b|\bauditRepo\b/.test(
+          content,
+        )
+      ) {
+        violations.push(`Prohibited auth/security audit reuse detected in subscription module ${file.path}.`);
+      }
+
       // Prohibit premature product audit repositories, services, controllers
       const classMatch = content.match(/ProductAuditController|ProductAuditPersistenceService|ProductAuditRepository|ProductAuditService/i);
       if (classMatch) {
