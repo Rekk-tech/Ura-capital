@@ -1,17 +1,17 @@
 # FEAT-059 Tasks: Gemini Development Adapter & Failure Isolation
 
-Status: DEPENDENCY BLOCKED BY FEAT-058
+Status: IMPLEMENTATION COMPLETE / INTERNAL FEATURE GATE PASS
 
-- [ ] T001 Implement the Gemini development/test adapter against FEAT-058 `LLMProvider` without making Gemini part of caller contracts. (FR-001; AC-001).
-- [ ] T002 Add or update boundary enforcement so Gemini SDK imports remain adapter-only. (FR-002; AC-002).
-- [ ] T003 Wire exact Human-approved Gemini model/API/token-limit/timeout and server-only credentials into the adapter. (FR-003; AC-003).
-- [ ] T004 Implement abort-aware timeout and cancellation propagation. (FR-004; AC-004).
-- [ ] T005 Implement the approved bounded retry classifier and ambiguous-call no-retry behavior. (FR-005; AC-005).
-- [ ] T006 Map provider failures to safe internal error classes. (FR-006; AC-006).
-- [ ] T007 Normalize bounded token/usage metadata for later telemetry. (FR-007; AC-007).
-- [ ] T008 Apply sanitization and add sensitive provider-data leakage probes. (FR-008; AC-008).
-- [ ] T009 Implement the explicit deterministic fake and production-like activation guard. (FR-009; AC-009).
-- [ ] T010 Run provider contract/unit/security tests, including structured output, normalized usage, no DeepSeek, and no-fallback probes; run canonical regression/exact-source CI and publish the implementation report. (FR-010; AC-010).
+- [x] T001 Implement the Gemini development/test adapter against FEAT-058 `LLMProvider` without making Gemini part of caller contracts. (FR-001; AC-001).
+- [x] T002 Add or update boundary enforcement so Gemini SDK imports remain adapter-only. (FR-002; AC-002).
+- [x] T003 Wire exact Human-approved Gemini model/API/token-limit/timeout and server-only credentials into the adapter. (FR-003; AC-003).
+- [x] T004 Implement abort-aware timeout and cancellation propagation. (FR-004; AC-004).
+- [x] T005 Implement the approved bounded retry classifier and ambiguous-call no-retry behavior. (FR-005; AC-005).
+- [x] T006 Map provider failures to safe internal error classes. (FR-006; AC-006).
+- [x] T007 Normalize bounded token/usage metadata for later telemetry. (FR-007; AC-007).
+- [x] T008 Apply sanitization and add sensitive provider-data leakage probes. (FR-008; AC-008).
+- [x] T009 Implement the explicit deterministic fake and production-like activation guard. (FR-009; AC-009).
+- [x] T010 Run provider contract/unit/security tests, including structured output, normalized usage, no DeepSeek, and no-fallback probes; run canonical regression/exact-source CI and publish the implementation report. (FR-010; AC-010).
 
 ## M1..M8 Task Traceability
 

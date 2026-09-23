@@ -17,15 +17,26 @@ import {
   AIGatewayMalformedResponseError,
   sanitizeAIGatewayMessage,
 } from "./ai-gateway.errors.js";
-import type { AIGatewayConfig } from "./ai-gateway.config.js";
-import { validateAIGatewayConfig, getMockActivationProof } from "./ai-gateway.config.js";
+import {
+  validateAIGatewayConfig,
+  getMockActivationProof,
+  type AIGatewayConfig,
+} from "./ai-gateway.config.js";
 import { DeterministicFakeLLMProvider } from "../test-doubles/deterministic-fake-llm-provider.js";
+import { GeminiAdapter } from "../infrastructure/gemini/index.js";
 
 export interface AIGatewayServiceOptions {
   readonly provider: LLMProvider | null;
   readonly config: AIGatewayConfig;
   readonly clock?: AIClockPort;
   readonly telemetry?: AITelemetryPort;
+}
+
+export interface CreateAIGatewayServiceOptions {
+  readonly provider?: LLMProvider;
+  readonly clock?: AIClockPort;
+  readonly telemetry?: AITelemetryPort;
+  readonly fetchFn?: typeof fetch;
 }
 
 export class AIGatewayService {
@@ -286,10 +297,16 @@ export function createAIGatewayService(
   }
 
   if (config.provider === "gemini") {
-    // FEAT-058 Scope Boundary: Gemini adapter is NOT implemented in FEAT-058 (owned by FEAT-059)
-    throw new AIGatewayConfigurationError(
-      "Gemini provider adapter is pending implementation in FEAT-059",
-    );
+    const geminiAdapter = new GeminiAdapter({
+      config,
+      fetchFn: overrides?.fetchFn,
+    });
+    return new AIGatewayService({
+      provider: geminiAdapter,
+      config,
+      clock: overrides?.clock,
+      telemetry: overrides?.telemetry,
+    });
   }
 
   throw new AIGatewayConfigurationError(`Unsupported provider selection: '${config.provider}'`);

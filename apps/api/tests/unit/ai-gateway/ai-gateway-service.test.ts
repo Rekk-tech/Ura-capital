@@ -282,20 +282,21 @@ describe("FEAT-058 AIGatewayService Contract & Orchestration Tests", () => {
       expect(service.isAvailable()).toBe(true);
     });
 
-    it("fails closed when Gemini provider is selected without an adapter (FEAT-059 pending)", () => {
-      expect(() =>
-        createAIGatewayService({
-          ...baseEnv,
-          AI_ENABLED: true,
-          AI_PROVIDER: "gemini",
-          GEMINI_MODEL_ID: "gemini-3.5-flash-lite",
-          GEMINI_API_VERSION: "v1",
-          GEMINI_MAX_INPUT_TOKENS: 4096,
-          GEMINI_MAX_OUTPUT_TOKENS: 1024,
-          GEMINI_TIMEOUT_MS: 15000,
-          GEMINI_API_KEY: "test-key",
-        }),
-      ).toThrow("pending implementation in FEAT-059");
+    it("successfully creates Gemini provider adapter when AI_PROVIDER is gemini (FEAT-059)", () => {
+      const service = createAIGatewayService({
+        ...baseEnv,
+        AI_ENABLED: true,
+        AI_PROVIDER: "gemini",
+        GEMINI_MODEL_ID: "gemini-3.5-flash-lite",
+        GEMINI_API_VERSION: "v1",
+        GEMINI_MAX_INPUT_TOKENS: 4096,
+        GEMINI_MAX_OUTPUT_TOKENS: 1024,
+        GEMINI_TIMEOUT_MS: 15000,
+        GEMINI_API_KEY: "test-key",
+      });
+      expect(service.isAvailable()).toBe(true);
+      expect(service.getConfig().provider).toBe("gemini");
+      expect(service.getConfig().modelId).toBe("gemini-3.5-flash-lite");
     });
   });
 });

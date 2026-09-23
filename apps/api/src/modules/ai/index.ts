@@ -53,3 +53,13 @@ export { AIGatewayService, createAIGatewayService } from "./core/ai-gateway.serv
 export type { DeterministicFakeProviderOptions } from "./test-doubles/deterministic-fake-llm-provider.js";
 
 export { DeterministicFakeLLMProvider } from "./test-doubles/deterministic-fake-llm-provider.js";
+
+// Isolated Gemini development adapter (FR-001, FR-002, AC-001, AC-002)
+export type { GeminiAdapterOptions } from "./infrastructure/gemini/index.js";
+export {
+  GeminiAdapter,
+  registerStructuredSchema,
+  getRegisteredSchema,
+  validateStructuredPayload,
+} from "./infrastructure/gemini/index.js";
+export type { SchemaValidationRule } from "./infrastructure/gemini/index.js";
