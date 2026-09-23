@@ -1,6 +1,6 @@
 # FEAT-058 Specification: Provider-Independent AI Gateway Foundation & Configuration
 
-Status: APPROVED FOR IMPLEMENTATION
+Status: DONE / HUMAN FEATURE GATE APPROVED / CHECKPOINT PUBLISHED
 Phase: Phase 8 - Aura Intelligence
 
 ## Objective
@@ -83,15 +83,11 @@ Conceptual v1 port (field bounds and public DTOs remain governed by P8-D09):
 
 ```ts
 interface LLMProvider {
-  generate(
-    request: LLMGenerateRequest,
-    execution: LLMExecutionContext,
-  ): Promise<LLMProviderResult>;
+  generate(request: LLMGenerateRequest, execution: LLMExecutionContext): Promise<LLMProviderResult>;
 }
 
 type LLMOutputMode =
-  | { kind: "TEXT" }
-  | { kind: "STRUCTURED"; schemaId: string; schemaVersion: string };
+  { kind: "TEXT" } | { kind: "STRUCTURED"; schemaId: string; schemaVersion: string };
 
 type LLMExecutionContext = {
   timeoutMs: number;

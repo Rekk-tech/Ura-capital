@@ -1,6 +1,6 @@
 # FEAT-058 Acceptance Criteria: Provider-Independent AI Gateway Foundation & Configuration
 
-Status: APPROVED FOR IMPLEMENTATION
+Status: HUMAN FEATURE GATE APPROVED / AC-001..AC-010 PASS / CHECKPOINT PUBLISHED
 
 - AC-001 One AI gateway module exists and no other module can invoke future model behavior outside its exposed port.
 - AC-002 Enabled startup rejects missing, blank, conflicting, or invalid provider, Gemini development/test model/API/token-limit/timeout, secret, or budget configuration and never falls back to another provider, model, or secret.
@@ -16,17 +16,17 @@ Status: APPROVED FOR IMPLEMENTATION
 ## Traceability
 
 | Requirement | Task | Acceptance |
-|---|---|---|
-| FR-001 | T001 | AC-001 |
-| FR-002 | T002 | AC-002 |
-| FR-003 | T003 | AC-003 |
-| FR-004 | T004 | AC-004 |
-| FR-005 | T005 | AC-005 |
-| FR-006 | T006 | AC-006 |
-| FR-007 | T007 | AC-007 |
-| FR-008 | T008 | AC-008 |
-| FR-009 | T009 | AC-009 |
-| FR-010 | T010 | AC-010 |
+| ----------- | ---- | ---------- |
+| FR-001      | T001 | AC-001     |
+| FR-002      | T002 | AC-002     |
+| FR-003      | T003 | AC-003     |
+| FR-004      | T004 | AC-004     |
+| FR-005      | T005 | AC-005     |
+| FR-006      | T006 | AC-006     |
+| FR-007      | T007 | AC-007     |
+| FR-008      | T008 | AC-008     |
+| FR-009      | T009 | AC-009     |
+| FR-010      | T010 | AC-010     |
 
 ## M1..M8 Acceptance Traceability
 
