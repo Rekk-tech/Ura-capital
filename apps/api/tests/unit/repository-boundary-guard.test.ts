@@ -212,5 +212,43 @@ describe("FEAT-013 Repository & Transaction Boundary Guard (Unit)", () => {
       expect(sanitizedUnix).not.toContain("/home");
     });
   });
+
+  describe("FEAT-058 AI Module & Dependency Boundaries (AC-005)", () => {
+    it("detects and flags Gemini SDK import in controllers", () => {
+      const mockCode = `
+        import { GoogleGenerativeAI } from "@google/generative-ai";
+        export class AIController {}
+      `;
+      const violations = scanControllerAst("apps/api/src/modules/ai/ai.controller.ts", mockCode);
+      expect(violations.some((v) => v.rule === "CONTROLLER_GEMINI_SDK_PROHIBITED")).toBe(true);
+    });
+
+    it("detects and flags Gemini SDK import in services", () => {
+      const mockCode = `
+        import { GoogleGenerativeAI } from "@google/generative-ai";
+        export class AIService {}
+      `;
+      const violations = scanServiceAst("apps/api/src/modules/ai/ai.service.ts", mockCode);
+      expect(violations.some((v) => v.rule === "SERVICE_GEMINI_SDK_PROHIBITED")).toBe(true);
+    });
+
+    it("detects and flags direct Redis client import in controllers", () => {
+      const mockCode = `
+        import Redis from "ioredis";
+        export class AIController {}
+      `;
+      const violations = scanControllerAst("apps/api/src/modules/ai/ai.controller.ts", mockCode);
+      expect(violations.some((v) => v.rule === "CONTROLLER_REDIS_CLIENT_PROHIBITED")).toBe(true);
+    });
+
+    it("detects and flags direct Redis client import in services", () => {
+      const mockCode = `
+        import Redis from "ioredis";
+        export class AIService {}
+      `;
+      const violations = scanServiceAst("apps/api/src/modules/ai/ai.service.ts", mockCode);
+      expect(violations.some((v) => v.rule === "SERVICE_REDIS_CLIENT_PROHIBITED")).toBe(true);
+    });
+  });
 });
 

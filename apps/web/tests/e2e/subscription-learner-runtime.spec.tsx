@@ -21,7 +21,23 @@ describe("Subscription learner real runtime journey", () => {
   let realToken: string;
   let realUser: { id: string; email: string; role: string };
 
-  const testDbUrl = process.env.TEST_DATABASE_URL ?? process.env.DATABASE_URL;
+function getFallbackDbUrl(): string | undefined {
+  if (process.env.TEST_DATABASE_URL) return process.env.TEST_DATABASE_URL;
+  if (process.env.DATABASE_URL) return process.env.DATABASE_URL;
+  const envPath = path.resolve(__dirname, "../../../../.env");
+  if (fs.existsSync(envPath)) {
+    const lines = fs.readFileSync(envPath, "utf-8").split("\n");
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith("DATABASE_URL=")) {
+        return trimmed.slice("DATABASE_URL=".length).trim();
+      }
+    }
+  }
+  return undefined;
+}
+
+const testDbUrl = getFallbackDbUrl();
 
   beforeAll(async () => {
     if (!testDbUrl) throw new Error("Isolated test database URL is required");

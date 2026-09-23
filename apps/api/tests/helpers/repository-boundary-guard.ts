@@ -153,6 +153,26 @@ export function scanControllerAst(filePath: string, content: string): BoundaryVi
           description: "Controllers must not import or call database connection infrastructure (getPrismaClient).",
         });
       }
+      if (
+        moduleSpecifier === "@google/generative-ai" ||
+        moduleSpecifier.includes("@google/genai") ||
+        moduleSpecifier.includes("@google/generative-ai")
+      ) {
+        violations.push({
+          file: displayPath,
+          line: getLineNumber(sourceFile, node.getStart()),
+          rule: "CONTROLLER_GEMINI_SDK_PROHIBITED",
+          description: "Controllers must not import Gemini or LLM vendor SDKs directly.",
+        });
+      }
+      if (moduleSpecifier === "ioredis" || moduleSpecifier.includes("ioredis")) {
+        violations.push({
+          file: displayPath,
+          line: getLineNumber(sourceFile, node.getStart()),
+          rule: "CONTROLLER_REDIS_CLIENT_PROHIBITED",
+          description: "Controllers must not import direct Redis client (ioredis).",
+        });
+      }
     }
 
     if (ts.isCallExpression(node)) {
@@ -166,6 +186,26 @@ export function scanControllerAst(filePath: string, content: string): BoundaryVi
               line: getLineNumber(sourceFile, node.getStart()),
               rule: "CONTROLLER_PRISMA_IMPORT_PROHIBITED",
               description: "Controllers must not import @prisma/client directly.",
+            });
+          }
+          if (
+            firstArg.text === "@google/generative-ai" ||
+            firstArg.text.includes("@google/genai") ||
+            firstArg.text.includes("@google/generative-ai")
+          ) {
+            violations.push({
+              file: displayPath,
+              line: getLineNumber(sourceFile, node.getStart()),
+              rule: "CONTROLLER_GEMINI_SDK_PROHIBITED",
+              description: "Controllers must not dynamically import Gemini SDK.",
+            });
+          }
+          if (firstArg.text === "ioredis" || firstArg.text.includes("ioredis")) {
+            violations.push({
+              file: displayPath,
+              line: getLineNumber(sourceFile, node.getStart()),
+              rule: "CONTROLLER_REDIS_CLIENT_PROHIBITED",
+              description: "Controllers must not dynamically import direct Redis client (ioredis).",
             });
           }
         }
@@ -244,6 +284,26 @@ export function scanServiceAst(filePath: string, content: string): BoundaryViola
           description: "Ordinary services must not import database connection infrastructure (getPrismaClient).",
         });
       }
+      if (
+        moduleSpecifier === "@google/generative-ai" ||
+        moduleSpecifier.includes("@google/genai") ||
+        moduleSpecifier.includes("@google/generative-ai")
+      ) {
+        violations.push({
+          file: displayPath,
+          line: getLineNumber(sourceFile, node.getStart()),
+          rule: "SERVICE_GEMINI_SDK_PROHIBITED",
+          description: "Ordinary services and AI services must not import Gemini or LLM vendor SDKs directly.",
+        });
+      }
+      if (moduleSpecifier === "ioredis" || moduleSpecifier.includes("ioredis")) {
+        violations.push({
+          file: displayPath,
+          line: getLineNumber(sourceFile, node.getStart()),
+          rule: "SERVICE_REDIS_CLIENT_PROHIBITED",
+          description: "Ordinary services must not import direct Redis client (ioredis).",
+        });
+      }
     }
 
     // Check dynamic require/import and direct $transaction
@@ -258,6 +318,26 @@ export function scanServiceAst(filePath: string, content: string): BoundaryViola
               line: getLineNumber(sourceFile, node.getStart()),
               rule: "SERVICE_PRISMA_CLIENT_IMPORT_PROHIBITED",
               description: "Ordinary services must not import @prisma/client.",
+            });
+          }
+          if (
+            firstArg.text === "@google/generative-ai" ||
+            firstArg.text.includes("@google/genai") ||
+            firstArg.text.includes("@google/generative-ai")
+          ) {
+            violations.push({
+              file: displayPath,
+              line: getLineNumber(sourceFile, node.getStart()),
+              rule: "SERVICE_GEMINI_SDK_PROHIBITED",
+              description: "Ordinary services and AI services must not dynamically import Gemini SDK.",
+            });
+          }
+          if (firstArg.text === "ioredis" || firstArg.text.includes("ioredis")) {
+            violations.push({
+              file: displayPath,
+              line: getLineNumber(sourceFile, node.getStart()),
+              rule: "SERVICE_REDIS_CLIENT_PROHIBITED",
+              description: "Ordinary services must not dynamically import direct Redis client (ioredis).",
             });
           }
         }

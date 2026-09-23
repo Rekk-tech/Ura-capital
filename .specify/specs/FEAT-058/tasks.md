@@ -2,16 +2,16 @@
 
 Status: APPROVED FOR IMPLEMENTATION
 
-- [ ] T001 Create the isolated AI module shell and composition boundary. (FR-001; AC-001).
-- [ ] T002 Extend the shared environment contract and startup validation with explicit fail-closed provider, Gemini development/test runtime, secret, token-limit, and timeout configuration. (FR-002; AC-002).
-- [ ] T003 Define the provider-independent `LLMProvider` generation/structured-output/usage/error/timeout contract plus context, retrieval, quota, clock/cancellation, and telemetry ports. (FR-003; AC-003).
-- [ ] T004 Implement environment classification and fake-adapter isolation rules. (FR-004; AC-004).
-- [ ] T005 Add or extend boundary checks for SDK, Prisma, raw SQL, and Redis-client imports. (FR-005; AC-005).
-- [ ] T006 Apply approved diagnostic sanitization to AI configuration/composition failures. (FR-006; AC-006).
-- [ ] T007 Add secret-leakage checks covering tracked files/source control, responses, bundles, Redis keys, logs, reports, and snapshots. (FR-007; AC-007).
-- [ ] T008 Verify the diff contains no endpoint, provider call, durable state, schema, migration, or UI behavior. (FR-008; AC-008).
-- [ ] T009 Implement deterministic dependency injection fixtures with production-like rejection. (FR-009; AC-009).
-- [ ] T010 Run targeted tests, authoritative guards, canonical regression, exact-source CI, and publish the implementation report. (FR-010; AC-010).
+- [x] T001 Create the isolated AI module shell and composition boundary. (FR-001; AC-001).
+- [x] T002 Extend the shared environment contract and startup validation with explicit fail-closed provider, Gemini development/test runtime, secret, token-limit, and timeout configuration. (FR-002; AC-002).
+- [x] T003 Define the provider-independent `LLMProvider` generation/structured-output/usage/error/timeout contract plus context, retrieval, quota, clock/cancellation, and telemetry ports. (FR-003; AC-003).
+- [x] T004 Implement environment classification and fake-adapter isolation rules. (FR-004; AC-004).
+- [x] T005 Add or extend boundary checks for SDK, Prisma, raw SQL, and Redis-client imports. (FR-005; AC-005).
+- [x] T006 Apply approved diagnostic sanitization to AI configuration/composition failures. (FR-006; AC-006).
+- [x] T007 Add secret-leakage checks covering tracked files/source control, responses, bundles, Redis keys, logs, reports, and snapshots. (FR-007; AC-007).
+- [x] T008 Verify the diff contains no endpoint, provider call, durable state, schema, migration, or UI behavior. (FR-008; AC-008).
+- [x] T009 Implement deterministic dependency injection fixtures with production-like rejection. (FR-009; AC-009).
+- [x] T010 Run targeted tests, authoritative guards, canonical regression, exact-source CI, and publish the implementation report. (FR-010; AC-010).
 
 ## M1..M8 Task Traceability
 

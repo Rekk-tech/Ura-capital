@@ -104,6 +104,17 @@ export const EnvConfigSchema = z
       return true;
     }, z.boolean().default(true)),
     COMMUNITY_RATE_LIMIT_KEY_SECRET: z.string().optional(),
+
+    // Phase 8 AI Gateway Foundation (FEAT-058 / P8-D03)
+    AI_ENABLED: booleanFromString.default(false),
+    AI_PROVIDER: z.string().optional(),
+    GEMINI_MODEL_ID: z.string().optional(),
+    GEMINI_API_VERSION: z.string().optional(),
+    GEMINI_MAX_INPUT_TOKENS: z.coerce.number().int().positive().optional(),
+    GEMINI_MAX_OUTPUT_TOKENS: z.coerce.number().int().positive().optional(),
+    GEMINI_TIMEOUT_MS: z.coerce.number().int().positive().optional(),
+    GEMINI_AUTOMATIC_FALLBACK: booleanFromString.default(false),
+    GEMINI_AUTOMATIC_RETRY: booleanFromString.default(false),
   })
   .superRefine((data, ctx) => {
     // Production requirement: Refresh cookie MUST be Secure in production
@@ -121,7 +132,8 @@ export const EnvConfigSchema = z
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["AUTH_RATE_LIMIT_KEY_SECRET"],
-          message: "AUTH_RATE_LIMIT_KEY_SECRET is required and must be at least 32 characters when rate limiting is enabled",
+          message:
+            "AUTH_RATE_LIMIT_KEY_SECRET is required and must be at least 32 characters when rate limiting is enabled",
         });
       }
 
@@ -136,7 +148,8 @@ export const EnvConfigSchema = z
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["AUTH_RATE_LIMIT_KEY_SECRET"],
-            message: "AUTH_RATE_LIMIT_KEY_SECRET must not reuse JWT_SECRET, AUTH_ACCESS_TOKEN_SECRET, or AUTH_REFRESH_TOKEN_SECRET",
+            message:
+              "AUTH_RATE_LIMIT_KEY_SECRET must not reuse JWT_SECRET, AUTH_ACCESS_TOKEN_SECRET, or AUTH_REFRESH_TOKEN_SECRET",
           });
         }
       }
@@ -144,11 +157,15 @@ export const EnvConfigSchema = z
 
     // FEAT-045: Validate community rate-limit HMAC secret when enabled or outside test
     if (data.COMMUNITY_RATE_LIMIT_ENABLED && data.NODE_ENV !== "test") {
-      if (!data.COMMUNITY_RATE_LIMIT_KEY_SECRET || data.COMMUNITY_RATE_LIMIT_KEY_SECRET.length < 32) {
+      if (
+        !data.COMMUNITY_RATE_LIMIT_KEY_SECRET ||
+        data.COMMUNITY_RATE_LIMIT_KEY_SECRET.length < 32
+      ) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["COMMUNITY_RATE_LIMIT_KEY_SECRET"],
-          message: "COMMUNITY_RATE_LIMIT_KEY_SECRET is required and must be at least 32 characters when rate limiting is enabled",
+          message:
+            "COMMUNITY_RATE_LIMIT_KEY_SECRET is required and must be at least 32 characters when rate limiting is enabled",
         });
       }
 
@@ -164,7 +181,121 @@ export const EnvConfigSchema = z
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["COMMUNITY_RATE_LIMIT_KEY_SECRET"],
-            message: "COMMUNITY_RATE_LIMIT_KEY_SECRET must not reuse JWT_SECRET, AUTH_ACCESS_TOKEN_SECRET, AUTH_REFRESH_TOKEN_SECRET, or AUTH_RATE_LIMIT_KEY_SECRET",
+            message:
+              "COMMUNITY_RATE_LIMIT_KEY_SECRET must not reuse JWT_SECRET, AUTH_ACCESS_TOKEN_SECRET, AUTH_REFRESH_TOKEN_SECRET, or AUTH_RATE_LIMIT_KEY_SECRET",
+          });
+        }
+      }
+    }
+
+    // Phase 8 AI Gateway Foundation (FEAT-058 / P8-D03)
+    if (data.AI_ENABLED) {
+      if (data.NODE_ENV === "production") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["AI_ENABLED"],
+          message: "Production AI activation is disabled pending P8-D11 and P8-D15 approvals",
+        });
+      }
+
+      if (!data.AI_PROVIDER || data.AI_PROVIDER.trim() === "") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["AI_PROVIDER"],
+          message: "AI_PROVIDER is required when AI is enabled",
+        });
+      } else if (data.AI_PROVIDER !== "gemini" && data.AI_PROVIDER !== "mock") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["AI_PROVIDER"],
+          message: "AI_PROVIDER must be 'gemini' or 'mock'",
+        });
+      }
+
+      if (data.AI_PROVIDER === "mock") {
+        if (data.NODE_ENV !== "development" && data.NODE_ENV !== "test") {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["AI_PROVIDER"],
+            message: "Mock AI provider is only permitted in development and test environments",
+          });
+        }
+      }
+
+      if (data.AI_PROVIDER === "gemini") {
+        if (data.GEMINI_MODEL_ID !== "gemini-3.5-flash-lite") {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["GEMINI_MODEL_ID"],
+            message: "GEMINI_MODEL_ID must be 'gemini-3.5-flash-lite'",
+          });
+        }
+
+        if (data.GEMINI_API_VERSION !== "v1") {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["GEMINI_API_VERSION"],
+            message: "GEMINI_API_VERSION must be 'v1'",
+          });
+        }
+
+        if (
+          data.GEMINI_MAX_INPUT_TOKENS === undefined ||
+          data.GEMINI_MAX_INPUT_TOKENS < 1 ||
+          data.GEMINI_MAX_INPUT_TOKENS > 4096
+        ) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["GEMINI_MAX_INPUT_TOKENS"],
+            message: "GEMINI_MAX_INPUT_TOKENS must be between 1 and 4096",
+          });
+        }
+
+        if (
+          data.GEMINI_MAX_OUTPUT_TOKENS === undefined ||
+          data.GEMINI_MAX_OUTPUT_TOKENS < 1 ||
+          data.GEMINI_MAX_OUTPUT_TOKENS > 1024
+        ) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["GEMINI_MAX_OUTPUT_TOKENS"],
+            message: "GEMINI_MAX_OUTPUT_TOKENS must be between 1 and 1024",
+          });
+        }
+
+        if (
+          data.GEMINI_TIMEOUT_MS === undefined ||
+          data.GEMINI_TIMEOUT_MS < 1 ||
+          data.GEMINI_TIMEOUT_MS > 15000
+        ) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["GEMINI_TIMEOUT_MS"],
+            message: "GEMINI_TIMEOUT_MS must be between 1 and 15000",
+          });
+        }
+
+        if (data.GEMINI_AUTOMATIC_FALLBACK === true) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["GEMINI_AUTOMATIC_FALLBACK"],
+            message: "GEMINI_AUTOMATIC_FALLBACK must be disabled",
+          });
+        }
+
+        if (data.GEMINI_AUTOMATIC_RETRY === true) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["GEMINI_AUTOMATIC_RETRY"],
+            message: "GEMINI_AUTOMATIC_RETRY must be disabled",
+          });
+        }
+
+        if (!data.GEMINI_API_KEY || data.GEMINI_API_KEY.trim() === "") {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["GEMINI_API_KEY"],
+            message: "GEMINI_API_KEY is required and must not be empty when AI_PROVIDER is gemini",
           });
         }
       }
@@ -345,6 +476,3 @@ export const SubscriptionMeResponseSchema = z
     data: SubscriptionMeDtoSchema,
   })
   .strict();
-
-
-

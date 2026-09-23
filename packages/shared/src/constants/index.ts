@@ -66,8 +66,7 @@ export const ACADEMY_REWARD_TYPES = {
   XP: "XP",
 } as const;
 
-export type AcademyRewardType =
-  (typeof ACADEMY_REWARD_TYPES)[keyof typeof ACADEMY_REWARD_TYPES];
+export type AcademyRewardType = (typeof ACADEMY_REWARD_TYPES)[keyof typeof ACADEMY_REWARD_TYPES];
 
 export const ACADEMY_SOURCE_TYPES = {
   LESSON_COMPLETION: "LESSON_COMPLETION",
@@ -76,8 +75,7 @@ export const ACADEMY_SOURCE_TYPES = {
   FLASHCARD_SESSION: "FLASHCARD_SESSION",
 } as const;
 
-export type AcademySourceType =
-  (typeof ACADEMY_SOURCE_TYPES)[keyof typeof ACADEMY_SOURCE_TYPES];
+export type AcademySourceType = (typeof ACADEMY_SOURCE_TYPES)[keyof typeof ACADEMY_SOURCE_TYPES];
 
 export const ACADEMY_RESOURCE_TYPES = {
   LESSON: "LESSON",
@@ -93,5 +91,33 @@ export const REWARD_LEDGER_STATUS = {
   REVERSED: "REVERSED",
 } as const;
 
-export type RewardLedgerStatus =
-  (typeof REWARD_LEDGER_STATUS)[keyof typeof REWARD_LEDGER_STATUS];
+export type RewardLedgerStatus = (typeof REWARD_LEDGER_STATUS)[keyof typeof REWARD_LEDGER_STATUS];
+
+// Phase 8 AI Gateway Foundation Constants (FEAT-058)
+export const AI_GATEWAY_ERROR_CODES = {
+  AUTHENTICATION: "AUTHENTICATION",
+  RATE_LIMITED: "RATE_LIMITED",
+  TIMEOUT: "TIMEOUT",
+  CANCELLED: "CANCELLED",
+  UNAVAILABLE: "UNAVAILABLE",
+  REFUSED: "REFUSED",
+  MALFORMED_RESPONSE: "MALFORMED_RESPONSE",
+  CONFIGURATION_ERROR: "CONFIGURATION_ERROR",
+  UNKNOWN: "UNKNOWN",
+} as const;
+
+export type AIGatewayErrorCode =
+  (typeof AI_GATEWAY_ERROR_CODES)[keyof typeof AI_GATEWAY_ERROR_CODES];
+
+export const AI_PROVIDERS = {
+  GEMINI: "gemini",
+  MOCK: "mock",
+} as const;
+
+export type AIProvider = (typeof AI_PROVIDERS)[keyof typeof AI_PROVIDERS];
+
+export const APPROVED_GEMINI_MODELS = ["gemini-3.5-flash-lite"] as const;
+export const APPROVED_GEMINI_API_VERSIONS = ["v1"] as const;
+export const APPROVED_GEMINI_MAX_INPUT_TOKENS = 4096;
+export const APPROVED_GEMINI_MAX_OUTPUT_TOKENS = 1024;
+export const APPROVED_GEMINI_TIMEOUT_MS = 15000;
