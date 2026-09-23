@@ -2244,7 +2244,7 @@ Status:
 ```text
 Phase 8: IN PROGRESS
 P8-D03: APPROVED FOR DEVELOPMENT ARCHITECTURE
-FEAT-058: IMPLEMENTATION COMPLETE / READY FOR QA
+FEAT-058: READY FOR HUMAN COMPENSATING REVIEW
 FEAT-059: DEPENDENCY BLOCKED
 FEAT-060..FEAT-068: DEPENDENCY BLOCKED
 FEAT-069: RESERVED
@@ -2256,15 +2256,19 @@ Production Provider: NOT SELECTED / DISABLED
 Status:
 
 ```text
-FEAT-058: IMPLEMENTATION COMPLETE / READY FOR QA
+FEAT-058: READY FOR HUMAN COMPENSATING REVIEW
 Planning: HUMAN MASTER PLANNING APPROVED
 Implementation: COMPLETE
 Implementation Owner: ANTIGRAVITY
-Independent QA Owner: CODEX
-Independent QA: NOT CLAIMED
-Compensating Control: CODEX Independent QA
+Implementation Self-Verification: PASS
+Targeted Technical Re-verification: PASS
+Independent Codex QA: NOT PERFORMED (Token budget exception)
+QA Independence: REDUCED
+Compensating Control: Targeted technical re-verification & Human review
+Human Compensating Review: PENDING
 Canonical 14 Validation: PASS (14/14 commands with no skips)
-Targeted FEAT-058 Tests: 5 files / 86 tests PASS (shared: 21, config: 14, service: 13, security: 13, boundary: 25)
+CI Run: SUCCESS / GREEN (Run ID: 35858349781 on commit 51de5f71b5aa2a9cd632f43474ea509c80805dbc)
+Targeted FEAT-058 Tests: 5 files / 86 tests PASS
 Standard Regression: 117 files / 1370 tests PASS
 Unit Regression: 86 files / 1125 tests PASS
 PostgreSQL Validation: 46 files / 577 tests PASS
@@ -2275,6 +2279,7 @@ Public AI Endpoints: ZERO
 Gemini SDK / Live API Calls: ZERO (FEAT-059 scope)
 DeepSeek / Multi-Provider Fallback: ZERO (Strict single provider port)
 Implementation Report: reports/implementation/phase-8/FEAT-058.md
+QA Report: reports/qa/phase-8/FEAT-058-COMPENSATING-REVIEW.md
 Acceptance Criteria: 10 PASS / 0 FAIL (AC-001..AC-010 PASS)
 Tasks: 10 COMPLETE / 0 OPEN (T001..T010 COMPLETE)
 Dependencies: P8-D03 APPROVED FOR DEVELOPMENT ARCHITECTURE; FEAT-059 DEPENDENCY BLOCKED
