@@ -18,6 +18,8 @@
 | **Database Mutations** | ZERO |
 | **Public Assistant Routes** | ZERO (Core contracts and prompt registry; public route orchestration owned by FEAT-066) |
 | **Internal Feature Gate Status** | **PASS** (10/10 tasks complete, 10/10 ACs pass, Canonical 14 PASS) |
+| **Exact Commit SHA** | `146325df22d7c49399b301fe3dc9084afd38fa27` |
+| **GitHub Actions CI Run** | [Run 36026948766](https://github.com/Rekk-tech/Ura-capital/actions/runs/36026948766) (SUCCESS) |
 | **QA Independence** | **SELF-VERIFICATION ONLY** (Compensating technical verification; independent phase verification owned by FEAT-068) |
 | **Human Final Gate Status** | **READY FOR HUMAN REVIEW / PENDING QA** |
 
@@ -218,6 +220,15 @@ Executed in the isolated worktree (`.tmp/feat060-worktree`) on branch `feat/FEAT
 | 14 | `npm run guard:seed-safety` | **PASS** | 0 unsafe seed scripts |
 
 **Summary**: 14/14 commands passed with zero failures and zero skips.
+
+### GitHub Actions Exact-Source Remote CI Validation
+- **Run ID**: [36026948766](https://github.com/Rekk-tech/Ura-capital/actions/runs/36026948766)
+- **Workflow**: `Aura Capital CI`
+- **Triggering Commit**: `146325df22d7c49399b301fe3dc9084afd38fa27`
+- **Branch**: `feat/FEAT-060-prompt-contracts`
+- **Status**: `completed`
+- **Conclusion**: `success`
+- **Execution**: All 15 canonical pipeline steps (clean, prisma validate, lint, typecheck, build, migration guard, isolated migration apply, unit tests, standard tests, test:db, test:redis, and boundary/governance guards) passed cleanly in isolated container environment.
 
 ---
 
