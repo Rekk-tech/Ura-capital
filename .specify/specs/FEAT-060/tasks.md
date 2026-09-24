@@ -1,17 +1,17 @@
 # FEAT-060 Tasks: Prompt Registry, Intent Classification & Structured Contracts
 
-Status: HUMAN MASTER PLANNING CONDITIONALLY APPROVED / IMPLEMENTATION NOT_STARTED
+Status: IMPLEMENTATION COMPLETE / READY FOR QA
 
-- [ ] T001 Implement the approved closed intent catalog and classifier contract. (FR-001; AC-001).
-- [ ] T002 Implement the bounded strict request schema. (FR-002; AC-002).
-- [ ] T003 Implement strict provider-independent `LLMProvider` structured-output and public-response schemas. (FR-003; AC-003).
-- [ ] T004 Implement the code-versioned server-owned prompt registry. (FR-004; AC-004).
-- [ ] T005 Implement instruction/context/retrieval/user-content separation in prompt assembly. (FR-005; AC-005).
-- [ ] T006 Add override and prompt-version tampering protections. (FR-006; AC-006).
-- [ ] T007 Implement strict canonical output parsing and provider-specific/malformed/oversized rejection. (FR-007; AC-007).
-- [ ] T008 Implement safe internal/public error and refusal classifications. (FR-008; AC-008).
-- [ ] T009 Create deterministic intent/schema/injection/compatibility fixtures and tests. (FR-009; AC-009).
-- [ ] T010 Export the canonical shared contract, run canonical validation/CI, and publish the implementation report. (FR-010; AC-010).
+- [x] T001 Implement the approved closed intent catalog and classifier contract. (FR-001; AC-001).
+- [x] T002 Implement the bounded strict request schema. (FR-002; AC-002).
+- [x] T003 Implement strict provider-independent `LLMProvider` structured-output and public-response schemas. (FR-003; AC-003).
+- [x] T004 Implement the code-versioned server-owned prompt registry. (FR-004; AC-004).
+- [x] T005 Implement instruction/context/retrieval/user-content separation in prompt assembly. (FR-005; AC-005).
+- [x] T006 Add override and prompt-version tampering protections. (FR-006; AC-006).
+- [x] T007 Implement strict canonical output parsing and provider-specific/malformed/oversized rejection. (FR-007; AC-007).
+- [x] T008 Implement safe internal/public error and refusal classifications. (FR-008; AC-008).
+- [x] T009 Create deterministic intent/schema/injection/compatibility fixtures and tests. (FR-009; AC-009).
+- [x] T010 Export the canonical shared contract, run canonical validation/CI, and publish the implementation report. (FR-010; AC-010).
 
 ## M1..M8 Task Traceability
 

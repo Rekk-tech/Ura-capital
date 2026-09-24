@@ -63,3 +63,42 @@ export {
   validateStructuredPayload,
 } from "./infrastructure/gemini/index.js";
 export type { SchemaValidationRule } from "./infrastructure/gemini/index.js";
+
+// Phase 8 AI Contracts & Validation (FEAT-060)
+export {
+  AIAssistValidationError,
+  validateAIAssistRequestBody,
+  validateProviderStructuredPayload,
+  buildAIAssistResponse,
+  buildServerOwnedRefusalResponse,
+  mapErrorToPublicResponse,
+} from "./contracts/index.js";
+export type {
+  BuildAIAssistResponseParams,
+  BuildServerOwnedRefusalParams,
+  SafeErrorResponse,
+} from "./contracts/index.js";
+
+// Phase 8 AI Prompts & Assembly (FEAT-060)
+export {
+  promptRegistry,
+  assemblePrompt,
+  AIAssistPromptV1,
+  IntentClassifierPromptV1,
+} from "./prompts/index.js";
+export type {
+  PromptDefinition,
+  PromptMetadata,
+  PromptAssemblyContext,
+  PromptAssemblyResult,
+  TrustedContextItemInput,
+  UntrustedRetrievalItemInput,
+} from "./prompts/index.js";
+
+// Phase 8 AI Intent Classification (FEAT-060)
+export {
+  classifyIntentDeterministic,
+} from "./intent/index.js";
+export type {
+  IntentClassificationResult,
+} from "./intent/index.js";

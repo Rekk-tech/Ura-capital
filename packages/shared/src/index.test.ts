@@ -39,6 +39,20 @@ import {
   APPROVED_GEMINI_MAX_INPUT_TOKENS,
   APPROVED_GEMINI_MAX_OUTPUT_TOKENS,
   APPROVED_GEMINI_TIMEOUT_MS,
+  AI_INTENTS,
+  AI_REQUEST_CONTEXT_MODES,
+  AI_RESPONSE_CONTEXT_MODES,
+  AI_SAFETY_OUTCOMES,
+  AI_REFUSAL_CODES,
+  AI_DISCLAIMER_CODES,
+  AI_BUDGET_LIMITS,
+  AI_CONTRACT_VERSION_V1,
+  AIAssistRequestSchema,
+  AIAssistResponseSchema,
+  AIAssistProviderStructuredPayloadSchema,
+  countCodePoints,
+  countUtf8Bytes,
+  normalizeAIMessage,
 } from "./index.js";
 
 describe("@aura/shared package", () => {
@@ -842,6 +856,149 @@ describe("@aura/shared package", () => {
         AUTH_REFRESH_COOKIE_SECURE: "true",
       });
       expect(invalidMockStaging.success).toBe(false);
+    });
+  });
+
+  describe("Phase 8 AI Contracts & Schemas (FEAT-060)", () => {
+    it("exports approved closed intent constants", () => {
+      expect(AI_INTENTS.LEARNING_EXPLANATION).toBe("LEARNING_EXPLANATION");
+      expect(AI_INTENTS.ACADEMY_GUIDANCE).toBe("ACADEMY_GUIDANCE");
+      expect(AI_INTENTS.SIMULATION_ANALYSIS).toBe("SIMULATION_ANALYSIS");
+      expect(AI_INTENTS.PORTFOLIO_EDUCATION).toBe("PORTFOLIO_EDUCATION");
+      expect(AI_INTENTS.UNSUPPORTED_OR_REFUSED).toBe("UNSUPPORTED_OR_REFUSED");
+      expect(Object.keys(AI_INTENTS)).toHaveLength(5);
+    });
+
+    it("exports AI_BUDGET_LIMITS with frozen limits", () => {
+      expect(AI_BUDGET_LIMITS.MAX_REQUEST_BODY_BYTES).toBe(12288);
+      expect(AI_BUDGET_LIMITS.MAX_MESSAGE_CODE_POINTS).toBe(2000);
+      expect(AI_BUDGET_LIMITS.MAX_MESSAGE_UTF8_BYTES).toBe(8192);
+      expect(AI_BUDGET_LIMITS.MAX_ANSWER_CODE_POINTS).toBe(6000);
+      expect(AI_BUDGET_LIMITS.MAX_ANSWER_UTF8_BYTES).toBe(24576);
+      expect(AI_BUDGET_LIMITS.MAX_RESPONSE_BODY_BYTES).toBe(32768);
+      expect(AI_BUDGET_LIMITS.MAX_CONTEXT_ITEM_BYTES).toBe(2048);
+      expect(AI_BUDGET_LIMITS.MAX_ADAPTER_CONTEXT_BYTES).toBe(8192);
+      expect(AI_BUDGET_LIMITS.MAX_RETRIEVAL_ITEMS).toBe(5);
+      expect(AI_BUDGET_LIMITS.MAX_RETRIEVAL_BYTES).toBe(8192);
+      expect(AI_BUDGET_LIMITS.MAX_CITATIONS).toBe(5);
+    });
+
+    it("exports request and response context mode catalogs", () => {
+      expect(AI_REQUEST_CONTEXT_MODES.AUTO).toBe("AUTO");
+      expect(AI_REQUEST_CONTEXT_MODES.ACADEMY).toBe("ACADEMY");
+      expect(AI_REQUEST_CONTEXT_MODES.SIMULATION).toBe("SIMULATION");
+
+      expect(AI_RESPONSE_CONTEXT_MODES.GENERAL).toBe("GENERAL");
+      expect(AI_RESPONSE_CONTEXT_MODES.ACADEMY).toBe("ACADEMY");
+      expect(AI_RESPONSE_CONTEXT_MODES.SIMULATION).toBe("SIMULATION");
+    });
+
+    it("exports safety, refusal, and disclaimer catalogs", () => {
+      expect(AI_SAFETY_OUTCOMES.ALLOWED).toBe("ALLOWED");
+      expect(AI_SAFETY_OUTCOMES.REFUSED).toBe("REFUSED");
+
+      expect(AI_REFUSAL_CODES.UNSUPPORTED_REQUEST).toBe("UNSUPPORTED_REQUEST");
+      expect(AI_REFUSAL_CODES.PROHIBITED_FINANCIAL_ACTION).toBe("PROHIBITED_FINANCIAL_ACTION");
+      expect(AI_REFUSAL_CODES.INSUFFICIENT_SAFE_CONTEXT).toBe("INSUFFICIENT_SAFE_CONTEXT");
+      expect(AI_REFUSAL_CODES.SAFETY_POLICY).toBe("SAFETY_POLICY");
+
+      expect(AI_DISCLAIMER_CODES.EDUCATIONAL_ONLY).toBe("EDUCATIONAL_ONLY");
+      expect(AI_DISCLAIMER_CODES.SIMULATION_ONLY).toBe("SIMULATION_ONLY");
+      expect(AI_CONTRACT_VERSION_V1).toBe("v1");
+    });
+
+    it("correctly counts Unicode code points and UTF-8 bytes", () => {
+      const ascii = "hello";
+      expect(countCodePoints(ascii)).toBe(5);
+      expect(countUtf8Bytes(ascii)).toBe(5);
+
+      const vn = "tiền tệ";
+      expect(countCodePoints(vn)).toBe(7);
+      expect(countUtf8Bytes(vn)).toBe(11);
+
+      const emoji = "🚀💰";
+      expect(countCodePoints(emoji)).toBe(2);
+      expect(countUtf8Bytes(emoji)).toBe(8);
+    });
+
+    it("normalizes AI user queries via NFKC and trims whitespace", () => {
+      const raw = "   \u0041\u030Aura   ";
+      expect(normalizeAIMessage(raw)).toBe("Åura");
+    });
+
+    it("validates valid AIAssistRequestSchema successfully", () => {
+      const valid = AIAssistRequestSchema.safeParse({
+        message: "Explain the capital asset pricing model",
+        contextMode: "ACADEMY",
+      });
+      expect(valid.success).toBe(true);
+      if (valid.success) {
+        expect(valid.data.contextMode).toBe("ACADEMY");
+      }
+    });
+
+    it("rejects unknown fields in AIAssistRequestSchema (strict mode)", () => {
+      const invalid = AIAssistRequestSchema.safeParse({
+        message: "Explain CAPM",
+        role: "admin",
+      });
+      expect(invalid.success).toBe(false);
+    });
+
+    it("validates valid AIAssistResponseSchema successfully", () => {
+      const validResponse = {
+        data: {
+          contractVersion: "v1",
+          requestId: "req-12345",
+          answer: "CAPM calculates expected return based on systematic risk.",
+          intent: "LEARNING_EXPLANATION",
+          context: {
+            mode: "GENERAL",
+            isSimulation: false,
+          },
+          citations: [
+            {
+              citationId: "cit-1",
+              sourceType: "ACADEMY_CONTENT",
+              title: "Lesson on Asset Pricing",
+              locationLabel: null,
+            },
+          ],
+          safety: {
+            outcome: "ALLOWED",
+            refusalCode: null,
+            disclaimerCode: "EDUCATIONAL_ONLY",
+          },
+          quota: {
+            minuteLimit: 5,
+            minuteRemaining: 4,
+            minuteResetAt: "2030-01-01T00:00:01Z",
+            dailyLimit: 50,
+            dailyRemaining: 49,
+            dailyResetAt: "2030-01-02T00:00:00Z",
+          },
+        },
+      };
+
+      const result = AIAssistResponseSchema.safeParse(validResponse);
+      expect(result.success).toBe(true);
+    });
+
+    it("validates AIAssistProviderStructuredPayloadSchema successfully", () => {
+      const validPayload = {
+        answer: "Systematic risk is measured by beta.",
+        intent: "LEARNING_EXPLANATION",
+        suggestedMode: "GENERAL",
+        safety: {
+          outcome: "ALLOWED",
+          refusalCode: null,
+          disclaimerCode: "EDUCATIONAL_ONLY",
+        },
+        referencedCitationIds: ["cit-1"],
+      };
+
+      const result = AIAssistProviderStructuredPayloadSchema.safeParse(validPayload);
+      expect(result.success).toBe(true);
     });
   });
 });

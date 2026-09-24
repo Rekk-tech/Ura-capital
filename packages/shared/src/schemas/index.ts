@@ -476,3 +476,5 @@ export const SubscriptionMeResponseSchema = z
     data: SubscriptionMeDtoSchema,
   })
   .strict();
+
+export * from "./ai.schemas.js";
