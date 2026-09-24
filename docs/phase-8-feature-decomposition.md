@@ -671,4 +671,4 @@ Phase 8 may be recommended PASS only when:
 - The Phase 9 handover contract is frozen and published.
 - Human explicitly approves the Phase 8 Final Gate.
 
-Current planning status: CONDITIONALLY APPROVED. Implementation state: IN_PROGRESS. FEAT-058: DONE / HUMAN FEATURE GATE APPROVED. FEAT-059: UNBLOCKED FOR PREREQUISITE VERIFICATION. Non-synthetic/production provider traffic remains blocked by P8-D11, and production provider activation remains blocked by pending P8-D15.
+Current planning status: CONDITIONALLY APPROVED. Implementation state: IN_PROGRESS. FEAT-058: DONE / HUMAN FEATURE GATE APPROVED. FEAT-059: DONE / HUMAN FEATURE GATE APPROVED. FEAT-060: UNBLOCKED (pending its additional approved prerequisites). Non-synthetic/production provider traffic remains blocked by P8-D11, and production provider activation remains blocked by pending P8-D15.
