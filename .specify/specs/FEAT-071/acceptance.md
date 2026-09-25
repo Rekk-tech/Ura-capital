@@ -1,15 +1,15 @@
 # FEAT-071 Acceptance Criteria: Authentication Entry & Account Experience
 
-Status: PROPOSED FOR HUMAN MASTER PLANNING REVIEW
+Status: SELF-VERIFIED / PASS (READY FOR HUMAN FEATURE GATE)
 
-- AC-001 `/login`, `/register`, and authenticated `/account` resolve through the canonical shell with deterministic auth-required states.
-- AC-002 Requests use only approved `/api/auth/*` contracts; no duplicate auth implementation or quota-bypass alias behavior is introduced.
-- AC-003 Client guidance matches approved normalization/password rules and server rejections remain authoritative.
-- AC-004 Unknown user and wrong password are externally indistinguishable; rate-limit/outage errors are safe and actionable.
-- AC-005 No password, password hash, access token, refresh token, cookie, or secret is persisted, rendered, placed in URLs, or logged.
-- AC-006 External, protocol-relative, malformed, or unsafe return targets are rejected to a safe internal default.
-- AC-007 Account data is server-derived and read-only; logout clears in-memory state and no client role value grants access.
-- AC-008 Targeted unit/component/browser tests and required regressions pass with zero backend/schema/migration change.
+- AC-001 [PASS] `/login`, `/register`, and authenticated `/account` resolve through the canonical shell with deterministic auth-required states.
+- AC-002 [PASS] Requests use only approved `/api/auth/*` contracts; no duplicate auth implementation or quota-bypass alias behavior is introduced.
+- AC-003 [PASS] Client guidance matches approved normalization/password rules and server rejections remain authoritative.
+- AC-004 [PASS] Unknown user and wrong password are externally indistinguishable; rate-limit/outage errors are safe and actionable.
+- AC-005 [PASS] No password, password hash, access token, refresh token, cookie, or secret is persisted, rendered, placed in URLs, or logged.
+- AC-006 [PASS] External, protocol-relative, malformed, or unsafe return targets are rejected to a safe internal default.
+- AC-007 [PASS] Account data is server-derived and read-only; logout clears in-memory state and no client role value grants access.
+- AC-008 [PASS] Targeted unit/component/browser tests and required regressions pass with zero backend/schema/migration change.
 
 ## Traceability Matrix
 

@@ -1,7 +1,10 @@
 export interface AuthUser {
   id: string;
   email: string;
-  role: string;
+  displayName?: string | null;
+  status?: string;
+  createdAt?: string;
+  role?: string;
 }
 
 export interface LoginResponse {
@@ -11,11 +14,34 @@ export interface LoginResponse {
   user: AuthUser;
 }
 
+export interface RegisterPayload {
+  email: string;
+  password: string;
+  displayName?: string;
+}
+
+export interface RegisterResponse {
+  user: AuthUser;
+}
+
+export class AuthApiError extends Error {
+  readonly status: number;
+  readonly code?: string;
+
+  constructor(message: string, status: number, code?: string) {
+    super(message);
+    this.name = "AuthApiError";
+    this.status = status;
+    this.code = code;
+  }
+}
+
 export interface IAuthApiClient {
   login(email: string, password: string): Promise<LoginResponse>;
+  register(payload: RegisterPayload): Promise<RegisterResponse>;
   refresh(): Promise<LoginResponse>;
   logout(): Promise<{ success: boolean }>;
-  getMe(accessToken: string): Promise<{ user: { userId: string; email: string; role: string } }>;
+  getMe(accessToken: string): Promise<{ user: AuthUser }>;
 }
 
 export class AuthApiClient implements IAuthApiClient {
@@ -33,21 +59,54 @@ export class AuthApiClient implements IAuthApiClient {
         "Content-Type": "application/json",
       },
       credentials: "include", // for refresh token cookie
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
     });
 
     if (!res.ok) {
-      let message = "Login failed";
+      let message = "Invalid email or password";
+      let code: string | undefined;
       try {
         const errorData = await res.json();
         message = errorData?.error?.message ?? message;
+        code = errorData?.error?.code;
       } catch {
         // use default
       }
-      throw new Error(message);
+      throw new AuthApiError(message, res.status, code);
     }
 
     return (await res.json()) as LoginResponse;
+  }
+
+  async register(payload: RegisterPayload): Promise<RegisterResponse> {
+    const res = await fetch(`${this.baseUrl}/register`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        email: payload.email.trim().toLowerCase(),
+        password: payload.password,
+        ...(payload.displayName?.trim() ? { displayName: payload.displayName.trim() } : {}),
+      }),
+    });
+
+    if (!res.ok) {
+      let message = "Registration failed";
+      let code: string | undefined;
+      try {
+        const errorData = await res.json();
+        message = errorData?.error?.message ?? message;
+        code = errorData?.error?.code;
+      } catch {
+        // use default
+      }
+      throw new AuthApiError(message, res.status, code);
+    }
+
+    return (await res.json()) as RegisterResponse;
   }
 
   async refresh(): Promise<LoginResponse> {
@@ -60,7 +119,7 @@ export class AuthApiClient implements IAuthApiClient {
     });
 
     if (!res.ok) {
-      throw new Error("Session refresh failed");
+      throw new AuthApiError("Session refresh failed", res.status);
     }
 
     return (await res.json()) as LoginResponse;
@@ -78,7 +137,7 @@ export class AuthApiClient implements IAuthApiClient {
     return { success: res.ok };
   }
 
-  async getMe(accessToken: string): Promise<{ user: { userId: string; email: string; role: string } }> {
+  async getMe(accessToken: string): Promise<{ user: AuthUser }> {
     const res = await fetch(`${this.baseUrl}/me`, {
       method: "GET",
       headers: {
@@ -88,10 +147,10 @@ export class AuthApiClient implements IAuthApiClient {
     });
 
     if (!res.ok) {
-      throw new Error("Unauthorized");
+      throw new AuthApiError("Unauthorized", res.status);
     }
 
-    return (await res.json()) as { user: { userId: string; email: string; role: string } };
+    return (await res.json()) as { user: AuthUser };
   }
 }
 

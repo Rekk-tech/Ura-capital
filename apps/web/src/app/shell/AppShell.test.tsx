@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "../../features/auth/context/AuthContext";
+import { AuthUser } from "../../api/auth.api";
 import { AppShell } from "./AppShell";
 import { RouteErrorBoundary } from "../components/RouteErrorBoundary";
 
@@ -15,11 +16,15 @@ const createTestQueryClient = () =>
     },
   });
 
-function renderShell(initialPath = "/") {
+function renderShell(
+  initialPath = "/",
+  initialToken: string | null = null,
+  initialUser: AuthUser | null = null
+) {
   const queryClient = createTestQueryClient();
   return render(
     <QueryClientProvider client={queryClient}>
-      <AuthProvider initialToken={null} initialUser={null}>
+      <AuthProvider initialToken={initialToken} initialUser={initialUser} initialIsLoading={false}>
         <MemoryRouter initialEntries={[initialPath]}>
           <AppShell />
         </MemoryRouter>
@@ -209,6 +214,38 @@ describe("AppShell & Route Governance (FEAT-070 / AC-001..AC-008)", () => {
       expect(
         screen.getByText(/no real capital is at risk/i)
       ).toBeDefined();
+    });
+  });
+
+  describe("FEAT-071 Route Resolution (AC-001)", () => {
+    it("renders canonical LoginPage at /login within shell", () => {
+      renderShell("/login");
+      expect(screen.getByRole("heading", { name: /sign in to aura capital/i })).toBeDefined();
+      expect(screen.getByRole("link", { name: /create an account/i })).toBeDefined();
+    });
+
+    it("renders canonical RegisterPage at /register within shell", () => {
+      renderShell("/register");
+      expect(screen.getByRole("heading", { name: /create your account/i })).toBeDefined();
+      expect(screen.getByText(/minimum 12 characters \(feat-003 policy\)/i)).toBeDefined();
+    });
+
+    it("renders deterministic auth-required guard at /account when unauthenticated", () => {
+      renderShell("/account", null, null);
+      expect(screen.getByRole("heading", { name: /please sign in/i })).toBeDefined();
+      expect(screen.getByText("Authentication Required")).toBeDefined();
+    });
+
+    it("renders server-derived AccountPage at /account when authenticated", () => {
+      renderShell("/account", "mock-token", {
+        id: "usr-shell-123",
+        email: "trader@auracapital.io",
+        displayName: "Shell Trader",
+        status: "ACTIVE",
+      });
+      expect(screen.getByRole("heading", { name: "Shell Trader" })).toBeDefined();
+      expect(screen.getByText("usr-shell-123")).toBeDefined();
+      expect(screen.getByText(/server authority notice:/i)).toBeDefined();
     });
   });
 });

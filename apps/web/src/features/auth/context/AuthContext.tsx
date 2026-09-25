@@ -7,6 +7,7 @@ export interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, displayName?: string) => Promise<AuthUser>;
   logout: () => Promise<void>;
   refreshSession: () => Promise<void>;
   setAuthSession: (token: string, user: AuthUser) => void;
@@ -18,11 +19,14 @@ export const AuthProvider: React.FC<{
   children: React.ReactNode;
   initialToken?: string | null;
   initialUser?: AuthUser | null;
-}> = ({ children, initialToken = null, initialUser = null }) => {
+  initialIsLoading?: boolean;
+}> = ({ children, initialToken = null, initialUser = null, initialIsLoading }) => {
   // In-memory access token storage per ADR-004 (no unsafe localStorage/sessionStorage)
   const [accessToken, setAccessToken] = useState<string | null>(initialToken);
   const [user, setUser] = useState<AuthUser | null>(initialUser);
-  const [isLoading, setIsLoading] = useState<boolean>(!initialToken);
+  const [isLoading, setIsLoading] = useState<boolean>(
+    initialIsLoading !== undefined ? initialIsLoading : !initialToken
+  );
 
   const refreshSession = useCallback(async () => {
     try {
@@ -48,6 +52,16 @@ export const AuthProvider: React.FC<{
     }
   }, []);
 
+  const register = useCallback(async (email: string, password: string, displayName?: string) => {
+    setIsLoading(true);
+    try {
+      const res = await authApi.register({ email, password, displayName });
+      return res.user;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   const logout = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -66,14 +80,14 @@ export const AuthProvider: React.FC<{
   }, []);
 
   useEffect(() => {
-    // If an initial token was provided, we are already initialized
-    if (initialToken) {
+    // If an initial token was provided or initial loading is explicitly disabled, skip refresh
+    if (initialToken || initialIsLoading === false) {
       setIsLoading(false);
       return;
     }
     // Otherwise attempt a silent cookie-based session refresh
     void refreshSession();
-  }, [initialToken, refreshSession]);
+  }, [initialToken, initialIsLoading, refreshSession]);
 
   const value: AuthContextType = {
     user,
@@ -81,6 +95,7 @@ export const AuthProvider: React.FC<{
     isAuthenticated: Boolean(accessToken),
     isLoading,
     login,
+    register,
     logout,
     refreshSession,
     setAuthSession,
