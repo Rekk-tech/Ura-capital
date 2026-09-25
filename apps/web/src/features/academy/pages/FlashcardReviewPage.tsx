@@ -12,7 +12,14 @@ import {
 import { AcademyApiError } from "../types/academy-ui.types";
 
 export const FlashcardReviewPage: React.FC = () => {
-  const { courseSlug, lessonSlug } = useParams<{ courseSlug: string; lessonSlug: string }>();
+  const params = useParams<{
+    courseSlug?: string;
+    courseId?: string;
+    lessonSlug?: string;
+    lessonId?: string;
+  }>();
+  const courseSlug = params.courseSlug || params.courseId;
+  const lessonSlug = params.lessonSlug || params.lessonId;
 
   const { data, isLoading, isError, error, refetch } = useFlashcardsQuery(courseSlug, lessonSlug);
 

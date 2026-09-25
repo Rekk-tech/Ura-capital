@@ -13,7 +13,9 @@ export const AcademyRoutes: React.FC = () => {
       <Route path="/courses/:courseSlug" element={<CourseDetailPage />} />
       <Route path="/courses/:courseSlug/lessons/:lessonSlug" element={<LessonDetailPage />} />
       <Route path="/courses/:courseSlug/lessons/:lessonSlug/flashcards" element={<FlashcardReviewPage />} />
+      <Route path="/lessons/:lessonSlug" element={<LessonDetailPage />} />
+      <Route path="/lessons/:lessonId" element={<LessonDetailPage />} />
+      <Route path="/flashcards" element={<FlashcardReviewPage />} />
     </Routes>
   );
 };
-

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ChevronRight, ArrowLeft, ArrowRight, BookOpen, Layers, HelpCircle, CheckCircle, XCircle } from "lucide-react";
+import { ChevronRight, ArrowLeft, ArrowRight, BookOpen, Layers, CheckCircle } from "lucide-react";
 import {
   useLessonQuery,
   useCourseQuery,
@@ -16,11 +16,19 @@ import {
 import { LessonContent } from "../components/LessonContent";
 import { LearnerXpDisplay } from "../components/LearnerXpDisplay";
 import { LessonDetailSkeleton, AuthRequiredCard, NotFoundState, ErrorState } from "../components/AcademyStates";
+import { QuizPlayer } from "../components/QuizPlayer";
 import { AcademyApiError } from "../types/academy-ui.types";
 
 
 export const LessonDetailPage: React.FC = () => {
-  const { courseSlug, lessonSlug } = useParams<{ courseSlug: string; lessonSlug: string }>();
+  const params = useParams<{
+    courseSlug?: string;
+    courseId?: string;
+    lessonSlug?: string;
+    lessonId?: string;
+  }>();
+  const courseSlug = params.courseSlug || params.courseId;
+  const lessonSlug = params.lessonSlug || params.lessonId;
 
   // Query A: Authenticated lesson content
   const lessonQuery = useLessonQuery(courseSlug, lessonSlug);
@@ -333,333 +341,31 @@ export const LessonDetailPage: React.FC = () => {
           </section>
         )}
 
-        {/* FEAT-023 Informational Quiz Summary Card */}
+        {/* FEAT-023 / FEAT-073 Interactive Quiz Player */}
         {quizQuery.data?.data && (
-          <section
-            className="lesson-quiz-section"
-            data-testid="lesson-quiz-card"
-            style={{
-              marginTop: "2.5rem",
-              padding: "1.5rem",
-              borderRadius: "0.75rem",
-              border: "1px solid var(--color-border, #334155)",
-              backgroundColor: "var(--color-surface, #1e293b)",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.75rem" }}>
-              <HelpCircle size={20} style={{ color: "var(--color-primary, #38bdf8)" }} aria-hidden="true" />
-              <h2 style={{ fontSize: "1.25rem", fontWeight: 600, margin: 0 }}>
-                {quizQuery.data.data.title}
-              </h2>
-            </div>
-            {quizQuery.data.data.description && (
-              <p style={{ color: "var(--color-text-muted, #94a3b8)", marginBottom: "1rem" }}>
-                {quizQuery.data.data.description}
-              </p>
-            )}
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "center", marginBottom: "1rem" }}>
-              <span
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  padding: "0.25rem 0.75rem",
-                  borderRadius: "9999px",
-                  fontSize: "0.875rem",
-                  backgroundColor: "rgba(56, 189, 248, 0.1)",
-                  color: "#38bdf8",
-                }}
-                data-testid="quiz-question-count"
-              >
-                {quizQuery.data.data.totalQuestions} {quizQuery.data.data.totalQuestions === 1 ? "Question" : "Questions"}
-              </span>
-              <span
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  padding: "0.25rem 0.75rem",
-                  borderRadius: "9999px",
-                  fontSize: "0.875rem",
-                  backgroundColor: "rgba(16, 185, 129, 0.1)",
-                  color: "#10b981",
-                }}
-                data-testid="quiz-passing-score"
-              >
-                Passing Score: {quizQuery.data.data.passingScore}%
-              </span>
-              {activeAttempt && (
-                <span
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    padding: "0.25rem 0.75rem",
-                    borderRadius: "9999px",
-                    fontSize: "0.875rem",
-                    backgroundColor: "rgba(234, 179, 8, 0.1)",
-                    color: "#eab308",
-                  }}
-                  data-testid="attempt-status-badge"
-                >
-                  Attempt #{activeAttempt.attemptNumber} &bull; In Progress
-                </span>
-              )}
-            </div>
-
-            {/* Graded Result Card (FEAT-025) */}
-            {gradedResult && (
-              <div
-                className="quiz-graded-card"
-                data-testid="quiz-graded-card"
-                style={{
-                  marginTop: "1.5rem",
-                  padding: "1.5rem",
-                  borderRadius: "0.5rem",
-                  backgroundColor: gradedResult.passed ? "rgba(34, 197, 94, 0.08)" : "rgba(239, 68, 68, 0.08)",
-                  border: `1px solid ${gradedResult.passed ? "rgba(34, 197, 94, 0.3)" : "rgba(239, 68, 68, 0.3)"}`,
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-                  <div>
-                    <h3 style={{ fontSize: "1.25rem", fontWeight: 700, margin: 0, color: gradedResult.passed ? "#22c55e" : "#ef4444" }}>
-                      Quiz {gradedResult.passed ? "Passed" : "Failed"}
-                    </h3>
-                    <p style={{ margin: "0.25rem 0 0 0", fontSize: "0.875rem", color: "var(--color-text-muted, #94a3b8)" }}>
-                      Final Score: <strong style={{ color: "var(--color-text, #fff)" }}>{gradedResult.score}%</strong>
-                    </p>
-                  </div>
-                  <span
-                    data-testid="quiz-result-badge"
-                    style={{
-                      padding: "0.25rem 0.75rem",
-                      borderRadius: "9999px",
-                      fontSize: "0.75rem",
-                      fontWeight: 600,
-                      backgroundColor: gradedResult.passed ? "rgba(34, 197, 94, 0.2)" : "rgba(239, 68, 68, 0.2)",
-                      color: gradedResult.passed ? "#22c55e" : "#ef4444",
-                    }}
-                  >
-                    {gradedResult.passed ? "PASSED" : "FAILED"}
-                  </span>
-                </div>
-
-                {/* Per-question correctness breakdown */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginTop: "1rem" }}>
-                  {quizQuery.data.data.questions.map((q, idx) => {
-                    const ans = gradedResult.answers.find((a) => a.questionId === q.id);
-                    const isCorrect = ans?.isCorrect ?? false;
-                    return (
-                      <div
-                        key={q.id}
-                        data-testid={`graded-question-${q.id}`}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          padding: "0.5rem 0.75rem",
-                          borderRadius: "0.375rem",
-                          backgroundColor: "rgba(255, 255, 255, 0.02)",
-                          fontSize: "0.875rem",
-                        }}
-                      >
-                        <span>{idx + 1}. {q.prompt}</span>
-                        <span
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "0.25rem",
-                            color: isCorrect ? "#22c55e" : "#ef4444",
-                            fontWeight: 500,
-                          }}
-                          data-testid={`question-correctness-${q.id}`}
-                        >
-                          {isCorrect ? (
-                            <>
-                              <CheckCircle size={14} /> Correct
-                            </>
-                          ) : (
-                            <>
-                              <XCircle size={14} /> Incorrect
-                            </>
-                          )}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <div style={{ marginTop: "1.5rem" }}>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={handleStartQuiz}
-                    disabled={startAttemptMutation.isPending}
-                    data-testid="retake-quiz-button"
-                  >
-                    {startAttemptMutation.isPending ? "Starting New Attempt..." : "Retake Quiz"}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* If no active attempt and no graded result: display Start Quiz button */}
-            {!gradedResult && !activeAttempt && (
-              <div style={{ marginTop: "1rem" }}>
-                {startAttemptMutation.isError && (
-                  <p
-                    style={{ color: "#ef4444", fontSize: "0.875rem", marginBottom: "0.75rem" }}
-                    data-testid="start-quiz-error"
-                  >
-                    {startAttemptMutation.error instanceof Error
-                      ? startAttemptMutation.error.message
-                      : "Failed to start quiz attempt."}
-                  </p>
-                )}
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={handleStartQuiz}
-                  disabled={startAttemptMutation.isPending}
-                  data-testid="start-quiz-button"
-                  style={{ cursor: startAttemptMutation.isPending ? "not-allowed" : "pointer" }}
-                >
-                  {startAttemptMutation.isPending ? "Starting Quiz..." : "Start Quiz"}
-                </button>
-              </div>
-            )}
-
-            {/* If active attempt exists and not yet graded: render safe questions and single-choice options */}
-            {!gradedResult && activeAttempt && (
-              <div
-                className="quiz-attempt-questions"
-                data-testid="quiz-attempt-container"
-                style={{ marginTop: "1.5rem", display: "flex", flexDirection: "column", gap: "1.5rem" }}
-              >
-                {saveError && (
-                  <p
-                    style={{ color: "#ef4444", fontSize: "0.875rem", margin: 0 }}
-                    data-testid="save-draft-error"
-                  >
-                    {saveError}
-                  </p>
-                )}
-                {quizQuery.data.data.questions.map((q, qIndex) => {
-                  const savedAnswer = activeAttempt.answers.find((a) => a.questionId === q.id);
-                  const selectedOptId = savedAnswer?.selectedOptionId ?? null;
-                  const isSavingThis = savingQuestionId === q.id;
-
-                  return (
-                    <div
-                      key={q.id}
-                      className="quiz-question-card"
-                      data-testid="quiz-question-item"
-                      style={{
-                        padding: "1rem",
-                        borderRadius: "0.5rem",
-                        backgroundColor: "rgba(255, 255, 255, 0.03)",
-                        border: "1px solid var(--color-border, #334155)",
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          marginBottom: "0.75rem",
-                        }}
-                      >
-                        <h3
-                          style={{ fontSize: "1rem", fontWeight: 600, margin: 0 }}
-                          data-testid={`question-prompt-${q.id}`}
-                        >
-                          {qIndex + 1}. {q.prompt}
-                        </h3>
-                        {isSavingThis && (
-                          <span
-                            style={{ fontSize: "0.75rem", color: "#38bdf8" }}
-                            data-testid="saving-indicator"
-                          >
-                            Saving...
-                          </span>
-                        )}
-                      </div>
-                      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                        {q.options.map((opt) => (
-                          <label
-                            key={opt.id}
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "0.75rem",
-                              padding: "0.5rem 0.75rem",
-                              borderRadius: "0.375rem",
-                              backgroundColor:
-                                selectedOptId === opt.id
-                                  ? "rgba(56, 189, 248, 0.15)"
-                                  : "rgba(255, 255, 255, 0.02)",
-                              border:
-                                selectedOptId === opt.id
-                                  ? "1px solid #38bdf8"
-                                  : "1px solid transparent",
-                              cursor: isSavingThis ? "wait" : "pointer",
-                            }}
-                            data-testid={`option-${opt.id}`}
-                          >
-                            <input
-                              type="radio"
-                              name={`question-${q.id}`}
-                              value={opt.id}
-                              checked={selectedOptId === opt.id}
-                              disabled={isSavingThis}
-                              onChange={() => handleSelectOption(q.id, opt.id)}
-                              data-testid={`radio-${opt.id}`}
-                            />
-                            <span style={{ fontSize: "0.875rem" }}>{opt.text}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-
-                {/* Submit Quiz Controls */}
-                {(() => {
-                  const answeredCount = quizQuery.data.data.questions.filter((q) => {
-                    const ans = activeAttempt.answers.find((a) => a.questionId === q.id);
-                    return Boolean(ans && ans.selectedOptionId);
-                  }).length;
-                  const totalCount = quizQuery.data.data.questions.length;
-                  const allAnswered = totalCount > 0 && answeredCount === totalCount;
-
-                  return (
-                    <div style={{ marginTop: "0.5rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ fontSize: "0.875rem", color: "var(--color-text-muted, #94a3b8)" }}>
-                          {answeredCount} of {totalCount} questions answered
-                        </span>
-                        {allAnswered && (
-                          <button
-                            type="button"
-                            className="btn btn-primary"
-                            onClick={handleSubmitQuiz}
-                            disabled={submitAttemptMutation.isPending}
-                            data-testid="submit-quiz-button"
-                            style={{ cursor: submitAttemptMutation.isPending ? "not-allowed" : "pointer" }}
-                          >
-                            {submitAttemptMutation.isPending ? "Submitting Quiz..." : "Submit Quiz"}
-                          </button>
-                        )}
-                      </div>
-                      {submitError && (
-                        <p style={{ color: "#ef4444", fontSize: "0.875rem", margin: 0 }} data-testid="submit-quiz-error">
-                          {submitError}
-                        </p>
-                      )}
-                    </div>
-                  );
-                })()}
-              </div>
-            )}
-          </section>
-
+          <QuizPlayer
+            quiz={quizQuery.data.data}
+            activeAttempt={activeAttempt}
+            gradedResult={gradedResult ?? null}
+            isStarting={startAttemptMutation.isPending}
+            isSaving={saveDraftMutation.isPending}
+            isSubmitting={submitAttemptMutation.isPending}
+            savingQuestionId={savingQuestionId}
+            startError={
+              startAttemptMutation.isError
+                ? startAttemptMutation.error instanceof Error
+                  ? startAttemptMutation.error.message
+                  : "Failed to start quiz attempt."
+                : null
+            }
+            saveError={saveError}
+            submitError={submitError}
+            onStartAttempt={handleStartQuiz}
+            onSelectOption={handleSelectOption}
+            onSubmitAttempt={handleSubmitQuiz}
+            onRetakeQuiz={handleStartQuiz}
+            serverXp={xpQuery.data?.data?.totalXp}
+          />
         )}
 
         {/* Dual Navigation: Bottom Footer Controls */}

@@ -98,7 +98,7 @@ export const ROUTE_REGISTRY: Record<RouteKey, RouteMetadata> = {
     title: "Academy Course Catalog",
     description: "Interactive financial lessons, flashcards, and quizzes.",
     navLabel: "Courses",
-    status: "PLANNED",
+    status: "AVAILABLE",
     requiresAuth: false,
     isNavVisible: true,
     section: "learning",

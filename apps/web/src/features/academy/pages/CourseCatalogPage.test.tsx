@@ -129,7 +129,28 @@ describe("CourseCatalogPage (Component & State - AC-003, AC-004, AC-013, AC-014,
     fireEvent.click(beginnerPill);
 
     await waitFor(() => {
-      expect(listSpy).toHaveBeenCalledWith({ page: 1, limit: 12, level: "BEGINNER" });
+      expect(listSpy).toHaveBeenCalledWith(
+        { page: 1, limit: 12, level: "BEGINNER" },
+        expect.anything(),
+      );
     });
   });
+
+  it("filters courses client-side based on search query", async () => {
+    vi.spyOn(academyApi, "listCourses").mockResolvedValue(mockCoursesData);
+
+    renderWithProviders(<CourseCatalogPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Personal Finance 101")).toBeDefined();
+      expect(screen.getByText("Portfolio Diversification")).toBeDefined();
+    });
+
+    const searchInput = screen.getByTestId("course-search-input");
+    fireEvent.change(searchInput, { target: { value: "Finance" } });
+
+    expect(screen.getByText("Personal Finance 101")).toBeDefined();
+    expect(screen.queryByText("Portfolio Diversification")).toBeNull();
+  });
 });
+

@@ -1,0 +1,533 @@
+import {
+  AcademyApiError,
+  AppErrorResponse,
+  CourseDetailDto,
+  CourseSummaryDto,
+  LessonDetailDto,
+  LessonFlashcardsResponseDto,
+  ListCoursesParams,
+  PaginationMeta,
+  QuizDefinitionDto,
+  QuizAttemptDto,
+  QuizResultDto,
+  CourseProgressDto,
+  LessonProgressDto,
+  LearnerXpDto,
+} from "../types/academy-ui.types";
+
+export interface IAcademyApiClient {
+  listCourses(params?: ListCoursesParams, options?: { signal?: AbortSignal }): Promise<{ data: CourseSummaryDto[]; pagination: PaginationMeta }>;
+  getCourseBySlug(slug: string, options?: { signal?: AbortSignal }): Promise<{ data: CourseDetailDto }>;
+  getLessonBySlug(courseSlug: string, lessonSlug: string, accessToken?: string, options?: { signal?: AbortSignal }): Promise<{ data: LessonDetailDto }>;
+  getLessonFlashcards(courseSlug: string, lessonSlug: string, accessToken?: string, options?: { signal?: AbortSignal }): Promise<{ data: LessonFlashcardsResponseDto }>;
+  getLessonQuiz(courseSlug: string, lessonSlug: string, accessToken?: string, options?: { signal?: AbortSignal }): Promise<{ data: QuizDefinitionDto }>;
+  getProjectedQuiz(quizId: string, accessToken?: string, options?: { signal?: AbortSignal }): Promise<{ data: QuizDefinitionDto }>;
+  startQuizAttempt(courseSlug: string, lessonSlug: string, accessToken?: string, options?: { signal?: AbortSignal }): Promise<{ data: QuizAttemptDto }>;
+  startQuizAttemptById(quizId: string, accessToken?: string, options?: { signal?: AbortSignal }): Promise<{ data: QuizAttemptDto }>;
+  getCurrentQuizAttempt(courseSlug: string, lessonSlug: string, accessToken?: string, options?: { signal?: AbortSignal }): Promise<{ data: QuizAttemptDto }>;
+  getQuizAttemptById(attemptId: string, accessToken?: string, options?: { signal?: AbortSignal }): Promise<{ data: QuizAttemptDto }>;
+  saveDraftQuizAnswer(attemptId: string, questionId: string, optionId: string, accessToken?: string, options?: { signal?: AbortSignal }): Promise<{ data: { questionId: string; selectedOptionId: string; updatedAt: string } }>;
+  submitQuizAttempt(attemptId: string, accessToken?: string, options?: { signal?: AbortSignal }): Promise<{ data: QuizResultDto }>;
+  getGradedQuizResult(attemptId: string, accessToken?: string, options?: { signal?: AbortSignal }): Promise<{ data: QuizResultDto }>;
+  getCourseProgress(courseSlug: string, accessToken?: string, options?: { signal?: AbortSignal }): Promise<{ data: CourseProgressDto }>;
+  completeLesson(courseSlug: string, lessonSlug: string, accessToken?: string, options?: { signal?: AbortSignal }): Promise<{ data: LessonProgressDto }>;
+  getMyXp(accessToken?: string, options?: { signal?: AbortSignal }): Promise<{ data: LearnerXpDto }>;
+}
+
+export class AcademyApiClient implements IAcademyApiClient {
+  private readonly baseUrl: string;
+
+  constructor(baseUrl = "/api/academy") {
+    this.baseUrl = baseUrl;
+  }
+
+  async listCourses(
+    params?: ListCoursesParams,
+    options?: { signal?: AbortSignal },
+  ): Promise<{ data: CourseSummaryDto[]; pagination: PaginationMeta }> {
+    const query = new URLSearchParams();
+    if (params?.page) query.set("page", String(params.page));
+    if (params?.limit) query.set("limit", String(params.limit));
+    if (params?.level) query.set("level", params.level);
+
+    const queryString = query.toString();
+    const url = `${this.baseUrl}/courses${queryString ? `?${queryString}` : ""}`;
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+      signal: options?.signal,
+    });
+
+    if (!res.ok) {
+      await this.handleError(res);
+    }
+
+    return (await res.json()) as { data: CourseSummaryDto[]; pagination: PaginationMeta };
+  }
+
+  async getCourseBySlug(
+    slug: string,
+    options?: { signal?: AbortSignal },
+  ): Promise<{ data: CourseDetailDto }> {
+    const url = `${this.baseUrl}/courses/${encodeURIComponent(slug)}`;
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+      signal: options?.signal,
+    });
+
+    if (!res.ok) {
+      await this.handleError(res);
+    }
+
+    return (await res.json()) as { data: CourseDetailDto };
+  }
+
+  async getLessonBySlug(
+    courseSlug: string,
+    lessonSlug: string,
+    accessToken?: string,
+    options?: { signal?: AbortSignal },
+  ): Promise<{ data: LessonDetailDto }> {
+    const url = `${this.baseUrl}/courses/${encodeURIComponent(courseSlug)}/lessons/${encodeURIComponent(lessonSlug)}`;
+
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+    };
+
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers,
+      signal: options?.signal,
+    });
+
+    if (!res.ok) {
+      await this.handleError(res);
+    }
+
+    return (await res.json()) as { data: LessonDetailDto };
+  }
+
+  async getLessonFlashcards(
+    courseSlug: string,
+    lessonSlug: string,
+    accessToken?: string,
+    options?: { signal?: AbortSignal },
+  ): Promise<{ data: LessonFlashcardsResponseDto }> {
+    const url = `${this.baseUrl}/courses/${encodeURIComponent(courseSlug)}/lessons/${encodeURIComponent(lessonSlug)}/flashcards`;
+
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+    };
+
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers,
+      signal: options?.signal,
+    });
+
+    if (!res.ok) {
+      await this.handleError(res);
+    }
+
+    return (await res.json()) as { data: LessonFlashcardsResponseDto };
+  }
+
+  async getLessonQuiz(
+    courseSlug: string,
+    lessonSlug: string,
+    accessToken?: string,
+    options?: { signal?: AbortSignal },
+  ): Promise<{ data: QuizDefinitionDto }> {
+    const url = `${this.baseUrl}/courses/${encodeURIComponent(courseSlug)}/lessons/${encodeURIComponent(lessonSlug)}/quiz`;
+
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+    };
+
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers,
+      signal: options?.signal,
+    });
+
+    if (!res.ok) {
+      await this.handleError(res);
+    }
+
+    return (await res.json()) as { data: QuizDefinitionDto };
+  }
+
+  /**
+   * Safe Projected Quiz Definition Read (Answer Secrecy Invariant)
+   * Guaranteed to contain no correct answers.
+   */
+  async getProjectedQuiz(
+    quizId: string,
+    accessToken?: string,
+    options?: { signal?: AbortSignal },
+  ): Promise<{ data: QuizDefinitionDto }> {
+    const url = `${this.baseUrl}/quizzes/${encodeURIComponent(quizId)}/projected`;
+
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+    };
+
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers,
+      signal: options?.signal,
+    });
+
+    if (!res.ok) {
+      await this.handleError(res);
+    }
+
+    return (await res.json()) as { data: QuizDefinitionDto };
+  }
+
+  async startQuizAttempt(
+    courseSlug: string,
+    lessonSlug: string,
+    accessToken?: string,
+    options?: { signal?: AbortSignal },
+  ): Promise<{ data: QuizAttemptDto }> {
+    const url = `${this.baseUrl}/courses/${encodeURIComponent(courseSlug)}/lessons/${encodeURIComponent(lessonSlug)}/quiz/attempts`;
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
+
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({}),
+      signal: options?.signal,
+    });
+
+    if (!res.ok) {
+      await this.handleError(res);
+    }
+
+    return (await res.json()) as { data: QuizAttemptDto };
+  }
+
+  async startQuizAttemptById(
+    quizId: string,
+    accessToken?: string,
+    options?: { signal?: AbortSignal },
+  ): Promise<{ data: QuizAttemptDto }> {
+    const url = `${this.baseUrl}/quiz-attempts`;
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
+
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ quizId }),
+      signal: options?.signal,
+    });
+
+    if (!res.ok) {
+      await this.handleError(res);
+    }
+
+    return (await res.json()) as { data: QuizAttemptDto };
+  }
+
+  async getCurrentQuizAttempt(
+    courseSlug: string,
+    lessonSlug: string,
+    accessToken?: string,
+    options?: { signal?: AbortSignal },
+  ): Promise<{ data: QuizAttemptDto }> {
+    const url = `${this.baseUrl}/courses/${encodeURIComponent(courseSlug)}/lessons/${encodeURIComponent(lessonSlug)}/quiz/attempts/current`;
+
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+    };
+
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers,
+      signal: options?.signal,
+    });
+
+    if (!res.ok) {
+      await this.handleError(res);
+    }
+
+    return (await res.json()) as { data: QuizAttemptDto };
+  }
+
+  async getQuizAttemptById(
+    attemptId: string,
+    accessToken?: string,
+    options?: { signal?: AbortSignal },
+  ): Promise<{ data: QuizAttemptDto }> {
+    const url = `${this.baseUrl}/quiz-attempts/${encodeURIComponent(attemptId)}`;
+
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+    };
+
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers,
+      signal: options?.signal,
+    });
+
+    if (!res.ok) {
+      await this.handleError(res);
+    }
+
+    return (await res.json()) as { data: QuizAttemptDto };
+  }
+
+  async saveDraftQuizAnswer(
+    attemptId: string,
+    questionId: string,
+    optionId: string,
+    accessToken?: string,
+    options?: { signal?: AbortSignal },
+  ): Promise<{ data: { questionId: string; selectedOptionId: string; updatedAt: string } }> {
+    const url = `${this.baseUrl}/quiz-attempts/${encodeURIComponent(attemptId)}/answers/${encodeURIComponent(questionId)}`;
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
+
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
+    const res = await fetch(url, {
+      method: "PUT",
+      headers,
+      body: JSON.stringify({ optionId }),
+      signal: options?.signal,
+    });
+
+    if (!res.ok) {
+      await this.handleError(res);
+    }
+
+    return (await res.json()) as { data: { questionId: string; selectedOptionId: string; updatedAt: string } };
+  }
+
+  async submitQuizAttempt(
+    attemptId: string,
+    accessToken?: string,
+    options?: { signal?: AbortSignal },
+  ): Promise<{ data: QuizResultDto }> {
+    const url = `${this.baseUrl}/quiz-attempts/${encodeURIComponent(attemptId)}/submit`;
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
+
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({}),
+      signal: options?.signal,
+    });
+
+    if (!res.ok) {
+      await this.handleError(res);
+    }
+
+    return (await res.json()) as { data: QuizResultDto };
+  }
+
+  async getGradedQuizResult(
+    attemptId: string,
+    accessToken?: string,
+    options?: { signal?: AbortSignal },
+  ): Promise<{ data: QuizResultDto }> {
+    const url = `${this.baseUrl}/quiz-attempts/${encodeURIComponent(attemptId)}/result`;
+
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+    };
+
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers,
+      signal: options?.signal,
+    });
+
+    if (!res.ok) {
+      await this.handleError(res);
+    }
+
+    return (await res.json()) as { data: QuizResultDto };
+  }
+
+  async getCourseProgress(
+    courseSlug: string,
+    accessToken?: string,
+    options?: { signal?: AbortSignal },
+  ): Promise<{ data: CourseProgressDto }> {
+    const url = `${this.baseUrl}/courses/${encodeURIComponent(courseSlug)}/progress`;
+
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+    };
+
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers,
+      signal: options?.signal,
+    });
+
+    if (!res.ok) {
+      await this.handleError(res);
+    }
+
+    return (await res.json()) as { data: CourseProgressDto };
+  }
+
+  async completeLesson(
+    courseSlug: string,
+    lessonSlug: string,
+    accessToken?: string,
+    options?: { signal?: AbortSignal },
+  ): Promise<{ data: LessonProgressDto }> {
+    const url = `${this.baseUrl}/courses/${encodeURIComponent(courseSlug)}/lessons/${encodeURIComponent(lessonSlug)}/complete`;
+
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    };
+
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({}),
+      signal: options?.signal,
+    });
+
+    if (!res.ok) {
+      await this.handleError(res);
+    }
+
+    return (await res.json()) as { data: LessonProgressDto };
+  }
+
+  async getMyXp(
+    accessToken?: string,
+    options?: { signal?: AbortSignal },
+  ): Promise<{ data: LearnerXpDto }> {
+    const url = `${this.baseUrl}/me/xp`;
+
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+    };
+
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers,
+      signal: options?.signal,
+    });
+
+    if (!res.ok) {
+      await this.handleError(res);
+    }
+
+    return (await res.json()) as { data: LearnerXpDto };
+  }
+
+  private async handleError(res: Response): Promise<never> {
+    let errorData: AppErrorResponse | null = null;
+
+    try {
+      errorData = (await res.json()) as AppErrorResponse;
+    } catch {
+      // JSON parse failure (e.g. proxy HTML or network error)
+    }
+
+    const code =
+      errorData?.error?.code ??
+      (res.status === 401
+        ? "UNAUTHENTICATED"
+        : res.status === 404
+        ? "NOT_FOUND"
+        : "INTERNAL_ERROR");
+    const message =
+      errorData?.error?.message ??
+      (res.status === 401
+        ? "Authentication required"
+        : res.status === 404
+        ? "Resource not found"
+        : "An unexpected error occurred");
+
+    throw new AcademyApiError(res.status, code, message);
+  }
+}
+
+export const academyApi = new AcademyApiClient();

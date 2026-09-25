@@ -128,4 +128,39 @@ describe("CourseDetailPage (Component & State - AC-005, AC-006, AC-013, AC-014, 
     });
     expect(getSpy).toHaveBeenCalledTimes(2);
   });
+
+  it("renders Continue Learning CTA button pointing to first uncompleted lesson", async () => {
+    vi.spyOn(academyApi, "getCourseBySlug").mockResolvedValue(mockCourseDetail);
+    vi.spyOn(academyApi, "getCourseProgress").mockResolvedValue({
+      data: {
+        courseSlug: "crypto-fundamentals",
+        completedLessons: 1,
+        totalLessons: 3,
+        progressPercent: 33,
+        status: "IN_PROGRESS",
+        completed: false,
+        completedAt: null,
+        lessons: [
+          {
+            lessonSlug: "blockchain-basics",
+            status: "COMPLETED",
+            completed: true,
+            completedAt: "2026-09-25T10:00:00Z",
+          },
+        ],
+      },
+    });
+
+    renderWithProviders();
+
+    await waitFor(() => {
+      const cta = screen.getByTestId("continue-learning-cta");
+      expect(cta).toBeDefined();
+      expect(cta.getAttribute("href")).toBe(
+        "/academy/courses/crypto-fundamentals/lessons/proof-of-work",
+      );
+      expect(cta.textContent).toContain("Continue Learning: Proof of Work Consensus");
+    });
+  });
 });
+

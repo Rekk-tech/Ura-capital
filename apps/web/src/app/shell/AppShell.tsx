@@ -11,9 +11,10 @@ import { LoginPage } from "../../features/auth/pages/LoginPage";
 import { RegisterPage } from "../../features/auth/pages/RegisterPage";
 import { AccountPage } from "../../features/auth/pages/AccountPage";
 import { DashboardPage } from "../../features/dashboard/pages/DashboardPage";
+import { AcademyRoutes } from "../router/academy-routes";
 
 /**
- * FEAT-070 / FEAT-071: Standard Application Shell & Auth Entry (FR-001, FR-003, AC-001)
+ * FEAT-070 / FEAT-071 / FEAT-072 / FEAT-073: Standard Application Shell (FR-001, FR-003, AC-001)
  *
  * Provides:
  * - Skip to main content link for keyboard & screen reader accessibility
@@ -40,10 +41,7 @@ export const AppShell: React.FC = () => {
           <Routes>
             {/* Core & Available Domain Routes */}
             <Route path="/" element={<LandingPage />} />
-            <Route
-              path="/academy/*"
-              element={<PlannedRoutePlaceholder route={ROUTE_REGISTRY.academy} />}
-            />
+            <Route path="/academy/*" element={<AcademyRoutes />} />
             <Route
               path="/simulation/*"
               element={<PlannedRoutePlaceholder route={ROUTE_REGISTRY.simulation} />}

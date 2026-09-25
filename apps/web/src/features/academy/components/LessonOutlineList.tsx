@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, BookOpen, CheckCircle } from "lucide-react";
+import { ArrowRight, BookOpen, CheckCircle, Unlock } from "lucide-react";
 import { LessonSummaryDto, LessonProgressDto } from "../types/academy-ui.types";
 
 interface LessonOutlineListProps {
@@ -42,11 +42,24 @@ export const LessonOutlineList: React.FC<LessonOutlineListProps> = ({
 
           return (
             <li key={lesson.slug} className="lesson-outline-item">
-              <Link to={lessonUrl} className="lesson-outline-link" aria-label={`Lesson ${stepNumber}: ${lesson.title}`}>
+              <Link
+                to={lessonUrl}
+                className="lesson-outline-link"
+                aria-label={`Lesson ${stepNumber}: ${lesson.title} - ${isCompleted ? "Completed" : "Available"}`}
+                data-testid={`lesson-link-${lesson.slug}`}
+              >
                 <div
                   className="outline-number-badge"
                   aria-hidden="true"
-                  style={isCompleted ? { backgroundColor: "rgba(16, 185, 129, 0.2)", color: "#10b981", borderColor: "#10b981" } : undefined}
+                  style={
+                    isCompleted
+                      ? {
+                          backgroundColor: "rgba(16, 185, 129, 0.2)",
+                          color: "#10b981",
+                          borderColor: "#10b981",
+                        }
+                      : undefined
+                  }
                 >
                   {isCompleted ? <CheckCircle size={14} /> : stepNumber}
                 </div>
@@ -70,7 +83,23 @@ export const LessonOutlineList: React.FC<LessonOutlineListProps> = ({
                       <CheckCircle size={13} />
                       Completed
                     </span>
-                  ) : null}
+                  ) : (
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "0.25rem",
+                        color: "var(--color-primary, #38bdf8)",
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
+                        marginRight: "0.5rem",
+                      }}
+                      data-testid={`lesson-status-${lesson.slug}`}
+                    >
+                      <Unlock size={12} />
+                      Open
+                    </span>
+                  )}
                   <span className="outline-action-text">Read Lesson</span>
                   <ArrowRight size={16} className="outline-action-icon" />
                 </div>

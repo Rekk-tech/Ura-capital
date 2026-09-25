@@ -6,6 +6,7 @@ import { AuthProvider } from "../../features/auth/context/AuthContext";
 import { AuthUser } from "../../api/auth.api";
 import { AppShell } from "./AppShell";
 import { RouteErrorBoundary } from "../components/RouteErrorBoundary";
+import { academyApi } from "../../features/academy/api/academyApi";
 
 const createTestQueryClient = () =>
   new QueryClient({
@@ -273,4 +274,48 @@ describe("AppShell & Route Governance (FEAT-070 / AC-001..AC-008)", () => {
       expect(screen.getByTestId("dashboard-widget-subscription")).toBeDefined();
     });
   });
+
+  describe("FEAT-073 Route Resolution (AC-001)", () => {
+    it("renders CourseCatalogPage at /academy within shell", async () => {
+      vi.spyOn(academyApi, "listCourses").mockResolvedValue({
+        data: [
+          {
+            slug: "intro-investing",
+            title: "Introduction to Investing",
+            description: "Core concepts of investing.",
+            level: "BEGINNER",
+            order: 1,
+            lessonCount: 3,
+          },
+        ],
+        pagination: { page: 1, limit: 12, total: 1, totalPages: 1 },
+      });
+
+      renderShell("/academy");
+      expect(
+        await screen.findByRole("heading", { level: 1, name: /aura academy courses/i }),
+      ).toBeDefined();
+    });
+
+    it("renders CourseDetailPage at /academy/courses/:courseSlug within shell", async () => {
+      vi.spyOn(academyApi, "getCourseBySlug").mockResolvedValue({
+        data: {
+          slug: "intro-investing",
+          title: "Introduction to Investing",
+          description: "Core concepts of investing.",
+          level: "BEGINNER",
+          order: 1,
+          lessons: [
+            { slug: "lesson-1", title: "What is an Asset?", order: 1 },
+          ],
+        },
+      });
+
+      renderShell("/academy/courses/intro-investing");
+      expect(
+        await screen.findByRole("heading", { level: 1, name: "Introduction to Investing" }),
+      ).toBeDefined();
+    });
+  });
 });
+

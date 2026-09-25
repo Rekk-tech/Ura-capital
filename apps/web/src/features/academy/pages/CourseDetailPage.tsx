@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams, Link } from "react-router-dom";
-import { ChevronRight, BookOpen } from "lucide-react";
+import { ChevronRight, BookOpen, Play } from "lucide-react";
 import { useCourseQuery, useCourseProgressQuery, useMyXpQuery } from "../hooks/use-academy";
 import { LessonOutlineList } from "../components/LessonOutlineList";
 import { LearnerXpDisplay } from "../components/LearnerXpDisplay";
@@ -8,7 +8,8 @@ import { CourseDetailSkeleton, ErrorState, NotFoundState } from "../components/A
 import { AcademyApiError } from "../types/academy-ui.types";
 
 export const CourseDetailPage: React.FC = () => {
-  const { courseSlug } = useParams<{ courseSlug: string }>();
+  const params = useParams<{ courseSlug?: string; courseId?: string }>();
+  const courseSlug = params.courseSlug || params.courseId;
   const { data, isLoading, isError, error, refetch } = useCourseQuery(courseSlug);
   const progressQuery = useCourseProgressQuery(courseSlug);
   const xpQuery = useMyXpQuery();
@@ -50,13 +51,26 @@ export const CourseDetailPage: React.FC = () => {
   }
 
   const progress = progressQuery.data?.data;
-  const derivedLessonCount = course.lessons ? course.lessons.length : 0;
+  const lessons = course.lessons ?? [];
+  const derivedLessonCount = lessons.length;
   const levelClass =
     course.level === "BEGINNER"
       ? "badge-beginner"
       : course.level === "INTERMEDIATE"
       ? "badge-intermediate"
       : "badge-advanced";
+
+  // Derive authoritative next uncompleted lesson for continue-learning CTA
+  const completedLessonSlugs = new Set(
+    (progress?.lessons ?? []).filter((l) => l.completed).map((l) => l.lessonSlug),
+  );
+  const nextUncompletedLesson = lessons.find((l) => !completedLessonSlugs.has(l.slug));
+  const targetLesson = nextUncompletedLesson ?? lessons[0];
+  const ctaLabel = nextUncompletedLesson
+    ? completedLessonSlugs.size > 0
+      ? `Continue Learning: ${nextUncompletedLesson.title}`
+      : `Start Learning: ${nextUncompletedLesson.title}`
+    : "Review Course";
 
   return (
     <div className="academy-detail-page">
@@ -93,6 +107,29 @@ export const CourseDetailPage: React.FC = () => {
         <p className="course-detail-description">
           {course.description ?? "Explore the concepts and modules covered in this course outline."}
         </p>
+
+        {/* Continue Learning CTA */}
+        {targetLesson && (
+          <div className="course-hero-cta" style={{ marginTop: "1.25rem" }}>
+            <Link
+              to={`/academy/courses/${encodeURIComponent(course.slug)}/lessons/${encodeURIComponent(targetLesson.slug)}`}
+              className="btn btn-primary"
+              data-testid="continue-learning-cta"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                padding: "0.625rem 1.25rem",
+                borderRadius: "0.5rem",
+                fontWeight: 600,
+                textDecoration: "none",
+              }}
+            >
+              <Play size={16} aria-hidden="true" />
+              <span>{ctaLabel}</span>
+            </Link>
+          </div>
+        )}
 
         {progress && (
           <div
