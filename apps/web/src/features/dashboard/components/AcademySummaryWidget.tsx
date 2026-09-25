@@ -19,17 +19,21 @@ export const AcademySummaryWidget: React.FC = () => {
 
   const xpQuery = useQuery({
     queryKey: ["dashboard", "academy", "xp"],
-    queryFn: () => academyApi.getMyXp(accessToken ?? undefined),
+    queryFn: ({ signal }) => academyApi.getMyXp(accessToken ?? undefined, { signal }),
     enabled: Boolean(accessToken),
     staleTime: 30_000,
     refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    retry: process.env.NODE_ENV === "test" ? false : 1,
   });
 
   const coursesQuery = useQuery({
     queryKey: ["dashboard", "academy", "courses"],
-    queryFn: () => academyApi.listCourses({ limit: 3 }),
+    queryFn: ({ signal }) => academyApi.listCourses({ limit: 3 }, { signal }),
     staleTime: 60_000,
     refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    retry: process.env.NODE_ENV === "test" ? false : 1,
   });
 
   const isLoading = xpQuery.isLoading || coursesQuery.isLoading;

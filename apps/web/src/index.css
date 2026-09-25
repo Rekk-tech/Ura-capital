@@ -3795,5 +3795,14 @@ a {
   }
 }
 
+/* Accessibility: Reduced Motion Support (AC-007, FR-007) */
+@media (prefers-reduced-motion: reduce) {
+  .spin-animation,
+  .loading-spinner {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 
 

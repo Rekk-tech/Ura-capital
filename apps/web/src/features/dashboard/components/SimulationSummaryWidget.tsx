@@ -19,10 +19,12 @@ export const SimulationSummaryWidget: React.FC = () => {
 
   const sessionsQuery = useQuery({
     queryKey: ["dashboard", "simulation", "sessions"],
-    queryFn: () => simulationApi.listSessions(accessToken ?? undefined),
+    queryFn: ({ signal }) => simulationApi.listSessions(accessToken ?? undefined, { signal }),
     enabled: Boolean(accessToken),
     staleTime: 30_000,
     refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    retry: process.env.NODE_ENV === "test" ? false : 1,
   });
 
   const activeSession =
@@ -31,11 +33,13 @@ export const SimulationSummaryWidget: React.FC = () => {
 
   const portfolioQuery = useQuery({
     queryKey: ["dashboard", "simulation", "portfolio", activeSession?.id],
-    queryFn: () =>
-      simulationApi.getPortfolioValuation(activeSession!.id, accessToken ?? undefined),
+    queryFn: ({ signal }) =>
+      simulationApi.getPortfolioValuation(activeSession!.id, accessToken ?? undefined, { signal }),
     enabled: Boolean(accessToken && activeSession?.id),
     staleTime: 15_000,
     refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    retry: process.env.NODE_ENV === "test" ? false : 1,
   });
 
   const isLoading = sessionsQuery.isLoading || (Boolean(activeSession) && portfolioQuery.isLoading);

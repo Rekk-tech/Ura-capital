@@ -18,9 +18,11 @@ export const CommunitySummaryWidget: React.FC = () => {
 
   const postsQuery = useQuery({
     queryKey: ["dashboard", "community", "posts"],
-    queryFn: () => communityApi.listPosts({ limit: 3 }, accessToken ?? undefined),
+    queryFn: ({ signal }) => communityApi.listPosts({ limit: 3 }, accessToken ?? undefined, { signal }),
     staleTime: 30_000,
     refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    retry: process.env.NODE_ENV === "test" ? false : 1,
   });
 
   const posts = postsQuery.data?.data ?? [];

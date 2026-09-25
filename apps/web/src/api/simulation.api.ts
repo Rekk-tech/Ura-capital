@@ -13,7 +13,7 @@ import {
 export interface ISimulationApiClient {
   listAssets(accessToken?: string): Promise<{ data: SimulationAssetDto[] }>;
   listSnapshots(scenarioKey: string, cycle: number, accessToken?: string): Promise<{ data: SimulationMarketSnapshotDto[] }>;
-  listSessions(accessToken?: string): Promise<{ data: SimulationSessionDto[] }>;
+  listSessions(accessToken?: string, options?: { signal?: AbortSignal }): Promise<{ data: SimulationSessionDto[] }>;
   createSession(data?: Record<string, never>, accessToken?: string): Promise<{ data: SimulationSessionDto }>;
   getSessionById(simulationId: string, accessToken?: string): Promise<{ data: SimulationSessionDto }>;
   startSession(simulationId: string, accessToken?: string): Promise<{ data: SimulationSessionDto }>;
@@ -21,7 +21,7 @@ export interface ISimulationApiClient {
   completeSession(simulationId: string, accessToken?: string): Promise<{ data: SimulationSessionDto }>;
   cancelSession(simulationId: string, accessToken?: string): Promise<{ data: SimulationSessionDto }>;
   submitOrder(simulationId: string, data: SubmitOrderRequestDto, accessToken?: string): Promise<{ data: SimulationOrderDto }>;
-  getPortfolioValuation(simulationId: string, accessToken?: string): Promise<{ data: SimulationPortfolioValuationDto }>;
+  getPortfolioValuation(simulationId: string, accessToken?: string, options?: { signal?: AbortSignal }): Promise<{ data: SimulationPortfolioValuationDto }>;
   getOrders(simulationId: string, accessToken?: string): Promise<{ data: SimulationOrderDto[] }>;
   getTrades(simulationId: string, accessToken?: string): Promise<{ data: SimulationTradeDto[] }>;
 }
@@ -53,12 +53,12 @@ export class SimulationApiClient implements ISimulationApiClient {
     return (await res.json()) as { data: SimulationMarketSnapshotDto[] };
   }
 
-  async listSessions(accessToken?: string): Promise<{ data: SimulationSessionDto[] }> {
+  async listSessions(accessToken?: string, options?: { signal?: AbortSignal }): Promise<{ data: SimulationSessionDto[] }> {
     const url = `${this.baseUrl}/sessions`;
     const headers: Record<string, string> = { Accept: "application/json" };
     if (accessToken) headers["Authorization"] = `Bearer ${accessToken}`;
 
-    const res = await fetch(url, { method: "GET", headers });
+    const res = await fetch(url, { method: "GET", headers, signal: options?.signal });
     if (!res.ok) await this.handleError(res);
     return (await res.json()) as { data: SimulationSessionDto[] };
   }
@@ -147,12 +147,12 @@ export class SimulationApiClient implements ISimulationApiClient {
     return (await res.json()) as { data: SimulationOrderDto };
   }
 
-  async getPortfolioValuation(simulationId: string, accessToken?: string): Promise<{ data: SimulationPortfolioValuationDto }> {
+  async getPortfolioValuation(simulationId: string, accessToken?: string, options?: { signal?: AbortSignal }): Promise<{ data: SimulationPortfolioValuationDto }> {
     const url = `${this.baseUrl}/sessions/${encodeURIComponent(simulationId)}/portfolio`;
     const headers: Record<string, string> = { Accept: "application/json" };
     if (accessToken) headers["Authorization"] = `Bearer ${accessToken}`;
 
-    const res = await fetch(url, { method: "GET", headers });
+    const res = await fetch(url, { method: "GET", headers, signal: options?.signal });
     if (!res.ok) await this.handleError(res);
     return (await res.json()) as { data: SimulationPortfolioValuationDto };
   }

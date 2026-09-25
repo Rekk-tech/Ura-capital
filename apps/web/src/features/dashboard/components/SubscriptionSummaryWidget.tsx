@@ -18,10 +18,12 @@ export const SubscriptionSummaryWidget: React.FC = () => {
 
   const subQuery = useQuery({
     queryKey: ["dashboard", "subscription", "current"],
-    queryFn: () => subscriptionApi.getCurrent(accessToken!),
+    queryFn: ({ signal }) => subscriptionApi.getCurrent(accessToken!, { signal }),
     enabled: Boolean(accessToken),
     staleTime: 60_000,
     refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    retry: process.env.NODE_ENV === "test" ? false : 1,
   });
 
   const sub = subQuery.data?.data;

@@ -323,6 +323,44 @@ describe("DashboardPage (FEAT-072: AC-001..AC-008)", () => {
         expect(screen.getByRole("link", { name: /start discussion/i })).toBeDefined();
       });
     });
+
+    it("renders accessible loading states while domain queries are in flight", () => {
+      vi.spyOn(academyApi, "getMyXp").mockImplementation(() => new Promise(() => {}));
+      vi.spyOn(academyApi, "listCourses").mockImplementation(() => new Promise(() => {}));
+      vi.spyOn(simulationApi, "listSessions").mockImplementation(() => new Promise(() => {}));
+      vi.spyOn(communityApi, "listPosts").mockImplementation(() => new Promise(() => {}));
+      vi.spyOn(subscriptionApi, "getCurrent").mockImplementation(() => new Promise(() => {}));
+
+      renderDashboard();
+
+      const loadingIndicators = screen.getAllByRole("status");
+      expect(loadingIndicators.length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText(/loading summary\.\.\./i).length).toBeGreaterThanOrEqual(1);
+    });
+
+    it("recovers to success when user clicks the retry button on a failed widget", async () => {
+      setupDefaultMocks();
+      const xpSpy = vi
+        .spyOn(academyApi, "getMyXp")
+        .mockRejectedValueOnce(new Error("Transient Network Glitch"))
+        .mockResolvedValue({
+          data: { totalXp: 1250 },
+        });
+
+      renderDashboard();
+
+      await waitFor(() => {
+        expect(screen.getByText(/unable to load academy progress/i)).toBeDefined();
+      });
+
+      const retryBtn = screen.getByRole("button", { name: /retry loading academy learning/i });
+      fireEvent.click(retryBtn);
+
+      await waitFor(() => {
+        expect(screen.getByTestId("learner-xp-value").textContent).toContain("1,250 XP");
+      });
+      expect(xpSpy).toHaveBeenCalledTimes(2);
+    });
   });
 
   describe("AC-005 & AC-006: Request Bounds & Authority Invariants", () => {

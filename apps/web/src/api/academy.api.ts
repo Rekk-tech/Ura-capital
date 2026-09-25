@@ -17,7 +17,7 @@ import {
 
 
 export interface IAcademyApiClient {
-  listCourses(params?: ListCoursesParams): Promise<{ data: CourseSummaryDto[]; pagination: PaginationMeta }>;
+  listCourses(params?: ListCoursesParams, options?: { signal?: AbortSignal }): Promise<{ data: CourseSummaryDto[]; pagination: PaginationMeta }>;
   getCourseBySlug(slug: string): Promise<{ data: CourseDetailDto }>;
   getLessonBySlug(courseSlug: string, lessonSlug: string, accessToken?: string): Promise<{ data: LessonDetailDto }>;
   getLessonFlashcards(courseSlug: string, lessonSlug: string, accessToken?: string): Promise<{ data: LessonFlashcardsResponseDto }>;
@@ -30,7 +30,7 @@ export interface IAcademyApiClient {
   getGradedQuizResult(attemptId: string, accessToken?: string): Promise<{ data: QuizResultDto }>;
   getCourseProgress(courseSlug: string, accessToken?: string): Promise<{ data: CourseProgressDto }>;
   completeLesson(courseSlug: string, lessonSlug: string, accessToken?: string): Promise<{ data: LessonProgressDto }>;
-  getMyXp(accessToken?: string): Promise<{ data: LearnerXpDto }>;
+  getMyXp(accessToken?: string, options?: { signal?: AbortSignal }): Promise<{ data: LearnerXpDto }>;
 }
 
 
@@ -42,7 +42,7 @@ export class AcademyApiClient implements IAcademyApiClient {
     this.baseUrl = baseUrl;
   }
 
-  async listCourses(params?: ListCoursesParams): Promise<{ data: CourseSummaryDto[]; pagination: PaginationMeta }> {
+  async listCourses(params?: ListCoursesParams, options?: { signal?: AbortSignal }): Promise<{ data: CourseSummaryDto[]; pagination: PaginationMeta }> {
     const query = new URLSearchParams();
     if (params?.page) query.set("page", String(params.page));
     if (params?.limit) query.set("limit", String(params.limit));
@@ -56,6 +56,7 @@ export class AcademyApiClient implements IAcademyApiClient {
       headers: {
         Accept: "application/json",
       },
+      signal: options?.signal,
     });
 
     if (!res.ok) {
@@ -384,7 +385,7 @@ export class AcademyApiClient implements IAcademyApiClient {
     return (await res.json()) as { data: LessonProgressDto };
   }
 
-  async getMyXp(accessToken?: string): Promise<{ data: LearnerXpDto }> {
+  async getMyXp(accessToken?: string, options?: { signal?: AbortSignal }): Promise<{ data: LearnerXpDto }> {
     const url = `${this.baseUrl}/me/xp`;
 
     const headers: Record<string, string> = {
@@ -398,6 +399,7 @@ export class AcademyApiClient implements IAcademyApiClient {
     const res = await fetch(url, {
       method: "GET",
       headers,
+      signal: options?.signal,
     });
 
     if (!res.ok) {
