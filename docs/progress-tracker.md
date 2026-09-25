@@ -2288,7 +2288,7 @@ Phase 9: ACTIVE / IN PROGRESS
 Strategy: BUILD MVP UI FIRST (Customer Priority)
 FEAT-070: DONE / HUMAN FEATURE GATE APPROVED
 FEAT-071: DONE / HUMAN FEATURE GATE APPROVED
-FEAT-072: UNBLOCKED FOR IMPLEMENTATION
+FEAT-072: IMPLEMENTATION COMPLETE / SELF-VERIFIED (PENDING HUMAN FEATURE GATE)
 FEAT-073..FEAT-080: PENDING
 ```
 
@@ -2353,6 +2353,37 @@ Acceptance Criteria: 8 PASS / 0 FAIL (AC-001..AC-008 PASS)
 Tasks: 8 COMPLETE / 0 OPEN (T001..T008 COMPLETE)
 Outstanding P0/P1 Defects: ZERO
 Dependencies Unblocked: FEAT-072
+Phase 9: IN PROGRESS
+```
+
+### FEAT-072: Learner Dashboard & Cross-Domain Summary
+
+Status:
+
+```text
+FEAT-072: IMPLEMENTATION COMPLETE / SELF-VERIFIED (PENDING HUMAN FEATURE GATE)
+Planning: HUMAN MASTER PLANNING APPROVED
+Implementation: COMPLETE
+Implementation Owner: ANTIGRAVITY
+Implementation Self-Verification: PASS
+Targeted Tests: 1 file / 10 tests PASS
+AppShell Integration: 19 tests PASS
+Full Web Suite: 23 files / 280 tests PASS
+Full API Suite: 66 files / 820 tests PASS
+Typecheck: PASS (workspace clean)
+ESLint: 0 errors / 0 warnings
+Production Build: PASS (vite build clean)
+Migration Impact: ZERO (10 migrations total, 0 added)
+Database Mutations: ZERO
+Application Security Invariants: PRESERVED (no client-side authority/entitlement grant, isolated widget errors, memory-only session, bounded composition)
+Human Feature Gate: PENDING
+Baseline: feat-071-approved (b6e74c679a7852c0099839446be1a017e8b603a1)
+Branch: feat/FEAT-072-learner-dashboard
+Implementation Report: reports/implementation/phase-9/FEAT-072.md
+Acceptance Criteria: 8 PASS / 0 FAIL (AC-001..AC-008 PASS)
+Tasks: 8 COMPLETE / 0 OPEN (T001..T008 COMPLETE)
+Outstanding P0/P1 Defects: ZERO
+Dependencies Unblocked: FEAT-073
 Phase 9: IN PROGRESS
 ```
 

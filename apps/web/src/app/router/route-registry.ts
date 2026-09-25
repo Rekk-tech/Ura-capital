@@ -86,7 +86,7 @@ export const ROUTE_REGISTRY: Record<RouteKey, RouteMetadata> = {
     title: "Learner Dashboard",
     description: "Cross-domain overview of learning progress and simulation status.",
     navLabel: "Dashboard",
-    status: "PLANNED",
+    status: "AVAILABLE",
     requiresAuth: true,
     isNavVisible: true,
     section: "core",

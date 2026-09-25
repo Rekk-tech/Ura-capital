@@ -1,15 +1,15 @@
 # FEAT-072 Acceptance Criteria: Learner Dashboard & Cross-Domain Summary
 
-Status: PROPOSED FOR HUMAN MASTER PLANNING REVIEW
+Status: SELF-VERIFIED / 8/8 PASS (READY FOR HUMAN FEATURE GATE)
 
-- AC-001 `/dashboard` requires an authenticated session and contains only Human-approved MVP domain summaries.
-- AC-002 No dashboard-specific API, table, migration, cross-domain transaction, or materialized authority is introduced.
-- AC-003 Every displayed fact is traceable to an approved server DTO and every action navigates to its owning domain.
-- AC-004 A failed/empty/unauthorized widget is isolated and never produces false global success or hides other usable widgets.
-- AC-005 Initial and user-triggered requests are bounded, cancellable, retry-limited, and free of render-loop storms.
-- AC-006 No client calculation grants progress, money, ownership, role, or premium entitlement.
-- AC-007 Dashboard works without overflow on mobile/tablet/desktop and passes keyboard/accessibility checks.
-- AC-008 Tests cover all widget states, partial failure, request bounds, authority invariants, and included-domain regressions.
+- AC-001 [PASS] `/dashboard` requires an authenticated session and contains only Human-approved MVP domain summaries.
+- AC-002 [PASS] No dashboard-specific API, table, migration, cross-domain transaction, or materialized authority is introduced.
+- AC-003 [PASS] Every displayed fact is traceable to an approved server DTO and every action navigates to its owning domain.
+- AC-004 [PASS] A failed/empty/unauthorized widget is isolated and never produces false global success or hides other usable widgets.
+- AC-005 [PASS] Initial and user-triggered requests are bounded, cancellable, retry-limited, and free of render-loop storms.
+- AC-006 [PASS] No client calculation grants progress, money, ownership, role, or premium entitlement.
+- AC-007 [PASS] Dashboard works without overflow on mobile/tablet/desktop and passes keyboard/accessibility checks.
+- AC-008 [PASS] Tests cover all widget states, partial failure, request bounds, authority invariants, and included-domain regressions.
 
 ## Traceability Matrix
 

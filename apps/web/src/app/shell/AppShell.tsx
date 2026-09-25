@@ -10,6 +10,7 @@ import { ROUTE_REGISTRY } from "../router/route-registry";
 import { LoginPage } from "../../features/auth/pages/LoginPage";
 import { RegisterPage } from "../../features/auth/pages/RegisterPage";
 import { AccountPage } from "../../features/auth/pages/AccountPage";
+import { DashboardPage } from "../../features/dashboard/pages/DashboardPage";
 
 /**
  * FEAT-070 / FEAT-071: Standard Application Shell & Auth Entry (FR-001, FR-003, AC-001)
@@ -61,11 +62,10 @@ export const AppShell: React.FC = () => {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
 
+            {/* Authenticated Dashboard (FEAT-072) */}
+            <Route path="/dashboard" element={<DashboardPage />} />
+
             {/* Honest Planned MVP Placeholders */}
-            <Route
-              path="/dashboard"
-              element={<PlannedRoutePlaceholder route={ROUTE_REGISTRY.dashboard} />}
-            />
             <Route
               path="/admin"
               element={<PlannedRoutePlaceholder route={ROUTE_REGISTRY.admin} />}

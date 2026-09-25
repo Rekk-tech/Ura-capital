@@ -145,11 +145,11 @@ describe("AppShell & Route Governance (FEAT-070 / AC-001..AC-008)", () => {
       expect(screen.getByRole("link", { name: /open simulation/i })).toBeDefined();
     });
 
-    it("renders planned route placeholder for /dashboard without claiming ready", () => {
-      renderShell("/dashboard");
-      expect(screen.getByRole("heading", { name: /learner dashboard/i })).toBeDefined();
+    it("renders planned route placeholder for /admin without claiming ready", () => {
+      renderShell("/admin");
+      expect(screen.getByRole("heading", { name: /admin control surface/i })).toBeDefined();
       expect(screen.getByText("Planned for MVP Release")).toBeDefined();
-      expect(screen.getByText("FEAT-072")).toBeDefined();
+      expect(screen.getByText("FEAT-077")).toBeDefined();
       expect(screen.getByRole("link", { name: /return to home/i })).toBeDefined();
     });
 
@@ -246,6 +246,31 @@ describe("AppShell & Route Governance (FEAT-070 / AC-001..AC-008)", () => {
       expect(screen.getByRole("heading", { name: "Shell Trader" })).toBeDefined();
       expect(screen.getByText("usr-shell-123")).toBeDefined();
       expect(screen.getByText(/server authority notice:/i)).toBeDefined();
+    });
+  });
+
+  describe("FEAT-072 Route Resolution (AC-001)", () => {
+    it("renders deterministic auth-required guard at /dashboard when unauthenticated", () => {
+      renderShell("/dashboard", null, null);
+      expect(screen.getByRole("heading", { name: /please sign in/i })).toBeDefined();
+      expect(screen.getByText("Authentication Required")).toBeDefined();
+      expect(screen.getByRole("link", { name: /sign in to continue/i }).getAttribute("href")).toBe(
+        "/login?returnTo=%2Fdashboard"
+      );
+    });
+
+    it("renders DashboardPage at /dashboard when authenticated", () => {
+      renderShell("/dashboard", "mock-token", {
+        id: "usr-dash-123",
+        email: "learner@auracapital.io",
+        displayName: "Dashboard Trader",
+        status: "ACTIVE",
+      });
+      expect(screen.getByRole("heading", { name: /welcome back, dashboard trader/i })).toBeDefined();
+      expect(screen.getByTestId("dashboard-widget-academy")).toBeDefined();
+      expect(screen.getByTestId("dashboard-widget-simulation")).toBeDefined();
+      expect(screen.getByTestId("dashboard-widget-community")).toBeDefined();
+      expect(screen.getByTestId("dashboard-widget-subscription")).toBeDefined();
     });
   });
 });
