@@ -5,9 +5,10 @@
 **Branch**: `feat/FEAT-071-auth-account`  
 **Base**: `planning/phase-9-master` (at `feat-070-approved` checkpoint `2f03e86`)  
 **Worktree**: `.tmp/phase9-planning`  
-**Status**: IMPLEMENTATION COMPLETE / SELF-VERIFIED / READY FOR HUMAN FEATURE GATE  
+**Status**: DONE / HUMAN FEATURE GATE APPROVED (2026-09-25)  
 **Date**: 2026-09-25  
-**Checkpoint Tag**: Pending Human Feature Gate (`feat-071-approved` to be created upon approval)  
+**Human Decision**: APPROVED (Explicit Human Authority Decision)  
+**Checkpoint Tag**: `feat-071-approved`  
 
 ---
 
@@ -27,7 +28,30 @@ It establishes:
 
 ---
 
-## 2. Requirements & Acceptance Traceability
+## 2. Human Feature Gate Approval
+
+- **Decision**: **APPROVED**
+- **Approval Authority**: Human Authority
+- **Date**: 2026-09-25
+- **Implementation SHA**: `a47f6f7b15a6b0cfa0bfa9da13fc9f87422be30a`
+- **Scope**: FEAT-071 Authentication Entry & Account Experience
+- **Acceptance Criteria**: 8/8 PASS
+- **Targeted Tests**: 4 files / 35 tests PASS
+- **AppShell Route Integration**: 17/17 tests PASS
+- **Web Suite**: 22 files / 268 tests PASS
+- **API Suite**: 66 files / 820 tests PASS
+- **Typecheck**: PASS across all 3 workspaces
+- **ESLint**: 0 errors / 0 warnings
+- **Production Build**: PASS
+- **Security Invariants**: PRESERVED (no tokens in storage/DOM/URL, memory-only ADR-004, safe internal redirect)
+- **Database Migrations / Mutations**: ZERO
+- **Defects**: 0 (P0: 0, P1: 0, P2: 0, P3: 0)
+- **Checkpoint Tag**: `feat-071-approved`
+- **Next Authorized Feature**: FEAT-072 (Learner Dashboard & Cross-Domain Summary)
+
+---
+
+## 3. Requirements & Acceptance Traceability
 
 | Requirement | Task | Acceptance Criteria | Implementation Status | Evidence / Test |
 |---|---|---|---|---|

@@ -1,6 +1,6 @@
 # FEAT-071 Tasks: Authentication Entry & Account Experience
 
-Status: IMPLEMENTATION COMPLETE / SELF-VERIFIED / READY FOR REVIEW
+Status: DONE / HUMAN FEATURE GATE APPROVED (2026-09-25)
 
 | Task | Work | Requirement | Acceptance | State |
 |---|---|---|---|---|

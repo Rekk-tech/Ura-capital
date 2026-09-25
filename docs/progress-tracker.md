@@ -2287,8 +2287,9 @@ Status:
 Phase 9: ACTIVE / IN PROGRESS
 Strategy: BUILD MVP UI FIRST (Customer Priority)
 FEAT-070: DONE / HUMAN FEATURE GATE APPROVED
-FEAT-071: UNBLOCKED FOR IMPLEMENTATION
-FEAT-072..FEAT-080: PENDING
+FEAT-071: DONE / HUMAN FEATURE GATE APPROVED
+FEAT-072: UNBLOCKED FOR IMPLEMENTATION
+FEAT-073..FEAT-080: PENDING
 ```
 
 ### FEAT-070: Application Shell, Navigation & Route Governance
@@ -2319,6 +2320,39 @@ Acceptance Criteria: 8 PASS / 0 FAIL (AC-001..AC-008 PASS)
 Tasks: 8 COMPLETE / 0 OPEN (T001..T008 COMPLETE)
 Outstanding P0/P1 Defects: ZERO
 Dependencies Unblocked: FEAT-071
+Phase 9: IN PROGRESS
+```
+
+### FEAT-071: Authentication Entry & Account Experience
+
+Status:
+
+```text
+FEAT-071: DONE / HUMAN FEATURE GATE APPROVED
+Planning: HUMAN MASTER PLANNING APPROVED
+Implementation: COMPLETE
+Implementation Owner: ANTIGRAVITY
+Implementation Self-Verification: PASS
+Targeted Tests: 4 files / 35 tests PASS
+AppShell Integration: 17 tests PASS
+Full Web Suite: 22 files / 268 tests PASS
+Full API Suite: 66 files / 820 tests PASS
+Typecheck: PASS (workspace clean)
+ESLint: 0 errors / 0 warnings
+Production Build: PASS (vite build clean)
+Migration Impact: ZERO (10 migrations total, 0 added)
+Database Mutations: ZERO
+Application Security Invariants: PRESERVED (no tokens in storage/DOM/URL, memory-only ADR-004, safe internal redirect)
+Human Feature Gate: APPROVED (Explicit Human Authority Decision, 2026-09-25)
+Implementation Commit: a47f6f7b15a6b0cfa0bfa9da13fc9f87422be30a
+Baseline: feat-070-approved (2f03e864cc272183936f2766d0950848c55b673c)
+Branch: feat/FEAT-071-auth-account
+Checkpoint Tag: feat-071-approved PUBLISHED
+Implementation Report: reports/implementation/phase-9/FEAT-071.md
+Acceptance Criteria: 8 PASS / 0 FAIL (AC-001..AC-008 PASS)
+Tasks: 8 COMPLETE / 0 OPEN (T001..T008 COMPLETE)
+Outstanding P0/P1 Defects: ZERO
+Dependencies Unblocked: FEAT-072
 Phase 9: IN PROGRESS
 ```
 

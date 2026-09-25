@@ -1,6 +1,6 @@
 # FEAT-071 Requirement: Authentication Entry & Account Experience
 
-Status: PROPOSED FOR HUMAN MASTER PLANNING REVIEW / IMPLEMENTATION NOT_STARTED
+Status: DONE / HUMAN FEATURE GATE APPROVED (2026-09-25)
 Phase: Phase 9 - UI Integration & Product Polish
 Type: Implementation feature
 Planning Owner: Codex

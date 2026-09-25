@@ -1,6 +1,6 @@
 # FEAT-071 Specification: Authentication Entry & Account Experience
 
-Status: IMPLEMENTATION COMPLETE / SELF-VERIFIED / READY FOR REVIEW
+Status: DONE / HUMAN FEATURE GATE APPROVED (2026-09-25)
 
 ## 1. Architecture Contract
 

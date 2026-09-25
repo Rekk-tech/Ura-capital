@@ -1,6 +1,6 @@
 # FEAT-071 Acceptance Criteria: Authentication Entry & Account Experience
 
-Status: SELF-VERIFIED / PASS (READY FOR HUMAN FEATURE GATE)
+Status: DONE / HUMAN FEATURE GATE APPROVED (8/8 PASS, 2026-09-25)
 
 - AC-001 [PASS] `/login`, `/register`, and authenticated `/account` resolve through the canonical shell with deterministic auth-required states.
 - AC-002 [PASS] Requests use only approved `/api/auth/*` contracts; no duplicate auth implementation or quota-bypass alias behavior is introduced.
