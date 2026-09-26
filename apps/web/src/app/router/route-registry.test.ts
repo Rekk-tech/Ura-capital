@@ -4,7 +4,7 @@ import {
   getPrimaryNavRoutes,
   findRouteByPath,
   isRouteActive,
-} from "./route-registry.js";
+} from "./route-registry";
 
 describe("Route Registry (FEAT-070 / AC-001)", () => {
   it("defines canonical routes with unique paths", () => {
