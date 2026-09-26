@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { App } from "./App.js";
+import { App } from "./App";
 
 describe("App Component Integration (FEAT-070 / AC-001..AC-008)", () => {
   it("renders Aura Capital branding and header navigation", () => {
