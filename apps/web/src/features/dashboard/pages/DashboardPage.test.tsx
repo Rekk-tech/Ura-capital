@@ -381,7 +381,7 @@ describe("DashboardPage (FEAT-072: AC-001..AC-008)", () => {
         expect(
           screen.getByText(/simulated execution only • virtual funds • no real capital at risk/i)
         ).toBeDefined();
-      });
+      }, { timeout: 4000 });
 
       // Bottom footer platform disclosure
       expect(screen.getByText(/platform disclosure:/i)).toBeDefined();

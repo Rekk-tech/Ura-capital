@@ -1,15 +1,15 @@
-# FEAT-075 Acceptance Criteria: Community Experience Integration & Polish
+# FEAT-075 Acceptance Criteria: Portfolio & Financial Valuation UI
 
-Status: PROPOSED FOR HUMAN MASTER PLANNING REVIEW
+Status: APPROVED FOR IMPLEMENTATION / IN_PROGRESS
 
-- AC-001 Community feed/detail routes use the shared shell and issue no protected request before authenticated readiness.
-- AC-002 Cursors remain opaque, ordering remains server-defined, and bounded load-more produces no duplicate UI rows.
-- AC-003 Post/comment mutations show only server-confirmed success; non-owner controls do not grant or imply authorization.
-- AC-004 Like/unlike prevents duplicate pending actions and final count/current-user state matches canonical refetched data.
-- AC-005 User content executes no HTML/script and hidden/removed/moderation internals are not disclosed.
-- AC-006 All approved state/error cases are deterministic; 429/503 honor safe server contracts and never report false success.
-- AC-007 Feed, composers, actions, and detail flows are responsive and accessible across required viewports.
-- AC-008 Targeted tests and Phase 6 regressions prove IDOR protection, concurrency semantics, sanitization, rate limits, and zero backend/schema change.
+- AC-001 `/portfolio` is reachable via AppShell navigation, deep links preserve path, and unauthenticated requests safely redirect to `/login?returnTo=%2Fportfolio`.
+- AC-002 Portfolio and trade queries pass native `AbortSignal`, configure `staleTime: 15_000`, disable `refetchOnWindowFocus`, and use smart bounded retry.
+- AC-003 `PortfolioEquitySummary` accurately renders Total Equity, Cash Balance, Position Market Value, Cost Basis, and NAV directly from server DTOs with exact Decimal formatting.
+- AC-004 `PnLAnalyticsCard` displays authoritative Realized PnL, Unrealized PnL, ROI percentage, and trade win/loss distribution without client accounting overrides.
+- AC-005 `AssetAllocationBreakdown` displays visual proportion bars and asset weights, with an explicit 100% cash empty state when no positions are open.
+- AC-006 `EquityTrendViewer` reflects equity changes across simulation cycles and trade milestones deterministically.
+- AC-007 Mandatory regulatory notice ("Simulated execution only • Virtual funds • No real capital at risk") and server-authority notice are prominently and persistently displayed.
+- AC-008 All 5 async states (Loading, Empty, Auth-required, Error with Retry, Success) are deterministic, responsive down to 320px+, accessible, with zero database migrations and all checks green.
 
 ## Traceability Matrix
 
@@ -22,9 +22,8 @@ Status: PROPOSED FOR HUMAN MASTER PLANNING REVIEW
 | FR-005 | T005 | AC-005 |
 | FR-006 | T006 | AC-006 |
 | FR-007 | T007 | AC-007 |
-| FR-008 | T008 | AC-008 |
+| FR-008 | T007, T008 | AC-008 |
 
 ## Verdict Rule
 
-PASS requires AC-001 through AC-008 with no mandatory skip, no P0/P1, no scope expansion, truthful evidence, and exact-source CI green. Otherwise FAIL and map each defect to the owning requirement.
-
+PASS requires AC-001 through AC-008 with no mandatory skip, zero P0/P1 defects, zero DB migrations, and exact-source CI green.

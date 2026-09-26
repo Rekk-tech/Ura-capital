@@ -1,23 +1,22 @@
-# FEAT-075 Tasks: Community Experience Integration & Polish
+# FEAT-075 Tasks: Portfolio & Financial Valuation UI
 
-Status: PROPOSED FOR HUMAN MASTER PLANNING REVIEW / NOT_STARTED
+Status: APPROVED FOR IMPLEMENTATION / IN_PROGRESS
 
 | Task | Work | Requirement | Acceptance | State |
 |---|---|---|---|---|
-| T001 | Integrate Community route metadata and authenticated route readiness with the shell. | FR-001 | AC-001 | TODO |
-| T002 | Audit cursor/load-more orchestration and canonical query invalidation. | FR-002 | AC-002 | TODO |
-| T003 | Harden post/comment mutation presentation around server validation and ownership. | FR-003 | AC-003 | TODO |
-| T004 | Harden like/unlike pending/refetch behavior without optimistic authority. | FR-004 | AC-004 | TODO |
-| T005 | Revalidate safe text rendering and hidden/removed content handling. | FR-005 | AC-005 | TODO |
-| T006 | Complete the Community async/error/rate-limit/outage matrix. | FR-006 | AC-006 | TODO |
-| T007 | Remediate Community responsive and accessibility gaps. | FR-007 | AC-007 | TODO |
-| T008 | Add targeted journeys, run the approved feature gate, and record exact evidence. | FR-008 | AC-008 | TODO |
+| T001 | Promote `/portfolio` route to AVAILABLE, requiresAuth in route-registry, and integrate into AppShell with ProtectedRoute. | FR-001 | AC-001 | TODO |
+| T002 | Audit and configure portfolio and trade query hooks in use-simulation.ts / use-portfolio.ts with AbortSignal and TanStack options. | FR-002 | AC-002 | TODO |
+| T003 | Implement PortfolioEquitySummary with exact Decimal formatting and zero floating-point error. | FR-003 | AC-003 | TODO |
+| T004 | Implement PnLAnalyticsCard with Realized/Unrealized PnL breakdown and trade win/loss metrics. | FR-004 | AC-004 | TODO |
+| T005 | Implement AssetAllocationBreakdown with visual percentages and 100% cash empty state. | FR-005 | AC-005 | TODO |
+| T006 | Implement EquityTrendViewer for cycle and trade progression tracking. | FR-006 | AC-006 | TODO |
+| T007 | Implement PortfolioPage unifying analytical components with 5 async states and mandatory regulatory disclaimers. | FR-007, FR-008 | AC-007, AC-008 | TODO |
+| T008 | Add targeted test suites (unit, component, accessibility, route integration) and run canonical quality gate. | FR-008 | AC-008 | TODO |
 
 ## Dependency Order
 
-T001 establishes the feature entry contract. T002-T007 follow in order where they touch shared behavior; independent test fixtures may be prepared in parallel. T008 closes validation and evidence only after T001-T007 are complete.
+T001 establishes the route contract. T002 establishes data contracts. T003-T006 build analytical presentation components. T007 integrates components into the dashboard page with async error matrix. T008 closes validation with test suites and feature gate.
 
 ## Traceability Rule
 
-No task may be marked complete without evidence for its mapped FR and AC. New scope requires Human review rather than silent task insertion.
-
+No task may be marked complete without evidence for its mapped FR and AC.

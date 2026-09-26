@@ -1,42 +1,39 @@
-# FEAT-075 Requirement: Community Experience Integration & Polish
+# FEAT-075 Requirement: Portfolio & Financial Valuation UI
 
-Status: PROPOSED FOR HUMAN MASTER PLANNING REVIEW / IMPLEMENTATION NOT_STARTED
+Status: APPROVED FOR IMPLEMENTATION / IN_PROGRESS
 Phase: Phase 9 - UI Integration & Product Polish
 Type: Implementation feature
-Planning Owner: Codex
+Planning Owner: Antigravity
 
 ## Goal
 
-Integrate and polish approved Community feed, post, comment, and like workflows while preserving authentication, ownership, visibility, and rate-limit boundaries.
+Deliver the dedicated, server-authoritative Portfolio & Financial Valuation experience (`/portfolio`), enabling learners to analyze total equity, cash ratio, asset allocation breakdown, realized/unrealized PnL analytics, and equity curve trends across simulation market cycles while preserving strict server financial authority, zero database migrations, and mandatory simulated capital disclaimers.
 
 ## Functional Requirements
 
-- FR-001 Integrate approved Community routes into the canonical shell with authenticated entry states.
-- FR-002 Preserve opaque cursor pagination, server ordering, bounded load-more behavior, and canonical refetch.
-- FR-003 Keep create/remove post and comment flows server-validated and ownership-authorized.
-- FR-004 Keep post like/unlike state relationally server-derived with pending protection and canonical refetch.
-- FR-005 Render user content safely as text and keep hidden/removed/moderation details unavailable.
-- FR-006 Complete loading, empty, auth-required, not-found, validation, forbidden, rate-limit, Redis-unavailable, and generic error states.
-- FR-007 Meet responsive, keyboard, focus, semantic, contrast, announcement, and reduced-motion requirements.
-- FR-008 Run targeted Community journeys and Phase 6 ownership/concurrency/security regression with truthful evidence.
+- FR-001 Route Governance & Shell Integration: Promote `/portfolio` route in `route-registry.ts` to `AVAILABLE`, enforce `requiresAuth: true`, and integrate into `AppShell.tsx` protected by `<ProtectedRoute>`.
+- FR-002 API Client & TanStack Query Hooks: Provide robust portfolio and trade analytics fetch methods forwarding native `AbortSignal`, configured with `staleTime: 15_000`, `refetchOnWindowFocus: false`, and bounded smart retry (skipping 401/403/404).
+- FR-003 Portfolio Equity Summary: Render Total Portfolio Equity, Cash Balance, Position Market Value, Total Cost Basis, and Net Asset Value (NAV) with exact Decimal precision matching server DTOs without browser rounding errors.
+- FR-004 PnL & Performance Analytics: Provide breakdown of Realized PnL vs. Unrealized PnL, return rate (ROI), and Win/Loss metrics derived strictly from authoritative server trade history and valuation DTOs.
+- FR-005 Asset Allocation Breakdown: Provide accessible visual breakdown (progress bars, allocation percentages, asset badges) across holdings, including an explicit 100% cash empty state when no positions are open.
+- FR-006 Equity Trend Progression: Track historical equity progression across simulation market cycles and completed trades without client-side financial recalculation.
+- FR-007 Regulatory Disclaimers & Financial Authority Notice: Prominently render mandatory virtual capital notices ("Simulated execution only • Virtual funds • No real capital at risk") and server-authority statements.
+- FR-008 Async State Matrix & Non-Functional Resilience: Handle all 5 async UI states (Loading skeleton, Empty state, Auth-required redirect, Error with retry, Success), responsive down to 320px+, keyboard-accessible, and 0 database migrations.
 
 ## Non-Functional Requirements
 
-- NFR-001 Preserve approved server-authority and security boundaries.
-- NFR-002 Meet responsive mobile, tablet, and desktop behavior without horizontal overflow.
-- NFR-003 Meet keyboard, focus, semantic, contrast, announcement, and reduced-motion baseline.
-- NFR-004 Add no database migration unless a later Human-approved scope change explicitly assigns one.
-- NFR-005 Produce deterministic tests and truthful exact-source evidence with no mandatory skips.
+- NFR-001 Server-Authoritative Financials: Client UI never calculates cash, positions, equity, or PnL as financial authority; all values derive directly from server DTOs.
+- NFR-002 Responsive Design: Fully responsive across 320px mobile up to ultrawide desktop without horizontal overflow or layout breakage.
+- NFR-003 Accessibility Baseline: Semantic HTML, ARIA progressbar/status attributes, keyboard focus management, contrast compliant, and support for `prefers-reduced-motion`.
+- NFR-004 Zero Database Migrations: Retain approved 10 migrations total; zero Prisma schema changes or DB mutations.
+- NFR-005 Deterministic Test Coverage: Unit and component test suites covering formatting, state matrix, and route navigation with 100% pass rate.
 
 ## Dependencies
 
-FEAT-070, FEAT-071, Phase 6 approved Community baseline.
+- FEAT-070: Shell navigation & route registry.
+- FEAT-071: Authentication provider & ProtectedRoute.
+- FEAT-074: Simulation session lifecycle & accounting endpoints.
 
 ## Scope Boundary
 
-Owns Community frontend integration. Excludes public feed, editing, nested replies, comment likes, moderation/admin, reporting, recommendation, private messaging, and audit persistence.
-
-## Approval Boundary
-
-This package is a proposal. It does not authorize implementation and may not be marked implemented, QA PASS, DONE, or Human approved without later gates.
-
+Owns the dedicated `/portfolio` experience and portfolio analytics presentation. Excludes live brokerage execution, real currency deposits/withdrawals, AI recommendations (Phase 8 frozen), and database schema changes.

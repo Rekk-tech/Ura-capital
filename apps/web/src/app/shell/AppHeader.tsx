@@ -8,6 +8,7 @@ import {
   LogIn,
   BookOpen,
   TrendingUp,
+  PieChart,
   Users,
   BadgeDollarSign,
   LayoutDashboard,
@@ -22,6 +23,7 @@ const NAV_ICONS: Record<string, React.ReactNode> = {
   "/dashboard": <LayoutDashboard size={16} aria-hidden="true" />,
   "/academy": <BookOpen size={16} aria-hidden="true" />,
   "/simulation": <TrendingUp size={16} aria-hidden="true" />,
+  "/portfolio": <PieChart size={16} aria-hidden="true" />,
   "/community": <Users size={16} aria-hidden="true" />,
   "/subscription": <BadgeDollarSign size={16} aria-hidden="true" />,
 };

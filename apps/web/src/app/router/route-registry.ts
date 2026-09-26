@@ -44,6 +44,7 @@ export const CANONICAL_ROUTES = {
   ACADEMY_FLASHCARDS: "/academy/courses/:courseSlug/lessons/:lessonSlug/flashcards",
   SIMULATION: "/simulation",
   SIMULATION_SESSION: "/simulation/sessions/:simulationId",
+  PORTFOLIO: "/portfolio",
   COMMUNITY: "/community",
   COMMUNITY_POST: "/community/posts/:postId",
   SUBSCRIPTION: "/subscription",
@@ -59,6 +60,7 @@ export type RouteKey =
   | "dashboard"
   | "academy"
   | "simulation"
+  | "portfolio"
   | "community"
   | "subscription"
   | "account"
@@ -116,6 +118,18 @@ export const ROUTE_REGISTRY: Record<RouteKey, RouteMetadata> = {
     section: "trading",
     owningFeature: "FEAT-074",
   },
+  portfolio: {
+    id: "portfolio",
+    path: CANONICAL_ROUTES.PORTFOLIO,
+    title: "Portfolio Valuation & Analytics",
+    description: "Server-authoritative portfolio equity, asset allocation, and performance analytics.",
+    navLabel: "Portfolio",
+    status: "AVAILABLE",
+    requiresAuth: true,
+    isNavVisible: true,
+    section: "trading",
+    owningFeature: "FEAT-075",
+  },
   community: {
     id: "community",
     path: CANONICAL_ROUTES.COMMUNITY,
@@ -126,7 +140,7 @@ export const ROUTE_REGISTRY: Record<RouteKey, RouteMetadata> = {
     requiresAuth: false,
     isNavVisible: true,
     section: "community",
-    owningFeature: "FEAT-075",
+    owningFeature: "FEAT-COMMUNITY",
   },
   subscription: {
     id: "subscription",
@@ -212,6 +226,7 @@ export function getPrimaryNavRoutes(): RouteMetadata[] {
     ROUTE_REGISTRY.dashboard,
     ROUTE_REGISTRY.academy,
     ROUTE_REGISTRY.simulation,
+    ROUTE_REGISTRY.portfolio,
     ROUTE_REGISTRY.community,
     ROUTE_REGISTRY.subscription,
   ].filter((r) => r.isNavVisible);
@@ -233,6 +248,7 @@ export function findRouteByPath(pathname: string): RouteMetadata | undefined {
   // Prefix match for nested routes
   if (normalized.startsWith("/academy")) return ROUTE_REGISTRY.academy;
   if (normalized.startsWith("/simulation")) return ROUTE_REGISTRY.simulation;
+  if (normalized.startsWith("/portfolio")) return ROUTE_REGISTRY.portfolio;
   if (normalized.startsWith("/community")) return ROUTE_REGISTRY.community;
   if (normalized.startsWith("/subscription")) return ROUTE_REGISTRY.subscription;
   if (normalized.startsWith("/dashboard")) return ROUTE_REGISTRY.dashboard;

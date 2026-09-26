@@ -1,48 +1,46 @@
-# FEAT-075 Plan: Community Experience Integration & Polish
+# FEAT-075 Plan: Portfolio & Financial Valuation UI
 
-Status: PROPOSED FOR HUMAN MASTER PLANNING REVIEW / IMPLEMENTATION_NOT_STARTED
+Status: APPROVED FOR IMPLEMENTATION / IN_PROGRESS
 
 ## 1. Preconditions
 
-- Human approves the Phase 9 master plan and FEAT-075 package.
-- Dependencies are satisfied: FEAT-070, FEAT-071, Phase 6 approved Community baseline.
-- Work starts from the approved Phase 9 integration baseline in an isolated worktree.
-- The implementation agent confirms zero unrelated dirty changes.
+- Human approves the FEAT-075 assignment.
+- Baseline tag `feat-074-approved` merged into `planning/phase-9-master`.
+- Work branch: `feat/FEAT-075-portfolio-valuation-ui`.
+- Clean worktree without dirty or unrelated changes.
 
 ## 2. Delivery Sequence
 
-1. Freeze consumed contracts and feature-owned file paths.
-2. Implement the eight FRs in task order with tests alongside behavior.
-3. Run targeted security, accessibility, responsive, and contract verification.
-4. Run relevant monorepo regression and authoritative guards.
-5. Publish an exact-source CI-green checkpoint only after the Internal Feature Gate passes.
+1. **Route Governance & Shell (T001)**:
+   - Add/promote `portfolio` route in `route-registry.ts` (`/portfolio`, status `AVAILABLE`, `requiresAuth: true`, `owningFeature: "FEAT-075"`).
+   - Integrate into `AppShell.tsx` protected by `<ProtectedRoute>`.
+   - Update `route-registry.test.ts` and `AppShell.test.tsx`.
+2. **API Hooks (T002)**:
+   - Expose dedicated hooks in `use-portfolio.ts` or `use-simulation.ts` leveraging `simulationApi`:
+     - `usePortfolioValuation(simulationId)`
+     - `useSimulationTrades(simulationId)`
+     - `useSimulationSessions()`
+   - Ensure AbortSignal forwarding, `staleTime: 15_000`, `refetchOnWindowFocus: false`, smart retry.
+3. **Core Visual Components (T003 - T006)**:
+   - `PortfolioEquitySummary`: Total equity, cash, market value, cost basis, NAV.
+   - `PnLAnalyticsCard`: Realized/Unrealized PnL, ROI, Win/Loss stats.
+   - `AssetAllocationBreakdown`: Weight bars, asset badges, 100% cash empty state.
+   - `EquityTrendViewer`: Cycle & trade progression tracker.
+4. **Page Integration & State Matrix (T007)**:
+   - `PortfolioPage`:
+     - Resolves active session or allows selecting simulation sessions.
+     - Handles 5 states: Loading (skeleton), Empty (no session or uninitialized), Auth-required, Error (with retry), Success.
+     - Renders mandatory regulatory disclaimer and server-authority notice.
+5. **Testing & Quality Gate (T008)**:
+   - Unit tests for formatting and calculation helpers.
+   - Component tests for each presentation component and `PortfolioPage`.
+   - Route resolution tests in `AppShell.test.tsx`.
+   - Run `npm run lint`, `npm run typecheck`, `npm run test:web`, `npm run build`, and security guards.
+   - Publish implementation report `reports/implementation/phase-9/FEAT-075.md`.
 
-## 3. File Ownership
+## 3. Invariants & Boundaries
 
-Owns Community frontend integration. Excludes public feed, editing, nested replies, comment likes, moderation/admin, reporting, recommendation, private messaging, and audit persistence.
-
-Shared shell, global tokens, root router, and package-manifest changes require integration-owner coordination. No parallel feature may silently rewrite those files.
-
-## 4. Test Strategy
-
-- Unit: pure mapping, state, validation, and safety helpers.
-- Component: interaction, async state, accessibility, and safe rendering.
-- Integration: authenticated API-client and route behavior with authoritative errors.
-- Browser E2E: critical journey at desktop and mobile breakpoints where the feature exposes a route.
-- Regression: owning upstream phase plus auth/session, RBAC/entitlement, and all authoritative guards affected by the diff.
-
-## 5. Migration and Rollback
-
-ZERO database or migration changes. Rollback is application-artifact rollback to the prior approved checkpoint; no database rollback is owned by this feature.
-
-## 6. Risks
-
-- Contract drift between approved APIs and frontend assumptions.
-- Client presentation accidentally treated as authorization or durable authority.
-- Shared-file merge conflicts during parallel work.
-- Incomplete async, mobile, keyboard, or failure-state coverage.
-
-## 7. Exit
-
-Internal Feature Gate PASS requires AC-001..AC-008 PASS, all tasks complete, exact-source CI green, zero P0/P1, truthful evidence, and no scope expansion.
-
+- ZERO database migrations.
+- Server-authoritative financials: all numbers from server DTOs.
+- Mandatory virtual funds disclaimer: always visible.
+- Phase 8 AI remains frozen.

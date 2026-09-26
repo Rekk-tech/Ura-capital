@@ -348,5 +348,78 @@ describe("AppShell & Route Governance (FEAT-070 / AC-001..AC-008)", () => {
       expect(screen.getByTestId("simulation-disclosure-banner")).toBeDefined();
     });
   });
+
+  describe("FEAT-075 Route Resolution (AC-001)", () => {
+    it("renders deterministic auth-required guard at /portfolio when unauthenticated", () => {
+      renderShell("/portfolio", null, null);
+      expect(screen.getByRole("heading", { name: /please sign in/i })).toBeDefined();
+      expect(screen.getByText("Authentication Required")).toBeDefined();
+      expect(screen.getByRole("link", { name: /sign in to continue/i }).getAttribute("href")).toBe(
+        "/login?returnTo=%2Fportfolio"
+      );
+    });
+
+    it("renders PortfolioPage at /portfolio within shell when authenticated", async () => {
+      vi.spyOn(simulationApi, "listSessions").mockResolvedValue({
+        data: [
+          {
+            id: "session-p-1",
+            userId: "usr-port-1",
+            scenarioId: "scen-1",
+            status: "ACTIVE",
+            startingCash: "100000.0000",
+            currentCycle: 2,
+            startedAt: "2026-09-26T00:00:00Z",
+            completedAt: null,
+            cancelledAt: null,
+            createdAt: "2026-09-26T00:00:00Z",
+            updatedAt: "2026-09-26T00:00:00Z",
+            simulated: true,
+          },
+        ],
+      });
+      vi.spyOn(simulationApi, "getPortfolioValuation").mockResolvedValue({
+        data: {
+          sessionId: "session-p-1",
+          currentCycle: 2,
+          cashBalance: "80000.0000",
+          marketValue: "25000.0000",
+          totalEquity: "105000.0000",
+          realizedPnl: "1000.0000",
+          unrealizedPnl: "4000.0000",
+          updatedAt: "2026-09-26T10:00:00Z",
+          simulated: true,
+          positions: [
+            {
+              assetId: "ast-1",
+              symbol: "AAPL",
+              name: "Apple Inc.",
+              quantity: 100,
+              averageCost: "210.0000",
+              currentPrice: "250.0000",
+              marketValue: "25000.0000",
+              unrealizedPnl: "4000.0000",
+              simulated: true,
+            },
+          ],
+        },
+      });
+      vi.spyOn(simulationApi, "getTrades").mockResolvedValue({
+        data: [],
+      });
+
+      renderShell("/portfolio", "mock-token", {
+        id: "usr-port-1",
+        email: "investor@auracapital.io",
+        displayName: "Valued Investor",
+        status: "ACTIVE",
+      });
+
+      expect(await screen.findByTestId("portfolio-page")).toBeDefined();
+      expect(screen.getByTestId("portfolio-equity-summary")).toBeDefined();
+      expect(screen.getByTestId("simulation-disclosure-banner")).toBeDefined();
+      expect(screen.getByTestId("server-authority-notice")).toBeDefined();
+    });
+  });
 });
 
