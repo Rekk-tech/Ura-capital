@@ -21,7 +21,7 @@ describe("Web Application Shell (Smoke Test)", () => {
 
     render(
       <QueryClientProvider client={queryClient}>
-        <AuthProvider initialToken={null} initialUser={null} initialIsLoading={false}>
+        <AuthProvider initialToken={null} initialUser={null}>
           <MemoryRouter initialEntries={["/"]}>
             <AppShell />
           </MemoryRouter>
