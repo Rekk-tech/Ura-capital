@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getSafeReturnUrl } from "./return-url.js";
+import { getSafeReturnUrl } from "./return-url";
 
 describe("getSafeReturnUrl (FEAT-071 / AC-006)", () => {
   it("returns default URL when input is null, undefined, or empty", () => {
