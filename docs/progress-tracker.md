@@ -2459,6 +2459,41 @@ Phase 9: IN PROGRESS
 
 ---
 
+### FEAT-075: Portfolio & Financial Valuation UI
+
+Status:
+
+```text
+FEAT-075: DONE / HUMAN FEATURE GATE APPROVED
+Planning: HUMAN MASTER PLANNING APPROVED
+Implementation: COMPLETE
+Implementation Owner: ANTIGRAVITY
+Implementation Self-Verification: PASS
+Targeted Tests: 7 files / 28 tests PASS
+AppShell Integration: 25 tests PASS
+Full Web Suite: 36 files / 355 tests PASS
+Full API Suite: 66 files / 820 tests PASS
+Typecheck: PASS (workspace clean)
+ESLint: 0 errors / 0 warnings
+Production Build: PASS (vite build clean, 620.21 kB / 169.62 kB gzip)
+Migration Impact: ZERO (10 migrations total, 0 added)
+Database Mutations: ZERO
+Application Security Invariants: PRESERVED (server-authoritative financials/PnL/NAV, mandatory virtual capital notice, memory-only session)
+Human Feature Gate: APPROVED (Explicit Human Authority Decision, 2026-09-26)
+Implementation Commit: 02b2a2f
+Baseline: feat-074-approved (b0462aa9d23865e678f17c46c4f0c61014a77833)
+Branch: feat/FEAT-075-portfolio-valuation-ui
+Checkpoint Tag: feat-075-approved PUBLISHED
+Implementation Report: reports/implementation/phase-9/FEAT-075.md
+Acceptance Criteria: 8 PASS / 0 FAIL (AC-001..AC-008 PASS)
+Tasks: 8 COMPLETE / 0 OPEN (T001..T008 COMPLETE)
+Outstanding P0/P1 Defects: ZERO
+Dependencies Unblocked: FEAT-076
+Phase 9: IN PROGRESS
+```
+
+---
+
 # Phase 10 - Production Hardening
 
 ## Goal
