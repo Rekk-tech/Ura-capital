@@ -164,7 +164,7 @@ export const ROUTE_REGISTRY: Record<RouteKey, RouteMetadata> = {
     requiresAuth: false,
     isNavVisible: true,
     section: "account",
-    owningFeature: "FEAT-SUBSCRIPTION",
+    owningFeature: "FEAT-076",
   },
   account: {
     id: "account",
