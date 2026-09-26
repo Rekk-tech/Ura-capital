@@ -12,7 +12,9 @@ import { execSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
 import type { AddressInfo } from "node:net";
 
-describe("Community Integrated Learner Journey (Real Runtime E2E - AC-029, AC-035)", () => {
+const testDbUrl = process.env.TEST_DATABASE_URL || process.env.DATABASE_URL;
+
+describe.skipIf(!testDbUrl)("Community Integrated Learner Journey (Real Runtime E2E - AC-029, AC-035)", () => {
   let server: http.Server;
   let apiBaseUrl: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -22,12 +24,8 @@ describe("Community Integrated Learner Journey (Real Runtime E2E - AC-029, AC-03
   let realToken: string;
   let realUser: { id: string; email: string; role: string };
 
-  const testDbUrl =
-    process.env.TEST_DATABASE_URL ||
-    process.env.DATABASE_URL ||
-    "postgresql://postgres:postgrespassword@localhost:5432/aura_capital_test_feat019_rework2_fresh";
-
   beforeAll(async () => {
+    if (!testDbUrl) return;
     // Ensure test environment variables are set
     process.env.NODE_ENV = "test";
     process.env.TEST_DATABASE_URL = testDbUrl;
