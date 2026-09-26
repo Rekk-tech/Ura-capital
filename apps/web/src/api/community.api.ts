@@ -16,7 +16,7 @@ export interface RequestOptions {
 
 export interface ICommunityApiClient {
   listPosts(
-    params?: { limit?: number; cursor?: string },
+    params?: { limit?: number; cursor?: string; sort?: "LATEST" | "POPULAR" },
     accessToken?: string,
     options?: RequestOptions,
   ): Promise<CommunityPostFeedResponse>;
@@ -70,6 +70,13 @@ export interface ICommunityApiClient {
     accessToken: string,
     options?: RequestOptions,
   ): Promise<{ data: CommunityPostLikeStateDto }>;
+
+  toggleLike(
+    postId: string,
+    isLiked: boolean,
+    accessToken: string,
+    options?: RequestOptions,
+  ): Promise<{ data: CommunityPostLikeStateDto }>;
 }
 
 export class CommunityApiClient implements ICommunityApiClient {
@@ -88,7 +95,7 @@ export class CommunityApiClient implements ICommunityApiClient {
   }
 
   async listPosts(
-    params?: { limit?: number; cursor?: string },
+    params?: { limit?: number; cursor?: string; sort?: "LATEST" | "POPULAR" },
     accessToken?: string,
     options?: RequestOptions,
   ): Promise<CommunityPostFeedResponse> {
@@ -104,7 +111,18 @@ export class CommunityApiClient implements ICommunityApiClient {
 
     const res = await fetch(url, { method: "GET", headers, signal: options?.signal });
     if (!res.ok) await this.handleError(res);
-    return (await res.json()) as CommunityPostFeedResponse;
+    const feed = (await res.json()) as CommunityPostFeedResponse;
+
+    if (params?.sort === "POPULAR") {
+      const sorted = [...feed.data].sort((a, b) => {
+        const scoreA = (a.likeCount || 0) + (a.commentCount || 0);
+        const scoreB = (b.likeCount || 0) + (b.commentCount || 0);
+        return scoreB - scoreA;
+      });
+      return { ...feed, data: sorted };
+    }
+
+    return feed;
   }
 
   async createPost(
@@ -119,10 +137,15 @@ export class CommunityApiClient implements ICommunityApiClient {
       Authorization: `Bearer ${accessToken}`,
     };
 
+    const finalContent =
+      data.title && data.title.trim()
+        ? `# ${data.title.trim()}\n\n${data.content.trim()}`
+        : data.content;
+
     const res = await fetch(url, {
       method: "POST",
       headers,
-      body: JSON.stringify(data),
+      body: JSON.stringify({ content: finalContent }),
       signal: options?.signal,
     });
     if (!res.ok) await this.handleError(res);
@@ -249,6 +272,18 @@ export class CommunityApiClient implements ICommunityApiClient {
     const res = await fetch(url, { method: "DELETE", headers, signal: options?.signal });
     if (!res.ok) await this.handleError(res);
     return (await res.json()) as { data: CommunityPostLikeStateDto };
+  }
+
+  async toggleLike(
+    postId: string,
+    isLiked: boolean,
+    accessToken: string,
+    options?: RequestOptions,
+  ): Promise<{ data: CommunityPostLikeStateDto }> {
+    if (isLiked) {
+      return this.unlikePost(postId, accessToken, options);
+    }
+    return this.likePost(postId, accessToken, options);
   }
 
   private async handleError(res: Response): Promise<never> {

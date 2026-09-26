@@ -61,6 +61,18 @@ describe("Route Registry (FEAT-070 / AC-001)", () => {
     expect(portfolio?.status).toBe("AVAILABLE");
     expect(portfolio?.requiresAuth).toBe(true);
 
+    const community = findRouteByPath("/community");
+    expect(community?.id).toBe("community");
+    expect(community?.owningFeature).toBe("FEAT-076");
+    expect(community?.status).toBe("AVAILABLE");
+    expect(community?.requiresAuth).toBe(false);
+
+    const communityPost = findRouteByPath("/community/posts/p-123");
+    expect(communityPost?.id).toBe("communityPost");
+    expect(communityPost?.owningFeature).toBe("FEAT-076");
+    expect(communityPost?.status).toBe("AVAILABLE");
+    expect(communityPost?.requiresAuth).toBe(false);
+
     const unknown = findRouteByPath("/unknown-route");
     expect(unknown).toBeUndefined();
   });

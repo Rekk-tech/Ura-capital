@@ -109,7 +109,7 @@ export const PostDetailPage: React.FC = () => {
   const comments = commentsQuery.data?.pages.flatMap((page) => page.data) ?? [];
 
   return (
-    <main className="community-page-container">
+    <main className="community-page-container" data-testid="post-detail-page">
       {/* Back to feed navigation */}
       <nav aria-label="Community navigation" style={{ marginBottom: "1.25rem" }}>
         <Link

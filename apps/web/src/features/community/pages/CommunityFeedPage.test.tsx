@@ -323,4 +323,29 @@ describe("CommunityFeedPage (Component & State - AC-001..AC-028)", () => {
       expect(likeSpy).toHaveBeenCalledWith("p-1111", "test-token");
     });
   });
+
+  it("renders sorting controls (Latest, Popular) and switches sort order (AC-003)", async () => {
+    const listSpy = vi.spyOn(communityApi, "listPosts").mockResolvedValue({
+      data: [mockPost1, mockPost2],
+      pageInfo: { nextCursor: null, hasNextPage: false },
+    });
+
+    renderWithProviders(<CommunityFeedPage />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("feed-sort-latest-btn")).toBeDefined();
+      expect(screen.getByTestId("feed-sort-popular-btn")).toBeDefined();
+    });
+
+    const popularBtn = screen.getByTestId("feed-sort-popular-btn");
+    fireEvent.click(popularBtn);
+
+    await waitFor(() => {
+      expect(listSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ sort: "POPULAR" }),
+        "test-token",
+        expect.anything(),
+      );
+    });
+  });
 });

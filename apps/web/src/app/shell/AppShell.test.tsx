@@ -8,6 +8,7 @@ import { AppShell } from "./AppShell";
 import { RouteErrorBoundary } from "../components/RouteErrorBoundary";
 import { academyApi } from "../../features/academy/api/academyApi";
 import { simulationApi } from "../../features/simulation/api/simulationApi";
+import { communityApi } from "../../api/community.api";
 
 const createTestQueryClient = () =>
   new QueryClient({
@@ -419,6 +420,61 @@ describe("AppShell & Route Governance (FEAT-070 / AC-001..AC-008)", () => {
       expect(screen.getByTestId("portfolio-equity-summary")).toBeDefined();
       expect(screen.getByTestId("simulation-disclosure-banner")).toBeDefined();
       expect(screen.getByTestId("server-authority-notice")).toBeDefined();
+    });
+  });
+
+  describe("FEAT-076 Route Resolution (AC-001)", () => {
+    it("renders CommunityFeedPage at /community within shell when authenticated", async () => {
+      vi.spyOn(communityApi, "listPosts").mockResolvedValue({
+        data: [],
+        pageInfo: { nextCursor: null, hasNextPage: false },
+      });
+
+      renderShell("/community", "mock-token", {
+        id: "usr-comm-1",
+        email: "learner@auracapital.io",
+        displayName: "Community Learner",
+        status: "ACTIVE",
+      });
+
+      expect(await screen.findByRole("heading", { name: "Community Discussions" })).toBeDefined();
+      expect(await screen.findByTestId("community-empty-state")).toBeDefined();
+    });
+
+    it("renders PostDetailPage at /community/posts/:postId within shell when authenticated", async () => {
+      vi.spyOn(communityApi, "getPostById").mockResolvedValue({
+        data: {
+          id: "post-test-1",
+          author: { displayName: "Senior Trader" },
+          content: "Risk management in volatile markets.",
+          createdAt: "2026-09-26T00:00:00Z",
+          likeCount: 12,
+          commentCount: 0,
+          likedByCurrentUser: false,
+          ownedByCurrentUser: false,
+        },
+      });
+      vi.spyOn(communityApi, "listComments").mockResolvedValue({
+        data: [],
+        pageInfo: { nextCursor: null, hasNextPage: false },
+      });
+
+      renderShell("/community/posts/post-test-1", "mock-token", {
+        id: "usr-comm-1",
+        email: "learner@auracapital.io",
+        displayName: "Community Learner",
+        status: "ACTIVE",
+      });
+
+      expect(await screen.findByText("Risk management in volatile markets.")).toBeDefined();
+      expect(screen.getByText("Senior Trader")).toBeDefined();
+    });
+
+    it("renders community auth card at /community without full redirect when unauthenticated", async () => {
+      renderShell("/community", null, null);
+
+      expect(await screen.findByTestId("community-auth-card")).toBeDefined();
+      expect(screen.getByText(/Authentication Required/i)).toBeDefined();
     });
   });
 });

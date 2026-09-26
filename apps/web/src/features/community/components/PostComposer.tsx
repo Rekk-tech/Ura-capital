@@ -15,6 +15,7 @@ interface PostComposerProps {
 const MAX_POST_LENGTH = 5000;
 
 export const PostComposer: React.FC<PostComposerProps> = ({ accessToken, onPostCreated }) => {
+  const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [validationError, setValidationError] = useState<string | null>(null);
 
@@ -40,7 +41,11 @@ export const PostComposer: React.FC<PostComposerProps> = ({ accessToken, onPostC
     }
 
     try {
-      await createPostMutation.mutateAsync({ content });
+      await createPostMutation.mutateAsync({
+        title: title.trim() || undefined,
+        content,
+      });
+      setTitle("");
       setContent("");
       setValidationError(null);
       if (onPostCreated) {
@@ -82,6 +87,30 @@ export const PostComposer: React.FC<PostComposerProps> = ({ accessToken, onPostC
         {isRateLimited && <CommunityRateLimitedBanner retryAfter={retryAfter} />}
         {isServiceUnavailable && <CommunityServiceUnavailableBanner />}
 
+        <div style={{ marginBottom: "0.5rem" }}>
+          <input
+            id="post-composer-title-input"
+            data-testid="post-composer-title-input"
+            type="text"
+            className="composer-title-input"
+            placeholder="Discussion title (optional)..."
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            disabled={isSubmitting}
+            maxLength={150}
+            style={{
+              width: "100%",
+              padding: "0.6rem 0.75rem",
+              backgroundColor: "var(--bg-surface)",
+              border: "1px solid var(--border-subtle)",
+              borderRadius: "var(--radius-sm)",
+              color: "var(--text-primary)",
+              fontSize: "0.95rem",
+              outline: "none",
+            }}
+          />
+        </div>
+
         <textarea
           id="post-composer-textarea"
           data-testid="post-composer-textarea"
@@ -120,7 +149,11 @@ export const PostComposer: React.FC<PostComposerProps> = ({ accessToken, onPostC
             gap: "0.5rem",
           }}
         >
-          <div id="post-composer-counter" style={{ fontSize: "0.85rem", color: isTooLong ? "var(--status-error)" : "var(--text-muted)" }}>
+          <div
+            id="post-composer-counter"
+            data-testid="post-composer-counter"
+            style={{ fontSize: "0.85rem", color: isTooLong ? "var(--status-error)" : "var(--text-muted)" }}
+          >
             {content.length} / {MAX_POST_LENGTH}
           </div>
 

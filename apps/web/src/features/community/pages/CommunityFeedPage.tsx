@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "../../auth/context/AuthContext";
 import { useCommunityFeedQuery } from "../hooks/use-community";
@@ -13,9 +13,10 @@ import {
 
 export const CommunityFeedPage: React.FC = () => {
   const { accessToken, isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const [sortBy, setSortBy] = useState<"LATEST" | "POPULAR">("LATEST");
 
   // Auth boundary: If unauthenticated, no community HTTP requests are dispatched (AC-003)
-  const feedQuery = useCommunityFeedQuery(accessToken ?? undefined);
+  const feedQuery = useCommunityFeedQuery(accessToken ?? undefined, 20, sortBy);
 
   if (isAuthLoading) {
     return (
@@ -44,7 +45,7 @@ export const CommunityFeedPage: React.FC = () => {
   const posts = feedQuery.data?.pages.flatMap((page) => page.data) ?? [];
 
   return (
-    <main className="community-page-container">
+    <main className="community-page-container" data-testid="community-feed-page">
       <section className="community-hero" style={{ marginBottom: "1.5rem" }}>
         <h1 className="hero-title" style={{ fontSize: "1.75rem", marginBottom: "0.5rem" }}>
           Community Discussions
@@ -56,6 +57,41 @@ export const CommunityFeedPage: React.FC = () => {
 
       {/* Post Composer */}
       <PostComposer accessToken={accessToken} />
+
+      {/* Sorting Tabs */}
+      <div
+        className="community-sort-controls"
+        style={{
+          display: "flex",
+          gap: "0.5rem",
+          marginBottom: "1rem",
+          alignItems: "center",
+        }}
+      >
+        <span style={{ fontSize: "0.875rem", color: "var(--text-muted)", marginRight: "0.25rem" }}>
+          Sort by:
+        </span>
+        <button
+          type="button"
+          data-testid="feed-sort-latest-btn"
+          className={`button ${sortBy === "LATEST" ? "button-primary" : "button-ghost"}`}
+          onClick={() => setSortBy("LATEST")}
+          aria-pressed={sortBy === "LATEST"}
+          style={{ padding: "0.4rem 0.85rem", fontSize: "0.85rem" }}
+        >
+          Latest
+        </button>
+        <button
+          type="button"
+          data-testid="feed-sort-popular-btn"
+          className={`button ${sortBy === "POPULAR" ? "button-primary" : "button-ghost"}`}
+          onClick={() => setSortBy("POPULAR")}
+          aria-pressed={sortBy === "POPULAR"}
+          style={{ padding: "0.4rem 0.85rem", fontSize: "0.85rem" }}
+        >
+          Popular
+        </button>
+      </div>
 
       {/* Feed content states */}
       {feedQuery.isLoading ? (

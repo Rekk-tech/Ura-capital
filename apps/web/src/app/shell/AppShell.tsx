@@ -15,6 +15,7 @@ import { AcademyRoutes } from "../router/academy-routes";
 import { SimulationRoutes } from "../router/simulation-routes";
 import { ProtectedRoute } from "../../features/auth/components/ProtectedRoute";
 import { PortfolioPage } from "../../features/portfolio/pages/PortfolioPage";
+import { CommunityRoutes } from "../router/community-routes";
 
 /**
  * FEAT-070 / FEAT-071 / FEAT-072 / FEAT-073 / FEAT-074 / FEAT-075: Standard Application Shell
@@ -54,10 +55,7 @@ export const AppShell: React.FC = () => {
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/community/*"
-              element={<PlannedRoutePlaceholder route={ROUTE_REGISTRY.community} />}
-            />
+            <Route path="/community/*" element={<CommunityRoutes />} />
             <Route
               path="/subscription/*"
               element={<PlannedRoutePlaceholder route={ROUTE_REGISTRY.subscription} />}

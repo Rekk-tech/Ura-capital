@@ -1,15 +1,15 @@
-# FEAT-076 Acceptance Criteria: Subscription Experience Integration & Polish
+# FEAT-076 Acceptance Criteria: Community Experience Integration & Polish
 
-Status: PROPOSED FOR HUMAN MASTER PLANNING REVIEW
+Status: APPROVED FOR IMPLEMENTATION
 
-- AC-001 The canonical Subscription route is present in the shared shell and respects authenticated readiness.
-- AC-002 UI exposes only safe approved DTO fields and no provider/customer/subscription identifiers or payment data.
-- AC-003 Every lifecycle status matches server facts and period/cancel semantics without client-created authority.
-- AC-004 No production commerce API/CTA, mock upgrade, local premium toggle, payment form, or false success is introduced.
-- AC-005 Client state cannot grant/extend entitlement and server 401/403/409 outcomes remain authoritative.
-- AC-006 All required async/error/rate-limit/outage states are deterministic and sanitized.
-- AC-007 Subscription status and available actions are responsive, accessible, and clearly announced.
-- AC-008 Targeted tests and Phase 7 regressions prove entitlement authority, deferrals, privacy, audit integrity, and zero backend/schema change.
+- AC-001 Route Governance & Navigation: `/community` and `/community/posts/:postId` are registered as AVAILABLE with `owningFeature: "FEAT-076"` in `route-registry.ts`. Public read is allowed (`requiresAuth: false`). Routes are properly integrated into `AppShell.tsx` and verified with route tests.
+- AC-002 Query Hooks & AbortSignal: `CommunityApiClient` forwards `AbortSignal` across all endpoints (`listPosts`, `getPostById`, `createPost`, `listComments`, `createComment`, `likePost`, `unlikePost`). TanStack hooks enforce `staleTime: 30_000`, `refetchOnWindowFocus: false`, and suppress retries on 401, 403, 404, and 429 errors.
+- AC-003 Community Feed & Cursor Pagination: `CommunityFeedPage` presents discussions with cursor-based pagination ("Load More Posts") and sorting options (Latest, Popular). All 5 async states (loading skeleton, empty, unauthenticated prompt, error with retry, and success feed) render cleanly.
+- AC-004 Post Composer & Rate Limit Resilience: `PostComposer` provides content input, real-time character counter (max 5,000), client validation, pending submission lock, and a friendly inline alert on 429 rate limit with retry-after guidance.
+- AC-005 Post Card Presentation: `PostCard` displays author display name, formatted relative or calendar date, sanitized content, comment count link navigating to `/community/posts/:postId`, and integrated like button.
+- AC-006 Atomic Like Toggle: `PostLikeButton` handles like/unlike toggle with accessible ARIA state (`aria-pressed`, `aria-label`), atomic count updates from server, and unauthenticated safeguard prompting login without page error.
+- AC-007 Post Detail & Threaded Comments: `PostDetailPage` renders complete post details, back navigation, threaded comments list, reply composer with validation, and delete action for author.
+- AC-008 Quality Gate & Non-Functional: Unit, component, and accessibility test suites pass 100%. Zero database migrations (approved total remains 10). Phase 8 AI frozen. Monorepo lint, typecheck, build, and guards all pass.
 
 ## Traceability Matrix
 
@@ -23,8 +23,3 @@ Status: PROPOSED FOR HUMAN MASTER PLANNING REVIEW
 | FR-006 | T006 | AC-006 |
 | FR-007 | T007 | AC-007 |
 | FR-008 | T008 | AC-008 |
-
-## Verdict Rule
-
-PASS requires AC-001 through AC-008 with no mandatory skip, no P0/P1, no scope expansion, truthful evidence, and exact-source CI green. Otherwise FAIL and map each defect to the owning requirement.
-

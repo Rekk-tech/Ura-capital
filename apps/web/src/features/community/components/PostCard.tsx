@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Heart, MessageSquare, Trash2, Loader2, User } from "lucide-react";
-import { CommunityPostDto, CommunityApiError } from "../types/community-ui.types";
-import {
-  useLikePostMutation,
-  useUnlikePostMutation,
-  useRemovePostMutation,
-} from "../hooks/use-community";
+import { MessageSquare, Trash2, Loader2, User, Flag } from "lucide-react";
+import { CommunityPostDto } from "../types/community-ui.types";
+import { useRemovePostMutation } from "../hooks/use-community";
+import { PostLikeButton } from "./PostLikeButton";
+import { ReportDialog } from "./ReportDialog";
 
 interface PostCardProps {
   post: CommunityPostDto;
@@ -22,40 +20,10 @@ export const PostCard: React.FC<PostCardProps> = ({
   isDetailView = false,
 }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isReportOpen, setIsReportOpen] = useState(false);
 
-  const likeMutation = useLikePostMutation(accessToken);
-  const unlikeMutation = useUnlikePostMutation(accessToken);
   const removeMutation = useRemovePostMutation(accessToken);
-
-  const isLikePending = likeMutation.isPending || unlikeMutation.isPending;
   const isRemovePending = removeMutation.isPending;
-
-  const handleLikeToggle = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (isLikePending) return;
-    setErrorMessage(null);
-
-    try {
-      if (post.likedByCurrentUser) {
-        await unlikeMutation.mutateAsync(post.id);
-      } else {
-        await likeMutation.mutateAsync(post.id);
-      }
-    } catch (err: unknown) {
-      if (err instanceof CommunityApiError) {
-        if (err.status === 429) {
-          setErrorMessage(`Rate limit: please wait ${err.retryAfter ?? 60}s`);
-        } else if (err.status === 503) {
-          setErrorMessage("Service temporarily unavailable");
-        } else {
-          setErrorMessage(err.message || "Failed to update like");
-        }
-      } else {
-        setErrorMessage("Action failed. Please try again.");
-      }
-    }
-  };
 
   const handleRemove = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -86,6 +54,12 @@ export const PostCard: React.FC<PostCardProps> = ({
   });
 
   const authorName = post.author?.displayName || "Aura Learner";
+
+  // Check for formatted title line (e.g. "# My Title\n\nContent")
+  const hasMarkdownTitle = post.content.startsWith("# ");
+  const lines = post.content.split("\n");
+  const extractedTitle = hasMarkdownTitle && lines[0] ? lines[0].replace(/^#\s*/, "").trim() : null;
+  const displayedContent = hasMarkdownTitle ? lines.slice(1).join("\n").trim() : post.content;
 
   return (
     <article
@@ -143,33 +117,68 @@ export const PostCard: React.FC<PostCardProps> = ({
           </div>
         </div>
 
-        {/* Owner-only logical removal control */}
-        {post.ownedByCurrentUser && (
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          {/* Content moderation reporting flag */}
           <button
             type="button"
-            data-testid={`post-remove-btn-${post.id}`}
-            aria-label="Remove post"
+            data-testid={`post-report-btn-${post.id}`}
+            aria-label="Report post"
             className="button button-ghost"
-            onClick={handleRemove}
-            disabled={isRemovePending}
+            onClick={() => setIsReportOpen(true)}
             style={{
-              color: "var(--status-error)",
-              padding: "0.4rem 0.6rem",
+              color: "var(--text-muted)",
+              padding: "0.35rem 0.5rem",
               fontSize: "0.85rem",
               display: "inline-flex",
               alignItems: "center",
-              gap: "0.35rem",
             }}
           >
-            {isRemovePending ? (
-              <Loader2 size={16} className="spin-animation" aria-hidden="true" />
-            ) : (
-              <Trash2 size={16} aria-hidden="true" />
-            )}
-            <span>Remove</span>
+            <Flag size={14} aria-hidden="true" />
           </button>
-        )}
+
+          {/* Owner-only logical removal control */}
+          {post.ownedByCurrentUser && (
+            <button
+              type="button"
+              data-testid={`post-remove-btn-${post.id}`}
+              aria-label="Remove post"
+              className="button button-ghost"
+              onClick={handleRemove}
+              disabled={isRemovePending}
+              style={{
+                color: "var(--status-error)",
+                padding: "0.4rem 0.6rem",
+                fontSize: "0.85rem",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.35rem",
+              }}
+            >
+              {isRemovePending ? (
+                <Loader2 size={16} className="spin-animation" aria-hidden="true" />
+              ) : (
+                <Trash2 size={16} aria-hidden="true" />
+              )}
+              <span>Remove</span>
+            </button>
+          )}
+        </div>
       </header>
+
+      {/* Prominently render extracted title if present */}
+      {extractedTitle && (
+        <h2
+          data-testid={`post-title-${post.id}`}
+          style={{
+            fontSize: "1.15rem",
+            fontWeight: 600,
+            color: "var(--text-primary)",
+            marginBottom: "0.5rem",
+          }}
+        >
+          {extractedTitle}
+        </h2>
+      )}
 
       {/* Safe plain text content rendering — strictly prevents XSS injection */}
       <div
@@ -183,7 +192,7 @@ export const PostCard: React.FC<PostCardProps> = ({
           marginBottom: "1rem",
         }}
       >
-        {post.content}
+        {displayedContent}
       </div>
 
       {errorMessage && (
@@ -210,33 +219,13 @@ export const PostCard: React.FC<PostCardProps> = ({
         }}
       >
         <div style={{ display: "flex", gap: "1.25rem", alignItems: "center" }}>
-          {/* Like toggle button */}
-          <button
-            type="button"
-            data-testid={`post-like-btn-${post.id}`}
-            aria-label={post.likedByCurrentUser ? "Unlike post" : "Like post"}
-            className="button button-ghost"
-            onClick={handleLikeToggle}
-            disabled={isLikePending}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.35rem",
-              color: post.likedByCurrentUser ? "var(--status-error)" : "var(--text-secondary)",
-              padding: "0.3rem 0.6rem",
-            }}
-          >
-            {isLikePending ? (
-              <Loader2 size={16} className="spin-animation" aria-hidden="true" />
-            ) : (
-              <Heart
-                size={16}
-                fill={post.likedByCurrentUser ? "currentColor" : "none"}
-                aria-hidden="true"
-              />
-            )}
-            <span data-testid={`post-like-count-${post.id}`}>{post.likeCount}</span>
-          </button>
+          {/* Integrated PostLikeButton */}
+          <PostLikeButton
+            postId={post.id}
+            likedByCurrentUser={post.likedByCurrentUser}
+            likeCount={post.likeCount}
+            accessToken={accessToken}
+          />
 
           {/* Comment count link or indicator */}
           {isDetailView ? (
@@ -285,6 +274,13 @@ export const PostCard: React.FC<PostCardProps> = ({
           </Link>
         )}
       </footer>
+
+      {/* Moderation reporting modal dialog */}
+      <ReportDialog
+        postId={post.id}
+        isOpen={isReportOpen}
+        onClose={() => setIsReportOpen(false)}
+      />
     </article>
   );
 };

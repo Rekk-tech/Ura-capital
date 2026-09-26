@@ -1,48 +1,50 @@
-# FEAT-076 Plan: Subscription Experience Integration & Polish
+# FEAT-076 Plan: Community Experience Integration & Polish
 
-Status: PROPOSED FOR HUMAN MASTER PLANNING REVIEW / IMPLEMENTATION_NOT_STARTED
+Status: APPROVED FOR IMPLEMENTATION
+Phase: Phase 9 — Customer MVP UI
 
 ## 1. Preconditions
 
-- Human approves the Phase 9 master plan and FEAT-076 package.
-- Dependencies are satisfied: FEAT-070, FEAT-071, FEAT-057 QA PASS, and Phase 7 Human Final Gate.
-- Work starts from the approved Phase 9 integration baseline in an isolated worktree.
-- The implementation agent confirms zero unrelated dirty changes.
+- Approved baseline: `planning/phase-9-master` with `feat-075-approved` merged.
+- Working branch: `feat/FEAT-076-community-experience`.
+- Phase 8 AI Track remains strictly FROZEN.
+- Zero database migrations (approved total remains 10).
 
-## 2. Delivery Sequence
+## 2. Architecture & Data Flow
 
-1. Freeze consumed contracts and feature-owned file paths.
-2. Implement the eight FRs in task order with tests alongside behavior.
-3. Run targeted security, accessibility, responsive, and contract verification.
-4. Run relevant monorepo regression and authoritative guards.
-5. Publish an exact-source CI-green checkpoint only after the Internal Feature Gate passes.
+```
+[Browser / Learner]
+       │
+       ▼
+ [AppShell / Router] ── (public read allowed, mutations require auth)
+       │
+       ├── /community ────────► CommunityFeedPage
+       │                              ├── Feed Sort Controls (Latest / Popular)
+       │                              ├── PostComposer (rate-limited, char count)
+       │                              └── Feed List (PostCard -> PostLikeButton, ReportDialog)
+       │
+       └── /community/posts/:postId ► PostDetailPage
+                                      ├── Post View (PostCard, back button)
+                                      ├── CommentComposer (rate-limited)
+                                      └── CommentList (CommentCard, author deletion)
+       │
+       ▼
+[use-community.ts Query Hooks] ── (staleTime: 30s, smart retry bypass)
+       │
+       ▼
+[CommunityApiClient] ── (AbortSignal forwarding, error mapping)
+       │
+       ▼
+[Express Server: /api/community/*] ── (PostgreSQL repository, Redis rate limits)
+```
 
-## 3. File Ownership
+## 3. Implementation Order
 
-Owns Subscription learner frontend integration. Excludes provider implementation, checkout/payment collection, admin override, reconciliation UI, invoices/refunds/tax/coupons, and new domain premium gates.
-
-Shared shell, global tokens, root router, and package-manifest changes require integration-owner coordination. No parallel feature may silently rewrite those files.
-
-## 4. Test Strategy
-
-- Unit: pure mapping, state, validation, and safety helpers.
-- Component: interaction, async state, accessibility, and safe rendering.
-- Integration: authenticated API-client and route behavior with authoritative errors.
-- Browser E2E: critical journey at desktop and mobile breakpoints where the feature exposes a route.
-- Regression: owning upstream phase plus auth/session, RBAC/entitlement, and all authoritative guards affected by the diff.
-
-## 5. Migration and Rollback
-
-ZERO database or migration changes. Rollback is application-artifact rollback to the prior approved checkpoint; no database rollback is owned by this feature.
-
-## 6. Risks
-
-- Contract drift between approved APIs and frontend assumptions.
-- Client presentation accidentally treated as authorization or durable authority.
-- Shared-file merge conflicts during parallel work.
-- Incomplete async, mobile, keyboard, or failure-state coverage.
-
-## 7. Exit
-
-Internal Feature Gate PASS requires AC-001..AC-008 PASS, all tasks complete, exact-source CI green, zero P0/P1, truthful evidence, and no scope expansion.
-
+1. **T001 (Route Governance)**: Update `route-registry.ts` to promote `community` and `communityPost` routes to AVAILABLE, `requiresAuth: false`, `owningFeature: "FEAT-076"`. Update `AppShell.tsx` and route tests.
+2. **T002 (API Client & Hooks)**: Audit `community.api.ts` ensuring `AbortSignal` forwarding on all calls. Refine `use-community.ts` with `staleTime: 30_000` and error-aware retry predicates.
+3. **T003 (CommunityFeedPage)**: Add sorting controls (Latest vs Popular), cursor pagination, and all 5 async states.
+4. **T004 (PostComposer)**: Add character counter, validation, pending state lock, and inline 429 banner.
+5. **T005 (PostCard)**: Sanitize content, format dates, link to post detail, integrate like button and report button.
+6. **T006 (PostLikeButton)**: Heart toggle button with atomic count reflection, ARIA accessibility, and auth safeguard.
+7. **T007 (PostDetailPage & Comments)**: Discussion view, back link, threaded comment list, comment composer.
+8. **T008 (Moderation & Quality Gate)**: Basic `ReportDialog`, test suites, and canonical verification pipeline.

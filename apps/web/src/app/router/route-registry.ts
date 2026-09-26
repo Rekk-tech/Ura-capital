@@ -62,6 +62,7 @@ export type RouteKey =
   | "simulation"
   | "portfolio"
   | "community"
+  | "communityPost"
   | "subscription"
   | "account"
   | "login"
@@ -136,11 +137,22 @@ export const ROUTE_REGISTRY: Record<RouteKey, RouteMetadata> = {
     title: "Community Discussions",
     description: "Collaborative investment insights, discussions, and posts.",
     navLabel: "Community",
-    status: "PLANNED",
+    status: "AVAILABLE",
     requiresAuth: false,
     isNavVisible: true,
     section: "community",
-    owningFeature: "FEAT-COMMUNITY",
+    owningFeature: "FEAT-076",
+  },
+  communityPost: {
+    id: "communityPost",
+    path: CANONICAL_ROUTES.COMMUNITY_POST,
+    title: "Community Post Detail",
+    description: "Detailed community discussion thread with comments.",
+    status: "AVAILABLE",
+    requiresAuth: false,
+    isNavVisible: false,
+    section: "community",
+    owningFeature: "FEAT-076",
   },
   subscription: {
     id: "subscription",
@@ -152,7 +164,7 @@ export const ROUTE_REGISTRY: Record<RouteKey, RouteMetadata> = {
     requiresAuth: false,
     isNavVisible: true,
     section: "account",
-    owningFeature: "FEAT-076",
+    owningFeature: "FEAT-SUBSCRIPTION",
   },
   account: {
     id: "account",
@@ -249,6 +261,7 @@ export function findRouteByPath(pathname: string): RouteMetadata | undefined {
   if (normalized.startsWith("/academy")) return ROUTE_REGISTRY.academy;
   if (normalized.startsWith("/simulation")) return ROUTE_REGISTRY.simulation;
   if (normalized.startsWith("/portfolio")) return ROUTE_REGISTRY.portfolio;
+  if (normalized.startsWith("/community/posts/")) return ROUTE_REGISTRY.communityPost;
   if (normalized.startsWith("/community")) return ROUTE_REGISTRY.community;
   if (normalized.startsWith("/subscription")) return ROUTE_REGISTRY.subscription;
   if (normalized.startsWith("/dashboard")) return ROUTE_REGISTRY.dashboard;

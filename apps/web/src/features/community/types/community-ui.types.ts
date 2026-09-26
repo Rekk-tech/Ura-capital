@@ -43,6 +43,7 @@ export interface CommunityCommentFeedResponse {
 }
 
 export interface CreatePostRequestDto {
+  title?: string;
   content: string;
 }
 
