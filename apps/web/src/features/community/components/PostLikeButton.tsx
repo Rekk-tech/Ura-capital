@@ -91,7 +91,7 @@ export const PostLikeButton: React.FC<PostLikeButtonProps> = ({
         onClick={handleToggle}
         disabled={isPending}
         aria-pressed={isLiked}
-        aria-label={isLiked ? `Unlike post (${count} likes)` : `Like post (${count} likes)`}
+        aria-label={isLiked ? "Unlike post" : "Like post"}
         style={{
           display: "inline-flex",
           alignItems: "center",
