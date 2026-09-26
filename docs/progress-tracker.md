@@ -2288,8 +2288,9 @@ Phase 9: ACTIVE / IN PROGRESS
 Strategy: BUILD MVP UI FIRST (Customer Priority)
 FEAT-070: DONE / HUMAN FEATURE GATE APPROVED
 FEAT-071: DONE / HUMAN FEATURE GATE APPROVED
-FEAT-072: IMPLEMENTATION COMPLETE / SELF-VERIFIED (PENDING HUMAN FEATURE GATE)
-FEAT-073..FEAT-080: PENDING
+FEAT-072: DONE / HUMAN FEATURE GATE APPROVED
+FEAT-073: DONE / HUMAN FEATURE GATE APPROVED
+FEAT-074..FEAT-080: PENDING
 ```
 
 ### FEAT-070: Application Shell, Navigation & Route Governance
@@ -2361,7 +2362,7 @@ Phase 9: IN PROGRESS
 Status:
 
 ```text
-FEAT-072: IMPLEMENTATION COMPLETE / SELF-VERIFIED (PENDING HUMAN FEATURE GATE)
+FEAT-072: DONE / HUMAN FEATURE GATE APPROVED
 Planning: HUMAN MASTER PLANNING APPROVED
 Implementation: COMPLETE
 Implementation Owner: ANTIGRAVITY
@@ -2376,14 +2377,49 @@ Production Build: PASS (vite build clean)
 Migration Impact: ZERO (10 migrations total, 0 added)
 Database Mutations: ZERO
 Application Security Invariants: PRESERVED (no client-side authority/entitlement grant, isolated widget errors, memory-only session, bounded composition)
-Human Feature Gate: PENDING
+Human Feature Gate: APPROVED (Explicit Human Authority Decision, 2026-09-25)
+Implementation Commit: 1193a21852edb56950ee0b2b8e8f85f39e3ec015
 Baseline: feat-071-approved (b6e74c679a7852c0099839446be1a017e8b603a1)
 Branch: feat/FEAT-072-learner-dashboard
+Checkpoint Tag: feat-072-approved PUBLISHED
 Implementation Report: reports/implementation/phase-9/FEAT-072.md
 Acceptance Criteria: 8 PASS / 0 FAIL (AC-001..AC-008 PASS)
 Tasks: 8 COMPLETE / 0 OPEN (T001..T008 COMPLETE)
 Outstanding P0/P1 Defects: ZERO
 Dependencies Unblocked: FEAT-073
+Phase 9: IN PROGRESS
+```
+
+### FEAT-073: Academy Experience Integration & Polish
+
+Status:
+
+```text
+FEAT-073: DONE / HUMAN FEATURE GATE APPROVED
+Planning: HUMAN MASTER PLANNING APPROVED
+Implementation: COMPLETE
+Implementation Owner: ANTIGRAVITY
+Implementation Self-Verification: PASS
+Targeted Tests: 4 files / 32 tests PASS
+AppShell Integration: 20 tests PASS
+Full Web Suite: 28 files / 301 tests PASS
+Full API Suite: 66 files / 820 tests PASS
+Typecheck: PASS (workspace clean)
+ESLint: 0 errors / 0 warnings
+Production Build: PASS (vite build clean, 544.89 kB / 154.71 kB gzip)
+Migration Impact: ZERO (10 migrations total, 0 added)
+Database Mutations: ZERO
+Application Security Invariants: PRESERVED (answer secrecy via getProjectedQuiz, server-authoritative progress/XP, token memory-only)
+Human Feature Gate: APPROVED (Explicit Human Authority Decision, 2026-09-26)
+Implementation Commit: 6ed1ab3
+Baseline: feat-072-approved (1193a21852edb56950ee0b2b8e8f85f39e3ec015)
+Branch: feat/FEAT-073-academy-experience
+Checkpoint Tag: feat-073-approved PUBLISHED
+Implementation Report: reports/implementation/phase-9/FEAT-073.md
+Acceptance Criteria: 8 PASS / 0 FAIL (AC-001..AC-008 PASS)
+Tasks: 8 COMPLETE / 0 OPEN (T001..T008 COMPLETE)
+Outstanding P0/P1 Defects: ZERO
+Dependencies Unblocked: FEAT-074
 Phase 9: IN PROGRESS
 ```
 
