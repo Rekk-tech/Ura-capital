@@ -117,6 +117,7 @@ Status: DONE / INTERNAL FEATURE GATE PASS / AWAITING HUMAN APPROVAL
 | Web unit tests (`npm run test:web`) | PASS | 30 test files / 327 tests PASS |
 | Production build (`npm run build`) | PASS | Web bundle 590.11 kB / 164.13 kB gzip |
 | Security guards (5 guards) | PASS | Migration, persistence, boundary, audit-governance, seed-safety |
+| GitHub Actions CI | PASS (✓ 1/1) | Run 36217519161 (Canonical Validation Pipeline, 15/15 steps PASS) |
 
 ### Migration Evidence
 
