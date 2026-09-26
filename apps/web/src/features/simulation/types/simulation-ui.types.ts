@@ -1,4 +1,4 @@
-export type SimulationSessionStatus = "CREATED" | "ACTIVE" | "COMPLETED" | "CANCELLED";
+export type SimulationSessionStatus = "CREATED" | "PENDING" | "ACTIVE" | "COMPLETED" | "CANCELLED";
 
 export interface SimulationSessionDto {
   id: string;
@@ -64,7 +64,7 @@ export interface SimulationPortfolioValuationDto {
 }
 
 export type SimulationOrderSide = "BUY" | "SELL";
-export type SimulationOrderType = "MARKET";
+export type SimulationOrderType = "MARKET" | "LIMIT";
 export type SimulationOrderStatus = "RECEIVED" | "FILLED" | "REJECTED";
 
 export interface SimulationOrderDto {
@@ -104,6 +104,7 @@ export interface SubmitOrderRequestDto {
   assetSymbol: string;
   quantity: number;
   idempotencyKey: string;
+  limitPrice?: string;
 }
 
 export interface AppErrorResponse {

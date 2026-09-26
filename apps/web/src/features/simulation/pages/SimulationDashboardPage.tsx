@@ -19,6 +19,7 @@ import { useAuth } from "../../auth/context/AuthContext";
 import { SimulationDisclosureBanner } from "../components/SimulationDisclosureBanner";
 import { SimulationSessionBar } from "../components/SimulationSessionBar";
 import { PortfolioSummaryCard } from "../components/PortfolioSummaryCard";
+import { MarketPriceView } from "../components/MarketPriceView";
 import { PositionsTable } from "../components/PositionsTable";
 import { MarketOrderTicket } from "../components/MarketOrderTicket";
 import { OrdersTable } from "../components/OrdersTable";
@@ -31,6 +32,7 @@ import {
 } from "../components/SimulationStates";
 import {
   SimulationOrderSide,
+  SimulationOrderType,
   SimulationApiError,
 } from "../types/simulation-ui.types";
 import { Sparkles, PlusCircle } from "lucide-react";
@@ -124,6 +126,8 @@ export const SimulationDashboardPage: React.FC = () => {
     assetSymbol: string,
     quantity: number,
     idempotencyKey: string,
+    orderType: SimulationOrderType = "MARKET",
+    limitPrice?: string,
   ) => {
     if (!activeSessionId) throw new Error("No active session selected");
 
@@ -131,10 +135,11 @@ export const SimulationDashboardPage: React.FC = () => {
       simulationId: activeSessionId,
       order: {
         side,
-        type: "MARKET",
+        type: orderType,
         assetSymbol,
         quantity,
         idempotencyKey,
+        limitPrice,
       },
       accessToken: accessToken ?? undefined,
     });
@@ -267,6 +272,13 @@ export const SimulationDashboardPage: React.FC = () => {
       <div className="simulation-dashboard-grid">
         {/* Left Column: Positions & Market Order Ticket */}
         <div className="dashboard-grid-column">
+          <MarketPriceView
+            assets={assets}
+            snapshots={snapshots}
+            currentCycle={session.currentCycle}
+            onSelectAsset={handleSelectAssetAction}
+          />
+
           <PositionsTable
             positions={portfolio.positions}
             onSelectAsset={handleSelectAssetAction}
@@ -281,6 +293,7 @@ export const SimulationDashboardPage: React.FC = () => {
             isSubmitting={submitOrderMutation.isPending}
             selectedSymbol={selectedSymbol}
             selectedSide={selectedSide}
+            cashBalance={portfolio.cashBalance}
           />
         </div>
 

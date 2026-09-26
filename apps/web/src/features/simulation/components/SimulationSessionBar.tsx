@@ -43,10 +43,11 @@ export const SimulationSessionBar: React.FC<SimulationSessionBarProps> = ({
           </span>
         );
       case "CREATED":
+      case "PENDING":
         return (
           <span className="badge badge-warning" data-testid="session-status-badge">
             <Clock size={13} style={{ marginRight: "4px" }} />
-            READY TO START
+            {status === "PENDING" ? "PENDING" : "READY TO START"}
           </span>
         );
       case "COMPLETED":
@@ -119,7 +120,7 @@ export const SimulationSessionBar: React.FC<SimulationSessionBarProps> = ({
           </div>
         )}
 
-        {session.status === "CREATED" && onStartSession && (
+        {(session.status === "CREATED" || session.status === "PENDING") && onStartSession && (
           <button
             type="button"
             className="button button-success"
@@ -146,7 +147,7 @@ export const SimulationSessionBar: React.FC<SimulationSessionBarProps> = ({
           </button>
         )}
 
-        {(session.status === "ACTIVE" || session.status === "CREATED") && onCancelSession && (
+        {(session.status === "ACTIVE" || session.status === "CREATED" || session.status === "PENDING") && onCancelSession && (
           <button
             type="button"
             className="button button-danger"

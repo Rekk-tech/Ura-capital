@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Send, CheckCircle, AlertCircle, TrendingUp, TrendingDown, HelpCircle } from "lucide-react";
+import { Send, CheckCircle, AlertCircle, TrendingUp, TrendingDown, HelpCircle, Wallet } from "lucide-react";
 import {
   SimulationAssetDto,
   SimulationMarketSnapshotDto,
   SimulationOrderSide,
+  SimulationOrderType,
   SimulationOrderDto,
   SimulationApiError,
 } from "../types/simulation-ui.types";
@@ -18,10 +19,13 @@ interface MarketOrderTicketProps {
     assetSymbol: string,
     quantity: number,
     idempotencyKey: string,
+    orderType?: SimulationOrderType,
+    limitPrice?: string,
   ) => Promise<SimulationOrderDto>;
   isSubmitting?: boolean;
   selectedSymbol?: string;
   selectedSide?: SimulationOrderSide;
+  cashBalance?: string;
 }
 
 export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
@@ -33,14 +37,17 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
   isSubmitting = false,
   selectedSymbol,
   selectedSide = "BUY",
+  cashBalance,
 }) => {
   const [side, setSide] = useState<SimulationOrderSide>(selectedSide);
+  const [orderType, setOrderType] = useState<SimulationOrderType>("MARKET");
   const [symbol, setSymbol] = useState<string>(selectedSymbol ?? (assets[0]?.symbol ?? ""));
   const [quantity, setQuantity] = useState<number>(10);
+  const [limitPrice, setLimitPrice] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successOrder, setSuccessOrder] = useState<SimulationOrderDto | null>(null);
 
-  // Sync external selection from Positions table quick action
+  // Sync external selection from Positions or Market Price table
   useEffect(() => {
     if (selectedSymbol) {
       setSymbol(selectedSymbol);
@@ -64,16 +71,33 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
   const activeSnapshot = snapshots.find((s) => s.asset?.symbol === symbol || s.assetId === activeAsset?.id);
   const currentPrice = activeSnapshot?.price ?? null;
 
-  // Informational estimated notional only (never submitted to backend)
-  const estimatedNotional = currentPrice && !isNaN(Number(currentPrice)) && quantity > 0
-    ? (Number(currentPrice) * quantity).toFixed(4)
+  // Informational estimated notional only (never submitted to backend as authoritative amount)
+  const effectivePrice = orderType === "LIMIT" && limitPrice && !isNaN(Number(limitPrice))
+    ? Number(limitPrice)
+    : currentPrice && !isNaN(Number(currentPrice))
+    ? Number(currentPrice)
+    : 0;
+
+  const estimatedNotional = effectivePrice > 0 && quantity > 0
+    ? (effectivePrice * quantity).toFixed(4)
     : null;
+
+  const numCashBalance = cashBalance && !isNaN(Number(cashBalance)) ? Number(cashBalance) : null;
+  const isExceedingCash = side === "BUY" && numCashBalance !== null && estimatedNotional !== null && Number(estimatedNotional) > numCashBalance;
 
   const isActiveSession = sessionStatus === "ACTIVE";
 
   const handleSideChange = (newSide: SimulationOrderSide) => {
     setSide(newSide);
     setErrorMsg(null);
+  };
+
+  const handleOrderTypeChange = (newType: SimulationOrderType) => {
+    setOrderType(newType);
+    setErrorMsg(null);
+    if (newType === "LIMIT" && !limitPrice && currentPrice) {
+      setLimitPrice(currentPrice);
+    }
   };
 
   const handleSymbolChange = (newSymbol: string) => {
@@ -101,6 +125,11 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
       return;
     }
 
+    if (isExceedingCash) {
+      setErrorMsg(`Order value ($${estimatedNotional}) exceeds available cash balance ($${cashBalance}). Reduce quantity or add funds.`);
+      return;
+    }
+
     setErrorMsg(null);
     setSuccessOrder(null);
 
@@ -110,7 +139,14 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
       : `ord-idem-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
     try {
-      const order = await onSubmitOrder(side, symbol, quantity, idempotencyKey);
+      const order = await onSubmitOrder(
+        side,
+        symbol,
+        quantity,
+        idempotencyKey,
+        orderType,
+        orderType === "LIMIT" ? limitPrice : undefined,
+      );
       setSuccessOrder(order);
     } catch (err: unknown) {
       if (err instanceof SimulationApiError) {
@@ -147,9 +183,20 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
   return (
     <div className="card market-order-ticket" data-testid="market-order-ticket">
       <div className="card-header-flex">
-        <h3 className="card-title">MARKET Order Ticket</h3>
-        <span className="badge badge-info font-mono">MARKET ONLY</span>
+        <h3 className="card-title">Order Ticket</h3>
+        <span className="badge badge-info font-mono" data-testid="ticket-type-badge">
+          {orderType} ORDER
+        </span>
       </div>
+
+      {/* Available Cash Balance Display */}
+      {cashBalance && (
+        <div className="ticket-cash-display" data-testid="ticket-cash-balance" style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "0.75rem" }}>
+          <Wallet size={14} className="text-accent" aria-hidden="true" />
+          <span>Available Purchasing Power:</span>
+          <strong className="font-mono text-primary">${cashBalance}</strong>
+        </div>
+      )}
 
       {!isActiveSession && (
         <div className="ticket-inactive-notice" data-testid="ticket-inactive-banner">
@@ -181,18 +228,20 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
       )}
 
       <form onSubmit={handleSubmit} className="order-form" data-testid="order-form">
-        {/* Side Toggle */}
+        {/* Order Side Toggle (BUY / SELL) */}
         <div className="form-group">
-          <label className="form-label">Order Action</label>
-          <div className="order-side-toggle" role="radiogroup" aria-label="Order Action">
+          <label className="form-label" id="side-label">Order Action</label>
+          <div className="order-side-toggle" role="radiogroup" aria-labelledby="side-label">
             <button
               type="button"
               className={`side-button side-buy ${side === "BUY" ? "active" : ""}`}
               onClick={() => handleSideChange("BUY")}
               disabled={!isActiveSession || isSubmitting}
               data-testid="side-buy-button"
+              aria-checked={side === "BUY"}
+              role="radio"
             >
-              <TrendingUp size={16} style={{ marginRight: "6px" }} />
+              <TrendingUp size={16} style={{ marginRight: "6px" }} aria-hidden="true" />
               BUY
             </button>
             <button
@@ -201,9 +250,40 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
               onClick={() => handleSideChange("SELL")}
               disabled={!isActiveSession || isSubmitting}
               data-testid="side-sell-button"
+              aria-checked={side === "SELL"}
+              role="radio"
             >
-              <TrendingDown size={16} style={{ marginRight: "6px" }} />
+              <TrendingDown size={16} style={{ marginRight: "6px" }} aria-hidden="true" />
               SELL
+            </button>
+          </div>
+        </div>
+
+        {/* Order Type Toggle (MARKET / LIMIT) */}
+        <div className="form-group">
+          <label className="form-label" id="type-label">Order Type</label>
+          <div className="order-side-toggle" role="radiogroup" aria-labelledby="type-label" style={{ gridTemplateColumns: "1fr 1fr" }}>
+            <button
+              type="button"
+              className={`side-button ${orderType === "MARKET" ? "active" : ""}`}
+              onClick={() => handleOrderTypeChange("MARKET")}
+              disabled={!isActiveSession || isSubmitting}
+              data-testid="type-market-button"
+              aria-checked={orderType === "MARKET"}
+              role="radio"
+            >
+              MARKET
+            </button>
+            <button
+              type="button"
+              className={`side-button ${orderType === "LIMIT" ? "active" : ""}`}
+              onClick={() => handleOrderTypeChange("LIMIT")}
+              disabled={!isActiveSession || isSubmitting}
+              data-testid="type-limit-button"
+              aria-checked={orderType === "LIMIT"}
+              role="radio"
+            >
+              LIMIT
             </button>
           </div>
         </div>
@@ -228,13 +308,33 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
           </select>
         </div>
 
-        {/* Current Snapshot Price Display (Informational Reference) */}
+        {/* Current Snapshot Price Display */}
         <div className="ticker-price-preview" data-testid="ticket-price-preview">
           <span className="price-preview-label">Authoritative Snapshot Price</span>
           <span className="price-preview-value font-mono">
             {currentPrice ? `$${currentPrice}` : "Awaiting Market Snapshot"}
           </span>
         </div>
+
+        {/* Limit Price Input when LIMIT is chosen */}
+        {orderType === "LIMIT" && (
+          <div className="form-group" data-testid="limit-price-group">
+            <label htmlFor="limit-price-input" className="form-label">Limit Price ($)</label>
+            <input
+              id="limit-price-input"
+              type="number"
+              className="input-text font-mono"
+              step="0.0001"
+              min="0.0001"
+              value={limitPrice}
+              onChange={(e) => setLimitPrice(e.target.value)}
+              disabled={!isActiveSession || isSubmitting}
+              data-testid="limit-price-input"
+              aria-label="Limit Price in USD"
+              placeholder={currentPrice ?? "Enter limit price"}
+            />
+          </div>
+        )}
 
         {/* Quantity Input */}
         <div className="form-group">
@@ -259,10 +359,24 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
 
         {/* Estimated Notional Preview */}
         {estimatedNotional && (
-          <div className="estimated-notional-box" data-testid="estimated-notional">
-            <span className="notional-label">Estimated Notional</span>
-            <span className="notional-value font-mono">${estimatedNotional}</span>
-            <span className="notional-disclaimer">Informational display only. Final execution occurs at authoritative server price.</span>
+          <div
+            className={`estimated-notional-box ${isExceedingCash ? "estimated-notional-warning" : ""}`}
+            data-testid="estimated-notional"
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span className="notional-label">Estimated Notional</span>
+              <span className="notional-value font-mono" data-testid="estimated-notional-value">
+                ${estimatedNotional}
+              </span>
+            </div>
+            {isExceedingCash && (
+              <span className="notional-warning-text" data-testid="cash-exceeded-warning" style={{ color: "var(--status-error)", fontSize: "0.8rem", display: "block", marginTop: "4px" }}>
+                Exceeds available cash balance (${cashBalance}).
+              </span>
+            )}
+            <span className="notional-disclaimer">
+              Informational display only. Final execution occurs at authoritative server price.
+            </span>
           </div>
         )}
 
@@ -270,11 +384,11 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
         <button
           type="submit"
           className={`button order-submit-btn ${side === "BUY" ? "button-success" : "button-error"}`}
-          disabled={!isActiveSession || isSubmitting || quantity <= 0}
+          disabled={!isActiveSession || isSubmitting || quantity <= 0 || isExceedingCash}
           data-testid="submit-order-button"
         >
-          <Send size={16} style={{ marginRight: "8px" }} />
-          {isSubmitting ? "Submitting Order..." : `Place ${side} Order`}
+          <Send size={16} style={{ marginRight: "8px" }} aria-hidden="true" />
+          {isSubmitting ? "Submitting Order..." : `Place ${side} ${orderType} Order`}
         </button>
       </form>
     </div>

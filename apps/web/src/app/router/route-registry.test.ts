@@ -50,6 +50,8 @@ describe("Route Registry (FEAT-070 / AC-001)", () => {
     const simulation = findRouteByPath("/simulation");
     expect(simulation?.id).toBe("simulation");
     expect(simulation?.owningFeature).toBe("FEAT-074");
+    expect(simulation?.status).toBe("AVAILABLE");
+    expect(simulation?.requiresAuth).toBe(true);
 
     const unknown = findRouteByPath("/unknown-route");
     expect(unknown).toBeUndefined();

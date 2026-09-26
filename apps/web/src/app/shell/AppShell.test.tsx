@@ -7,6 +7,7 @@ import { AuthUser } from "../../api/auth.api";
 import { AppShell } from "./AppShell";
 import { RouteErrorBoundary } from "../components/RouteErrorBoundary";
 import { academyApi } from "../../features/academy/api/academyApi";
+import { simulationApi } from "../../features/simulation/api/simulationApi";
 
 const createTestQueryClient = () =>
   new QueryClient({
@@ -315,6 +316,36 @@ describe("AppShell & Route Governance (FEAT-070 / AC-001..AC-008)", () => {
       expect(
         await screen.findByRole("heading", { level: 1, name: "Introduction to Investing" }),
       ).toBeDefined();
+    });
+  });
+
+  describe("FEAT-074 Route Resolution (AC-001)", () => {
+    it("renders deterministic auth-required guard at /simulation when unauthenticated", () => {
+      renderShell("/simulation", null, null);
+      expect(screen.getByRole("heading", { name: /please sign in/i })).toBeDefined();
+      expect(screen.getByText("Authentication Required")).toBeDefined();
+      expect(screen.getByRole("link", { name: /sign in to continue/i }).getAttribute("href")).toBe(
+        "/login?returnTo=%2Fsimulation"
+      );
+    });
+
+    it("renders SimulationDashboardPage at /simulation within shell when authenticated", async () => {
+      vi.spyOn(simulationApi, "listSessions").mockResolvedValue({
+        data: [],
+      });
+      vi.spyOn(simulationApi, "listAssets").mockResolvedValue({
+        data: [],
+      });
+
+      renderShell("/simulation", "mock-token", {
+        id: "usr-sim-123",
+        email: "simtrader@auracapital.io",
+        displayName: "Sim Trader",
+        status: "ACTIVE",
+      });
+
+      expect(await screen.findByTestId("simulation-page")).toBeDefined();
+      expect(screen.getByTestId("simulation-disclosure-banner")).toBeDefined();
     });
   });
 });
