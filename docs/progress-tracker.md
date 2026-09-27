@@ -2295,7 +2295,8 @@ FEAT-075: DONE / HUMAN FEATURE GATE APPROVED
 FEAT-076: DONE / HUMAN FEATURE GATE APPROVED
 FEAT-077: DONE / HUMAN FEATURE GATE APPROVED
 FEAT-078: DEFERRED (Phase 8 AI Isolation)
-FEAT-079..FEAT-080: PENDING
+FEAT-079: DONE / HUMAN FEATURE GATE APPROVED
+FEAT-080: PENDING
 ```
 
 ### FEAT-070: Application Shell, Navigation & Route Governance
@@ -2562,6 +2563,40 @@ Tasks: 8 COMPLETE / 0 OPEN (T001..T008 COMPLETE)
 Outstanding P0/P1 Defects: ZERO
 Remote GitHub Actions CI: PASS (Run 36323637586, 15/15 steps PASS)
 Dependencies Unblocked: FEAT-079, FEAT-080
+Phase 9: IN PROGRESS
+```
+
+### FEAT-079: Learning Path & Course Player UI
+
+Status:
+
+```text
+FEAT-079: DONE / HUMAN FEATURE GATE APPROVED
+Planning: HUMAN MASTER PLANNING APPROVED
+Implementation: COMPLETE
+Implementation Owner: ANTIGRAVITY
+Implementation Self-Verification: PASS
+Targeted Tests: 5 files / 72 tests PASS
+AppShell Integration: 33 tests PASS (+2 new FEAT-079 tests)
+Full Web Suite: 47 files / 434 tests PASS (+25 new tests)
+Typecheck: PASS (workspace clean)
+ESLint: 0 errors / 0 warnings
+Production Build: PASS (vite build clean, 737.20 kB / 191.81 kB gzip)
+Migration Impact: ZERO (10 migrations total, 0 added)
+Database Mutations: ZERO
+Application Security Invariants: PRESERVED (strict server authority, prerequisite locks enforced, DOMPurify XSS sanitization, mandatory audit notice)
+Phase 8 AI Track: FROZEN (zero Gemini/AI imports or calls)
+Human Feature Gate: APPROVED (Explicit Human Authority Decision, 2026-09-27)
+Implementation Commit: d407a8d
+Baseline: feat-077-approved (76df341)
+Branch: feat/FEAT-079-learning-path-player-ui
+Checkpoint Tag: feat-079-approved PUBLISHED
+Implementation Report: reports/implementation/phase-9/FEAT-079.md
+Acceptance Criteria: 8 PASS / 0 FAIL (AC-001..AC-008 PASS)
+Tasks: 8 COMPLETE / 0 OPEN (T001..T008 COMPLETE)
+Outstanding P0/P1 Defects: ZERO
+Remote GitHub Actions CI: PASS (Run 36325850694, 15/15 steps PASS)
+Dependencies Unblocked: FEAT-080
 Phase 9: IN PROGRESS
 ```
 
