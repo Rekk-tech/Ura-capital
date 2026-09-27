@@ -9,6 +9,7 @@ import { RouteErrorBoundary } from "../components/RouteErrorBoundary";
 import { academyApi } from "../../features/academy/api/academyApi";
 import { simulationApi } from "../../features/simulation/api/simulationApi";
 import { communityApi } from "../../api/community.api";
+import { adminApi } from "../../api/admin.api";
 
 const createTestQueryClient = () =>
   new QueryClient({
@@ -148,11 +149,11 @@ describe("AppShell & Route Governance (FEAT-070 / AC-001..AC-008)", () => {
       expect(screen.getByRole("link", { name: /open simulation/i })).toBeDefined();
     });
 
-    it("renders planned route placeholder for /admin without claiming ready", () => {
-      renderShell("/admin");
-      expect(screen.getByRole("heading", { name: /admin control surface/i })).toBeDefined();
+    it("renders planned route placeholder for /subscription without claiming ready", () => {
+      renderShell("/subscription");
+      expect(screen.getByRole("heading", { name: /subscription & tiers/i })).toBeDefined();
       expect(screen.getByText("Planned for MVP Release")).toBeDefined();
-      expect(screen.getByText("FEAT-077")).toBeDefined();
+      expect(screen.getByText("FEAT-076")).toBeDefined();
       expect(screen.getByRole("link", { name: /return to home/i })).toBeDefined();
     });
 
@@ -477,5 +478,64 @@ describe("AppShell & Route Governance (FEAT-070 / AC-001..AC-008)", () => {
       expect(screen.getByText(/Authentication Required/i)).toBeDefined();
     });
   });
+
+  describe("FEAT-077 Route Resolution & RBAC Guarding (AC-001, AC-002)", () => {
+    it("redirects unauthenticated visitor at /admin to /login?returnTo=%2Fadmin", () => {
+      renderShell("/admin", null, null);
+      // Unauthenticated access must redirect to login
+      expect(screen.getByRole("heading", { name: /sign in to aura capital/i })).toBeDefined();
+    });
+
+    it("renders deterministic 403 Forbidden view at /admin for authenticated non-admin learner", () => {
+      renderShell("/admin", "learner-token", {
+        id: "usr-learner-1",
+        email: "learner@auracapital.io",
+        displayName: "Standard Learner",
+        status: "ACTIVE",
+        role: "LEARNER",
+      });
+
+      expect(screen.getByTestId("admin-forbidden-view")).toBeDefined();
+      expect(screen.getByRole("heading", { name: /administrative access denied/i })).toBeDefined();
+      expect(screen.getByText(/403 Forbidden/i)).toBeDefined();
+      expect(screen.getByTestId("server-authority-notice")).toBeDefined();
+      expect(screen.getByRole("link", { name: /return to learner dashboard/i })).toBeDefined();
+      // Ensure administrative control surface is NOT exposed
+      expect(screen.queryByTestId("admin-dashboard-page")).toBeNull();
+    });
+
+    it("renders AdminDashboardPage at /admin for authenticated admin user", async () => {
+      vi.spyOn(adminApi, "getSystemMetrics").mockResolvedValue({
+        data: {
+          totalUsers: 120,
+          activeUsers24h: 35,
+          activeSimulationSessions: 14,
+          flaggedContentCount: 2,
+          pendingReviewCount: 2,
+          systemHealth: "HEALTHY",
+          uptimeSeconds: 7200,
+          databaseStatus: "CONNECTED",
+          lastAuditTimestamp: "2026-09-27T00:00:00Z",
+        },
+      });
+
+      renderShell("/admin", "admin-token", {
+        id: "usr-admin-1",
+        email: "admin@auracapital.io",
+        displayName: "Super Admin",
+        status: "ACTIVE",
+        role: "ADMIN",
+      });
+
+      expect(await screen.findByTestId("admin-dashboard-page")).toBeDefined();
+      expect(screen.getByRole("heading", { name: "Admin Control Surface" })).toBeDefined();
+      expect(screen.getByTestId("server-authority-notice")).toBeDefined();
+      expect(screen.getByTestId("admin-tab-overview")).toBeDefined();
+      expect(screen.getByTestId("admin-tab-users")).toBeDefined();
+      expect(screen.getByTestId("admin-tab-moderation")).toBeDefined();
+      expect(screen.getByTestId("admin-tab-audit")).toBeDefined();
+    });
+  });
 });
+
 

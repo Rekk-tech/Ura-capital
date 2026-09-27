@@ -25,6 +25,8 @@ export interface RouteMetadata {
   status: RouteStatus;
   /** Whether the route requires an authenticated user session */
   requiresAuth: boolean;
+  /** Optional role required to access the route (e.g. ADMIN) */
+  requiredRole?: string;
   /** Whether to render in the primary navigation header */
   isNavVisible: boolean;
   /** Route category/section */
@@ -52,6 +54,9 @@ export const CANONICAL_ROUTES = {
   LOGIN: "/login",
   REGISTER: "/register",
   ADMIN: "/admin",
+  ADMIN_USERS: "/admin/users",
+  ADMIN_MODERATION: "/admin/moderation",
+  ADMIN_AUDIT: "/admin/audit",
   AI_COACH: "/ai",
 } as const;
 
@@ -68,6 +73,9 @@ export type RouteKey =
   | "login"
   | "register"
   | "admin"
+  | "adminUsers"
+  | "adminModeration"
+  | "adminAudit"
   | "ai";
 
 export const ROUTE_REGISTRY: Record<RouteKey, RouteMetadata> = {
@@ -206,9 +214,47 @@ export const ROUTE_REGISTRY: Record<RouteKey, RouteMetadata> = {
     id: "admin",
     path: CANONICAL_ROUTES.ADMIN,
     title: "Admin Control Surface",
-    description: "Administrative access verification.",
-    status: "PLANNED",
+    description: "System overview, operational metrics, and governance control desk.",
+    navLabel: "Admin",
+    status: "AVAILABLE",
     requiresAuth: true,
+    requiredRole: "ADMIN",
+    isNavVisible: false,
+    section: "admin",
+    owningFeature: "FEAT-077",
+  },
+  adminUsers: {
+    id: "adminUsers",
+    path: CANONICAL_ROUTES.ADMIN_USERS,
+    title: "User Management — Admin",
+    description: "User directory, status management, and role oversight.",
+    status: "AVAILABLE",
+    requiresAuth: true,
+    requiredRole: "ADMIN",
+    isNavVisible: false,
+    section: "admin",
+    owningFeature: "FEAT-077",
+  },
+  adminModeration: {
+    id: "adminModeration",
+    path: CANONICAL_ROUTES.ADMIN_MODERATION,
+    title: "Content Moderation — Admin",
+    description: "Community content review and moderation queue.",
+    status: "AVAILABLE",
+    requiresAuth: true,
+    requiredRole: "ADMIN",
+    isNavVisible: false,
+    section: "admin",
+    owningFeature: "FEAT-077",
+  },
+  adminAudit: {
+    id: "adminAudit",
+    path: CANONICAL_ROUTES.ADMIN_AUDIT,
+    title: "Security & Audit Log — Admin",
+    description: "Immutable administrative action audit trail.",
+    status: "AVAILABLE",
+    requiresAuth: true,
+    requiredRole: "ADMIN",
     isNavVisible: false,
     section: "admin",
     owningFeature: "FEAT-077",
@@ -266,6 +312,9 @@ export function findRouteByPath(pathname: string): RouteMetadata | undefined {
   if (normalized.startsWith("/subscription")) return ROUTE_REGISTRY.subscription;
   if (normalized.startsWith("/dashboard")) return ROUTE_REGISTRY.dashboard;
   if (normalized.startsWith("/account")) return ROUTE_REGISTRY.account;
+  if (normalized.startsWith("/admin/users")) return ROUTE_REGISTRY.adminUsers;
+  if (normalized.startsWith("/admin/moderation")) return ROUTE_REGISTRY.adminModeration;
+  if (normalized.startsWith("/admin/audit")) return ROUTE_REGISTRY.adminAudit;
   if (normalized.startsWith("/admin")) return ROUTE_REGISTRY.admin;
   if (normalized.startsWith("/login")) return ROUTE_REGISTRY.login;
   if (normalized.startsWith("/register")) return ROUTE_REGISTRY.register;

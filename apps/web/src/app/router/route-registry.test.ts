@@ -22,6 +22,9 @@ describe("Route Registry (FEAT-070 / AC-001)", () => {
     expect(paths).toContain("/login");
     expect(paths).toContain("/register");
     expect(paths).toContain("/admin");
+    expect(paths).toContain("/admin/users");
+    expect(paths).toContain("/admin/moderation");
+    expect(paths).toContain("/admin/audit");
     expect(paths).toContain("/ai");
   });
 
@@ -73,6 +76,28 @@ describe("Route Registry (FEAT-070 / AC-001)", () => {
     expect(communityPost?.status).toBe("AVAILABLE");
     expect(communityPost?.requiresAuth).toBe(false);
 
+    const admin = findRouteByPath("/admin");
+    expect(admin?.id).toBe("admin");
+    expect(admin?.owningFeature).toBe("FEAT-077");
+    expect(admin?.status).toBe("AVAILABLE");
+    expect(admin?.requiresAuth).toBe(true);
+    expect(admin?.requiredRole).toBe("ADMIN");
+
+    const adminUsers = findRouteByPath("/admin/users");
+    expect(adminUsers?.id).toBe("adminUsers");
+    expect(adminUsers?.owningFeature).toBe("FEAT-077");
+    expect(adminUsers?.status).toBe("AVAILABLE");
+    expect(adminUsers?.requiresAuth).toBe(true);
+    expect(adminUsers?.requiredRole).toBe("ADMIN");
+
+    const adminMod = findRouteByPath("/admin/moderation");
+    expect(adminMod?.id).toBe("adminModeration");
+    expect(adminMod?.requiredRole).toBe("ADMIN");
+
+    const adminAudit = findRouteByPath("/admin/audit");
+    expect(adminAudit?.id).toBe("adminAudit");
+    expect(adminAudit?.requiredRole).toBe("ADMIN");
+
     const unknown = findRouteByPath("/unknown-route");
     expect(unknown).toBeUndefined();
   });
@@ -89,5 +114,6 @@ describe("Route Registry (FEAT-070 / AC-001)", () => {
     expect(isRouteActive("/academy/lesson-1", "/academy")).toBe(true);
     expect(isRouteActive("/simulation/trades", "/simulation")).toBe(true);
     expect(isRouteActive("/community", "/simulation")).toBe(false);
+    expect(isRouteActive("/admin/users", "/admin")).toBe(true);
   });
 });

@@ -2293,7 +2293,9 @@ FEAT-073: DONE / HUMAN FEATURE GATE APPROVED
 FEAT-074: DONE / HUMAN FEATURE GATE APPROVED
 FEAT-075: DONE / HUMAN FEATURE GATE APPROVED
 FEAT-076: DONE / HUMAN FEATURE GATE APPROVED
-FEAT-077..FEAT-080: PENDING
+FEAT-077: IMPLEMENTED / READY FOR HUMAN FEATURE GATE REVIEW
+FEAT-078: DEFERRED (Phase 8 AI Isolation)
+FEAT-079..FEAT-080: PENDING
 ```
 
 ### FEAT-070: Application Shell, Navigation & Route Governance
@@ -2526,6 +2528,37 @@ Acceptance Criteria: 8 PASS / 0 FAIL (AC-001..AC-008 PASS)
 Tasks: 8 COMPLETE / 0 OPEN (T001..T008 COMPLETE)
 Outstanding P0/P1 Defects: ZERO
 Dependencies Unblocked: FEAT-077
+Phase 9: IN PROGRESS
+```
+
+### FEAT-077: Admin Control Surface UI
+
+Status:
+
+```text
+FEAT-077: IMPLEMENTED / READY FOR HUMAN FEATURE GATE REVIEW
+Planning: HUMAN MASTER PLANNING APPROVED
+Implementation: COMPLETE
+Implementation Owner: ANTIGRAVITY
+Implementation Self-Verification: PASS
+Targeted Tests: 5 files / 39 tests PASS
+AppShell Integration: 31 tests PASS (+3 new FEAT-077 tests)
+Full Web Suite: 45 files / 409 tests PASS (+42 new tests)
+Typecheck: PASS (workspace clean)
+ESLint: 0 errors / 0 warnings
+Production Build: PASS (vite build clean, 703.12 kB / 185.10 kB gzip)
+Migration Impact: ZERO (10 migrations total, 0 added)
+Database Mutations: ZERO
+Application Security Invariants: PRESERVED (strict server-authoritative RBAC, deterministic 403 Forbidden for non-admins, unauthenticated redirect to login, mandatory audit notice)
+Phase 8 AI Track: FROZEN (zero Gemini/AI imports or calls)
+Human Feature Gate: PENDING HUMAN REVIEW
+Baseline: feat-076-approved (b409562)
+Branch: feat/FEAT-077-admin-control-surface
+Implementation Report: reports/implementation/phase-9/FEAT-077.md
+Acceptance Criteria: 8 PASS / 0 FAIL (AC-001..AC-008 PASS)
+Tasks: 8 COMPLETE / 0 OPEN (T001..T008 COMPLETE)
+Outstanding P0/P1 Defects: ZERO
+Dependencies Unblocked: FEAT-079, FEAT-080
 Phase 9: IN PROGRESS
 ```
 

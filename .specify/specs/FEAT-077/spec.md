@@ -1,58 +1,48 @@
-# FEAT-077 Specification: Admin Access Boundary & Existing Capability Surface
+# FEAT-077 Specification: Admin Control Surface UI
 
-Status: PROPOSED FOR HUMAN MASTER PLANNING REVIEW / IMPLEMENTATION_NOT_STARTED
+Status: IN_PROGRESS (Feature Implementation Branch: feat/FEAT-077-admin-control-surface)
 
 ## 1. Architecture Contract
 
-- Objective: Provide a minimal, fail-closed admin access/status surface over the existing PostgreSQL-authorized ADMIN guard without inventing administrative product capabilities.
-- API: Consumes existing authenticated `GET /admin/ping` or its approved canonical alias only. No admin mutation/read API is invented.
-- Persistence: ZERO database or migration changes.
-- Security: PostgreSQL is the sole ADMIN authority; JWT remains role-free; client navigation or cached account data never authorizes; 401/403/5xx fail closed.
-- Ownership: Owns `/admin` status/access presentation only. Excludes CMS, moderation, role/user/subscription mutation, audit viewing, support override, reconciliation, and default credentials.
+- Objective: Provide a comprehensive, server-authoritative, fail-closed Admin Control Surface UI for Aura Capital operations.
+- Routes & Navigation:
+  - Canonical entry route: `/admin` (promoted to `AVAILABLE`, `requiresAuth: true`, `requiredRole: "ADMIN"`, `owningFeature: "FEAT-077"`).
+  - Sub-views / tabs: Overview (System Metrics), User Management (`/admin/users`), Content Moderation (`/admin/moderation`), Security Audit Log (`/admin/audit`).
+- Security & RBAC:
+  - Server-authoritative verification: Initial validation checks session authentication and queries `GET /admin/ping` (or user role claim validated by server).
+  - Unauthenticated access redirects to `/login?returnTo=%2Fadmin`.
+  - Authenticated non-admin learners receive a deterministic 403 Forbidden / Access Denied view without exposing administrative controls or issuing unauthorized queries to admin data endpoints.
+- Network & Caching:
+  - TanStack Query hooks with `staleTime: 30_000` (30s) and `refetchOnWindowFocus: false`.
+  - Suppress automated retries on 401 Unauthorized, 403 Forbidden, and 404 Not Found.
+  - Native `AbortSignal` plumbed across all fetch methods in `AdminApiClient`.
+- Persistence & Invariants:
+  - ZERO database migrations (approved total remains exactly 10).
+  - Phase 8 AI track remains strictly FROZEN.
+  - All administrative actions display mandatory Server Authority Disclosures.
 
-## 2. Functional Contract
+## 2. Functional Requirements
 
-### FR-001
+### FR-001: Route Governance & Sub-route Promotion
+Promote `/admin` from `PLANNED` to `AVAILABLE` in `route-registry.ts`. Register sub-routes (`/admin/users`, `/admin/moderation`, `/admin/audit`). Enforce `requiresAuth: true`, `requiredRole: "ADMIN"`, and `owningFeature: "FEAT-077"`.
 
-Add a canonical `/admin` route only after Human approves the minimal existing-capability scope.
+### FR-002: Authoritative RBAC Guarding
+Mount `<AdminRoutes />` in `AppShell.tsx` protected by `<AdminRouteGuard>`. Ensure unauthenticated users are directed to sign in with return path, and authenticated non-admin users receive a deterministic 403 Access Denied view with zero unauthorized query leakage.
 
-### FR-002
+### FR-003: Operational Overview Dashboard
+Provide system metrics (total registered users, active sessions, moderation queue count, system health status), quick links, and responsive tabs for switching control surface views.
 
-Authenticate through the approved session and verify access through the existing server admin guard.
+### FR-004: User Management Surface
+Present paginated, searchable, and filterable table of registered users with User ID, Display Name, Email, Role, Status, and Created Date. Support user status toggle (Suspend / Reactivate) with accessible confirmation dialog.
 
-### FR-003
+### FR-005: Content Moderation Desk
+Queue of reported community items (posts, comments) displaying report reason, flag count, and preview snippet. Support moderation actions ("Dismiss Report", "Hide/Delete Content") with server confirmation.
 
-Render distinct safe unauthenticated, denied, allowed, and unavailable states without role enumeration leakage.
+### FR-006: Audit Log Inspection Table
+Read-only table of administrative and security events (event type, actor ID, target entity, timestamp, status). Render mandatory Server Authority Notice: "All administrative actions and role evaluations are strictly server-authoritative and immutably audited."
 
-### FR-004
+### FR-007: Safe State & Network Handling
+Cleanly handle all 5 async UI states across all admin panels: Loading (skeleton), Empty, Auth/Role-required (403), Error (with retry button), and Success. Ensure `AdminApiClient` passes `AbortSignal` and hooks suppress retries on 401/403/404.
 
-Ensure zero-role, USER-only, and ROOT-only users cannot gain ADMIN access through client state.
-
-### FR-005
-
-Reflect same-token ADMIN grant/removal immediately by rechecking server authority.
-
-### FR-006
-
-Expose no administrative command, role-management, CMS, moderation, subscription, audit, or repair operation.
-
-### FR-007
-
-Meet responsive, keyboard, focus, semantic, contrast, and announcement requirements.
-
-### FR-008
-
-Test server-authority, spoof resistance, fail-closed errors, route security, and regressions.
-
-## 3. State and Error Contract
-
-Every networked view must distinguish loading, success, empty where meaningful, authentication-required, authorization-denied, not-found, validation/rate-limit/unavailable, and generic failure as applicable. UI copy must be safe, bounded, and must not expose stack traces, provider details, database details, secrets, tokens, cookies, or sensitive paths.
-
-## 4. Data and Authority Contract
-
-ZERO database or migration changes. Browser state and query caches are presentation mechanisms only. Server denials and owning-domain facts override stale client state.
-
-## 5. Quality Gate
-
-All ACs must pass, targeted tests must be deterministic, relevant earlier-phase regressions and repository checks must remain green, exact-source CI must succeed, and there must be no open P0/P1. Self-verification is not independent QA.
-
+### FR-008: Accessibility & Responsive Standards
+Ensure single H1 heading per view, valid heading hierarchy, keyboard accessible actions (Tab/Enter/Space/Escape), focus trap in confirmation modals, `@media (prefers-reduced-motion: reduce)`, and responsive layout from 320px+ with zero horizontal overflow.

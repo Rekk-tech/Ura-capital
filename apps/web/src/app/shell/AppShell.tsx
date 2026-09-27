@@ -16,9 +16,10 @@ import { SimulationRoutes } from "../router/simulation-routes";
 import { ProtectedRoute } from "../../features/auth/components/ProtectedRoute";
 import { PortfolioPage } from "../../features/portfolio/pages/PortfolioPage";
 import { CommunityRoutes } from "../router/community-routes";
+import { AdminRoutes } from "../../features/admin/routes/admin-routes";
 
 /**
- * FEAT-070 / FEAT-071 / FEAT-072 / FEAT-073 / FEAT-074 / FEAT-075: Standard Application Shell
+ * FEAT-070 / FEAT-071 / FEAT-072 / FEAT-073 / FEAT-074 / FEAT-075 / FEAT-076 / FEAT-077: Standard Application Shell
  *
  * Provides:
  * - Skip to main content link for keyboard & screen reader accessibility
@@ -69,11 +70,10 @@ export const AppShell: React.FC = () => {
             {/* Authenticated Dashboard (FEAT-072) */}
             <Route path="/dashboard" element={<DashboardPage />} />
 
+            {/* Admin Control Surface UI (FEAT-077) */}
+            <Route path="/admin/*" element={<AdminRoutes />} />
+
             {/* Honest Planned MVP Placeholders */}
-            <Route
-              path="/admin"
-              element={<PlannedRoutePlaceholder route={ROUTE_REGISTRY.admin} />}
-            />
             <Route
               path="/ai"
               element={<PlannedRoutePlaceholder route={ROUTE_REGISTRY.ai} />}

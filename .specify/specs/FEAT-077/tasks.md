@@ -1,23 +1,19 @@
-# FEAT-077 Tasks: Admin Access Boundary & Existing Capability Surface
+# FEAT-077 Tasks: Admin Control Surface UI
 
-Status: PROPOSED FOR HUMAN MASTER PLANNING REVIEW / NOT_STARTED
+Status: COMPLETED (Feature Implementation Branch: feat/FEAT-077-admin-control-surface)
 
 | Task | Work | Requirement | Acceptance | State |
 |---|---|---|---|---|
-| T001 | Record P9-D05 and add the canonical minimal admin route only after approval. | FR-001 | AC-001 | TODO |
-| T002 | Wire the route to existing session authentication and server admin guard contract. | FR-002 | AC-002 | TODO |
-| T003 | Implement safe unauthenticated/denied/allowed/unavailable state presentation. | FR-003 | AC-003 | TODO |
-| T004 | Add client spoof and non-ADMIN role denial probes. | FR-004 | AC-004 | TODO |
-| T005 | Add same-token server-side ADMIN grant/removal refresh behavior. | FR-005 | AC-005 | TODO |
-| T006 | Add static/runtime checks proving no admin operation surface was introduced. | FR-006 | AC-006 | TODO |
-| T007 | Implement responsive/accessibility behavior using shared primitives. | FR-007 | AC-007 | TODO |
-| T008 | Add targeted tests, run the approved feature gate, and record exact evidence. | FR-008 | AC-008 | TODO |
+| T001 | Route Governance: Promote `/admin` to `AVAILABLE`, register sub-routes (`/admin/users`, `/admin/moderation`, `/admin/audit`), configure `requiresAuth: true`, `requiredRole: "ADMIN"`, and `owningFeature: "FEAT-077"` in `route-registry.ts` and `route-registry.test.ts`. | FR-001 | AC-001 | COMPLETED |
+| T002 | RBAC Guarding: Implement `<AdminRouteGuard>` and `<AdminRoutes />`, wire into `AppShell.tsx`, redirect unauthenticated to `/login?returnTo=%2Fadmin`, and render deterministic 403 Forbidden view for non-admin users without dispatching administrative queries. | FR-002 | AC-002 | COMPLETED |
+| T003 | API Client & Hooks: Implement `AdminApiClient` with `verifyAdminAccess`, `getSystemMetrics`, `listUsers`, `updateUserStatus`, `listModerationQueue`, `resolveModerationItem`, `listAuditRecords`, forwarding `AbortSignal`. Create TanStack Query hooks in `use-admin.ts` with `staleTime: 30_000`, `refetchOnWindowFocus: false`, and retry suppression on 401, 403, 404. | FR-007 | AC-007 | COMPLETED |
+| T004 | Admin Dashboard View: Build `AdminDashboardPage.tsx` with high-level operational overview, system metrics cards, tabbed navigation, 5 async states, and Server Authority Notice banner. | FR-003 | AC-003 | COMPLETED |
+| T005 | User Management Panel: Build `AdminUserTable.tsx` with user list, search by email/name, filter by status, and suspend/reactivate action with accessible confirmation modal. | FR-004 | AC-004 | COMPLETED |
+| T006 | Content Moderation Desk: Build `AdminModerationQueue.tsx` with flagged items list, snippet preview, report count, and dismiss/hide resolution actions. | FR-005 | AC-005 | COMPLETED |
+| T007 | Audit Log Inspection: Build `AdminAuditLogTable.tsx` displaying immutable security and administrative events with timestamp, actor, event type, and status. | FR-006 | AC-006 | COMPLETED |
+| T008 | Testing & Quality Gate: Unit and component test suites (`admin.api.test.ts`, `AdminDashboardPage.test.tsx`, `AdminUserTable.test.tsx`, `AdminModerationQueue.test.tsx`, accessibility tests), lint, typecheck, build, and implementation report. | FR-008 | AC-008 | COMPLETED |
 
 ## Dependency Order
 
-T001 establishes the feature entry contract. T002-T007 follow in order where they touch shared behavior; independent test fixtures may be prepared in parallel. T008 closes validation and evidence only after T001-T007 are complete.
-
-## Traceability Rule
-
-No task may be marked complete without evidence for its mapped FR and AC. New scope requires Human review rather than silent task insertion.
-
+T001 -> T002 -> T003 -> T004 -> T005 -> T006 -> T007 -> T008.
+All tasks strictly maintain zero DB migrations and Phase 8 AI isolation.
