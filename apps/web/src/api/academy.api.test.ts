@@ -346,6 +346,226 @@ describe("AcademyApiClient (Unit/Contract - AC-002, AC-012)", () => {
       expect(result).toEqual(mockAnswer);
     });
   });
+
+  describe("FEAT-079: getLearningPath", () => {
+    it("returns direct server response when /api/academy/learning-path succeeds", async () => {
+      const mockRoadmap = {
+        data: {
+          tracks: [
+            {
+              id: "beginner-track",
+              title: "Beginner Foundations",
+              level: "BEGINNER" as const,
+              description: "Core market concepts",
+              milestones: [
+                {
+                  courseSlug: "intro-1",
+                  courseTitle: "Intro 1",
+                  description: "Basics",
+                  level: "BEGINNER" as const,
+                  order: 1,
+                  lessonCount: 3,
+                  prerequisites: [],
+                  status: "AVAILABLE" as const,
+                  completedLessons: 0,
+                  progressPercent: 0,
+                },
+              ],
+            },
+          ],
+          totalCourses: 1,
+          completedCourses: 0,
+          overallProgressPercent: 0,
+          activeCourseSlug: "intro-1",
+        },
+      };
+
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => mockRoadmap,
+      });
+      globalThis.fetch = fetchMock;
+
+      const abortController = new AbortController();
+      const res = await client.getLearningPath("test-token", { signal: abortController.signal });
+
+      expect(fetchMock).toHaveBeenCalledWith("/api/academy/learning-path", {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Authorization: "Bearer test-token",
+        },
+        signal: abortController.signal,
+      });
+      expect(res).toEqual(mockRoadmap);
+    });
+
+    it("synthesizes sequenced roadmap when /learning-path returns 404", async () => {
+      const mockCourses = {
+        data: [
+          { slug: "intro", title: "Intro", description: "Desc", level: "BEGINNER", order: 1, lessonCount: 2 },
+          { slug: "adv-1", title: "Adv 1", description: "Desc", level: "ADVANCED", order: 1, lessonCount: 4 },
+        ],
+        pagination: { page: 1, limit: 100, total: 2, totalPages: 1 },
+      };
+
+      const mockProgress = {
+        data: {
+          courseSlug: "intro",
+          completedLessons: 2,
+          totalLessons: 2,
+          progressPercent: 100,
+          status: "COMPLETED" as const,
+          completed: true,
+          completedAt: "2026-09-27T00:00:00Z",
+          lessons: [
+            { lessonSlug: "l1", status: "COMPLETED" as const, completed: true, completedAt: null },
+            { lessonSlug: "l2", status: "COMPLETED" as const, completed: true, completedAt: null },
+          ],
+        },
+      };
+
+      const fetchMock = vi.fn().mockImplementation((url: string) => {
+        if (url === "/api/academy/learning-path") {
+          return Promise.resolve({ ok: false, status: 404, json: async () => ({}) });
+        }
+        if (url.includes("/courses?")) {
+          return Promise.resolve({ ok: true, json: async () => mockCourses });
+        }
+        if (url.includes("/courses/intro/progress")) {
+          return Promise.resolve({ ok: true, json: async () => mockProgress });
+        }
+        return Promise.resolve({ ok: false, status: 404, json: async () => ({}) });
+      });
+      globalThis.fetch = fetchMock;
+
+      const result = await client.getLearningPath("test-token");
+      expect(result.data.tracks).toHaveLength(3);
+      const beginnerTrack = result.data.tracks.find((t) => t.level === "BEGINNER");
+      expect(beginnerTrack?.milestones).toHaveLength(1);
+      expect(beginnerTrack?.milestones[0]?.status).toBe("COMPLETED");
+      expect(result.data.completedCourses).toBe(1);
+    });
+  });
+
+  describe("FEAT-079: getCourseLessons", () => {
+    it("computes sequential lock states and progression flags", async () => {
+      const mockCourse = {
+        data: {
+          slug: "market-intro",
+          title: "Market Intro",
+          description: "Desc",
+          level: "BEGINNER" as const,
+          order: 1,
+          lessons: [
+            { slug: "lesson-1", title: "Lesson 1", order: 1 },
+            { slug: "lesson-2", title: "Lesson 2", order: 2 },
+            { slug: "lesson-3", title: "Lesson 3", order: 3 },
+          ],
+        },
+      };
+
+      const mockProgress = {
+        data: {
+          courseSlug: "market-intro",
+          completedLessons: 1,
+          totalLessons: 3,
+          progressPercent: 33,
+          status: "IN_PROGRESS" as const,
+          completed: false,
+          completedAt: null,
+          lessons: [
+            { lessonSlug: "lesson-1", status: "COMPLETED" as const, completed: true, completedAt: null },
+          ],
+        },
+      };
+
+      const fetchMock = vi.fn().mockImplementation((url: string) => {
+        if (url.endsWith("/courses/market-intro")) {
+          return Promise.resolve({ ok: true, json: async () => mockCourse });
+        }
+        if (url.endsWith("/courses/market-intro/progress")) {
+          return Promise.resolve({ ok: true, json: async () => mockProgress });
+        }
+        return Promise.resolve({ ok: false, status: 404 });
+      });
+      globalThis.fetch = fetchMock;
+
+      const res = await client.getCourseLessons("market-intro", "test-token");
+      expect(res.data.lessons).toHaveLength(3);
+      // Lesson 1: completed, unlocked
+      expect(res.data.lessons[0]?.isCompleted).toBe(true);
+      expect(res.data.lessons[0]?.isLocked).toBe(false);
+      // Lesson 2: not completed, unlocked because Lesson 1 was completed
+      expect(res.data.lessons[1]?.isCompleted).toBe(false);
+      expect(res.data.lessons[1]?.isLocked).toBe(false);
+      // Lesson 3: locked because Lesson 2 is NOT completed
+      expect(res.data.lessons[2]?.isCompleted).toBe(false);
+      expect(res.data.lessons[2]?.isLocked).toBe(true);
+      expect(res.data.lessons[2]?.prerequisiteLessonSlug).toBe("lesson-2");
+    });
+  });
+
+  describe("FEAT-079: getLessonContent and markLessonComplete", () => {
+    it("getLessonContent proxies to getLessonBySlug", async () => {
+      const mockLesson = {
+        data: {
+          courseSlug: "market-intro",
+          slug: "lesson-1",
+          title: "Lesson 1",
+          content: "# Lesson 1 Content",
+          order: 1,
+        },
+      };
+
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => mockLesson,
+      });
+      globalThis.fetch = fetchMock;
+
+      const res = await client.getLessonContent("market-intro", "lesson-1", "token-xyz");
+      expect(res).toEqual(mockLesson);
+      expect(fetchMock).toHaveBeenCalledWith(
+        "/api/academy/courses/market-intro/lessons/lesson-1",
+        expect.objectContaining({
+          method: "GET",
+          headers: expect.objectContaining({
+            Authorization: "Bearer token-xyz",
+          }),
+        }),
+      );
+    });
+
+    it("markLessonComplete proxies to completeLesson", async () => {
+      const mockComplete = {
+        data: {
+          lessonSlug: "lesson-1",
+          status: "COMPLETED" as const,
+          completed: true,
+          completedAt: "2026-09-27T00:00:00Z",
+        },
+      };
+
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => mockComplete,
+      });
+      globalThis.fetch = fetchMock;
+
+      const res = await client.markLessonComplete("market-intro", "lesson-1", "token-xyz");
+      expect(res).toEqual(mockComplete);
+      expect(fetchMock).toHaveBeenCalledWith(
+        "/api/academy/courses/market-intro/lessons/lesson-1/complete",
+        expect.objectContaining({
+          method: "POST",
+          headers: expect.objectContaining({
+            Authorization: "Bearer token-xyz",
+          }),
+        }),
+      );
+    });
+  });
 });
 
 

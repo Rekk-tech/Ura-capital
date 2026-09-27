@@ -1,58 +1,94 @@
-# FEAT-079 Specification: Accessibility, Responsive & Async-State Hardening
+# FEAT-079 Specification: Learning Path & Course Player UI
 
-Status: PROPOSED FOR HUMAN MASTER PLANNING REVIEW / IMPLEMENTATION_NOT_STARTED
+Status: IN_PROGRESS / ASSIGNED TO ANTIGRAVITY
+Target Reviewer: Human Authority
 
-## 1. Architecture Contract
+## 1. Architecture & Boundaries
 
-- Objective: Perform a controlled cross-product remediation pass so every Human-approved Phase 9 surface has complete accessibility, responsive, and asynchronous-state behavior.
-- API: No new API. Existing responses may be exercised to verify all UI states; no contract is changed.
-- Persistence: ZERO database or migration changes.
-- Security: Hardening must not weaken authentication, authorization, entitlement, sanitization, rate limits, error privacy, or server authority to simplify UX.
-- Ownership: Owns shared tokens/components and scoped UI remediation across included surfaces after their feature checkpoints. Excludes new product behavior, API/schema changes, domain redesign, and Phase 10 production hardening.
+- **Objective**: Provide a comprehensive visual curriculum roadmap (`/academy/learning-path`) and an immersive, distraction-free Course Player (`/academy/courses/:courseSlug/player/:lessonSlug`) adhering to strict server-authoritative progression.
+- **Route Governance**: Promote `/academy/learning-path` and `/academy/courses/:courseSlug/player/:lessonSlug` from `PLANNED` to `AVAILABLE` under `owningFeature: "FEAT-079"`.
+- **Server Authority**: Lesson completion, unlock rules, XP rewards, and course milestones must be derived directly from server DTOs. Client caches serve presentation purposes only.
+- **XSS & Content Sanitization**: Educational markdown must be parsed with raw HTML suppression and sanitized through DOMPurify before rendering.
+- **Phase 8 AI Isolation**: AI track remains 100% FROZEN. No Gemini or AI gateway calls permitted.
+- **Persistence Boundary**: Exactly 10 migrations total; ZERO schema changes or database migrations.
 
 ## 2. Functional Contract
 
-### FR-001
+### FR-001: Route Governance & Availability Promotion
+- Register `ACADEMY_LEARNING_PATH` (`/academy/learning-path`) and `ACADEMY_COURSE_PLAYER` (`/academy/courses/:courseSlug/player/:lessonSlug`) in `route-registry.ts`.
+- Set `status: "AVAILABLE"`, `owningFeature: "FEAT-079"`, and section `"learning"`.
+- Update `route-registry.test.ts` and `AppShell.test.tsx` to assert learning path route resolution and metadata.
 
-Create a complete route/component inventory for accessibility, responsive, and asynchronous-state coverage.
+### FR-002: Academy API Client Enhancements
+- In `AcademyApiClient` (`apps/web/src/features/academy/api/academyApi.ts` & `apps/web/src/api/academy.api.ts`):
+  - `getLearningPath(accessToken?, options?)`: Retrieves sequenced roadmap with tracks (`BEGINNER`, `INTERMEDIATE`, `ADVANCED`), milestones, and prerequisite statuses.
+  - `getCourseLessons(courseSlug, accessToken?, options?)`: Retrieves ordered lessons with completion statuses and lock states.
+  - `getLessonContent(courseSlug, lessonSlug, accessToken?, options?)`: Retrieves sanitized lesson detail.
+  - `markLessonComplete(courseSlug, lessonSlug, accessToken?, options?)`: Dispatches server-authoritative lesson completion.
+  - Native `AbortSignal` forwarding across all fetch calls.
 
-### FR-002
+### FR-003: Resilient TanStack Query Hooks
+- In `apps/web/src/features/academy/hooks/use-academy.ts`:
+  - `useLearningPathQuery(accessToken?)`: Configured with `staleTime: 30_000`, `refetchOnWindowFocus: false`.
+  - `useCourseLessonsQuery(courseSlug, accessToken?)`: Cached lesson outline with prerequisite lock states.
+  - `useLessonContentQuery(courseSlug, lessonSlug, accessToken?)`: Content query.
+  - `useMarkLessonCompleteMutation()`: Invalidation of progress, learning path, lesson, and XP queries on success.
+  - Retry suppression: Immediate suppression of retries on 401, 403, and 404 HTTP errors.
 
-Consolidate semantic color, typography, spacing, focus, motion, and layout tokens without a one-note palette or inaccessible contrast.
+### FR-004: Visual Learning Roadmap (`LearningPathPage.tsx`)
+- Render visual curriculum roadmap across milestone tracks:
+  - Track tabs or sections: Beginner Foundations, Intermediate Strategies, Advanced Mastery.
+  - Course cards showing title, description, level, lesson count, progress percentage, and status (`LOCKED`, `AVAILABLE`, `IN_PROGRESS`, `COMPLETED`).
+  - Active course callout highlighting learner's current milestone.
+  - Handles all 5 async UI states:
+    1. Loading (roadmap skeleton)
+    2. Empty (no courses available)
+    3. Auth-Required (informational card prompting login to track personal progress)
+    4. Error (error alert with retry trigger)
+    5. Success (curriculum roadmap)
+  - Explicit Server Authority Disclosure notice rendered.
 
-### FR-003
+### FR-005: Immersive Course Player (`CoursePlayerView.tsx`)
+- Distraction-free split-pane reading layout:
+  - **Left Sidebar**:
+    - Course title & back-to-roadmap link.
+    - Overall course progress bar with percentage and completed/total lesson counts.
+    - Collapsible syllabus with ordered chapters/lessons.
+    - Status indicators: Completed checkmark, Active reading indicator, Locked padlock.
+    - Toggle collapse button for focused reading on smaller screens.
+  - **Main Reading Panel**:
+    - Lesson position label ("Lesson X of Y") and lesson title.
+    - Markdown body rendered safely via `LessonContent.tsx` / DOMPurify.
+  - **Bottom Control Bar**:
+    - "Previous Lesson" button (disabled on first lesson).
+    - "Mark as Completed" / "Complete & Continue" button triggering authoritative mutation.
+    - "Next Lesson" button (disabled on last lesson or if next lesson is locked).
 
-Verify keyboard navigation, logical focus order, visible focus, focus restoration, landmarks, headings, labels, and live announcements.
+### FR-006: Prerequisite Lock Enforcement & Progression
+- Sequential lesson progression:
+  - The first lesson of an unlocked course is always accessible.
+  - Subsequent lessons remain locked until preceding lessons are completed.
+  - Direct navigation to a locked lesson URL displays an accessible locked state informing the learner of required prerequisites, without rendering unauthorized content.
+- "Complete & Continue" button triggers `markLessonComplete` mutation, invalidates query caches, and transitions automatically to the next unlocked lesson.
 
-### FR-004
+### FR-007: Server Authority Disclosures
+- Prominently render server authority notice on both Learning Path and Course Player views:
+  *"All course completions, module unlock states, and XP rewards are evaluated exclusively server-authoritatively."*
 
-Verify mobile, tablet, and desktop layouts with stable dimensions, no incoherent overlap, and no unintended horizontal overflow.
+### FR-008: Accessibility & Responsive Standards
+- Single `<h1>` per view, semantic hierarchy (`<h2>`, `<h3>`).
+- Full keyboard operability (Tab, Enter, Space, Escape).
+- ARIA landmarks (`nav`, `main`, `aside`, `role="progressbar"`).
+- Prefers-reduced-motion media query respected.
+- Responsive layout down to 320px with zero horizontal scroll overflow.
 
-### FR-005
+## 3. Data & State Matrix
 
-Complete loading, success, empty, auth-required, denied, not-found, validation, conflict, rate-limit, unavailable, and generic error states where applicable.
-
-### FR-006
-
-Respect reduced-motion and avoid animation-dependent meaning, layout shift, or inaccessible transient feedback.
-
-### FR-007
-
-Run automated accessibility/responsive checks plus documented manual keyboard, zoom, and screen-reader-oriented review.
-
-### FR-008
-
-Re-run all included domain security/authority regressions and publish truthful remediation evidence.
-
-## 3. State and Error Contract
-
-Every networked view must distinguish loading, success, empty where meaningful, authentication-required, authorization-denied, not-found, validation/rate-limit/unavailable, and generic failure as applicable. UI copy must be safe, bounded, and must not expose stack traces, provider details, database details, secrets, tokens, cookies, or sensitive paths.
-
-## 4. Data and Authority Contract
-
-ZERO database or migration changes. Browser state and query caches are presentation mechanisms only. Server denials and owning-domain facts override stale client state.
-
-## 5. Quality Gate
-
-All ACs must pass, targeted tests must be deterministic, relevant earlier-phase regressions and repository checks must remain green, exact-source CI must succeed, and there must be no open P0/P1. Self-verification is not independent QA.
-
+| State | Learning Path Page | Course Player View |
+|---|---|---|
+| **Loading** | Animated milestone track skeletons | Player sidebar + reading panel skeletons |
+| **Empty** | "No courses available in this track" empty card | "No lessons found in this course" state |
+| **Auth-Required** | Guest view with progress tracking notice | Guest preview or sign-in prompt for progress recording |
+| **Locked** | Padlock badge, prerequisite requirement notice | Locked lesson view with prerequisite completion prompt |
+| **Error** | Error banner with retry trigger | Error state with retry trigger |
+| **Success** | Interactive curriculum roadmap | Immersive syllabus + content + controls |

@@ -536,6 +536,98 @@ describe("AppShell & Route Governance (FEAT-070 / AC-001..AC-008)", () => {
       expect(screen.getByTestId("admin-tab-audit")).toBeDefined();
     });
   });
+
+  describe("FEAT-079 Route Resolution (AC-001)", () => {
+    it("renders LearningPathPage at /academy/learning-path within shell", async () => {
+      vi.spyOn(academyApi, "getLearningPath").mockResolvedValue({
+        data: {
+          tracks: [
+            {
+              id: "beginner-track",
+              title: "Beginner Foundations",
+              level: "BEGINNER",
+              description: "Foundational investments",
+              milestones: [
+                {
+                  courseSlug: "intro-investing",
+                  courseTitle: "Introduction to Investing",
+                  description: "Basics",
+                  level: "BEGINNER",
+                  order: 1,
+                  lessonCount: 3,
+                  prerequisites: [],
+                  status: "AVAILABLE",
+                  completedLessons: 0,
+                  progressPercent: 0,
+                },
+              ],
+            },
+          ],
+          totalCourses: 1,
+          completedCourses: 0,
+          overallProgressPercent: 0,
+          activeCourseSlug: "intro-investing",
+        },
+      });
+
+      renderShell("/academy/learning-path");
+      expect(
+        await screen.findByRole("heading", { level: 1, name: /financial learning path/i }),
+      ).toBeDefined();
+      expect(screen.getByTestId("server-authority-notice")).toBeDefined();
+    });
+
+    it("renders CoursePlayerView at /academy/courses/:courseSlug/player/:lessonSlug within shell", async () => {
+      vi.spyOn(academyApi, "getCourseBySlug").mockResolvedValue({
+        data: {
+          slug: "intro-investing",
+          title: "Introduction to Investing",
+          description: "Core concepts",
+          level: "BEGINNER",
+          order: 1,
+          lessons: [
+            { slug: "lesson-1", title: "What is an Asset?", order: 1 },
+          ],
+        },
+      });
+
+      vi.spyOn(academyApi, "getCourseLessons").mockResolvedValue({
+        data: {
+          courseSlug: "intro-investing",
+          courseTitle: "Introduction to Investing",
+          lessons: [
+            {
+              slug: "lesson-1",
+              title: "What is an Asset?",
+              order: 1,
+              isCompleted: false,
+              isLocked: false,
+              prerequisiteLessonSlug: null,
+            },
+          ],
+          completedCount: 0,
+          totalCount: 1,
+          progressPercent: 0,
+        },
+      });
+
+      vi.spyOn(academyApi, "getLessonBySlug").mockResolvedValue({
+        data: {
+          courseSlug: "intro-investing",
+          slug: "lesson-1",
+          title: "What is an Asset?",
+          content: "## Assets and Capital\nAn asset provides future economic benefit.",
+          order: 1,
+          progress: null,
+        },
+      });
+
+      renderShell("/academy/courses/intro-investing/player/lesson-1");
+      expect(await screen.findByTestId("course-player-view")).toBeDefined();
+      expect(screen.getByTestId("player-lesson-title")).toBeDefined();
+      expect(screen.getByTestId("player-server-authority-notice")).toBeDefined();
+    });
+  });
 });
 
 

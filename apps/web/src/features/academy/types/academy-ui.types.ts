@@ -184,6 +184,67 @@ export interface LearnerXpDto {
   totalXp: number;
 }
 
+// FEAT-079: Learning Path & Course Player UI Types
+export type MilestoneStatus = "LOCKED" | "AVAILABLE" | "IN_PROGRESS" | "COMPLETED";
 
+export interface LearningPathMilestoneDto {
+  courseSlug: string;
+  courseTitle: string;
+  description: string | null;
+  level: CourseLevel;
+  order: number;
+  lessonCount: number;
+  prerequisites: string[];
+  status: MilestoneStatus;
+  completedLessons: number;
+  progressPercent: number;
+}
 
+export interface LearningPathTrackDto {
+  id: string;
+  title: string;
+  level: CourseLevel;
+  description: string;
+  milestones: LearningPathMilestoneDto[];
+}
 
+export interface LearningPathResponseDto {
+  tracks: LearningPathTrackDto[];
+  totalCourses: number;
+  completedCourses: number;
+  overallProgressPercent: number;
+  activeCourseSlug: string | null;
+}
+
+export interface PlayerLessonDto {
+  slug: string;
+  title: string;
+  order: number;
+  isCompleted: boolean;
+  isLocked: boolean;
+  prerequisiteLessonSlug?: string | null;
+}
+
+export interface CourseLessonsResponseDto {
+  courseSlug: string;
+  courseTitle: string;
+  lessons: PlayerLessonDto[];
+  completedCount: number;
+  totalCount: number;
+  progressPercent: number;
+}
+
+export type LearningPathViewState =
+  | "LOADING"
+  | "SUCCESS"
+  | "EMPTY"
+  | "AUTH_REQUIRED"
+  | "ERROR";
+
+export type CoursePlayerViewState =
+  | "LOADING"
+  | "SUCCESS"
+  | "LOCKED"
+  | "NOT_FOUND"
+  | "AUTH_REQUIRED"
+  | "ERROR";

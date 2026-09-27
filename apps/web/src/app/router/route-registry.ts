@@ -44,6 +44,8 @@ export const CANONICAL_ROUTES = {
   ACADEMY_COURSE: "/academy/courses/:courseSlug",
   ACADEMY_LESSON: "/academy/courses/:courseSlug/lessons/:lessonSlug",
   ACADEMY_FLASHCARDS: "/academy/courses/:courseSlug/lessons/:lessonSlug/flashcards",
+  ACADEMY_LEARNING_PATH: "/academy/learning-path",
+  ACADEMY_COURSE_PLAYER: "/academy/courses/:courseSlug/player/:lessonSlug",
   SIMULATION: "/simulation",
   SIMULATION_SESSION: "/simulation/sessions/:simulationId",
   PORTFOLIO: "/portfolio",
@@ -64,6 +66,8 @@ export type RouteKey =
   | "home"
   | "dashboard"
   | "academy"
+  | "academyLearningPath"
+  | "academyCoursePlayer"
   | "simulation"
   | "portfolio"
   | "community"
@@ -114,6 +118,29 @@ export const ROUTE_REGISTRY: Record<RouteKey, RouteMetadata> = {
     isNavVisible: true,
     section: "learning",
     owningFeature: "FEAT-073",
+  },
+  academyLearningPath: {
+    id: "academyLearningPath",
+    path: CANONICAL_ROUTES.ACADEMY_LEARNING_PATH,
+    title: "Learning Path Roadmap",
+    description: "Sequenced financial learning curriculum and prerequisite roadmap.",
+    navLabel: "Learning Path",
+    status: "AVAILABLE",
+    requiresAuth: false,
+    isNavVisible: false,
+    section: "learning",
+    owningFeature: "FEAT-079",
+  },
+  academyCoursePlayer: {
+    id: "academyCoursePlayer",
+    path: CANONICAL_ROUTES.ACADEMY_COURSE_PLAYER,
+    title: "Course Player",
+    description: "Immersive distraction-free lesson reading and sequential curriculum player.",
+    status: "AVAILABLE",
+    requiresAuth: false,
+    isNavVisible: false,
+    section: "learning",
+    owningFeature: "FEAT-079",
   },
   simulation: {
     id: "simulation",
@@ -304,6 +331,8 @@ export function findRouteByPath(pathname: string): RouteMetadata | undefined {
   if (exact) return exact;
 
   // Prefix match for nested routes
+  if (normalized.startsWith("/academy/courses/") && normalized.includes("/player/")) return ROUTE_REGISTRY.academyCoursePlayer;
+  if (normalized === "/academy/learning-path" || normalized.startsWith("/academy/learning-path")) return ROUTE_REGISTRY.academyLearningPath;
   if (normalized.startsWith("/academy")) return ROUTE_REGISTRY.academy;
   if (normalized.startsWith("/simulation")) return ROUTE_REGISTRY.simulation;
   if (normalized.startsWith("/portfolio")) return ROUTE_REGISTRY.portfolio;

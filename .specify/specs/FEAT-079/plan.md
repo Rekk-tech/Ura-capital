@@ -1,48 +1,38 @@
-# FEAT-079 Plan: Accessibility, Responsive & Async-State Hardening
+# FEAT-079 Plan: Learning Path & Course Player UI
 
-Status: PROPOSED FOR HUMAN MASTER PLANNING REVIEW / IMPLEMENTATION_NOT_STARTED
+Status: IN_PROGRESS / ASSIGNED TO ANTIGRAVITY
 
-## 1. Preconditions
+## 1. Delivery Architecture
 
-- Human approves the Phase 9 master plan and FEAT-079 package.
-- Dependencies are satisfied: FEAT-070 and all FEAT-071 through FEAT-078 surfaces included in the Human-approved MVP cut.
-- Work starts from the approved Phase 9 integration baseline in an isolated worktree.
-- The implementation agent confirms zero unrelated dirty changes.
+1. **Route Governance & Shell Integration**:
+   - Register `ACADEMY_LEARNING_PATH` (`/academy/learning-path`) and `ACADEMY_COURSE_PLAYER` (`/academy/courses/:courseSlug/player/:lessonSlug`) in `apps/web/src/app/router/route-registry.ts`.
+   - Mount routes in `apps/web/src/app/router/academy-routes.tsx`.
+   - Update tests in `route-registry.test.ts` and `AppShell.test.tsx`.
 
-## 2. Delivery Sequence
+2. **Types & API Client**:
+   - Define learning path DTOs (`LearningPathTrackDto`, `LearningPathMilestoneDto`, `PlayerLessonDto`, `CoursePlayerDetailsDto`) in `academy-ui.types.ts`.
+   - Add `getLearningPath`, `getCourseLessons`, `getLessonContent`, and `markLessonComplete` to `AcademyApiClient` in `academyApi.ts`.
+   - Forward `AbortSignal` across all requests.
+   - Unit test methods in `academy.api.test.ts`.
 
-1. Freeze consumed contracts and feature-owned file paths.
-2. Implement or execute the eight FRs in task order with tests/evidence alongside work.
-3. Run targeted security, accessibility, responsive, and contract verification.
-4. Run relevant monorepo regression and authoritative guards.
-5. Publish an exact-source CI-green checkpoint or QA result only after the defined gate passes.
+3. **TanStack Query Hooks**:
+   - Add `useLearningPathQuery`, `useCourseLessonsQuery`, `useLessonContentQuery`, and `useMarkLessonCompleteMutation` to `use-academy.ts`.
+   - Apply `shouldRetry` preventing retry loops on 401/403/404.
 
-## 3. File Ownership
+4. **Visual Learning Roadmap**:
+   - Create `LearningPathPage.tsx` under `apps/web/src/features/academy/pages/`.
+   - Implement milestone tracks (Beginner, Intermediate, Advanced) with prerequisite checks, active course highlight, and progress bars.
+   - Support all 5 async UI states: Loading, Empty, Auth-Required, Error, and Success.
+   - Component test in `LearningPathPage.test.tsx`.
 
-Owns shared tokens/components and scoped UI remediation across included surfaces after their feature checkpoints. Excludes new product behavior, API/schema changes, domain redesign, and Phase 10 production hardening.
+5. **Immersive Course Player**:
+   - Create `CoursePlayerView.tsx` under `apps/web/src/features/academy/components/` (and/or `LessonPlayerPage.tsx` page).
+   - Implement split-pane layout with collapsible syllabus, chapters, completion checkmarks, active lesson indicator, and course progress bar.
+   - Render sanitized markdown body via DOMPurify (`LessonContent.tsx`).
+   - Implement bottom control bar with Previous, Complete & Continue, and Next controls.
+   - Enforce sequential progression and prerequisite lock states.
+   - Component test in `CoursePlayerView.test.tsx`.
 
-Shared shell, global tokens, root router, and package-manifest changes require integration-owner coordination. No parallel feature may silently rewrite those files.
-
-## 4. Test Strategy
-
-- Unit: pure mapping, state, validation, and safety helpers where implementation exists.
-- Component: interaction, async state, accessibility, and safe rendering.
-- Integration: authenticated API-client and route behavior with authoritative errors.
-- Browser E2E: critical journey at desktop and mobile breakpoints.
-- Regression: owning upstream phases plus auth/session, RBAC/entitlement, and all authoritative guards affected by the source.
-
-## 5. Migration and Rollback
-
-ZERO database or migration changes. No database rollback is owned by this feature.
-
-## 6. Risks
-
-- Contract drift between approved APIs and frontend assumptions.
-- Client presentation accidentally treated as authorization or durable authority.
-- Shared-file merge conflicts during parallel work.
-- Incomplete async, mobile, keyboard, or failure-state coverage.
-
-## 7. Exit
-
-The feature gate requires AC-001..AC-008 PASS, all tasks complete, exact-source CI green, zero P0/P1, truthful evidence, and no scope expansion. A validation-only gate must not repair defects itself.
-
+6. **Accessibility & Quality Verification**:
+   - Single H1 per view, semantic heading structure, keyboard operability, ARIA landmark roles, and responsive layout from 320px+ with zero horizontal overflow.
+   - Run `npm run lint`, `npm run typecheck`, `npm run test:web`, `npm run build`, and repository guards.

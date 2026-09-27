@@ -311,6 +311,12 @@ export function useCompleteLessonMutation() {
         queryKey: ["academy", "course-progress", variables.courseSlug],
       });
       queryClient.invalidateQueries({
+        queryKey: ["academy", "course-lessons", variables.courseSlug],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["academy", "learning-path"],
+      });
+      queryClient.invalidateQueries({
         queryKey: ["academy", "lesson", variables.courseSlug, variables.lessonSlug],
       });
       queryClient.invalidateQueries({
@@ -331,5 +337,78 @@ export function useMyXpQuery(accessToken?: string) {
     staleTime: ACADEMY_QUERY_OPTIONS.staleTime,
     refetchOnWindowFocus: ACADEMY_QUERY_OPTIONS.refetchOnWindowFocus,
     retry: false,
+  });
+}
+
+// FEAT-079: Learning Path Curriculum Roadmap Query Hook
+export function useLearningPathQuery(accessToken?: string | null) {
+  return useQuery({
+    queryKey: ["academy", "learning-path", accessToken ?? undefined],
+    queryFn: ({ signal }) => academyApi.getLearningPath(accessToken ?? undefined, { signal }),
+    staleTime: ACADEMY_QUERY_OPTIONS.staleTime,
+    refetchOnWindowFocus: ACADEMY_QUERY_OPTIONS.refetchOnWindowFocus,
+    gcTime: ACADEMY_QUERY_OPTIONS.gcTime,
+    retry: shouldRetry,
+  });
+}
+
+// FEAT-079: Course Player Lesson Outline with Lock States Query Hook
+export function useCourseLessonsQuery(courseSlug: string | undefined, accessToken?: string | null) {
+  return useQuery({
+    queryKey: ["academy", "course-lessons", courseSlug, accessToken ?? undefined],
+    queryFn: ({ signal }) => {
+      if (!courseSlug) throw new Error("Course slug is required");
+      return academyApi.getCourseLessons(courseSlug, accessToken ?? undefined, { signal });
+    },
+    enabled: Boolean(courseSlug),
+    staleTime: ACADEMY_QUERY_OPTIONS.staleTime,
+    refetchOnWindowFocus: ACADEMY_QUERY_OPTIONS.refetchOnWindowFocus,
+    gcTime: ACADEMY_QUERY_OPTIONS.gcTime,
+    retry: shouldRetry,
+  });
+}
+
+// FEAT-079: Lesson Content Query Hook (alias with typed contract)
+export function useLessonContentQuery(
+  courseSlug: string | undefined,
+  lessonSlug: string | undefined,
+  accessToken?: string | null,
+) {
+  return useLessonQuery(courseSlug, lessonSlug, accessToken ?? undefined);
+}
+
+// FEAT-079: Mark Lesson Complete Mutation Hook
+export function useMarkLessonCompleteMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      courseSlug,
+      lessonSlug,
+      accessToken,
+    }: {
+      courseSlug: string;
+      lessonSlug: string;
+      accessToken?: string | null;
+    }) => academyApi.markLessonComplete(courseSlug, lessonSlug, accessToken ?? undefined),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["academy", "course-progress", variables.courseSlug],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["academy", "course-lessons", variables.courseSlug],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["academy", "learning-path"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["academy", "lesson", variables.courseSlug, variables.lessonSlug],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["academy", "me", "xp"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["dashboard"],
+      });
+    },
   });
 }

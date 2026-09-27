@@ -14,6 +14,8 @@ describe("Route Registry (FEAT-070 / AC-001)", () => {
     expect(paths).toContain("/");
     expect(paths).toContain("/dashboard");
     expect(paths).toContain("/academy");
+    expect(paths).toContain("/academy/learning-path");
+    expect(paths).toContain("/academy/courses/:courseSlug/player/:lessonSlug");
     expect(paths).toContain("/simulation");
     expect(paths).toContain("/portfolio");
     expect(paths).toContain("/community");
@@ -97,6 +99,16 @@ describe("Route Registry (FEAT-070 / AC-001)", () => {
     const adminAudit = findRouteByPath("/admin/audit");
     expect(adminAudit?.id).toBe("adminAudit");
     expect(adminAudit?.requiredRole).toBe("ADMIN");
+
+    const learningPath = findRouteByPath("/academy/learning-path");
+    expect(learningPath?.id).toBe("academyLearningPath");
+    expect(learningPath?.owningFeature).toBe("FEAT-079");
+    expect(learningPath?.status).toBe("AVAILABLE");
+
+    const coursePlayer = findRouteByPath("/academy/courses/personal-finance/player/budgeting-basics");
+    expect(coursePlayer?.id).toBe("academyCoursePlayer");
+    expect(coursePlayer?.owningFeature).toBe("FEAT-079");
+    expect(coursePlayer?.status).toBe("AVAILABLE");
 
     const unknown = findRouteByPath("/unknown-route");
     expect(unknown).toBeUndefined();
