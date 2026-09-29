@@ -18,6 +18,7 @@ import { ProtectedRoute } from "../../features/auth/components/ProtectedRoute";
 import { PortfolioPage } from "../../features/portfolio/pages/PortfolioPage";
 import { CommunityRoutes } from "../router/community-routes";
 import { AdminRoutes } from "../../features/admin/routes/admin-routes";
+import { ProfileSettingsPage } from "../../features/profile/pages/ProfileSettingsPage";
 
 /**
  * FEAT-070 / FEAT-071 / FEAT-072 / FEAT-073 / FEAT-074 / FEAT-075 / FEAT-076 / FEAT-077: Standard Application Shell
@@ -68,6 +69,22 @@ export const AppShell: React.FC = () => {
 
             {/* Authenticated Account Profile & Auth Entry Surfaces (FEAT-071) */}
             <Route path="/account" element={<AccountPage />} />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <ProfileSettingsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <ProfileSettingsPage />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
 

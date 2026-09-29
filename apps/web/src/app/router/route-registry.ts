@@ -54,6 +54,8 @@ export const CANONICAL_ROUTES = {
   COMMUNITY_POST: "/community/posts/:postId",
   SUBSCRIPTION: "/subscription",
   ACCOUNT: "/account",
+  USER_PROFILE: "/profile",
+  SETTINGS: "/settings",
   LOGIN: "/login",
   REGISTER: "/register",
   ADMIN: "/admin",
@@ -75,6 +77,8 @@ export type RouteKey =
   | "communityPost"
   | "subscription"
   | "account"
+  | "userProfile"
+  | "settings"
   | "login"
   | "register"
   | "admin"
@@ -214,6 +218,30 @@ export const ROUTE_REGISTRY: Record<RouteKey, RouteMetadata> = {
     section: "account",
     owningFeature: "FEAT-071",
   },
+  userProfile: {
+    id: "userProfile",
+    path: CANONICAL_ROUTES.USER_PROFILE,
+    title: "User Profile & Account Settings",
+    description: "Manage your profile information, password credentials, and active sessions.",
+    navLabel: "Profile",
+    status: "AVAILABLE",
+    requiresAuth: true,
+    isNavVisible: false,
+    section: "account",
+    owningFeature: "FEAT-078",
+  },
+  settings: {
+    id: "settings",
+    path: CANONICAL_ROUTES.SETTINGS,
+    title: "Account Settings",
+    description: "Manage your account security, credentials, and active sessions.",
+    navLabel: "Settings",
+    status: "AVAILABLE",
+    requiresAuth: true,
+    isNavVisible: false,
+    section: "account",
+    owningFeature: "FEAT-078",
+  },
   login: {
     id: "login",
     path: CANONICAL_ROUTES.LOGIN,
@@ -341,6 +369,8 @@ export function findRouteByPath(pathname: string): RouteMetadata | undefined {
   if (normalized.startsWith("/community")) return ROUTE_REGISTRY.community;
   if (normalized.startsWith("/subscription")) return ROUTE_REGISTRY.subscription;
   if (normalized.startsWith("/dashboard")) return ROUTE_REGISTRY.dashboard;
+  if (normalized.startsWith("/profile")) return ROUTE_REGISTRY.userProfile;
+  if (normalized.startsWith("/settings")) return ROUTE_REGISTRY.settings;
   if (normalized.startsWith("/account")) return ROUTE_REGISTRY.account;
   if (normalized.startsWith("/admin/users")) return ROUTE_REGISTRY.adminUsers;
   if (normalized.startsWith("/admin/moderation")) return ROUTE_REGISTRY.adminModeration;

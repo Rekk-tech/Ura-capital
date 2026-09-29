@@ -245,7 +245,7 @@ describe("CoursePlayerView (FEAT-079 / FR-005, FR-006, FR-007, FR-008 / AC-005, 
       new AcademyApiError(401, "UNAUTHENTICATED", "Authentication required"),
     );
 
-    renderCoursePlayer();
+    renderCoursePlayer("investing-101", "lesson-2", false);
 
     expect(await screen.findByTestId("course-player-auth-required")).toBeDefined();
     expect(screen.getByText(/authentication required/i)).toBeDefined();

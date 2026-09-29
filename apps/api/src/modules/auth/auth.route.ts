@@ -3,6 +3,7 @@ import { registrationController } from "./registration.controller.js";
 import { loginController } from "./login.controller.js";
 import { refreshController } from "./refresh.controller.js";
 import { logoutController } from "./logout.controller.js";
+import { profileController } from "./profile.controller.js";
 import { authenticate } from "./auth.middleware.js";
 import type { AuthenticatedRequest } from "./auth.types.js";
 import { HTTP_STATUS } from "@aura/shared";
@@ -43,5 +44,16 @@ const meHandler = (req: AuthenticatedRequest, res: Response): void => {
 router.get("/auth/me", authenticate, (req, res) => meHandler(req as AuthenticatedRequest, res));
 router.get("/api/auth/me", authenticate, (req, res) => meHandler(req as AuthenticatedRequest, res));
 
+// FEAT-078 User Profile & Account Settings Endpoints
+router.get("/auth/profile", authenticate, (req, res, next) => profileController.getProfile(req as AuthenticatedRequest, res, next));
+router.get("/api/auth/profile", authenticate, (req, res, next) => profileController.getProfile(req as AuthenticatedRequest, res, next));
+router.patch("/auth/profile", authenticate, (req, res, next) => profileController.updateProfile(req as AuthenticatedRequest, res, next));
+router.patch("/api/auth/profile", authenticate, (req, res, next) => profileController.updateProfile(req as AuthenticatedRequest, res, next));
+router.post("/auth/change-password", authenticate, (req, res, next) => profileController.changePassword(req as AuthenticatedRequest, res, next));
+router.post("/api/auth/change-password", authenticate, (req, res, next) => profileController.changePassword(req as AuthenticatedRequest, res, next));
+router.get("/auth/sessions", authenticate, (req, res, next) => profileController.listSessions(req as AuthenticatedRequest, res, next));
+router.get("/api/auth/sessions", authenticate, (req, res, next) => profileController.listSessions(req as AuthenticatedRequest, res, next));
+
 export const authRouter = router;
+
 

@@ -99,6 +99,8 @@ describe("AcademyApiClient (Unit/Contract - AC-002, AC-012)", () => {
       expect(fetchMock).toHaveBeenCalledWith("/api/academy/courses/market-intro", {
         method: "GET",
         headers: { Accept: "application/json" },
+        credentials: "include",
+        signal: undefined,
       });
       expect(result).toEqual(mockCourse);
     });
@@ -153,6 +155,8 @@ describe("AcademyApiClient (Unit/Contract - AC-002, AC-012)", () => {
           Accept: "application/json",
           Authorization: "Bearer mock-token-xyz",
         },
+        credentials: "include",
+        signal: undefined,
       });
       expect(result).toEqual(mockLesson);
     });
@@ -221,6 +225,8 @@ describe("AcademyApiClient (Unit/Contract - AC-002, AC-012)", () => {
           Accept: "application/json",
           Authorization: "Bearer mock-token-xyz",
         },
+        credentials: "include",
+        signal: undefined,
       });
       expect(result).toEqual(mockQuiz);
     });
@@ -272,6 +278,8 @@ describe("AcademyApiClient (Unit/Contract - AC-002, AC-012)", () => {
             Authorization: "Bearer token-abc",
           },
           body: JSON.stringify({}),
+          credentials: "include",
+          signal: undefined,
         },
       );
       expect(result).toEqual(mockAttempt);
@@ -307,6 +315,8 @@ describe("AcademyApiClient (Unit/Contract - AC-002, AC-012)", () => {
             Accept: "application/json",
             Authorization: "Bearer token-abc",
           },
+          credentials: "include",
+          signal: undefined,
         },
       );
       expect(result).toEqual(mockAttempt);
@@ -341,6 +351,8 @@ describe("AcademyApiClient (Unit/Contract - AC-002, AC-012)", () => {
             Authorization: "Bearer token-abc",
           },
           body: JSON.stringify({ optionId: "opt-1" }),
+          credentials: "include",
+          signal: undefined,
         },
       );
       expect(result).toEqual(mockAnswer);

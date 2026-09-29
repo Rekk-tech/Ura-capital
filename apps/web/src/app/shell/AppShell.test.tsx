@@ -10,6 +10,7 @@ import { academyApi } from "../../features/academy/api/academyApi";
 import { simulationApi } from "../../features/simulation/api/simulationApi";
 import { communityApi } from "../../api/community.api";
 import { adminApi } from "../../api/admin.api";
+import { profileApi } from "../../api/profile.api";
 
 const createTestQueryClient = () =>
   new QueryClient({
@@ -626,6 +627,63 @@ describe("AppShell & Route Governance (FEAT-070 / AC-001..AC-008)", () => {
       expect(await screen.findByTestId("course-player-view")).toBeDefined();
       expect(screen.getByTestId("player-lesson-title")).toBeDefined();
       expect(screen.getByTestId("player-server-authority-notice")).toBeDefined();
+    });
+  });
+
+  describe("FEAT-078 Route Resolution (Profile & Account Settings)", () => {
+    it("renders deterministic auth-required guard at /profile when unauthenticated", () => {
+      renderShell("/profile", null, null);
+      expect(screen.getByRole("heading", { name: /please sign in/i })).toBeDefined();
+      expect(screen.getByText("Authentication Required")).toBeDefined();
+    });
+
+    it("renders deterministic auth-required guard at /settings when unauthenticated", () => {
+      renderShell("/settings", null, null);
+      expect(screen.getByRole("heading", { name: /please sign in/i })).toBeDefined();
+      expect(screen.getByText("Authentication Required")).toBeDefined();
+    });
+
+    it("renders ProfileSettingsPage at /profile when authenticated", async () => {
+      vi.spyOn(profileApi, "getProfile").mockResolvedValue({
+        id: "usr-shell-123",
+        email: "trader@auracapital.io",
+        displayName: "Shell Trader",
+        status: "ACTIVE",
+        roles: ["USER"],
+        createdAt: "2026-01-01T00:00:00Z",
+      });
+      vi.spyOn(profileApi, "listSessions").mockResolvedValue([]);
+
+      renderShell("/profile", "mock-token", {
+        id: "usr-shell-123",
+        email: "trader@auracapital.io",
+        displayName: "Shell Trader",
+        status: "ACTIVE",
+      });
+      expect(await screen.findByRole("heading", { name: "User Profile & Settings" })).toBeDefined();
+      expect(screen.getByRole("tab", { name: /profile information/i })).toBeDefined();
+      expect(screen.getByRole("tab", { name: /security & password/i })).toBeDefined();
+      expect(screen.getByRole("tab", { name: /active sessions/i })).toBeDefined();
+    });
+
+    it("renders ProfileSettingsPage at /settings when authenticated", async () => {
+      vi.spyOn(profileApi, "getProfile").mockResolvedValue({
+        id: "usr-shell-123",
+        email: "trader@auracapital.io",
+        displayName: "Shell Trader",
+        status: "ACTIVE",
+        roles: ["USER"],
+        createdAt: "2026-01-01T00:00:00Z",
+      });
+      vi.spyOn(profileApi, "listSessions").mockResolvedValue([]);
+
+      renderShell("/settings", "mock-token", {
+        id: "usr-shell-123",
+        email: "trader@auracapital.io",
+        displayName: "Shell Trader",
+        status: "ACTIVE",
+      });
+      expect(await screen.findByRole("heading", { name: "User Profile & Settings" })).toBeDefined();
     });
   });
 });

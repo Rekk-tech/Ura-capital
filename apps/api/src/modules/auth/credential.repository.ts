@@ -76,3 +76,5 @@ export class PrismaCredentialRepository implements ICredentialRepository {
     });
   }
 }
+
+export const credentialRepository: ICredentialRepository = new PrismaCredentialRepository();

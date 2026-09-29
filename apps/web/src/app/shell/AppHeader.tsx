@@ -16,6 +16,7 @@ import {
   ChevronDown,
   Sparkles,
   ShieldCheck,
+  Settings,
 } from "lucide-react";
 import { APP_NAME } from "@aura/shared";
 import { useAuth } from "../../features/auth/context/AuthContext";
@@ -244,6 +245,10 @@ export const AppHeader: React.FC = () => {
                     <Sparkles size={15} />
                     <span>Membership Plans</span>
                   </Link>
+                  <Link to="/profile" className="dropdown-item" role="menuitem" onClick={() => setIsUserMenuOpen(false)}>
+                    <Settings size={15} />
+                    <span>Profile & Settings</span>
+                  </Link>
                   <Link to="/account" className="dropdown-item" role="menuitem" onClick={() => setIsUserMenuOpen(false)}>
                     <User size={15} />
                     <span>Account Profile</span>
@@ -332,6 +337,15 @@ export const AppHeader: React.FC = () => {
                   )}
                   <Link to="/dashboard" className="btn btn-primary btn-sm mobile-auth-btn">
                     Dashboard
+                  </Link>
+                  <Link
+                    to="/profile"
+                    className="btn btn-secondary btn-sm mobile-auth-btn"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
+                  >
+                    <Settings size={15} />
+                    <span>Profile & Settings</span>
                   </Link>
                   <button
                     type="button"
