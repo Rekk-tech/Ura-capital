@@ -1,0 +1,100 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: aura-postgres-prod
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgrespassword}
+      POSTGRES_DB: ${POSTGRES_DB:-aura_capital_prod}
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-aura_capital_prod}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - aura-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: aura-redis-prod
+    restart: always
+    volumes:
+      - redis_prod_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - aura-network
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: aura-api-prod
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      HOST: 0.0.0.0
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgrespassword}@postgres:5432/${POSTGRES_DB:-aura_capital_prod}
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-aura-capital-prod-jwt-secret-min-32-chars-long-demo}
+      AUTH_ACCESS_TOKEN_SECRET: ${AUTH_ACCESS_TOKEN_SECRET:-aura-capital-prod-access-token-secret-at-least-32-chars}
+      AUTH_REFRESH_TOKEN_SECRET: ${AUTH_REFRESH_TOKEN_SECRET:-aura-capital-prod-refresh-token-secret-at-least-32-chars}
+      AUTH_ACCESS_TOKEN_TTL_MINUTES: ${AUTH_ACCESS_TOKEN_TTL_MINUTES:-15}
+      AUTH_ACCESS_TOKEN_ISSUER: ${AUTH_ACCESS_TOKEN_ISSUER:-aura-capital}
+      AUTH_ACCESS_TOKEN_AUDIENCE: ${AUTH_ACCESS_TOKEN_AUDIENCE:-aura-client}
+      AUTH_REFRESH_COOKIE_NAME: ${AUTH_REFRESH_COOKIE_NAME:-aura_refresh_token}
+      AUTH_REFRESH_COOKIE_SECURE: ${AUTH_REFRESH_COOKIE_SECURE:-false}
+      AUTH_REFRESH_COOKIE_SAME_SITE: ${AUTH_REFRESH_COOKIE_SAME_SITE:-lax}
+      AUTH_RATE_LIMIT_WINDOW_MS: ${AUTH_RATE_LIMIT_WINDOW_MS:-900000}
+      AUTH_RATE_LIMIT_MAX_REQUESTS: ${AUTH_RATE_LIMIT_MAX_REQUESTS:-100}
+      AUTH_RATE_LIMIT_KEY_SECRET: ${AUTH_RATE_LIMIT_KEY_SECRET:-aura-capital-prod-rate-limit-hmac-key-at-least-32-chars}
+      COMMUNITY_RATE_LIMIT_KEY_SECRET: ${COMMUNITY_RATE_LIMIT_KEY_SECRET:-aura-capital-prod-community-rl-hmac-key-at-least-32-chars}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost}
+      DEV_SEED_USER_PASSWORD: ${DEV_SEED_USER_PASSWORD:-DevSeedPassword123!}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/health/liveness"]
+      interval: 15s
+      timeout: 5s
+      start_period: 25s
+      retries: 3
+    networks:
+      - aura-network
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: aura-web-prod
+    restart: always
+    ports:
+      - "${WEB_PORT:-80}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+    networks:
+      - aura-network
+
+volumes:
+  postgres_prod_data:
+  redis_prod_data:
+
+networks:
+  aura-network:
+    driver: bridge

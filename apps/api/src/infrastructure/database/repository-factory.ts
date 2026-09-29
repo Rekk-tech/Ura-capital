@@ -61,6 +61,10 @@ import {
   PrismaSubscriptionProviderEventRepository,
   PrismaSubscriptionTransitionRepository,
 } from "../../modules/subscription/subscription.repository.js";
+import {
+  type IHealthRepository,
+  PrismaHealthRepository,
+} from "../../modules/health/health.repository.js";
 
 /**
  * Shared container representing all domain repository instances bound to a specific
@@ -94,6 +98,8 @@ export interface IRepositoryContainer {
   readonly subscriptionRepo: ISubscriptionRepository;
   readonly subscriptionProviderEventRepo: ISubscriptionProviderEventRepository;
   readonly subscriptionTransitionRepo: ISubscriptionTransitionRepository;
+  // Health repository
+  readonly healthRepo: IHealthRepository;
 }
 
 /**
@@ -134,6 +140,8 @@ export function createRepositoryContainer(
     subscriptionRepo: new PrismaSubscriptionRepository(client),
     subscriptionProviderEventRepo: new PrismaSubscriptionProviderEventRepository(client),
     subscriptionTransitionRepo: new PrismaSubscriptionTransitionRepository(client),
+    // Health repository
+    healthRepo: new PrismaHealthRepository(client as PrismaClient | undefined),
   };
 }
 
@@ -171,4 +179,7 @@ export const communityPostLikeRepository = rootRepositoryContainer.communityPost
 export const subscriptionRepository = rootRepositoryContainer.subscriptionRepo;
 export const subscriptionProviderEventRepository = rootRepositoryContainer.subscriptionProviderEventRepo;
 export const subscriptionTransitionRepository = rootRepositoryContainer.subscriptionTransitionRepo;
+
+// Health repository singleton
+export const healthRepository = rootRepositoryContainer.healthRepo;
 

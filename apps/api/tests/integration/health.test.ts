@@ -30,6 +30,33 @@ describe("API Health Endpoint (Integration)", () => {
     expect(response.body.status).toBe("healthy");
   });
 
+  it("returns 200 on GET /health/liveness and /api/health/liveness", async () => {
+    const app = createApp();
+    const res1 = await request(app).get("/health/liveness");
+    expect(res1.status).toBe(200);
+    expect(res1.body.status).toBe("healthy");
+    expect(res1.body.service).toBe("aura-api");
+    expect(res1.body.timestamp).toBeDefined();
+
+    const res2 = await request(app).get("/api/health/liveness");
+    expect(res2.status).toBe(200);
+    expect(res2.body.status).toBe("healthy");
+  });
+
+  it("returns 200 or 503 structured checks on GET /health/readiness and /api/health/readiness", async () => {
+    const app = createApp();
+    const res1 = await request(app).get("/health/readiness");
+    expect([200, 503]).toContain(res1.status);
+    expect(res1.body.service).toBe("aura-api");
+    expect(res1.body.checks).toBeDefined();
+    expect(res1.body.checks.database).toBeDefined();
+    expect(res1.body.checks.redis).toBeDefined();
+
+    const res2 = await request(app).get("/api/health/readiness");
+    expect([200, 503]).toContain(res2.status);
+    expect(res2.body.checks).toBeDefined();
+  });
+
   it("returns 404 with standard error envelope for unknown routes", async () => {
     const app = createApp();
     const response = await request(app).get("/non-existent-route");
