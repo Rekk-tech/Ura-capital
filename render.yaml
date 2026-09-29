@@ -95,7 +95,6 @@ services:
   - type: web
     name: aura-capital-web
     runtime: static
-    plan: free
     buildCommand: npm ci && npm run build --workspace=@aura/shared && npm run build --workspace=@aura/web
     staticPublishPath: apps/web/dist
     routes:
