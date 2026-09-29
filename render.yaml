@@ -29,8 +29,7 @@ services:
     plan: free
     region: oregon
     buildCommand: npm ci && npm run build --workspace=@aura/shared && npm run build --workspace=@aura/api && npx prisma generate --schema=apps/api/prisma/schema.prisma
-    preDeployCommand: npx prisma migrate deploy --schema=apps/api/prisma/schema.prisma && npm run seed:dev
-    startCommand: npm run start --workspace=@aura/api
+    startCommand: npx prisma migrate deploy --schema=apps/api/prisma/schema.prisma && npm run seed:dev && npm run start --workspace=@aura/api
     healthCheckPath: /health/readiness
     envVars:
       - key: NODE_ENV
@@ -97,7 +96,6 @@ services:
     name: aura-capital-web
     runtime: static
     plan: free
-    region: oregon
     buildCommand: npm ci && npm run build --workspace=@aura/shared && npm run build --workspace=@aura/web
     staticPublishPath: apps/web/dist
     routes:
