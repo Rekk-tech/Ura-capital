@@ -28,7 +28,7 @@ services:
     runtime: node
     plan: free
     region: oregon
-    buildCommand: npm ci && npm run build --workspace=@aura/shared && npm run build --workspace=@aura/api && npx prisma generate --schema=apps/api/prisma/schema.prisma
+    buildCommand: npm ci --include=dev && npm run build --workspace=@aura/shared && npm run build --workspace=@aura/api && npx prisma generate --schema=apps/api/prisma/schema.prisma
     startCommand: npx prisma migrate deploy --schema=apps/api/prisma/schema.prisma && npm run seed:dev && npm run start --workspace=@aura/api
     healthCheckPath: /health/readiness
     envVars:
@@ -95,7 +95,7 @@ services:
   - type: web
     name: aura-capital-web
     runtime: static
-    buildCommand: npm ci && npm run build --workspace=@aura/shared && npm run build --workspace=@aura/web
+    buildCommand: npm ci --include=dev && npm run build --workspace=@aura/shared && npm run build --workspace=@aura/web
     staticPublishPath: apps/web/dist
     routes:
       - type: rewrite
