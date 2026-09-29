@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   useSimulationSessionsQuery,
   useSimulationSessionQuery,
@@ -38,13 +38,24 @@ import {
 import { Sparkles, PlusCircle, Compass } from "lucide-react";
 import { MapSelectionView } from "../components/MapSelectionView";
 
-export const SimulationDashboardPage: React.FC = () => {
+export interface SimulationDashboardPageProps {
+  mode?: "maps" | "cockpit";
+}
+
+export const SimulationDashboardPage: React.FC<SimulationDashboardPageProps> = ({ mode: propMode }) => {
   const { simulationId: routeSessionId } = useParams<{ simulationId?: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [selectedSymbol, setSelectedSymbol] = useState<string | undefined>(undefined);
   const [selectedSide, setSelectedSide] = useState<SimulationOrderSide>("BUY");
-  const [showMapSelector, setShowMapSelector] = useState(false);
+
+  const isMapsView =
+    propMode === "maps" ||
+    (propMode === undefined &&
+      !routeSessionId &&
+      !location.pathname.endsWith("/live") &&
+      location.search.includes("view=maps"));
 
   const { accessToken, isAuthenticated, isLoading: isAuthLoading } = useAuth();
 
@@ -87,10 +98,21 @@ export const SimulationDashboardPage: React.FC = () => {
         accessToken: accessToken ?? undefined,
       });
       if (res?.data?.id) {
-        navigate(`/simulation/sessions/${res.data.id}`);
+        navigate(`/simulation/live`);
       }
     } catch {
       // Error handled by mutation state
+    }
+  };
+
+  const handleEnterCockpitFromMap = async (mapId: "map1-fomo" | "map2-pro") => {
+    if (mapId === "map2-pro") {
+      return;
+    }
+    if (activeSessionId) {
+      navigate(`/simulation/live`);
+    } else {
+      await handleCreateSession();
     }
   };
 
@@ -206,17 +228,34 @@ export const SimulationDashboardPage: React.FC = () => {
     );
   }
 
-  // Zero sessions state
+  // 5. Maps Selection View (Dedicated /simulation overview route)
+  if (isMapsView) {
+    return (
+      <main className="simulation-page" data-testid="simulation-page">
+        <SimulationDisclosureBanner />
+        <div className="simulation-page-header" style={{ marginBottom: "2rem" }}>
+          <div>
+            <h1 className="page-title">Simulation Trading Arenas</h1>
+            <p className="page-subtitle">
+              Select your simulated financial arena: High-intensity FOMO Arena or Systematic Pro Room.
+            </p>
+          </div>
+        </div>
+        <MapSelectionView
+          hasActiveSession={Boolean(session && session.status === "ACTIVE")}
+          activeSessionCycle={session?.currentCycle}
+          activeScenarioName={session?.scenario?.name}
+          onEnterCockpit={handleEnterCockpitFromMap}
+        />
+      </main>
+    );
+  }
+
+  // Zero sessions state in Cockpit
   if (sessions.length === 0 || !session || !portfolioQuery.data?.data) {
     return (
       <main className="simulation-page" data-testid="simulation-page">
         <SimulationDisclosureBanner />
-        <div style={{ marginBottom: "2rem" }}>
-          <MapSelectionView
-            hasActiveSession={false}
-            onEnterCockpit={(_mapId) => handleCreateSession()}
-          />
-        </div>
         <div className="card simulation-state-card" data-testid="no-sessions-card">
           <div className="card-icon-wrap" style={{ background: "rgba(59, 130, 246, 0.15)", color: "var(--accent-primary)" }}>
             <Sparkles size={28} />
@@ -225,16 +264,26 @@ export const SimulationDashboardPage: React.FC = () => {
           <p className="card-description" style={{ margin: "0.5rem 0 1.5rem" }}>
             Start your investment journey in a safe sandbox. You will receive $100,000.0000 virtual USD to practice trading equities across discrete market cycles.
           </p>
-          <button
-            type="button"
-            className="button button-primary"
-            onClick={handleCreateSession}
-            disabled={createSessionMutation.isPending}
-            data-testid="create-first-session-button"
-          >
-            <PlusCircle size={16} style={{ marginRight: "6px" }} />
-            {createSessionMutation.isPending ? "Creating Simulation..." : "Create Simulation Session"}
-          </button>
+          <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>
+            <button
+              type="button"
+              className="button button-primary"
+              onClick={handleCreateSession}
+              disabled={createSessionMutation.isPending}
+              data-testid="create-first-session-button"
+            >
+              <PlusCircle size={16} style={{ marginRight: "6px" }} />
+              {createSessionMutation.isPending ? "Creating Simulation..." : "Create Simulation Session"}
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => navigate("/simulation")}
+            >
+              <Compass size={16} style={{ marginRight: "6px" }} />
+              <span>View Simulation Maps</span>
+            </button>
+          </div>
         </div>
       </main>
     );
@@ -260,28 +309,14 @@ export const SimulationDashboardPage: React.FC = () => {
         <button
           type="button"
           className="btn btn-secondary btn-md"
-          onClick={() => setShowMapSelector((prev) => !prev)}
+          onClick={() => navigate("/simulation")}
           data-testid="toggle-map-selector-button"
           style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}
         >
           <Compass size={16} />
-          <span>{showMapSelector ? "Hide Maps Selector ▲" : "View Simulation Maps (FOMO Arena & Pro Room) ▼"}</span>
+          <span>← Back to Simulation Maps</span>
         </button>
       </div>
-
-      {/* 2-Map Selector Drawer */}
-      {showMapSelector && (
-        <div style={{ marginBottom: "1.5rem" }}>
-          <MapSelectionView
-            hasActiveSession={session.status === "ACTIVE"}
-            activeSessionCycle={session.currentCycle}
-            activeScenarioName={session.scenario?.name}
-            onEnterCockpit={(_mapId) => {
-              setShowMapSelector(false);
-            }}
-          />
-        </div>
-      )}
 
       <SimulationSessionBar
         session={session}

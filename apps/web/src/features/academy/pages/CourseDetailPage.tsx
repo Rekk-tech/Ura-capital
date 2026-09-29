@@ -6,13 +6,16 @@ import { LessonOutlineList } from "../components/LessonOutlineList";
 import { LearnerXpDisplay } from "../components/LearnerXpDisplay";
 import { CourseDetailSkeleton, ErrorState, NotFoundState } from "../components/AcademyStates";
 import { AcademyApiError } from "../types/academy-ui.types";
+import { useAuth } from "../../auth/context/AuthContext";
 
 export const CourseDetailPage: React.FC = () => {
   const params = useParams<{ courseSlug?: string; courseId?: string }>();
   const courseSlug = params.courseSlug || params.courseId;
+  const { accessToken } = useAuth();
+  const effectiveToken = accessToken ?? undefined;
   const { data, isLoading, isError, error, refetch } = useCourseQuery(courseSlug);
-  const progressQuery = useCourseProgressQuery(courseSlug);
-  const xpQuery = useMyXpQuery();
+  const progressQuery = useCourseProgressQuery(courseSlug, effectiveToken);
+  const xpQuery = useMyXpQuery(effectiveToken);
 
   if (isLoading) {
     return <CourseDetailSkeleton />;

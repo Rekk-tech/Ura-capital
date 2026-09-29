@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { authApi, AuthUser } from "../../../api/auth.api";
+import { setGlobalAccessToken, getGlobalAccessToken } from "../../../api/auth-token";
 
 export interface AuthContextType {
   user: AuthUser | null;
@@ -22,11 +23,18 @@ export const AuthProvider: React.FC<{
   initialIsLoading?: boolean;
 }> = ({ children, initialToken = null, initialUser = null, initialIsLoading }) => {
   // In-memory access token storage per ADR-004 (no unsafe localStorage/sessionStorage)
-  const [accessToken, setAccessToken] = useState<string | null>(initialToken);
+  const [accessToken, setAccessToken] = useState<string | null>(() => {
+    if (initialToken) setGlobalAccessToken(initialToken);
+    return initialToken;
+  });
   const [user, setUser] = useState<AuthUser | null>(initialUser);
   const [isLoading, setIsLoading] = useState<boolean>(
     initialIsLoading !== undefined ? initialIsLoading : !initialToken
   );
+
+  useEffect(() => {
+    setGlobalAccessToken(accessToken);
+  }, [accessToken]);
 
   const refreshSession = useCallback(async () => {
     try {
@@ -107,7 +115,18 @@ export const AuthProvider: React.FC<{
 export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    const token = getGlobalAccessToken();
+    return {
+      user: null,
+      accessToken: token,
+      isAuthenticated: Boolean(token),
+      isLoading: false,
+      login: async () => {},
+      register: async () => ({ id: "", email: "", status: "ACTIVE", createdAt: "" }),
+      logout: async () => {},
+      refreshSession: async () => {},
+      setAuthSession: () => {},
+    };
   }
   return context;
 }

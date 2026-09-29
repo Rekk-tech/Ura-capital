@@ -96,11 +96,11 @@ export const AcademySummaryWidget: React.FC = () => {
                     </span>
                   </div>
                   <Link
-                    to={`/academy`}
+                    to={`/academy/courses/${encodeURIComponent(course.slug)}`}
                     className="btn btn-outline btn-xs"
                     aria-label={`Start course: ${course.title}`}
                   >
-                    Start
+                    Resume Course
                   </Link>
                 </li>
               ))}

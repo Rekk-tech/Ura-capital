@@ -47,6 +47,7 @@ export const CANONICAL_ROUTES = {
   ACADEMY_LEARNING_PATH: "/academy/learning-path",
   ACADEMY_COURSE_PLAYER: "/academy/courses/:courseSlug/player/:lessonSlug",
   SIMULATION: "/simulation",
+  SIMULATION_LIVE: "/simulation/live",
   SIMULATION_SESSION: "/simulation/sessions/:simulationId",
   PORTFOLIO: "/portfolio",
   COMMUNITY: "/community",

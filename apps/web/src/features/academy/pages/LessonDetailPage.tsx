@@ -18,7 +18,7 @@ import { LearnerXpDisplay } from "../components/LearnerXpDisplay";
 import { LessonDetailSkeleton, AuthRequiredCard, NotFoundState, ErrorState } from "../components/AcademyStates";
 import { QuizPlayer } from "../components/QuizPlayer";
 import { AcademyApiError } from "../types/academy-ui.types";
-
+import { useAuth } from "../../auth/context/AuthContext";
 
 export const LessonDetailPage: React.FC = () => {
   const params = useParams<{
@@ -30,22 +30,25 @@ export const LessonDetailPage: React.FC = () => {
   const courseSlug = params.courseSlug || params.courseId;
   const lessonSlug = params.lessonSlug || params.lessonId;
 
+  const { accessToken } = useAuth();
+  const effectiveToken = accessToken ?? undefined;
+
   // Query A: Authenticated lesson content
-  const lessonQuery = useLessonQuery(courseSlug, lessonSlug);
+  const lessonQuery = useLessonQuery(courseSlug, lessonSlug, effectiveToken);
 
   // Query B: Course outline & metadata for navigation
   const courseQuery = useCourseQuery(courseSlug);
 
   // Query C: Lesson Quiz Definition (FEAT-023)
-  const quizQuery = useLessonQuizQuery(courseSlug, lessonSlug);
+  const quizQuery = useLessonQuizQuery(courseSlug, lessonSlug, effectiveToken);
 
   // Query D & Mutations: Quiz Attempt Lifecycle (FEAT-024 & FEAT-025)
-  const currentAttemptQuery = useCurrentQuizAttemptQuery(courseSlug, lessonSlug);
+  const currentAttemptQuery = useCurrentQuizAttemptQuery(courseSlug, lessonSlug, effectiveToken);
   const startAttemptMutation = useStartQuizAttemptMutation();
   const saveDraftMutation = useSaveDraftQuizAnswerMutation();
   const submitAttemptMutation = useSubmitQuizAttemptMutation();
   const completeLessonMutation = useCompleteLessonMutation();
-  const xpQuery = useMyXpQuery();
+  const xpQuery = useMyXpQuery(effectiveToken);
   const [savingQuestionId, setSavingQuestionId] = useState<string | null>(null);
 
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -64,7 +67,7 @@ export const LessonDetailPage: React.FC = () => {
         ? submitAttemptMutation.data.data.attemptId
         : undefined;
 
-  const gradedResultQuery = useGradedQuizResultQuery(gradedAttemptId);
+  const gradedResultQuery = useGradedQuizResultQuery(gradedAttemptId, effectiveToken);
   const gradedResult = submitAttemptMutation.data?.data ?? gradedResultQuery.data?.data;
 
   const isLessonCompleted = Boolean(
@@ -76,14 +79,14 @@ export const LessonDetailPage: React.FC = () => {
   const handleStartQuiz = () => {
     if (!courseSlug || !lessonSlug) return;
     setSubmitError(null);
-    startAttemptMutation.mutate({ courseSlug, lessonSlug });
+    startAttemptMutation.mutate({ courseSlug, lessonSlug, accessToken: effectiveToken });
   };
 
   const handleCompleteLesson = () => {
     if (!courseSlug || !lessonSlug) return;
     setCompleteError(null);
     completeLessonMutation.mutate(
-      { courseSlug, lessonSlug },
+      { courseSlug, lessonSlug, accessToken: effectiveToken },
       {
         onError: (err: unknown) => {
           if (err instanceof AcademyApiError) {
@@ -105,6 +108,7 @@ export const LessonDetailPage: React.FC = () => {
       attemptId: activeAttempt.id,
       courseSlug,
       lessonSlug,
+      accessToken: effectiveToken,
     }, {
       onError: (err) => {
         setSubmitError(err instanceof Error ? err.message : "Failed to submit quiz.");
@@ -123,6 +127,7 @@ export const LessonDetailPage: React.FC = () => {
         optionId,
         courseSlug,
         lessonSlug,
+        accessToken: effectiveToken,
       },
       {
         onError: (err) => {

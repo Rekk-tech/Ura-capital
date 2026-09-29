@@ -98,6 +98,7 @@ export const PostComposer: React.FC<PostComposerProps> = ({ accessToken, onPostC
             onChange={(e) => setTitle(e.target.value)}
             disabled={isSubmitting}
             maxLength={150}
+            title="Provide a descriptive headline for your community discussion (optional, up to 150 characters)"
             style={{
               width: "100%",
               padding: "0.6rem 0.75rem",
@@ -125,6 +126,7 @@ export const PostComposer: React.FC<PostComposerProps> = ({ accessToken, onPostC
           disabled={isSubmitting}
           aria-invalid={Boolean(validationError) || isTooLong}
           aria-describedby="post-composer-help post-composer-counter"
+          title="Write your market insights, simulation trade reflection, or study questions for fellow capital learners"
           style={{
             width: "100%",
             padding: "0.75rem",
@@ -149,12 +151,17 @@ export const PostComposer: React.FC<PostComposerProps> = ({ accessToken, onPostC
             gap: "0.5rem",
           }}
         >
-          <div
-            id="post-composer-counter"
-            data-testid="post-composer-counter"
-            style={{ fontSize: "0.85rem", color: isTooLong ? "var(--status-error)" : "var(--text-muted)" }}
-          >
-            {content.length} / {MAX_POST_LENGTH}
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+            <div
+              id="post-composer-counter"
+              data-testid="post-composer-counter"
+              style={{ fontSize: "0.85rem", color: isTooLong ? "var(--status-error)" : "var(--text-muted)" }}
+            >
+              {content.length} / {MAX_POST_LENGTH}
+            </div>
+            <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
+              💡 Share analysis, cycle trade notes, or questions
+            </span>
           </div>
 
           <button
@@ -162,6 +169,7 @@ export const PostComposer: React.FC<PostComposerProps> = ({ accessToken, onPostC
             data-testid="post-composer-submit-btn"
             className="button button-primary"
             disabled={!canSubmit}
+            title="Publish this discussion post to the community feed"
             style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}
           >
             {isSubmitting ? (

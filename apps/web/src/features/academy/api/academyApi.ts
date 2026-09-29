@@ -20,6 +20,7 @@ import {
   PlayerLessonDto,
 } from "../types/academy-ui.types";
 import { getApiBaseUrl } from "../../../api/config";
+import { getGlobalAccessToken } from "../../../api/auth-token";
 
 export interface IAcademyApiClient {
   listCourses(params?: ListCoursesParams, options?: { signal?: AbortSignal }): Promise<{ data: CourseSummaryDto[]; pagination: PaginationMeta }>;
@@ -52,6 +53,20 @@ export class AcademyApiClient implements IAcademyApiClient {
     this.baseUrl = baseUrl;
   }
 
+  private getHeaders(accessToken?: string, isJson = false): Record<string, string> {
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+    };
+    if (isJson) {
+      headers["Content-Type"] = "application/json";
+    }
+    const token = accessToken || getGlobalAccessToken();
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+    return headers;
+  }
+
   async listCourses(
     params?: ListCoursesParams,
     options?: { signal?: AbortSignal },
@@ -66,9 +81,8 @@ export class AcademyApiClient implements IAcademyApiClient {
 
     const res = await fetch(url, {
       method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
+      headers: this.getHeaders(),
+      credentials: "include",
       signal: options?.signal,
     });
 
@@ -87,9 +101,8 @@ export class AcademyApiClient implements IAcademyApiClient {
 
     const res = await fetch(url, {
       method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
+      headers: this.getHeaders(),
+      credentials: "include",
       signal: options?.signal,
     });
 
@@ -108,17 +121,10 @@ export class AcademyApiClient implements IAcademyApiClient {
   ): Promise<{ data: LessonDetailDto }> {
     const url = `${this.baseUrl}/courses/${encodeURIComponent(courseSlug)}/lessons/${encodeURIComponent(lessonSlug)}`;
 
-    const headers: Record<string, string> = {
-      Accept: "application/json",
-    };
-
-    if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`;
-    }
-
     const res = await fetch(url, {
       method: "GET",
-      headers,
+      headers: this.getHeaders(accessToken),
+      credentials: "include",
       signal: options?.signal,
     });
 
@@ -137,17 +143,10 @@ export class AcademyApiClient implements IAcademyApiClient {
   ): Promise<{ data: LessonFlashcardsResponseDto }> {
     const url = `${this.baseUrl}/courses/${encodeURIComponent(courseSlug)}/lessons/${encodeURIComponent(lessonSlug)}/flashcards`;
 
-    const headers: Record<string, string> = {
-      Accept: "application/json",
-    };
-
-    if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`;
-    }
-
     const res = await fetch(url, {
       method: "GET",
-      headers,
+      headers: this.getHeaders(accessToken),
+      credentials: "include",
       signal: options?.signal,
     });
 
@@ -166,17 +165,10 @@ export class AcademyApiClient implements IAcademyApiClient {
   ): Promise<{ data: QuizDefinitionDto }> {
     const url = `${this.baseUrl}/courses/${encodeURIComponent(courseSlug)}/lessons/${encodeURIComponent(lessonSlug)}/quiz`;
 
-    const headers: Record<string, string> = {
-      Accept: "application/json",
-    };
-
-    if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`;
-    }
-
     const res = await fetch(url, {
       method: "GET",
-      headers,
+      headers: this.getHeaders(accessToken),
+      credentials: "include",
       signal: options?.signal,
     });
 
@@ -198,17 +190,10 @@ export class AcademyApiClient implements IAcademyApiClient {
   ): Promise<{ data: QuizDefinitionDto }> {
     const url = `${this.baseUrl}/quizzes/${encodeURIComponent(quizId)}/projected`;
 
-    const headers: Record<string, string> = {
-      Accept: "application/json",
-    };
-
-    if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`;
-    }
-
     const res = await fetch(url, {
       method: "GET",
-      headers,
+      headers: this.getHeaders(accessToken),
+      credentials: "include",
       signal: options?.signal,
     });
 
@@ -227,18 +212,10 @@ export class AcademyApiClient implements IAcademyApiClient {
   ): Promise<{ data: QuizAttemptDto }> {
     const url = `${this.baseUrl}/courses/${encodeURIComponent(courseSlug)}/lessons/${encodeURIComponent(lessonSlug)}/quiz/attempts`;
 
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    };
-
-    if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`;
-    }
-
     const res = await fetch(url, {
       method: "POST",
-      headers,
+      headers: this.getHeaders(accessToken, true),
+      credentials: "include",
       body: JSON.stringify({}),
       signal: options?.signal,
     });
@@ -257,18 +234,10 @@ export class AcademyApiClient implements IAcademyApiClient {
   ): Promise<{ data: QuizAttemptDto }> {
     const url = `${this.baseUrl}/quiz-attempts`;
 
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    };
-
-    if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`;
-    }
-
     const res = await fetch(url, {
       method: "POST",
-      headers,
+      headers: this.getHeaders(accessToken, true),
+      credentials: "include",
       body: JSON.stringify({ quizId }),
       signal: options?.signal,
     });
@@ -288,17 +257,10 @@ export class AcademyApiClient implements IAcademyApiClient {
   ): Promise<{ data: QuizAttemptDto }> {
     const url = `${this.baseUrl}/courses/${encodeURIComponent(courseSlug)}/lessons/${encodeURIComponent(lessonSlug)}/quiz/attempts/current`;
 
-    const headers: Record<string, string> = {
-      Accept: "application/json",
-    };
-
-    if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`;
-    }
-
     const res = await fetch(url, {
       method: "GET",
-      headers,
+      headers: this.getHeaders(accessToken),
+      credentials: "include",
       signal: options?.signal,
     });
 
@@ -316,17 +278,10 @@ export class AcademyApiClient implements IAcademyApiClient {
   ): Promise<{ data: QuizAttemptDto }> {
     const url = `${this.baseUrl}/quiz-attempts/${encodeURIComponent(attemptId)}`;
 
-    const headers: Record<string, string> = {
-      Accept: "application/json",
-    };
-
-    if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`;
-    }
-
     const res = await fetch(url, {
       method: "GET",
-      headers,
+      headers: this.getHeaders(accessToken),
+      credentials: "include",
       signal: options?.signal,
     });
 
@@ -346,18 +301,10 @@ export class AcademyApiClient implements IAcademyApiClient {
   ): Promise<{ data: { questionId: string; selectedOptionId: string; updatedAt: string } }> {
     const url = `${this.baseUrl}/quiz-attempts/${encodeURIComponent(attemptId)}/answers/${encodeURIComponent(questionId)}`;
 
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    };
-
-    if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`;
-    }
-
     const res = await fetch(url, {
       method: "PUT",
-      headers,
+      headers: this.getHeaders(accessToken, true),
+      credentials: "include",
       body: JSON.stringify({ optionId }),
       signal: options?.signal,
     });
@@ -376,18 +323,10 @@ export class AcademyApiClient implements IAcademyApiClient {
   ): Promise<{ data: QuizResultDto }> {
     const url = `${this.baseUrl}/quiz-attempts/${encodeURIComponent(attemptId)}/submit`;
 
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    };
-
-    if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`;
-    }
-
     const res = await fetch(url, {
       method: "POST",
-      headers,
+      headers: this.getHeaders(accessToken, true),
+      credentials: "include",
       body: JSON.stringify({}),
       signal: options?.signal,
     });
@@ -406,17 +345,10 @@ export class AcademyApiClient implements IAcademyApiClient {
   ): Promise<{ data: QuizResultDto }> {
     const url = `${this.baseUrl}/quiz-attempts/${encodeURIComponent(attemptId)}/result`;
 
-    const headers: Record<string, string> = {
-      Accept: "application/json",
-    };
-
-    if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`;
-    }
-
     const res = await fetch(url, {
       method: "GET",
-      headers,
+      headers: this.getHeaders(accessToken),
+      credentials: "include",
       signal: options?.signal,
     });
 
@@ -434,17 +366,10 @@ export class AcademyApiClient implements IAcademyApiClient {
   ): Promise<{ data: CourseProgressDto }> {
     const url = `${this.baseUrl}/courses/${encodeURIComponent(courseSlug)}/progress`;
 
-    const headers: Record<string, string> = {
-      Accept: "application/json",
-    };
-
-    if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`;
-    }
-
     const res = await fetch(url, {
       method: "GET",
-      headers,
+      headers: this.getHeaders(accessToken),
+      credentials: "include",
       signal: options?.signal,
     });
 
@@ -463,18 +388,10 @@ export class AcademyApiClient implements IAcademyApiClient {
   ): Promise<{ data: LessonProgressDto }> {
     const url = `${this.baseUrl}/courses/${encodeURIComponent(courseSlug)}/lessons/${encodeURIComponent(lessonSlug)}/complete`;
 
-    const headers: Record<string, string> = {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    };
-
-    if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`;
-    }
-
     const res = await fetch(url, {
       method: "POST",
-      headers,
+      headers: this.getHeaders(accessToken, true),
+      credentials: "include",
       body: JSON.stringify({}),
       signal: options?.signal,
     });
@@ -492,17 +409,10 @@ export class AcademyApiClient implements IAcademyApiClient {
   ): Promise<{ data: LearnerXpDto }> {
     const url = `${this.baseUrl}/me/xp`;
 
-    const headers: Record<string, string> = {
-      Accept: "application/json",
-    };
-
-    if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`;
-    }
-
     const res = await fetch(url, {
       method: "GET",
-      headers,
+      headers: this.getHeaders(accessToken),
+      credentials: "include",
       signal: options?.signal,
     });
 
@@ -698,9 +608,10 @@ export class AcademyApiClient implements IAcademyApiClient {
     const course = courseRes.data;
 
     let progress: CourseProgressDto | null = null;
-    if (accessToken) {
+    const token = accessToken || getGlobalAccessToken();
+    if (token) {
       try {
-        const progRes = await this.getCourseProgress(courseSlug, accessToken, options);
+        const progRes = await this.getCourseProgress(courseSlug, token, options);
         progress = progRes.data;
       } catch {
         // Unauthenticated or unstarted progress is handled gracefully

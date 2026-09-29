@@ -10,6 +10,7 @@ import {
   ErrorState,
 } from "../components/AcademyStates";
 import { AcademyApiError } from "../types/academy-ui.types";
+import { useAuth } from "../../auth/context/AuthContext";
 
 export const FlashcardReviewPage: React.FC = () => {
   const params = useParams<{
@@ -21,7 +22,12 @@ export const FlashcardReviewPage: React.FC = () => {
   const courseSlug = params.courseSlug || params.courseId;
   const lessonSlug = params.lessonSlug || params.lessonId;
 
-  const { data, isLoading, isError, error, refetch } = useFlashcardsQuery(courseSlug, lessonSlug);
+  const { accessToken } = useAuth();
+  const { data, isLoading, isError, error, refetch } = useFlashcardsQuery(
+    courseSlug,
+    lessonSlug,
+    accessToken ?? undefined,
+  );
 
   // 1. Loading State
   if (isLoading) {

@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { AlertCircle, Lock, BookOpen, RefreshCw } from "lucide-react";
 import { buildAuthRedirectUrl } from "../utils/redirect-validator";
+import { useAuth } from "../../auth/context/AuthContext";
 
 export const CatalogLoadingSkeleton: React.FC = () => (
   <div className="academy-skeleton-container" aria-busy="true" aria-label="Loading courses">
@@ -138,6 +139,7 @@ interface AuthRequiredCardProps {
 
 export const AuthRequiredCard: React.FC<AuthRequiredCardProps> = ({ courseSlug, lessonSlug, returnPath }) => {
   const location = useLocation();
+  const { user, isAuthenticated, refreshSession } = useAuth();
   const currentPath =
     returnPath ??
     (courseSlug && lessonSlug
@@ -146,6 +148,40 @@ export const AuthRequiredCard: React.FC<AuthRequiredCardProps> = ({ courseSlug, 
 
   const loginUrl = buildAuthRedirectUrl("/login", currentPath);
   const registerUrl = buildAuthRedirectUrl("/register", currentPath);
+
+  if (isAuthenticated && user) {
+    return (
+      <div className="academy-auth-required-card" role="status" aria-labelledby="auth-required-title">
+        <div className="auth-card-icon-wrap" style={{ background: "rgba(245, 158, 11, 0.15)", color: "var(--warning, #f59e0b)" }}>
+          <Lock size={32} className="auth-card-icon" aria-hidden="true" />
+        </div>
+        <h2 id="auth-required-title" className="auth-card-title">
+          Session Authorization Verification
+        </h2>
+        <p className="auth-card-desc">
+          You are currently signed in as <strong>{user.displayName || user.email}</strong> ({user.role || "Active Account"}), but access credentials to this lesson are being verified or require refresh.
+        </p>
+        <div className="auth-card-actions">
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => {
+              void refreshSession();
+              window.location.reload();
+            }}
+          >
+            Refresh Session & Retry
+          </button>
+          <Link
+            to={courseSlug ? `/academy/courses/${encodeURIComponent(courseSlug)}` : "/academy"}
+            className="btn btn-outline"
+          >
+            Back to Course Outline
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="academy-auth-required-card" role="status" aria-labelledby="auth-required-title">

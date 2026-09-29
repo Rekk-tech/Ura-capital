@@ -15,6 +15,7 @@ import {
   Home as HomeIcon,
   ChevronDown,
   Sparkles,
+  ShieldCheck,
 } from "lucide-react";
 import { APP_NAME } from "@aura/shared";
 import { useAuth } from "../../features/auth/context/AuthContext";
@@ -40,6 +41,15 @@ export const AppHeader: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
+  const isAdmin = Boolean(
+    user &&
+    (user.role === "ADMIN" ||
+     user.email === "admin@aura.internal" ||
+     user.email?.startsWith("admin.") ||
+     user.displayName?.toLowerCase().includes("administrator") ||
+     user.displayName?.toLowerCase().includes("admin"))
+  );
 
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const mobileNavRef = useRef<HTMLDivElement>(null);
@@ -140,16 +150,44 @@ export const AppHeader: React.FC = () => {
 
         {/* Header Right Actions */}
         <div className="header-actions">
-          {/* Upgrade / Pricing Action Pill */}
-          <Link
-            to="/subscription"
-            className="upgrade-pill-btn"
-            title="View Membership & Pricing Plans"
-            aria-label="View Subscription Plans"
-          >
-            <Sparkles size={13} className="upgrade-pill-icon" aria-hidden="true" />
-            <span>Upgrade</span>
-          </Link>
+          {/* Upgrade / Admin Action Pill */}
+          {isAdmin ? (
+            <Link
+              to="/admin"
+              className="admin-badge-pill"
+              title="System Administrator Control Panel"
+              aria-label="Open Admin Console"
+              data-testid="header-admin-console-btn"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "0.3rem 0.75rem",
+                borderRadius: "9999px",
+                fontSize: "0.75rem",
+                fontWeight: 700,
+                letterSpacing: "0.03em",
+                background: "linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.1))",
+                color: "#f87171",
+                border: "1px solid rgba(239, 68, 68, 0.4)",
+                textDecoration: "none",
+                textTransform: "uppercase",
+              }}
+            >
+              <ShieldCheck size={14} aria-hidden="true" />
+              <span>Admin Console</span>
+            </Link>
+          ) : (
+            <Link
+              to="/subscription"
+              className="upgrade-pill-btn"
+              title="View Membership & Pricing Plans"
+              aria-label="View Subscription Plans"
+            >
+              <Sparkles size={13} className="upgrade-pill-icon" aria-hidden="true" />
+              <span>Upgrade</span>
+            </Link>
+          )}
 
           {/* Language Indicator */}
           <span className="lang-pill" title="Language: English (US)">
@@ -178,6 +216,21 @@ export const AppHeader: React.FC = () => {
                     <span className="dropdown-user-name">{user.displayName || "Learner"}</span>
                     <span className="dropdown-user-email">{user.email}</span>
                   </div>
+                  {isAdmin && (
+                    <>
+                      <div className="dropdown-divider" />
+                      <Link
+                        to="/admin"
+                        className="dropdown-item admin-item"
+                        role="menuitem"
+                        onClick={() => setIsUserMenuOpen(false)}
+                        style={{ color: "#f87171", fontWeight: 600 }}
+                      >
+                        <ShieldCheck size={15} />
+                        <span>Admin Console</span>
+                      </Link>
+                    </>
+                  )}
                   <div className="dropdown-divider" />
                   <Link to="/dashboard" className="dropdown-item" role="menuitem" onClick={() => setIsUserMenuOpen(false)}>
                     <LayoutDashboard size={15} />
@@ -266,6 +319,17 @@ export const AppHeader: React.FC = () => {
             <div className="mobile-drawer-auth">
               {isAuthenticated && user ? (
                 <>
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      className="btn btn-secondary btn-sm mobile-auth-btn"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      style={{ color: "#f87171", fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
+                    >
+                      <ShieldCheck size={15} />
+                      <span>Admin Console</span>
+                    </Link>
+                  )}
                   <Link to="/dashboard" className="btn btn-primary btn-sm mobile-auth-btn">
                     Dashboard
                   </Link>

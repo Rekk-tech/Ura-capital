@@ -56,7 +56,7 @@ export function useLessonQuery(
   accessToken?: string,
 ) {
   return useQuery({
-    queryKey: ["academy", "lesson", courseSlug, lessonSlug],
+    queryKey: ["academy", "lesson", courseSlug, lessonSlug, accessToken],
     queryFn: ({ signal }) => {
       if (!courseSlug || !lessonSlug) throw new Error("Course and lesson slugs are required");
       return academyApi.getLessonBySlug(courseSlug, lessonSlug, accessToken, { signal });
@@ -75,7 +75,7 @@ export function useFlashcardsQuery(
   accessToken?: string,
 ) {
   return useQuery({
-    queryKey: ["academy", "flashcards", courseSlug, lessonSlug],
+    queryKey: ["academy", "flashcards", courseSlug, lessonSlug, accessToken],
     queryFn: ({ signal }) => {
       if (!courseSlug || !lessonSlug) throw new Error("Course and lesson slugs are required");
       return academyApi.getLessonFlashcards(courseSlug, lessonSlug, accessToken, { signal });
@@ -94,7 +94,7 @@ export function useLessonQuizQuery(
   accessToken?: string,
 ) {
   return useQuery({
-    queryKey: ["academy", "quiz", courseSlug, lessonSlug],
+    queryKey: ["academy", "quiz", courseSlug, lessonSlug, accessToken],
     queryFn: ({ signal }) => {
       if (!courseSlug || !lessonSlug) throw new Error("Course and lesson slugs are required");
       return academyApi.getLessonQuiz(courseSlug, lessonSlug, accessToken, { signal });
@@ -282,7 +282,7 @@ export function useCourseProgressQuery(
   accessToken?: string,
 ) {
   return useQuery({
-    queryKey: ["academy", "course-progress", courseSlug],
+    queryKey: ["academy", "course-progress", courseSlug, accessToken],
     queryFn: ({ signal }) => {
       if (!courseSlug) throw new Error("Course slug is required");
       return academyApi.getCourseProgress(courseSlug, accessToken, { signal });

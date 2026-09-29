@@ -240,6 +240,7 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
               data-testid="side-buy-button"
               aria-checked={side === "BUY"}
               role="radio"
+              title="BUY: Execute purchase of equities using available virtual cash balance"
             >
               <TrendingUp size={16} aria-hidden="true" />
               <span>BUY</span>
@@ -252,6 +253,7 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
               data-testid="side-sell-button"
               aria-checked={side === "SELL"}
               role="radio"
+              title="SELL: Execute sale of held positions to realize profit or loss into virtual cash"
             >
               <TrendingDown size={16} aria-hidden="true" />
               <span>SELL</span>
@@ -271,6 +273,7 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
               data-testid="type-market-button"
               aria-checked={orderType === "MARKET"}
               role="radio"
+              title="MARKET Order: Fills immediately at the authoritative price snapshot of the current cycle"
             >
               MARKET
             </button>
@@ -282,6 +285,7 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
               data-testid="type-limit-button"
               aria-checked={orderType === "LIMIT"}
               role="radio"
+              title="LIMIT Order: Rests on book and executes only when the market price meets or improves upon your limit"
             >
               LIMIT
             </button>
@@ -299,6 +303,7 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
             disabled={!isActiveSession || isSubmitting || assets.length === 0}
             data-testid="asset-select"
             aria-label="Select Asset to Trade"
+            title="Choose which equity symbol to buy or sell from current simulation universe"
           >
             {assets.map((a) => (
               <option key={a.id} value={a.symbol}>
@@ -309,7 +314,7 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
         </div>
 
         {/* Current Snapshot Price Display */}
-        <div className="ticker-price-preview" data-testid="ticket-price-preview">
+        <div className="ticker-price-preview" data-testid="ticket-price-preview" title="Authoritative pricing reference derived from the current discrete cycle">
           <span className="price-preview-label">Authoritative Snapshot Price</span>
           <span className="price-preview-value font-mono">
             {currentPrice ? `$${currentPrice}` : "Awaiting Market Snapshot"}
@@ -332,6 +337,7 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
               data-testid="limit-price-input"
               aria-label="Limit Price in USD"
               placeholder={currentPrice ?? "Enter limit price"}
+              title="Enter your desired execution price limit in USD"
             />
           </div>
         )}
@@ -353,6 +359,7 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
             disabled={!isActiveSession || isSubmitting}
             data-testid="quantity-input"
             aria-label="Order Quantity in whole shares"
+            title="Enter the number of whole shares to trade (minimum: 1)"
             required
           />
           {/* Quick Position Sizing Buttons */}
@@ -378,6 +385,7 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
                       setErrorMsg(null);
                     }}
                     disabled={isSubmitting}
+                    title={`Calculate position size for ${label} of available capital (${targetQty} shares)`}
                   >
                     {label}
                   </button>
@@ -392,6 +400,7 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
           <div
             className={`estimated-notional-box ${isExceedingCash ? "estimated-notional-warning" : ""}`}
             data-testid="estimated-notional"
+            title="Estimated total value based on price × quantity"
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span className="notional-label">Estimated Notional</span>
@@ -416,6 +425,7 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
           className={`button order-submit-btn ${side === "BUY" ? "button-success" : "button-error"}`}
           disabled={!isActiveSession || isSubmitting || quantity <= 0 || isExceedingCash}
           data-testid="submit-order-button"
+          title={`Click to commit and transmit this ${side} ${orderType} order to the simulation exchange`}
         >
           <Send size={16} style={{ marginRight: "8px" }} aria-hidden="true" />
           {isSubmitting ? "Submitting Order..." : `Place ${side} ${orderType} Order`}
