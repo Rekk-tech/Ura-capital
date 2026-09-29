@@ -1,0 +1,303 @@
+/* ==========================================================================
+   AURA CAPITAL — DESIGN TOKENS & SYSTEM STYLES (Light + Bright Corporate FinTech)
+   Ref: AURA_UI_REDESIGN_SPEC.md (Section 1)
+   ========================================================================== */
+
+:root {
+  /* Brand Accents */
+  --aura-blue-600: #1D6FF2;   /* primary brand */
+  --aura-blue-500: #3B82F6;
+  --aura-blue-100: #DBEAFE;
+  --aura-blue-50:  #EFF6FF;
+  --aura-teal-500: #06B6D4;   /* secondary / analytical */
+  --aura-teal-50:  #ECFEFF;
+  --aura-green-500: #22C55E;  /* success / profit / Jabil green */
+  --aura-green-50:  #F0FDF4;
+  --aura-lime-400:  #A3E635;  /* highlight chip / micro-accent */
+  --aura-amber-500: #F59E0B;  /* warning / disclaimer */
+  --aura-amber-50:  #FFFBEB;
+  --aura-red-500:   #EF4444;  /* danger / loss / sell */
+  --aura-red-50:    #FEF2F2;
+
+  /* Neutral (Light Theme Canvas) */
+  --bg-page:        #F7FAFF;  /* primary page background */
+  --bg-surface:     #FFFFFF;  /* clean card & panel surface */
+  --bg-soft:        #EEF4FF;  /* alternating section band */
+  --bg-navy:        #0B2A5B;  /* high-contrast dark navy band (Jabil style) */
+  --bg-navy-dark:   #071C3D;
+  --text-strong:    #0B1B3A;  /* primary headers and emphatic text */
+  --text-body:      #41506B;  /* standard readable body text */
+  --text-muted:     #7B8AA5;  /* secondary descriptions & captions */
+  --text-light:     #F8FAFC;  /* text on navy sections */
+  --border:         #E1E8F5;  /* crisp border */
+  --border-focus:   #1D6FF2;  /* focus ring & active border */
+
+  /* Gradient Palette */
+  --grad-brand:     linear-gradient(90deg, #1D6FF2 0%, #06B6D4 55%, #22C55E 100%);
+  --grad-hero:      linear-gradient(135deg, #EAF3FF 0%, #E6FBF3 100%);
+  --grad-navy:      linear-gradient(135deg, #0B2A5B 0%, #0E4C92 100%);
+  --grad-card:      linear-gradient(180deg, #FFFFFF 0%, #F8FAFF 100%);
+  --grad-fomo:      linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%);
+  --grad-pro:       linear-gradient(135deg, #EFF6FF 0%, #E0F2FE 100%);
+
+  /* Shape & Shadows */
+  --radius-xs:   4px;
+  --radius-sm:   8px;
+  --radius-md:   14px;
+  --radius-lg:   22px;
+  --radius-pill: 999px;
+
+  --shadow-sm:    0 2px 8px rgba(11, 27, 58, 0.04);
+  --shadow-card:  0 6px 24px rgba(29, 111, 242, 0.08);
+  --shadow-hover: 0 12px 32px rgba(29, 111, 242, 0.16);
+  --shadow-navy:  0 10px 30px rgba(7, 28, 61, 0.25);
+
+  /* Typography metrics */
+  --font-heading: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
+
+  /* Aliases for backwards compatibility with existing UI components */
+  --bg-primary:          var(--bg-page);
+  --bg-card:             var(--bg-surface);
+  --bg-card-hover:       #F1F5FD;
+  --border-subtle:       var(--border);
+  --border-active:       var(--aura-blue-600);
+  --text-primary:        var(--text-strong);
+  --text-secondary:      var(--text-body);
+  --accent-primary:      var(--aura-blue-600);
+  --accent-primary-hover:#1557BF;
+  --accent-cyan:         var(--aura-teal-500);
+  --status-success:      var(--aura-green-500);
+  --status-success-bg:   var(--aura-green-50);
+  --status-warning:      var(--aura-amber-500);
+  --status-warning-bg:   var(--aura-amber-50);
+  --status-error:        var(--aura-red-500);
+  --status-error-bg:     var(--aura-red-50);
+}
+
+/* ==========================================================================
+   Typography Helpers
+   ========================================================================== */
+.text-gradient {
+  background: var(--grad-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.text-gradient-navy {
+  background: linear-gradient(90deg, #FFFFFF 0%, #67E8F9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.text-success {
+  color: var(--aura-green-500) !important;
+}
+
+.text-danger {
+  color: var(--aura-red-500) !important;
+}
+
+.text-neutral {
+  color: var(--text-body) !important;
+}
+
+/* ==========================================================================
+   Button System (AURA_UI_REDESIGN_SPEC.md - Section 1.3)
+   ========================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Sizes */
+.btn-sm {
+  height: 36px;
+  padding: 0 16px;
+  font-size: 0.875rem;
+}
+
+.btn-md, .btn {
+  height: 44px;
+  padding: 0 22px;
+  font-size: 0.95rem;
+}
+
+.btn-lg {
+  height: 52px;
+  padding: 0 28px;
+  font-size: 1.05rem;
+}
+
+/* Variants */
+.btn-primary {
+  background-color: var(--aura-blue-600);
+  color: #FFFFFF;
+  border-color: var(--aura-blue-600);
+  box-shadow: 0 4px 14px rgba(29, 111, 242, 0.25);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #1557BF;
+  border-color: #1557BF;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(29, 111, 242, 0.35);
+}
+
+.btn-gradient {
+  background: var(--grad-brand);
+  color: #FFFFFF;
+  border: none;
+  box-shadow: 0 4px 16px rgba(29, 111, 242, 0.28);
+}
+
+.btn-gradient:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(6, 182, 212, 0.4);
+  filter: brightness(1.06);
+}
+
+.btn-secondary, .btn-outline {
+  background-color: #FFFFFF;
+  color: var(--aura-blue-600);
+  border-color: var(--aura-blue-600);
+}
+
+.btn-secondary:hover:not(:disabled), .btn-outline:hover:not(:disabled) {
+  background-color: var(--aura-blue-50);
+  transform: translateY(-2px);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--aura-blue-600);
+  border-color: transparent;
+  padding: 0 14px;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background-color: var(--aura-blue-50);
+  color: #1557BF;
+}
+
+.btn-danger {
+  background-color: #FFFFFF;
+  color: var(--aura-red-500);
+  border-color: #FECACA;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: var(--aura-red-50);
+  border-color: var(--aura-red-500);
+}
+
+.btn-buy {
+  background-color: var(--aura-green-500);
+  color: #FFFFFF;
+  border: none;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.btn-buy:hover:not(:disabled) {
+  background-color: #16A34A;
+  transform: translateY(-1px);
+}
+
+.btn-sell {
+  background-color: var(--aura-red-500);
+  color: #FFFFFF;
+  border: none;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.btn-sell:hover:not(:disabled) {
+  background-color: #DC2626;
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   Inputs, Selects & Form Controls (Refined)
+   ========================================================================== */
+input, select, textarea {
+  font-family: var(--font-body);
+  color: var(--text-strong);
+  background-color: #FFFFFF;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.625rem 1rem;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--aura-blue-600);
+  box-shadow: 0 0 0 3px var(--aura-blue-100);
+}
+
+select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2341506B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1em;
+  padding-right: 2.5rem;
+}
+
+/* ==========================================================================
+   Card System
+   ========================================================================== */
+.card-aura {
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  box-shadow: var(--shadow-card);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-aura:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-3px);
+  border-color: #CBD5E1;
+}
+
+/* Disclaimer Banner */
+.disclaimer-banner-aura {
+  background-color: #FFFBEB;
+  border: 1.5px solid #FDE68A;
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  color: #92400E;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}

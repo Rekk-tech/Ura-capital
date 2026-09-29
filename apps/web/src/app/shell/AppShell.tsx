@@ -2,6 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import { AppHeader } from "./AppHeader";
 import { AppFooter } from "./AppFooter";
+import { ScrollToTop } from "./ScrollToTop";
 import { RouteErrorBoundary } from "../components/RouteErrorBoundary";
 import { NotFoundPage } from "../components/NotFoundPage";
 import { PlannedRoutePlaceholder } from "../components/PlannedRoutePlaceholder";
@@ -32,6 +33,9 @@ import { AdminRoutes } from "../../features/admin/routes/admin-routes";
 export const AppShell: React.FC = () => {
   return (
     <div className="app-container">
+      {/* Scroll to Top on Route Navigation */}
+      <ScrollToTop />
+
       {/* Accessibility Skip Link */}
       <a href="#main-content" className="skip-link">
         Skip to main content

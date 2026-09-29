@@ -43,6 +43,35 @@ export const CourseCatalogPage: React.FC = () => {
         </p>
       </header>
 
+      {/* 3-Stage Curriculum Pathway */}
+      <section className="academy-curriculum-overview" aria-label="Aura Academy 3-Stage Curriculum Roadmap" style={{ marginBottom: "2rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1rem" }}>
+          <div className="card-aura" style={{ padding: "1.25rem", borderLeft: "4px solid var(--aura-blue-500)" }}>
+            <span className="badge badge-brand" style={{ marginBottom: "0.5rem", display: "inline-block" }}>STAGE 1 · STATIONS 1–3</span>
+            <h3 style={{ fontSize: "1.05rem", fontWeight: 700, margin: "0 0 0.4rem" }}>Awareness & Foundations</h3>
+            <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", margin: 0, lineHeight: 1.5 }}>
+              Core financial literacy, personal cash flow budgeting, risk profiling, and inflation dynamics.
+            </p>
+          </div>
+
+          <div className="card-aura" style={{ padding: "1.25rem", borderLeft: "4px solid var(--aura-teal-500)" }}>
+            <span className="badge badge-teal" style={{ marginBottom: "0.5rem", display: "inline-block" }}>STAGE 2 · STATIONS 4–6</span>
+            <h3 style={{ fontSize: "1.05rem", fontWeight: 700, margin: "0 0 0.4rem" }}>Skills & Real Simulation</h3>
+            <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", margin: 0, lineHeight: 1.5 }}>
+              Equity valuation, technical indicators, order execution mechanics, and volatility management in FOMO Arena.
+            </p>
+          </div>
+
+          <div className="card-aura" style={{ padding: "1.25rem", borderLeft: "4px solid var(--aura-green-500)" }}>
+            <span className="badge badge-success-subtle" style={{ marginBottom: "0.5rem", display: "inline-block" }}>STAGE 3 · STATIONS 7–9</span>
+            <h3 style={{ fontSize: "1.05rem", fontWeight: 700, margin: "0 0 0.4rem" }}>Strategy & Mastery</h3>
+            <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", margin: 0, lineHeight: 1.5 }}>
+              Macroeconomic cycles, multi-asset portfolio hedging, risk-adjusted returns, and autonomous execution.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <div
         className="catalog-toolbar"
         style={{
@@ -82,7 +111,7 @@ export const CourseCatalogPage: React.FC = () => {
             style={{
               position: "absolute",
               left: "0.75rem",
-              color: "var(--color-text-muted, #94a3b8)",
+              color: "var(--text-muted)",
               pointerEvents: "none",
             }}
           />
@@ -101,10 +130,10 @@ export const CourseCatalogPage: React.FC = () => {
               paddingRight: "1rem",
               paddingTop: "0.5rem",
               paddingBottom: "0.5rem",
-              borderRadius: "0.5rem",
-              border: "1px solid var(--color-border, #334155)",
-              backgroundColor: "var(--color-surface, #1e293b)",
-              color: "var(--color-text, #f8fafc)",
+              borderRadius: "var(--radius-md)",
+              border: "1px solid var(--border-subtle)",
+              backgroundColor: "var(--bg-surface)",
+              color: "var(--text-main)",
               fontSize: "0.875rem",
               outline: "none",
               minWidth: "220px",
@@ -131,15 +160,19 @@ export const CourseCatalogPage: React.FC = () => {
           <EmptyState
             message={
               searchQuery
-                ? `No courses found matching "${searchQuery}".`
+                ? `No courses found matching "${searchQuery}". Try a different keyword.`
                 : level
-                ? `No courses found matching "${level.toLowerCase()}" level.`
-                : "No published courses available yet."
+                ? `No courses found matching "${level.toLowerCase()}" level. Try resetting filters.`
+                : "New interactive courses are currently being prepared. Explore the 3-stage curriculum roadmap above in the meantime."
             }
-            onReset={() => {
-              setSearchQuery("");
-              handleLevelChange(undefined);
-            }}
+            onReset={
+              searchQuery || level
+                ? () => {
+                    setSearchQuery("");
+                    handleLevelChange(undefined);
+                  }
+                : undefined
+            }
           />
         )}
 

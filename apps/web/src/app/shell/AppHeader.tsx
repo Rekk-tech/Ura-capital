@@ -13,6 +13,8 @@ import {
   BadgeDollarSign,
   LayoutDashboard,
   Home as HomeIcon,
+  ChevronDown,
+  Sparkles,
 } from "lucide-react";
 import { APP_NAME } from "@aura/shared";
 import { useAuth } from "../../features/auth/context/AuthContext";
@@ -29,128 +31,210 @@ const NAV_ICONS: Record<string, React.ReactNode> = {
 };
 
 /**
- * FEAT-070: Responsive, Accessible Navigation Header (FR-003, AC-003)
- *
- * Implements:
- * - Desktop and mobile responsive navigation
- * - aria-current="page" on active route
- * - Keyboard navigation and Escape-to-close behavior
- * - Focus-safe drawer toggle
- * - Integration with AuthProvider for session state
+ * Modern Corporate Single-Row Application Header
+ * (Ref: AURA_UI_REDESIGN_SPEC.md - Section 2 & AURA_UX_IMPROVEMENTS_SPEC.md - Section 2)
  */
 export const AppHeader: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const mobileNavRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
   const navRoutes = getPrimaryNavRoutes();
   const isHome = location.pathname === "/";
 
-  // Close mobile menu on route change
+  // Close menus on route change
   useEffect(() => {
     setIsMobileMenuOpen(false);
+    setIsUserMenuOpen(false);
   }, [location.pathname]);
 
-  // Handle keyboard Escape to close mobile menu and restore focus
+  // Handle keyboard Escape to close menus
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isMobileMenuOpen) {
-        setIsMobileMenuOpen(false);
-        menuButtonRef.current?.focus();
+      if (e.key === "Escape") {
+        if (isMobileMenuOpen) {
+          setIsMobileMenuOpen(false);
+          menuButtonRef.current?.focus();
+        }
+        if (isUserMenuOpen) {
+          setIsUserMenuOpen(false);
+        }
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isMobileMenuOpen]);
+  }, [isMobileMenuOpen, isUserMenuOpen]);
+
+  // Handle click outside user dropdown
+  useEffect(() => {
+    if (!isUserMenuOpen) {
+      return undefined;
+    }
+    const handleClickOutside = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isUserMenuOpen]);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen((prev) => !prev);
   };
 
   const handleLogout = async () => {
+    setIsUserMenuOpen(false);
     await logout();
     navigate("/");
   };
 
+  const userInitials = user?.displayName
+    ? user.displayName.slice(0, 2).toUpperCase()
+    : user?.email
+    ? user.email.slice(0, 2).toUpperCase()
+    : "AC";
+
   return (
-    <header className="header" role="banner">
-      <div className="brand">
-        <Link to="/" className="brand-link" aria-label={`${APP_NAME} Home`}>
-          <div className="brand-icon" aria-hidden="true">A</div>
-          <div>
-            {isHome ? (
-              <h1 className="brand-title">{APP_NAME}</h1>
-            ) : (
-              <span className="brand-title">{APP_NAME}</span>
-            )}
-          </div>
-        </Link>
-      </div>
-
-      {/* Desktop Navigation */}
-      <nav className="header-nav desktop-nav" aria-label="Primary Navigation">
-        {navRoutes.map((route) => {
-          const active = isRouteActive(location.pathname, route.path);
-          return (
-            <Link
-              key={route.path}
-              to={route.path}
-              className={`nav-link ${active ? "nav-link-active" : ""}`}
-              aria-current={active ? "page" : undefined}
-            >
-              {NAV_ICONS[route.path] || null}
-              <span>{route.navLabel || route.title}</span>
-              {route.status === "PLANNED" && (
-                <span className="badge badge-subtle" aria-label="Planned feature">
-                  Soon
-                </span>
+    <header className="header header-sticky" role="banner">
+      <div className="header-inner">
+        {/* Brand Logo */}
+        <div className="brand">
+          <Link to="/" className="brand-link" aria-label={`${APP_NAME} Home`}>
+            <div className="brand-icon" aria-hidden="true">A</div>
+            <div>
+              {isHome ? (
+                <h1 className="brand-title">{APP_NAME}</h1>
+              ) : (
+                <span className="brand-title">{APP_NAME}</span>
               )}
-            </Link>
-          );
-        })}
-      </nav>
-
-      {/* Auth & Session Controls */}
-      <div className="header-actions">
-        {isAuthenticated && user ? (
-          <div className="user-profile-badge">
-            <Link to="/account" className="user-info-link" aria-label="Account profile">
-              <User size={16} aria-hidden="true" />
-              <span className="user-email">{user.email}</span>
-            </Link>
-            <button
-              type="button"
-              className="btn btn-ghost btn-sm"
-              onClick={handleLogout}
-              aria-label="Sign out of account"
-              title="Sign Out"
-            >
-              <LogOut size={16} aria-hidden="true" />
-              <span className="sr-only">Sign Out</span>
-            </button>
-          </div>
-        ) : (
-          <Link to="/login" className="btn btn-outline btn-sm auth-signin-btn">
-            <LogIn size={15} aria-hidden="true" />
-            <span>Sign In</span>
+            </div>
           </Link>
-        )}
+        </div>
 
-        {/* Mobile Menu Toggle Button */}
-        <button
-          ref={menuButtonRef}
-          type="button"
-          className="mobile-menu-toggle"
-          onClick={toggleMobileMenu}
-          aria-expanded={isMobileMenuOpen}
-          aria-controls="mobile-nav"
-          aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-        >
-          {isMobileMenuOpen ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
-        </button>
+        {/* Desktop Navigation Links (Single-Row Core Tabs) */}
+        <nav className="header-nav desktop-nav" aria-label="Primary Navigation">
+          {navRoutes.filter((route) => route.path !== "/subscription").map((route) => {
+            const active = isRouteActive(location.pathname, route.path);
+            return (
+              <Link
+                key={route.path}
+                to={route.path}
+                className={`nav-link ${active ? "nav-link-active" : ""}`}
+                aria-current={active ? "page" : undefined}
+              >
+                {NAV_ICONS[route.path] || null}
+                <span>{route.navLabel || route.title}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Header Right Actions */}
+        <div className="header-actions">
+          {/* Upgrade / Pricing Action Pill */}
+          <Link
+            to="/subscription"
+            className="upgrade-pill-btn"
+            title="View Membership & Pricing Plans"
+            aria-label="View Subscription Plans"
+          >
+            <Sparkles size={13} className="upgrade-pill-icon" aria-hidden="true" />
+            <span>Upgrade</span>
+          </Link>
+
+          {/* Language Indicator */}
+          <span className="lang-pill" title="Language: English (US)">
+            EN
+          </span>
+
+          {isAuthenticated && user ? (
+            /* Authenticated User Menu Dropdown */
+            <div className="user-menu-container" ref={userMenuRef}>
+              <button
+                type="button"
+                className="user-avatar-btn"
+                onClick={() => setIsUserMenuOpen((prev) => !prev)}
+                aria-expanded={isUserMenuOpen}
+                aria-haspopup="true"
+                aria-label={`User menu for ${user.email}`}
+              >
+                <div className="avatar-circle">{userInitials}</div>
+                <span className="user-email-chip">{user.displayName || user.email}</span>
+                <ChevronDown size={14} className={`chevron-icon ${isUserMenuOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              {isUserMenuOpen && (
+                <div className="user-dropdown-menu" role="menu">
+                  <div className="user-dropdown-header">
+                    <span className="dropdown-user-name">{user.displayName || "Learner"}</span>
+                    <span className="dropdown-user-email">{user.email}</span>
+                  </div>
+                  <div className="dropdown-divider" />
+                  <Link to="/dashboard" className="dropdown-item" role="menuitem" onClick={() => setIsUserMenuOpen(false)}>
+                    <LayoutDashboard size={15} />
+                    <span>Dashboard</span>
+                  </Link>
+                  <Link to="/portfolio" className="dropdown-item" role="menuitem" onClick={() => setIsUserMenuOpen(false)}>
+                    <PieChart size={15} />
+                    <span>Portfolio</span>
+                  </Link>
+                  <Link to="/subscription" className="dropdown-item" role="menuitem" onClick={() => setIsUserMenuOpen(false)}>
+                    <Sparkles size={15} />
+                    <span>Membership Plans</span>
+                  </Link>
+                  <Link to="/account" className="dropdown-item" role="menuitem" onClick={() => setIsUserMenuOpen(false)}>
+                    <User size={15} />
+                    <span>Account Profile</span>
+                  </Link>
+                  <div className="dropdown-divider" />
+                  <button
+                    type="button"
+                    className="dropdown-item dropdown-logout-btn"
+                    onClick={handleLogout}
+                    role="menuitem"
+                  >
+                    <LogOut size={15} />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* Unauthenticated Visitor CTAs */
+            <div className="unauth-btn-group">
+              <Link to="/login" className="btn btn-ghost btn-sm auth-signin-btn">
+                <LogIn size={15} aria-hidden="true" />
+                <span>Sign In</span>
+              </Link>
+              <Link to="/register" className="btn btn-gradient btn-sm auth-signup-btn">
+                <Sparkles size={14} aria-hidden="true" />
+                <span>Get Started Free</span>
+              </Link>
+            </div>
+          )}
+
+          {/* Mobile Menu Toggle Button */}
+          <button
+            ref={menuButtonRef}
+            type="button"
+            className="mobile-menu-toggle"
+            onClick={toggleMobileMenu}
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="mobile-nav"
+            aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+          >
+            {isMobileMenuOpen ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Navigation Drawer */}
@@ -172,55 +256,49 @@ export const AppHeader: React.FC = () => {
                   to={route.path}
                   className={`mobile-nav-link ${active ? "mobile-nav-link-active" : ""}`}
                   aria-current={active ? "page" : undefined}
-                  onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {NAV_ICONS[route.path] || null}
                   <span>{route.navLabel || route.title}</span>
-                  {route.status === "PLANNED" && (
-                    <span className="badge badge-subtle">Coming Soon</span>
-                  )}
                 </Link>
               );
             })}
 
-            <div className="mobile-nav-divider" />
-
-            {isAuthenticated && user ? (
-              <div className="mobile-auth-controls">
-                <Link
-                  to="/account"
-                  className="mobile-nav-link"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <User size={16} aria-hidden="true" />
-                  <span>Profile ({user.email})</span>
-                </Link>
-                <button
-                  type="button"
-                  className="btn btn-secondary btn-block"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    void handleLogout();
-                  }}
-                >
-                  <LogOut size={16} aria-hidden="true" />
-                  <span>Sign Out</span>
-                </button>
-              </div>
-            ) : (
-              <div className="mobile-auth-controls">
-                <Link
-                  to="/login"
-                  className="btn btn-primary btn-block"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <LogIn size={16} aria-hidden="true" />
-                  <span>Sign In</span>
-                </Link>
-              </div>
-            )}
+            <div className="mobile-drawer-auth">
+              {isAuthenticated && user ? (
+                <>
+                  <Link to="/dashboard" className="btn btn-primary btn-sm mobile-auth-btn">
+                    Dashboard
+                  </Link>
+                  <button
+                    type="button"
+                    className="btn btn-outline btn-sm mobile-auth-btn"
+                    onClick={handleLogout}
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" className="btn btn-secondary btn-sm mobile-auth-btn">
+                    Sign In
+                  </Link>
+                  <Link to="/register" className="btn btn-gradient btn-sm mobile-auth-btn">
+                    Get Started Free
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
         </div>
+      )}
+
+      {/* Backdrop for closing mobile menu on outside click */}
+      {isMobileMenuOpen && (
+        <div
+          className="mobile-drawer-backdrop"
+          onClick={() => setIsMobileMenuOpen(false)}
+          aria-hidden="true"
+        />
       )}
     </header>
   );

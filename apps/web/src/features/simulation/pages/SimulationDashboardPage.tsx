@@ -35,7 +35,8 @@ import {
   SimulationOrderType,
   SimulationApiError,
 } from "../types/simulation-ui.types";
-import { Sparkles, PlusCircle } from "lucide-react";
+import { Sparkles, PlusCircle, Compass } from "lucide-react";
+import { MapSelectionView } from "../components/MapSelectionView";
 
 export const SimulationDashboardPage: React.FC = () => {
   const { simulationId: routeSessionId } = useParams<{ simulationId?: string }>();
@@ -43,6 +44,7 @@ export const SimulationDashboardPage: React.FC = () => {
 
   const [selectedSymbol, setSelectedSymbol] = useState<string | undefined>(undefined);
   const [selectedSide, setSelectedSide] = useState<SimulationOrderSide>("BUY");
+  const [showMapSelector, setShowMapSelector] = useState(false);
 
   const { accessToken, isAuthenticated, isLoading: isAuthLoading } = useAuth();
 
@@ -209,6 +211,12 @@ export const SimulationDashboardPage: React.FC = () => {
     return (
       <main className="simulation-page" data-testid="simulation-page">
         <SimulationDisclosureBanner />
+        <div style={{ marginBottom: "2rem" }}>
+          <MapSelectionView
+            hasActiveSession={false}
+            onEnterCockpit={(_mapId) => handleCreateSession()}
+          />
+        </div>
         <div className="card simulation-state-card" data-testid="no-sessions-card">
           <div className="card-icon-wrap" style={{ background: "rgba(59, 130, 246, 0.15)", color: "var(--accent-primary)" }}>
             <Sparkles size={28} />
@@ -242,12 +250,38 @@ export const SimulationDashboardPage: React.FC = () => {
       <SimulationDisclosureBanner />
 
       {/* 2. Page Header & Session Bar (AC-001) */}
-      <div className="simulation-page-header">
-        <h1 className="page-title">Simulation Trading Cockpit</h1>
-        <p className="page-subtitle">
-          Practice market order execution, position risk management, and portfolio accounting in an isolated virtual sandbox.
-        </p>
+      <div className="simulation-page-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "1rem" }}>
+        <div>
+          <h1 className="page-title">Simulation Trading Cockpit</h1>
+          <p className="page-subtitle">
+            Practice market order execution, position risk management, and portfolio accounting in an isolated virtual sandbox.
+          </p>
+        </div>
+        <button
+          type="button"
+          className="btn btn-secondary btn-md"
+          onClick={() => setShowMapSelector((prev) => !prev)}
+          data-testid="toggle-map-selector-button"
+          style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}
+        >
+          <Compass size={16} />
+          <span>{showMapSelector ? "Hide Maps Selector ▲" : "View Simulation Maps (FOMO Arena & Pro Room) ▼"}</span>
+        </button>
       </div>
+
+      {/* 2-Map Selector Drawer */}
+      {showMapSelector && (
+        <div style={{ marginBottom: "1.5rem" }}>
+          <MapSelectionView
+            hasActiveSession={session.status === "ACTIVE"}
+            activeSessionCycle={session.currentCycle}
+            activeScenarioName={session.scenario?.name}
+            onEnterCockpit={(_mapId) => {
+              setShowMapSelector(false);
+            }}
+          />
+        </div>
+      )}
 
       <SimulationSessionBar
         session={session}

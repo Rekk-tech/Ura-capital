@@ -241,8 +241,8 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
               aria-checked={side === "BUY"}
               role="radio"
             >
-              <TrendingUp size={16} style={{ marginRight: "6px" }} aria-hidden="true" />
-              BUY
+              <TrendingUp size={16} aria-hidden="true" />
+              <span>BUY</span>
             </button>
             <button
               type="button"
@@ -253,8 +253,8 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
               aria-checked={side === "SELL"}
               role="radio"
             >
-              <TrendingDown size={16} style={{ marginRight: "6px" }} aria-hidden="true" />
-              SELL
+              <TrendingDown size={16} aria-hidden="true" />
+              <span>SELL</span>
             </button>
           </div>
         </div>
@@ -355,6 +355,36 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
             aria-label="Order Quantity in whole shares"
             required
           />
+          {/* Quick Position Sizing Buttons */}
+          {isActiveSession && effectivePrice > 0 && (
+            <div className="quick-qty-buttons" style={{ display: "flex", gap: "6px", marginTop: "8px", alignItems: "center" }}>
+              <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600 }}>Quick Size:</span>
+              {[
+                { label: "25%", pct: 0.25 },
+                { label: "50%", pct: 0.50 },
+                { label: "100%", pct: 1.00 },
+              ].map(({ label, pct }) => {
+                const targetQty = side === "BUY" && numCashBalance
+                  ? Math.max(1, Math.floor((numCashBalance * pct) / effectivePrice))
+                  : 10;
+                return (
+                  <button
+                    key={label}
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    style={{ padding: "3px 10px", fontSize: "0.75rem", height: "auto", borderRadius: "var(--radius-pill)" }}
+                    onClick={() => {
+                      setQuantity(targetQty);
+                      setErrorMsg(null);
+                    }}
+                    disabled={isSubmitting}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Estimated Notional Preview */}

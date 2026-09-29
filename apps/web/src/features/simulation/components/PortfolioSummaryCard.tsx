@@ -36,6 +36,18 @@ export const PortfolioSummaryCard: React.FC<PortfolioSummaryCardProps> = ({ port
         </span>
       </div>
 
+      {/* Portfolio Allocation Mini Ratio Bar */}
+      <div className="portfolio-ratio-bar-wrap" style={{ margin: "0.6rem 0 1rem", padding: "0.5rem 0.75rem", background: "var(--bg-page)", borderRadius: "var(--radius-sm)", border: "1px solid var(--border-subtle)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", color: "var(--text-muted)", marginBottom: "4px" }}>
+          <span>Cash Power: <strong className="font-mono text-primary">${portfolio.cashBalance}</strong></span>
+          <span>Equities Value: <strong className="font-mono text-primary">${portfolio.marketValue}</strong> ({portfolio.positions.length} active)</span>
+        </div>
+        <div style={{ height: "6px", width: "100%", background: "var(--aura-blue-100)", borderRadius: "9999px", overflow: "hidden", display: "flex" }}>
+          <div style={{ height: "100%", width: `${Math.min(100, Math.max(0, (Number(portfolio.cashBalance) / Number(portfolio.totalEquity || 1)) * 100))}%`, background: "var(--aura-green-500)", transition: "width 0.3s ease" }} title="Cash Balance Ratio" />
+          <div style={{ height: "100%", flex: 1, background: "var(--aura-blue-600)", transition: "width 0.3s ease" }} title="Market Positions Ratio" />
+        </div>
+      </div>
+
       <div className="portfolio-metrics-grid">
         {/* Total Equity */}
         <div className="metric-box metric-highlight" data-testid="metric-total-equity">
