@@ -93,8 +93,9 @@ services:
   # ---------------------------------------------------------------------------
   # 3. Frontend React 19 SPA (Render Static Site Fallback / Direct Hosting)
   # ---------------------------------------------------------------------------
-  - type: static
+  - type: web
     name: aura-capital-web
+    runtime: static
     plan: free
     region: oregon
     buildCommand: npm ci && npm run build --workspace=@aura/shared && npm run build --workspace=@aura/web
@@ -105,7 +106,4 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: aura-capital-api
-          property: host
+        value: "https://aura-capital-api.onrender.com"

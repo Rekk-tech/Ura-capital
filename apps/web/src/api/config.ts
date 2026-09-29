@@ -9,7 +9,12 @@
  */
 export function getApiBaseUrl(): string {
   if (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_API_URL) {
-    const raw = String(import.meta.env.VITE_API_URL).trim();
+    let raw = String(import.meta.env.VITE_API_URL).trim().replace(/\/+$/, "");
+    if (raw.endsWith("/api/v1")) {
+      raw = raw.slice(0, -"/api/v1".length);
+    } else if (raw.endsWith("/api")) {
+      raw = raw.slice(0, -"/api".length);
+    }
     return raw.replace(/\/+$/, "");
   }
   return "";
