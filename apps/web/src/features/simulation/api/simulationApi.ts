@@ -9,6 +9,7 @@ import {
   AppErrorResponse,
   SimulationApiError,
 } from "../types/simulation-ui.types";
+import { getApiBaseUrl } from "../../../api/config";
 
 export interface RequestOptions {
   signal?: AbortSignal;
@@ -33,7 +34,7 @@ export interface ISimulationApiClient {
 export class SimulationApiClient implements ISimulationApiClient {
   private readonly baseUrl: string;
 
-  constructor(baseUrl = "/api/simulation") {
+  constructor(baseUrl = `${getApiBaseUrl()}/api/simulation`) {
     this.baseUrl = baseUrl;
   }
 

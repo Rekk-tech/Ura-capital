@@ -1,3 +1,5 @@
+import { getApiBaseUrl } from "./config";
+
 export interface AdminRequestOptions {
   signal?: AbortSignal;
 }
@@ -222,7 +224,10 @@ export class AdminApiClient implements IAdminApiClient {
   private baseUrl: string;
   private pingUrl: string;
 
-  constructor(baseUrl = "/api/admin", pingUrl = "/admin/ping") {
+  constructor(
+    baseUrl = `${getApiBaseUrl()}/api/admin`,
+    pingUrl = `${getApiBaseUrl()}/admin/ping`,
+  ) {
     this.baseUrl = baseUrl;
     this.pingUrl = pingUrl;
   }

@@ -19,6 +19,7 @@ import {
   MilestoneStatus,
   PlayerLessonDto,
 } from "../types/academy-ui.types";
+import { getApiBaseUrl } from "../../../api/config";
 
 export interface IAcademyApiClient {
   listCourses(params?: ListCoursesParams, options?: { signal?: AbortSignal }): Promise<{ data: CourseSummaryDto[]; pagination: PaginationMeta }>;
@@ -47,7 +48,7 @@ export interface IAcademyApiClient {
 export class AcademyApiClient implements IAcademyApiClient {
   private readonly baseUrl: string;
 
-  constructor(baseUrl = "/api/academy") {
+  constructor(baseUrl = `${getApiBaseUrl()}/api/academy`) {
     this.baseUrl = baseUrl;
   }
 

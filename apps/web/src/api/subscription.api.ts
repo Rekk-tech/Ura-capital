@@ -8,6 +8,7 @@ import {
   SubscriptionApiError,
   type CancelSubscriptionResult,
 } from "../features/subscription/types/subscription-ui.types";
+import { getApiBaseUrl } from "./config";
 
 export interface SubscriptionRequestOptions {
   signal?: AbortSignal;
@@ -92,7 +93,7 @@ function parseCancelResult(payload: unknown): CancelSubscriptionResult {
 }
 
 export class SubscriptionApiClient implements ISubscriptionApiClient {
-  constructor(private baseUrl = "/api/subscriptions") {}
+  constructor(private baseUrl = `${getApiBaseUrl()}/api/subscriptions`) {}
 
   setBaseUrl(baseUrl: string): void {
     this.baseUrl = baseUrl;

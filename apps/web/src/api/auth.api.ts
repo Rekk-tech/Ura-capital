@@ -1,3 +1,5 @@
+import { getApiBaseUrl } from "./config";
+
 export interface AuthUser {
   id: string;
   email: string;
@@ -47,7 +49,7 @@ export interface IAuthApiClient {
 export class AuthApiClient implements IAuthApiClient {
   private readonly baseUrl: string;
 
-  constructor(baseUrl = "/api/auth") {
+  constructor(baseUrl = `${getApiBaseUrl()}/api/auth`) {
     this.baseUrl = baseUrl;
   }
 

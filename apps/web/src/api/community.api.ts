@@ -9,6 +9,7 @@ import {
   CommunityApiError,
   AppErrorResponse,
 } from "../features/community/types/community-ui.types";
+import { getApiBaseUrl } from "./config";
 
 export interface RequestOptions {
   signal?: AbortSignal;
@@ -82,7 +83,7 @@ export interface ICommunityApiClient {
 export class CommunityApiClient implements ICommunityApiClient {
   private baseUrl: string;
 
-  constructor(baseUrl = "/api/community") {
+  constructor(baseUrl = `${getApiBaseUrl()}/api/community`) {
     this.baseUrl = baseUrl;
   }
 
