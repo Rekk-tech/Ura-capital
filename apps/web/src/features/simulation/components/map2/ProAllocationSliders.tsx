@@ -57,7 +57,6 @@ export const ProAllocationSliders: React.FC<ProAllocationSlidersProps> = ({
     cash: "#F59E0B",   // Amber
   };
 
-  // Build SVG conic gradient or path segments
   const cumulative = [
     { key: "growth", val: allocation.growth, color: donutColors.growth, label: "Tăng trưởng" },
     { key: "value", val: allocation.value, color: donutColors.value, label: "Giá trị" },
@@ -111,13 +110,18 @@ export const ProAllocationSliders: React.FC<ProAllocationSlidersProps> = ({
         {/* Sliders Column (2 cols on md) */}
         <div className="md:col-span-2 flex flex-col gap-4">
           {/* EQ_GROWTH */}
-          <div className="flex flex-col gap-1.5">
-            <div className="flex justify-between text-xs">
-              <span className="font-bold text-slate-800 flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-                Cổ phiếu Tăng trưởng (EQ_GROWTH)
-              </span>
-              <span className="font-mono font-bold text-slate-900">{allocation.growth}%</span>
+          <div className="flex flex-col gap-1.5 p-3 rounded-xl bg-slate-50/70 border border-slate-100">
+            <div className="flex justify-between items-center text-xs">
+              <div>
+                <span className="font-bold text-slate-800 flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+                  Cổ phiếu Tăng trưởng (EQ_GROWTH)
+                </span>
+                <span className="text-[11px] text-slate-400 ml-4 block">
+                  Sharpe lịch sử 3 năm (tham khảo): 1.84 • Beta Rate: -2.0
+                </span>
+              </div>
+              <span className="font-mono font-bold text-slate-900 text-sm">{allocation.growth}%</span>
             </div>
             <input
               type="range"
@@ -131,13 +135,18 @@ export const ProAllocationSliders: React.FC<ProAllocationSlidersProps> = ({
           </div>
 
           {/* EQ_VALUE */}
-          <div className="flex flex-col gap-1.5">
-            <div className="flex justify-between text-xs">
-              <span className="font-bold text-slate-800 flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                Cổ phiếu Giá trị / Phòng thủ (EQ_VALUE)
-              </span>
-              <span className="font-mono font-bold text-slate-900">{allocation.value}%</span>
+          <div className="flex flex-col gap-1.5 p-3 rounded-xl bg-slate-50/70 border border-slate-100">
+            <div className="flex justify-between items-center text-xs">
+              <div>
+                <span className="font-bold text-slate-800 flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                  Cổ phiếu Giá trị / Phòng thủ (EQ_VALUE)
+                </span>
+                <span className="text-[11px] text-slate-400 ml-4 block">
+                  Sharpe lịch sử 3 năm (tham khảo): 2.10 • Cổ tức 8-10%/năm
+                </span>
+              </div>
+              <span className="font-mono font-bold text-slate-900 text-sm">{allocation.value}%</span>
             </div>
             <input
               type="range"
@@ -150,14 +159,19 @@ export const ProAllocationSliders: React.FC<ProAllocationSlidersProps> = ({
             />
           </div>
 
-          {/* BOND */}
-          <div className="flex flex-col gap-1.5">
-            <div className="flex justify-between text-xs">
-              <span className="font-bold text-slate-800 flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
-                Trái phiếu Doanh nghiệp (BOND)
-              </span>
-              <span className="font-mono font-bold text-slate-900">{allocation.bond}%</span>
+          {/* BOND — Synchronized to 1-year term at 7.5% annual yield (Review Issue 1.3) */}
+          <div className="flex flex-col gap-1.5 p-3 rounded-xl bg-slate-50/70 border border-slate-100">
+            <div className="flex justify-between items-center text-xs">
+              <div>
+                <span className="font-bold text-slate-800 flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
+                  Trái phiếu Doanh nghiệp / Chính phủ (BOND)
+                </span>
+                <span className="text-[11px] text-slate-400 ml-4 block">
+                  Kỳ hạn 1 năm — Lợi suất 7.50%/năm (0.01875/quý)
+                </span>
+              </div>
+              <span className="font-mono font-bold text-slate-900 text-sm">{allocation.bond}%</span>
             </div>
             <input
               type="range"
@@ -171,13 +185,18 @@ export const ProAllocationSliders: React.FC<ProAllocationSlidersProps> = ({
           </div>
 
           {/* CASH */}
-          <div className="flex flex-col gap-1.5">
-            <div className="flex justify-between text-xs">
-              <span className="font-bold text-slate-800 flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                Tiền gửi / Tiết kiệm linh hoạt (CASH)
-              </span>
-              <span className="font-mono font-bold text-slate-900">{allocation.cash}%</span>
+          <div className="flex flex-col gap-1.5 p-3 rounded-xl bg-slate-50/70 border border-slate-100">
+            <div className="flex justify-between items-center text-xs">
+              <div>
+                <span className="font-bold text-slate-800 flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+                  Tiền gửi / Tiết kiệm linh hoạt (CASH)
+                </span>
+                <span className="text-[11px] text-slate-400 ml-4 block">
+                  Lợi tức 4.00%/năm • An toàn thanh khoản tuyệt đối
+                </span>
+              </div>
+              <span className="font-mono font-bold text-slate-900 text-sm">{allocation.cash}%</span>
             </div>
             <input
               type="range"
@@ -192,11 +211,11 @@ export const ProAllocationSliders: React.FC<ProAllocationSlidersProps> = ({
         </div>
 
         {/* Donut Chart Visualizer Column */}
-        <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-50 border border-slate-200">
-          <div className="relative w-32 h-32 flex items-center justify-center">
-            {/* Simple CSS Conic Gradient Donut representation */}
+        <div className="flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-50 border border-slate-200">
+          <div className="relative w-36 h-36 flex items-center justify-center">
+            {/* CSS Conic Gradient Donut representation */}
             <div
-              className="w-28 h-28 rounded-full shadow-inner transition-all duration-300"
+              className="w-32 h-32 rounded-full shadow-inner transition-all duration-300"
               style={{
                 background: `conic-gradient(
                   ${donutColors.growth} 0% ${allocation.growth}%,
@@ -207,17 +226,17 @@ export const ProAllocationSliders: React.FC<ProAllocationSlidersProps> = ({
               }}
             />
             {/* Center Cutout Hole */}
-            <div className="absolute w-16 h-16 rounded-full bg-white flex flex-col items-center justify-center shadow-xs">
-              <PieChart size={16} className="text-slate-400 mb-0.5" />
-              <span className="text-[10px] font-bold text-slate-700">{total}%</span>
+            <div className="absolute w-20 h-20 rounded-full bg-white flex flex-col items-center justify-center shadow-xs">
+              <PieChart size={18} className="text-slate-400 mb-0.5" />
+              <span className="text-xs font-bold text-slate-700">{total}%</span>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-x-3 gap-y-1 mt-3 text-[10px] text-slate-600">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 mt-4 text-[11px] text-slate-600 font-medium">
             {cumulative.map((item) => (
-              <div key={item.key} className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
-                <span>{item.label}: {item.val}%</span>
+              <div key={item.key} className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }} />
+                <span>{item.label}: <strong className="font-mono text-slate-800">{item.val}%</strong></span>
               </div>
             ))}
           </div>
@@ -225,7 +244,7 @@ export const ProAllocationSliders: React.FC<ProAllocationSlidersProps> = ({
       </div>
 
       {/* Validation Warning & Submit Button */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-3 pt-2 border-t border-slate-100">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-100">
         {!isValid ? (
           <span className="text-xs text-rose-600 flex items-center gap-1 font-semibold">
             <AlertCircle size={14} />

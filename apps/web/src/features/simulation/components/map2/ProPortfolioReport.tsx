@@ -67,12 +67,12 @@ export const ProPortfolioReport: React.FC<ProPortfolioReportProps> = ({
         {/* Alpha */}
         <div className="card-aura p-4 rounded-xl border border-slate-200 bg-white shadow-sm flex flex-col justify-between">
           <span className="text-xs text-slate-500 font-semibold flex items-center gap-1">
-            <BarChart2 size={14} className="text-emerald-600" /> Alpha vs Thị Trường
+            <BarChart2 size={14} className="text-emerald-600" /> Alpha vs VN-Index
           </span>
           <div className="text-2xl font-black font-mono text-slate-900 mt-2">
             {report.alpha >= 0 ? `+${(report.alpha * 100).toFixed(2)}%` : `${(report.alpha * 100).toFixed(2)}%`}
           </div>
-          <span className="text-[11px] text-slate-400">Hiệu suất vượt trội</span>
+          <span className="text-[11px] text-slate-400">So với VN-Index (+8.50%/năm)</span>
         </div>
 
         {/* Max Drawdown */}

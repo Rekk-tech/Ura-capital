@@ -49,6 +49,9 @@ export const ProMacroPanel: React.FC<ProMacroPanelProps> = ({
             <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-600">
               CHU KỲ VĨ MÔ 3 NĂM
             </span>
+            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+              DỮ LIỆU MÔ PHỎNG QUÝ {currentQuarter}
+            </span>
             <span
               className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${
                 stageBadgeColors[stageKey] || "bg-slate-100 text-slate-800"
