@@ -89,7 +89,11 @@ export function useMap1Game(accessToken?: string | null): UseMap1GameReturn {
       setError(null);
       setDebrief(null);
       const res = await mapGameApiClient.startMap1(accessToken);
-      const sid = res.data.sessionId;
+      const rawData = res.data as { sessionId?: string; session?: { id?: string }; id?: string };
+      const sid = rawData.sessionId || rawData.session?.id || rawData.id;
+      if (!sid) {
+        throw new Error("Không nhận được session ID hợp lệ từ server");
+      }
       setSessionId(sid);
       await fetchState(sid);
     } catch (err: unknown) {
@@ -245,8 +249,14 @@ export function useMap2Game(accessToken?: string | null): UseMap2GameReturn {
       setError(null);
       setReport(null);
       const res = await mapGameApiClient.startMap2(accessToken);
-      setSessionId(res.data.sessionId);
-      setSession(res.data.session);
+      const rawData = res.data as { sessionId?: string; session?: Map2Session; id?: string };
+      const sessionObj = (rawData.session || rawData) as Map2Session;
+      const sid = rawData.sessionId || sessionObj?.id;
+      if (!sid) {
+        throw new Error("Không nhận được session ID hợp lệ từ server");
+      }
+      setSessionId(sid);
+      setSession(sessionObj);
     } catch (err: unknown) {
       setError(getErrorMessage(err, "Không thể khởi tạo phiên Map 2"));
     } finally {

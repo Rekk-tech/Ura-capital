@@ -35,6 +35,7 @@ export class Map1GameController {
       const state = this.map1Service.getCurrentState(session.id);
       res.status(HTTP_STATUS.CREATED).json({
         data: {
+          sessionId: session.id,
           session,
           state,
         },

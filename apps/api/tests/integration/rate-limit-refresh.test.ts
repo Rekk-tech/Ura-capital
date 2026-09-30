@@ -216,7 +216,7 @@ describe("Rate Limit — Refresh Integration", () => {
     await disconnectRedis();
 
     const originalRedisUrl = process.env.REDIS_URL;
-    process.env.REDIS_URL = "redis://127.0.0.1:59997";
+    process.env.REDIS_URL = "redis://127.0.0.1:59999";
     resetEnvCache();
 
     try {

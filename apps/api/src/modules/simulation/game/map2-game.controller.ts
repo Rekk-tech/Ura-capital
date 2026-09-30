@@ -32,7 +32,12 @@ export class Map2GameController {
     try {
       const user = this.requireUser(req);
       const session = this.map2Service.startSession(user.id);
-      res.status(HTTP_STATUS.CREATED).json({ data: session });
+      res.status(HTTP_STATUS.CREATED).json({
+        data: {
+          sessionId: session.id,
+          session,
+        },
+      });
     } catch (err) {
       next(err);
     }
