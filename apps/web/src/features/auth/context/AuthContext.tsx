@@ -1,6 +1,23 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { authApi, AuthUser } from "../../../api/auth.api";
+import { profileApi } from "../../../api/profile.api";
 import { setGlobalAccessToken, getGlobalAccessToken } from "../../../api/auth-token";
+
+async function enrichUserRole(baseUser: AuthUser, token: string): Promise<AuthUser> {
+  if (baseUser.role) return baseUser;
+  try {
+    const profile = await profileApi.getProfile(token);
+    if (profile?.roles && profile.roles.length > 0) {
+      return {
+        ...baseUser,
+        role: profile.roles.includes("ADMIN") ? "ADMIN" : profile.roles[0],
+      };
+    }
+  } catch {
+    // If profile call fails, retain baseUser safely
+  }
+  return baseUser;
+}
 
 export interface AuthContextType {
   user: AuthUser | null;
@@ -40,7 +57,8 @@ export const AuthProvider: React.FC<{
     try {
       const res = await authApi.refresh();
       setAccessToken(res.accessToken);
-      setUser(res.user);
+      const userWithRole = await enrichUserRole(res.user, res.accessToken);
+      setUser(userWithRole);
     } catch {
       setAccessToken(null);
       setUser(null);
@@ -54,7 +72,8 @@ export const AuthProvider: React.FC<{
     try {
       const res = await authApi.login(email, password);
       setAccessToken(res.accessToken);
-      setUser(res.user);
+      const userWithRole = await enrichUserRole(res.user, res.accessToken);
+      setUser(userWithRole);
     } finally {
       setIsLoading(false);
     }
