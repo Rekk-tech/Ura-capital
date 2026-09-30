@@ -36,6 +36,7 @@ export interface LessonDetailDto {
   content: string | null;
   order: number;
   progress?: LessonProgressDto | null;
+  flashcards?: FlashcardItemDto[];
 }
 
 export interface PaginationMeta {

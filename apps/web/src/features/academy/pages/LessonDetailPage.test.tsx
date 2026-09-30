@@ -524,6 +524,58 @@ describe("LessonDetailPage (Dual-Query, Navigation, Auth, Security - AC-007..AC-
     expect(cachedCurrentAttempt).toBeDefined();
     assertNoLeakageInValue(cachedCurrentAttempt);
   });
+
+  describe("Conditional Study Flashcards Header Button", () => {
+    it("does not render Study Flashcards button when lesson has zero flashcards", async () => {
+      vi.spyOn(academyApi, "getLessonBySlug").mockResolvedValue(mockLessonDetail);
+      vi.spyOn(academyApi, "getCourseBySlug").mockResolvedValue(mockCourseDetail);
+      vi.spyOn(academyApi, "getLessonFlashcards").mockResolvedValue({
+        data: {
+          courseSlug: "crypto-fundamentals",
+          lessonSlug: "proof-of-work",
+          lessonTitle: "Proof of Work Consensus",
+          flashcards: [],
+          totalCount: 0,
+        },
+      });
+
+      renderWithProviders();
+
+      await waitFor(() => {
+        expect(screen.getByRole("heading", { level: 1, name: "Proof of Work Consensus" })).toBeDefined();
+      });
+
+      expect(screen.queryByTestId("study-flashcards-button")).toBeNull();
+    });
+
+    it("renders Study Flashcards button when lesson has flashcards", async () => {
+      vi.spyOn(academyApi, "getLessonBySlug").mockResolvedValue(mockLessonDetail);
+      vi.spyOn(academyApi, "getCourseBySlug").mockResolvedValue(mockCourseDetail);
+      vi.spyOn(academyApi, "getLessonFlashcards").mockResolvedValue({
+        data: {
+          courseSlug: "crypto-fundamentals",
+          lessonSlug: "proof-of-work",
+          lessonTitle: "Proof of Work Consensus",
+          flashcards: [
+            { front: "What is PoW?", back: "Proof of Work consensus.", order: 1 },
+          ],
+          totalCount: 1,
+        },
+      });
+
+      renderWithProviders();
+
+      await waitFor(() => {
+        expect(screen.getByRole("heading", { level: 1, name: "Proof of Work Consensus" })).toBeDefined();
+      });
+
+      const flashcardBtn = await screen.findByTestId("study-flashcards-button");
+      expect(flashcardBtn).toBeDefined();
+      expect(flashcardBtn.getAttribute("href")).toBe(
+        "/academy/courses/crypto-fundamentals/lessons/proof-of-work/flashcards"
+      );
+    });
+  });
 });
 
 

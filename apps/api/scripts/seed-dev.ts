@@ -166,7 +166,7 @@ async function main() {
         },
       });
 
-      await tx.academyLesson.upsert({
+      const lesson2 = await tx.academyLesson.upsert({
         where: { courseId_slug: { courseId: course1.id, slug: "order-books" } },
         update: {
           title: "Order Book Depth & Spread Analysis",
@@ -184,20 +184,69 @@ async function main() {
         },
       });
 
-      // Flashcards for lesson 1
-      await tx.academyFlashcard.upsert({
-        where: { lessonId_order: { lessonId: lesson1.id, order: 1 } },
-        update: {
-          front: "What is the primary role of capital markets?",
-          back: "Efficient allocation of capital from savers/investors to productive businesses.",
-        },
-        create: {
-          lessonId: lesson1.id,
+      // Flashcards for lesson 1 (market-basics)
+      const lesson1Cards = [
+        {
           order: 1,
           front: "What is the primary role of capital markets?",
           back: "Efficient allocation of capital from savers/investors to productive businesses.",
         },
-      });
+        {
+          order: 2,
+          front: "What is the difference between a Market Order and a Limit Order?",
+          back: "A Market Order executes immediately at best available market price, while a Limit Order executes only at the specified limit price or better.",
+        },
+        {
+          order: 3,
+          front: "What is Bid-Ask Spread?",
+          back: "The difference between the highest price a buyer is willing to pay (Bid) and the lowest price a seller is willing to accept (Ask).",
+        },
+        {
+          order: 4,
+          front: "Why does trading volume matter in capital markets?",
+          back: "High volume reflects deep market liquidity, leading to tighter bid-ask spreads and minimal price slippage on trades.",
+        },
+      ];
+
+      for (const card of lesson1Cards) {
+        await tx.academyFlashcard.upsert({
+          where: { lessonId_order: { lessonId: lesson1.id, order: card.order } },
+          update: { front: card.front, back: card.back },
+          create: { lessonId: lesson1.id, order: card.order, front: card.front, back: card.back },
+        });
+      }
+
+      // Flashcards for lesson 2 (order-books)
+      const lesson2Cards = [
+        {
+          order: 1,
+          front: "What does Order Book Depth represent?",
+          back: "The cumulative volume of pending limit orders waiting at various bid and ask price levels.",
+        },
+        {
+          order: 2,
+          front: "What causes Slippage during order execution?",
+          back: "Slippage occurs when a market order consumes available depth and fills across multiple price levels, or during rapid market volatility.",
+        },
+        {
+          order: 3,
+          front: "How does a large market sell order affect a thin order book?",
+          back: "It sweeps through successive bid price tiers downward, causing severe downward price slippage and temporary illiquidity.",
+        },
+        {
+          order: 4,
+          front: "What is Level 2 Market Data?",
+          back: "A real-time data feed showing stacked buyer and seller queues across multiple price increments beyond top-of-book (Level 1).",
+        },
+      ];
+
+      for (const card of lesson2Cards) {
+        await tx.academyFlashcard.upsert({
+          where: { lessonId_order: { lessonId: lesson2.id, order: card.order } },
+          update: { front: card.front, back: card.back },
+          create: { lessonId: lesson2.id, order: card.order, front: card.front, back: card.back },
+        });
+      }
 
       const course2 = await tx.academyCourse.upsert({
         where: { slug: "advanced-derivatives" },
@@ -218,7 +267,7 @@ async function main() {
         },
       });
 
-      await tx.academyLesson.upsert({
+      const lesson3 = await tx.academyLesson.upsert({
         where: { courseId_slug: { courseId: course2.id, slug: "options-greeks" } },
         update: {
           title: "The Options Greeks: Delta, Gamma, Theta",
@@ -235,6 +284,38 @@ async function main() {
           content: "# Option Contracts & The Greeks\n\nAn option is a standardized derivative contract. The Greeks measure position sensitivity to underlying asset price, time decay, and implied volatility.",
         },
       });
+
+      // Flashcards for lesson 3 (options-greeks)
+      const lesson3Cards = [
+        {
+          order: 1,
+          front: "What does Delta measure in option pricing?",
+          back: "The expected change in option premium for every $1 movement in the underlying asset's price.",
+        },
+        {
+          order: 2,
+          front: "What is Theta Decay?",
+          back: "The daily erosion of an option's extrinsic time value as the contract approaches its expiration date.",
+        },
+        {
+          order: 3,
+          front: "What is the relationship between Gamma and Delta?",
+          back: "Gamma measures the rate of acceleration of Delta per $1 move in the underlying asset, reflecting convexity risk.",
+        },
+        {
+          order: 4,
+          front: "What does Vega indicate for an option position?",
+          back: "The dollar sensitivity of the option's value to a 1% shift in the underlying asset's implied volatility (IV).",
+        },
+      ];
+
+      for (const card of lesson3Cards) {
+        await tx.academyFlashcard.upsert({
+          where: { lessonId_order: { lessonId: lesson3.id, order: card.order } },
+          update: { front: card.front, back: card.back },
+          create: { lessonId: lesson3.id, order: card.order, front: card.front, back: card.back },
+        });
+      }
 
       console.log("[SEED_DEV] Academy courses and lessons ensured.");
 

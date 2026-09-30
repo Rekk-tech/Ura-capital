@@ -248,6 +248,15 @@ export function useSubmitQuizAttemptMutation() {
         queryClient.invalidateQueries({
           queryKey: ["academy", "course-progress", variables.courseSlug],
         });
+        queryClient.invalidateQueries({
+          queryKey: ["academy", "course-progress"],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["academy", "course", variables.courseSlug],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["academy", "courses"],
+        });
       }
       // Authoritative server reward reconciliation
       queryClient.invalidateQueries({
@@ -309,6 +318,15 @@ export function useCompleteLessonMutation() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["academy", "course-progress", variables.courseSlug],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["academy", "course-progress"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["academy", "course", variables.courseSlug],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["academy", "courses"],
       });
       queryClient.invalidateQueries({
         queryKey: ["academy", "course-lessons", variables.courseSlug],

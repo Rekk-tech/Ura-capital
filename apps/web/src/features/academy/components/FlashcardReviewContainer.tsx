@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { ChevronLeft, ChevronRight, RotateCcw, Eye, CheckCircle2 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ChevronLeft, ChevronRight, RotateCcw, Eye, CheckCircle2, ArrowLeft } from "lucide-react";
 import { FlashcardItemDto } from "../types/academy-ui.types";
 import { sanitizeLessonMarkdown } from "../utils/markdown-sanitizer";
 
@@ -22,6 +23,8 @@ const isInteractiveElement = (target: EventTarget | null): boolean => {
 
 export const FlashcardReviewContainer: React.FC<FlashcardReviewContainerProps> = ({
   flashcards,
+  courseSlug,
+  lessonSlug,
 }) => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [isRevealed, setIsRevealed] = useState<boolean>(false);
@@ -92,6 +95,11 @@ export const FlashcardReviewContainer: React.FC<FlashcardReviewContainerProps> =
   }, [isRevealed, isCompleted, currentIndex, handleReveal, handleNext, handlePrevious, handleRestart]);
 
   if (isCompleted) {
+    const lessonUrl =
+      courseSlug && lessonSlug
+        ? `/academy/courses/${encodeURIComponent(courseSlug)}/lessons/${encodeURIComponent(lessonSlug)}`
+        : "/academy";
+
     return (
       <div className="flashcard-deck-completed" data-testid="flashcard-completed-view">
         <div className="flashcard-completion-card">
@@ -100,15 +108,39 @@ export const FlashcardReviewContainer: React.FC<FlashcardReviewContainerProps> =
           <p className="flashcard-completion-desc">
             You reviewed all {total} {total === 1 ? "flashcard" : "flashcards"} in this lesson.
           </p>
-          <button
-            type="button"
-            className="btn btn-primary flashcard-restart-btn"
-            onClick={handleRestart}
-            aria-label="Restart Review"
+          <div
+            className="flashcard-completion-actions"
+            style={{
+              display: "flex",
+              gap: "12px",
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: "1.5rem",
+              flexWrap: "wrap",
+            }}
           >
-            <RotateCcw className="w-4 h-4 mr-2 inline" aria-hidden="true" />
-            Restart Review
-          </button>
+            <Link
+              to={lessonUrl}
+              className="btn btn-primary flashcard-return-btn"
+              data-testid="flashcard-return-lesson-btn"
+              aria-label="Return to Lesson"
+              style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+            >
+              <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+              <span>Return to Lesson</span>
+            </Link>
+            <button
+              type="button"
+              className="btn btn-secondary flashcard-restart-btn"
+              onClick={handleRestart}
+              aria-label="Restart Review"
+              data-testid="flashcard-restart-btn"
+              style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+            >
+              <RotateCcw className="w-4 h-4" aria-hidden="true" />
+              <span>Restart Review</span>
+            </button>
+          </div>
         </div>
       </div>
     );

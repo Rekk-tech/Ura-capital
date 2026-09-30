@@ -4,6 +4,7 @@ import { ChevronRight, ArrowLeft, ArrowRight, BookOpen, Layers, CheckCircle } fr
 import {
   useLessonQuery,
   useCourseQuery,
+  useFlashcardsQuery,
   useLessonQuizQuery,
   useCurrentQuizAttemptQuery,
   useStartQuizAttemptMutation,
@@ -41,6 +42,13 @@ export const LessonDetailPage: React.FC = () => {
 
   // Query C: Lesson Quiz Definition (FEAT-023)
   const quizQuery = useLessonQuizQuery(courseSlug, lessonSlug, effectiveToken);
+
+  // Query C.2: Lesson Flashcards (FEAT-022)
+  const flashcardsQuery = useFlashcardsQuery(courseSlug, lessonSlug, effectiveToken);
+  const hasFlashcards = Boolean(
+    (lessonQuery.data?.data?.flashcards && lessonQuery.data.data.flashcards.length > 0) ||
+    (flashcardsQuery.data?.data?.flashcards && flashcardsQuery.data.data.flashcards.length > 0)
+  );
 
   // Query D & Mutations: Quiz Attempt Lifecycle (FEAT-024 & FEAT-025)
   const currentAttemptQuery = useCurrentQuizAttemptQuery(courseSlug, lessonSlug, effectiveToken);
@@ -257,7 +265,7 @@ export const LessonDetailPage: React.FC = () => {
             {xpQuery.data?.data && (
               <LearnerXpDisplay totalXp={xpQuery.data.data.totalXp} />
             )}
-            {courseSlug && lessonSlug && (
+            {courseSlug && lessonSlug && hasFlashcards && (
               <Link
                 to={`/academy/courses/${encodeURIComponent(courseSlug)}/lessons/${encodeURIComponent(lessonSlug)}/flashcards`}
                 className="btn btn-outline lesson-flashcards-link"
