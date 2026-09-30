@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Flame,
   BrainCircuit,
@@ -25,6 +26,7 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
   activeSessionCycle,
   activeScenarioName,
 }) => {
+  const navigate = useNavigate();
   const [briefingMap, setBriefingMap] = useState<"map1-fomo" | "map2-pro" | null>(null);
 
   return (
@@ -109,7 +111,7 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
             <button
               type="button"
               className={`btn ${hasActiveSession ? "btn-secondary" : "btn-primary"} btn-md btn-block`}
-              onClick={() => onEnterCockpit("map1-fomo")}
+              onClick={() => navigate("/simulation/map-1")}
             >
               <span>{hasActiveSession ? "Switch to Map 1 →" : "Launch Map 1 (FOMO Arena) →"}</span>
             </button>
@@ -171,10 +173,13 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
           </div>
 
           <div className="map-picker-actions">
-            <div className="locked-banner">
-              <Lock size={15} className="text-amber" />
-              <span>Complete Map 1 with &gt; 50% capital to unlock Pro Room</span>
-            </div>
+            <button
+              type="button"
+              className="btn btn-secondary btn-md btn-block"
+              onClick={() => navigate("/simulation/map-2")}
+            >
+              <span>Launch Map 2 (Pro Room) →</span>
+            </button>
             <button
               type="button"
               className="btn btn-ghost btn-sm"
@@ -302,21 +307,21 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
                   className="btn btn-primary btn-md"
                   onClick={() => {
                     setBriefingMap(null);
-                    onEnterCockpit("map1-fomo");
+                    navigate("/simulation/map-1");
                   }}
                 >
-                  <span>Enter Trading Cockpit →</span>
+                  <span>Enter FOMO Arena →</span>
                 </button>
               ) : (
                 <button
                   type="button"
-                  className="btn btn-secondary btn-md"
+                  className="btn btn-primary btn-md"
                   onClick={() => {
                     setBriefingMap(null);
-                    onEnterCockpit("map1-fomo");
+                    navigate("/simulation/map-2");
                   }}
                 >
-                  <span>Play Map 1 to Unlock</span>
+                  <span>Enter Pro Room →</span>
                 </button>
               )}
             </div>

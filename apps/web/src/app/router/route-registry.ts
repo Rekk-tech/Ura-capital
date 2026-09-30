@@ -49,6 +49,8 @@ export const CANONICAL_ROUTES = {
   SIMULATION: "/simulation",
   SIMULATION_LIVE: "/simulation/live",
   SIMULATION_SESSION: "/simulation/sessions/:simulationId",
+  SIMULATION_MAP1: "/simulation/map-1",
+  SIMULATION_MAP2: "/simulation/map-2",
   PORTFOLIO: "/portfolio",
   COMMUNITY: "/community",
   COMMUNITY_POST: "/community/posts/:postId",
@@ -72,6 +74,8 @@ export type RouteKey =
   | "academyLearningPath"
   | "academyCoursePlayer"
   | "simulation"
+  | "simulationMap1"
+  | "simulationMap2"
   | "portfolio"
   | "community"
   | "communityPost"
@@ -158,6 +162,30 @@ export const ROUTE_REGISTRY: Record<RouteKey, RouteMetadata> = {
     isNavVisible: true,
     section: "trading",
     owningFeature: "FEAT-074",
+  },
+  simulationMap1: {
+    id: "simulationMap1",
+    path: CANONICAL_ROUTES.SIMULATION_MAP1,
+    title: "Map 1 — FOMO Arena Simulation",
+    description: "High-pressure 7-round real-time trading battleground with behavioral FOMO scoring.",
+    navLabel: "FOMO Arena",
+    status: "AVAILABLE",
+    requiresAuth: true,
+    isNavVisible: false,
+    section: "trading",
+    owningFeature: "FEAT-082",
+  },
+  simulationMap2: {
+    id: "simulationMap2",
+    path: CANONICAL_ROUTES.SIMULATION_MAP2,
+    title: "Map 2 — Pro Room Macro Strategy",
+    description: "Institutional 12-quarter asset allocation simulation with Graham & Buffett AI Advisor.",
+    navLabel: "Pro Room",
+    status: "AVAILABLE",
+    requiresAuth: true,
+    isNavVisible: false,
+    section: "trading",
+    owningFeature: "FEAT-082",
   },
   portfolio: {
     id: "portfolio",

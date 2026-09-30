@@ -124,6 +124,18 @@ describe("Route Registry (FEAT-070 / AC-001)", () => {
     expect(settings?.status).toBe("AVAILABLE");
     expect(settings?.requiresAuth).toBe(true);
 
+    const map1 = findRouteByPath("/simulation/map-1");
+    expect(map1?.id).toBe("simulationMap1");
+    expect(map1?.owningFeature).toBe("FEAT-082");
+    expect(map1?.status).toBe("AVAILABLE");
+    expect(map1?.requiresAuth).toBe(true);
+
+    const map2 = findRouteByPath("/simulation/map-2");
+    expect(map2?.id).toBe("simulationMap2");
+    expect(map2?.owningFeature).toBe("FEAT-082");
+    expect(map2?.status).toBe("AVAILABLE");
+    expect(map2?.requiresAuth).toBe(true);
+
     const unknown = findRouteByPath("/unknown-route");
     expect(unknown).toBeUndefined();
   });

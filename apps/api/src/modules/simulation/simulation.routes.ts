@@ -12,6 +12,8 @@ import { SimulationOrderController } from "./simulation-order.controller.js";
 import { SimulationValuationService } from "./simulation-valuation.service.js";
 import { SimulationValuationController } from "./simulation-valuation.controller.js";
 import { createSimulationOrderRateLimiter } from "./simulation-order.rate-limit.js";
+import { map1GameController } from "./game/map1-game.controller.js";
+import { map2GameController } from "./game/map2-game.controller.js";
 import type { RequestHandler } from "express";
 
 export function createSimulationRouter(
@@ -137,7 +139,58 @@ export function createSimulationRouter(
     (req, res, next) => valuationCtrl.getTrades(req, res, next),
   );
 
+  // ========================================================================
+  // FEAT-082: Map 1 — FOMO Arena Dedicated Routes (AURA_MAP1_MAP2_GAME_SPEC)
+  // ========================================================================
+  router.post("/api/sim/map1/start", authenticate, (req, res, next) => {
+    map1GameController.start(req, res, next);
+  });
+
+  router.get("/api/sim/map1/:id/state", authenticate, (req, res, next) => {
+    map1GameController.getState(req, res, next);
+  });
+
+  router.post("/api/sim/map1/:id/order", authenticate, (req, res, next) => {
+    map1GameController.submitOrder(req, res, next);
+  });
+
+  router.post("/api/sim/map1/:id/quiz", authenticate, (req, res, next) => {
+    map1GameController.submitQuiz(req, res, next);
+  });
+
+  router.post("/api/sim/map1/:id/finish", authenticate, (req, res, next) => {
+    map1GameController.finish(req, res, next);
+  });
+
+  // ========================================================================
+  // FEAT-082: Map 2 — Pro Room Dedicated Routes (AURA_MAP1_MAP2_GAME_SPEC)
+  // ========================================================================
+  router.post("/api/sim/map2/start", authenticate, (req, res, next) => {
+    map2GameController.start(req, res, next);
+  });
+
+  router.get("/api/sim/map2/:id/session", authenticate, (req, res, next) => {
+    map2GameController.getSession(req, res, next);
+  });
+
+  router.post("/api/sim/map2/:id/allocate", authenticate, (req, res, next) => {
+    map2GameController.allocate(req, res, next);
+  });
+
+  router.post("/api/sim/map2/:id/quiz", authenticate, (req, res, next) => {
+    map2GameController.submitQuiz(req, res, next);
+  });
+
+  router.post("/api/sim/map2/:id/commit-quarter", authenticate, (req, res, next) => {
+    map2GameController.commitQuarter(req, res, next);
+  });
+
+  router.get("/api/sim/map2/:id/report", authenticate, (req, res, next) => {
+    map2GameController.getReport(req, res, next);
+  });
+
   return router;
 }
 
 export const simulationRouter = createSimulationRouter();
+
