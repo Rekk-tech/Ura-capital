@@ -76,7 +76,7 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
             <div className="map-icon-halo map1-halo">
               <Flame size={32} className="text-orange" />
             </div>
-            <h3 className="map-title-lg">FOMO ARENA</h3>
+            <h3 className="map-title-lg">MAP 1 — FOMO ARENA</h3>
             <p className="map-tagline-lg">Psychological Endurance & Short-Term Speculation</p>
           </div>
 
@@ -91,7 +91,7 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
               <span className="spec-icon-label">
                 <Coins size={15} className="text-muted" /> Virtual Capital:
               </span>
-              <strong>$10,000.00 Virtual Funds</strong>
+              <strong>$10,000.00 virtual cash</strong>
             </div>
             <div className="spec-row">
               <span className="spec-icon-label">
@@ -112,8 +112,9 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
               type="button"
               className={`btn ${hasActiveSession ? "btn-secondary" : "btn-primary"} btn-md btn-block`}
               onClick={() => navigate("/simulation/map-1")}
+              data-testid="enter-fomo-arena-button"
             >
-              <span>{hasActiveSession ? "Switch to Map 1 →" : "Launch Map 1 (FOMO Arena) →"}</span>
+              <span>Start Map 1 (FOMO Arena) →</span>
             </button>
             <button
               type="button"
@@ -133,7 +134,7 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
               <span>MAP 2</span>
             </div>
             <span className="badge badge-amber-subtle">
-              <Lock size={13} /> LOCKED
+              <Lock size={13} /> Locked until Map 1 is survived
             </span>
           </div>
 
@@ -141,7 +142,7 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
             <div className="map-icon-halo map2-halo">
               <BrainCircuit size={32} className="text-teal" />
             </div>
-            <h3 className="map-title-lg">PRO ROOM</h3>
+            <h3 className="map-title-lg">MAP 2 — PRO ROOM</h3>
             <p className="map-tagline-lg">Disciplined Value Investing & Strategic Allocation</p>
           </div>
 
@@ -150,13 +151,13 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
               <span className="spec-icon-label">
                 <Clock size={15} className="text-muted" /> Mechanics:
               </span>
-              <strong>Turn-based · 12 economic quarters</strong>
+              <strong>Turn-based · 12 quarters</strong>
             </div>
             <div className="spec-row">
               <span className="spec-icon-label">
                 <Coins size={15} className="text-muted" /> Virtual Capital:
               </span>
-              <strong>$100,000.00 Virtual Funds</strong>
+              <strong>$100,000.00 virtual cash</strong>
             </div>
             <div className="spec-row">
               <span className="spec-icon-label">
@@ -168,7 +169,7 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
               <span className="spec-icon-label">
                 <Sparkles size={15} className="text-muted" /> AI Support:
               </span>
-              <strong>CrediFin AI Advisor Insights</strong>
+              <strong>Graham & Buffett AI Advisor</strong>
             </div>
           </div>
 
@@ -177,8 +178,9 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
               type="button"
               className="btn btn-secondary btn-md btn-block"
               onClick={() => navigate("/simulation/map-2")}
+              data-testid="enter-pro-room-button"
             >
-              <span>Launch Map 2 (Pro Room) →</span>
+              <span>Start Map 2 (Pro Room) →</span>
             </button>
             <button
               type="button"

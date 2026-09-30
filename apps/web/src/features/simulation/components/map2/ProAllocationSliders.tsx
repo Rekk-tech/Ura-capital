@@ -9,26 +9,34 @@ interface ProAllocationSlidersProps {
   onCommitQuarter: (allocation: Map2Allocation) => Promise<void>;
 }
 
+const defaultAllocation: Map2Allocation = { growth: 25, value: 25, bond: 25, cash: 25 };
+
 export const ProAllocationSliders: React.FC<ProAllocationSlidersProps> = ({
   currentAllocation,
   currentQuarter,
   isCommitting,
   onCommitQuarter,
 }) => {
-  const [allocation, setAllocation] = useState<Map2Allocation>(currentAllocation);
+  const [allocation, setAllocation] = useState<Map2Allocation>(currentAllocation || defaultAllocation);
 
   useEffect(() => {
-    setAllocation(currentAllocation);
+    if (currentAllocation) {
+      setAllocation(currentAllocation);
+    }
   }, [currentAllocation]);
 
-  const total = allocation.growth + allocation.value + allocation.bond + allocation.cash;
+  const activeAlloc = allocation || defaultAllocation;
+  const total = (activeAlloc.growth ?? 0) + (activeAlloc.value ?? 0) + (activeAlloc.bond ?? 0) + (activeAlloc.cash ?? 0);
   const isValid = Math.abs(total - 100) < 0.01;
 
   const handleSliderChange = (asset: keyof Map2Allocation, value: number) => {
-    setAllocation((prev) => ({
-      ...prev,
-      [asset]: value,
-    }));
+    setAllocation((prev) => {
+      const base = prev || defaultAllocation;
+      return {
+        ...base,
+        [asset]: value,
+      };
+    });
   };
 
   const handleAutoNormalize = () => {
@@ -37,16 +45,16 @@ export const ProAllocationSliders: React.FC<ProAllocationSlidersProps> = ({
       return;
     }
     const factor = 100 / total;
-    const g = Math.round(allocation.growth * factor);
-    const v = Math.round(allocation.value * factor);
-    const b = Math.round(allocation.bond * factor);
+    const g = Math.round(activeAlloc.growth * factor);
+    const v = Math.round(activeAlloc.value * factor);
+    const b = Math.round(activeAlloc.bond * factor);
     const c = 100 - (g + v + b);
     setAllocation({ growth: g, value: v, bond: b, cash: Math.max(0, c) });
   };
 
   const handleCommit = async () => {
     if (!isValid) return;
-    await onCommitQuarter(allocation);
+    await onCommitQuarter(activeAlloc);
   };
 
   // Donut Chart SVG calculations
@@ -58,10 +66,10 @@ export const ProAllocationSliders: React.FC<ProAllocationSlidersProps> = ({
   };
 
   const cumulative = [
-    { key: "growth", val: allocation.growth, color: donutColors.growth, label: "Tăng trưởng" },
-    { key: "value", val: allocation.value, color: donutColors.value, label: "Giá trị" },
-    { key: "bond", val: allocation.bond, color: donutColors.bond, label: "Trái phiếu" },
-    { key: "cash", val: allocation.cash, color: donutColors.cash, label: "Tiền mặt" },
+    { key: "growth", val: activeAlloc.growth, color: donutColors.growth, label: "Tăng trưởng" },
+    { key: "value", val: activeAlloc.value, color: donutColors.value, label: "Giá trị" },
+    { key: "bond", val: activeAlloc.bond, color: donutColors.bond, label: "Trái phiếu" },
+    { key: "cash", val: activeAlloc.cash, color: donutColors.cash, label: "Tiền mặt" },
   ];
 
   return (
@@ -121,14 +129,14 @@ export const ProAllocationSliders: React.FC<ProAllocationSlidersProps> = ({
                   Sharpe lịch sử 3 năm (tham khảo): 1.84 • Beta Rate: -2.0
                 </span>
               </div>
-              <span className="font-mono font-bold text-slate-900 text-sm">{allocation.growth}%</span>
+              <span className="font-mono font-bold text-slate-900 text-sm">{activeAlloc.growth}%</span>
             </div>
             <input
               type="range"
               min="0"
               max="100"
               step="5"
-              value={allocation.growth}
+              value={activeAlloc.growth}
               onChange={(e) => handleSliderChange("growth", Number(e.target.value))}
               className="w-full accent-rose-500 h-2 bg-slate-200 rounded-lg cursor-pointer"
             />
@@ -146,14 +154,14 @@ export const ProAllocationSliders: React.FC<ProAllocationSlidersProps> = ({
                   Sharpe lịch sử 3 năm (tham khảo): 2.10 • Cổ tức 8-10%/năm
                 </span>
               </div>
-              <span className="font-mono font-bold text-slate-900 text-sm">{allocation.value}%</span>
+              <span className="font-mono font-bold text-slate-900 text-sm">{activeAlloc.value}%</span>
             </div>
             <input
               type="range"
               min="0"
               max="100"
               step="5"
-              value={allocation.value}
+              value={activeAlloc.value}
               onChange={(e) => handleSliderChange("value", Number(e.target.value))}
               className="w-full accent-emerald-500 h-2 bg-slate-200 rounded-lg cursor-pointer"
             />
@@ -171,14 +179,14 @@ export const ProAllocationSliders: React.FC<ProAllocationSlidersProps> = ({
                   Kỳ hạn 1 năm — Lợi suất 7.50%/năm (0.01875/quý)
                 </span>
               </div>
-              <span className="font-mono font-bold text-slate-900 text-sm">{allocation.bond}%</span>
+              <span className="font-mono font-bold text-slate-900 text-sm">{activeAlloc.bond}%</span>
             </div>
             <input
               type="range"
               min="0"
               max="100"
               step="5"
-              value={allocation.bond}
+              value={activeAlloc.bond}
               onChange={(e) => handleSliderChange("bond", Number(e.target.value))}
               className="w-full accent-blue-500 h-2 bg-slate-200 rounded-lg cursor-pointer"
             />
@@ -196,14 +204,14 @@ export const ProAllocationSliders: React.FC<ProAllocationSlidersProps> = ({
                   Lợi tức 4.00%/năm • An toàn thanh khoản tuyệt đối
                 </span>
               </div>
-              <span className="font-mono font-bold text-slate-900 text-sm">{allocation.cash}%</span>
+              <span className="font-mono font-bold text-slate-900 text-sm">{activeAlloc.cash}%</span>
             </div>
             <input
               type="range"
               min="0"
               max="100"
               step="5"
-              value={allocation.cash}
+              value={activeAlloc.cash}
               onChange={(e) => handleSliderChange("cash", Number(e.target.value))}
               className="w-full accent-amber-500 h-2 bg-slate-200 rounded-lg cursor-pointer"
             />

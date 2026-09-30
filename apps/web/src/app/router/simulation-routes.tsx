@@ -9,7 +9,10 @@ export const SimulationRoutes: React.FC = () => {
   return (
     <ProtectedRoute>
       <Routes>
-        <Route path="/" element={<SimulationDashboardPage />} />
+        <Route path="/" element={<SimulationDashboardPage mode="maps" />} />
+        <Route path="/maps" element={<SimulationDashboardPage mode="maps" />} />
+        <Route path="/cockpit" element={<SimulationDashboardPage mode="cockpit" />} />
+        <Route path="/trading" element={<SimulationDashboardPage mode="cockpit" />} />
         <Route path="/live" element={<SimulationDashboardPage mode="cockpit" />} />
         <Route path="/sessions/:simulationId" element={<SimulationDashboardPage mode="cockpit" />} />
         <Route path="/map-1" element={<FomoArenaPage />} />

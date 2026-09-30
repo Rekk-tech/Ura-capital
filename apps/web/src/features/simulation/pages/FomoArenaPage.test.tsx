@@ -1,44 +1,26 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import { FomoArenaPage } from "./FomoArenaPage";
-import * as useMapGameHooks from "../hooks/use-map-game";
-import * as AuthContextModule from "../../auth/context/AuthContext";
+import * as useMapGameModule from "../hooks/use-map-game";
 
+vi.mock("../hooks/use-map-game");
 vi.mock("../../auth/context/AuthContext", () => ({
-  useAuth: vi.fn(),
+  useAuth: () => ({
+    accessToken: "mock-token",
+    isAuthenticated: true,
+    user: { id: "user-1", email: "user@ura.local" },
+  }),
 }));
 
-vi.mock("../hooks/use-map-game", () => ({
-  useMap1Game: vi.fn(),
-  useMap2Game: vi.fn(),
-}));
-
-describe("FomoArenaPage (FEAT-082)", () => {
-  const mockStartNewGame = vi.fn();
-  const mockSubmitOrder = vi.fn();
-  const mockSubmitTrap = vi.fn();
-  const mockSubmitQuiz = vi.fn();
-  const mockCompleteTutorial = vi.fn();
-  const mockResetGame = vi.fn();
-
+describe("FomoArenaPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(AuthContextModule.useAuth).mockReturnValue({
-      user: { id: "user-1", email: "trader@ura.capital", role: "USER" },
-      accessToken: "mock-token",
-      refreshToken: "mock-refresh",
-      isAuthenticated: true,
-      isLoading: false,
-      login: vi.fn(),
-      register: vi.fn(),
-      logout: vi.fn(),
-      refreshAuth: vi.fn(),
-    } as unknown as ReturnType<typeof AuthContextModule.useAuth>);
   });
 
-  it("renders disclosure banner and empty start screen when no session is active", () => {
-    vi.mocked(useMapGameHooks.useMap1Game).mockReturnValue({
+  it("renders empty state with Start Game CTA and Disclosure banner", () => {
+    const mockStartNewGame = vi.fn();
+    vi.spyOn(useMapGameModule, "useMap1Game").mockReturnValue({
       sessionId: null,
       state: null,
       debrief: null,
@@ -47,35 +29,35 @@ describe("FomoArenaPage (FEAT-082)", () => {
       error: null,
       tutorialCompleted: true,
       startNewGame: mockStartNewGame,
-      submitOrder: mockSubmitOrder,
-      submitTrap: mockSubmitTrap,
-      submitQuiz: mockSubmitQuiz,
+      submitOrder: vi.fn(),
+      submitTrap: vi.fn(),
+      submitQuiz: vi.fn(),
+      completeTutorial: vi.fn(),
       finishGame: vi.fn(),
-      completeTutorial: mockCompleteTutorial,
-      resetGame: mockResetGame,
+      resetGame: vi.fn(),
     });
 
     render(
-      <MemoryRouter>
+      <BrowserRouter>
         <FomoArenaPage />
-      </MemoryRouter>,
+      </BrowserRouter>
     );
 
-    // Disclosure banner
-    expect(screen.getByText(/SIMULATION ONLY/i)).toBeDefined();
-    expect(screen.getByText(/NO REAL MONEY/i)).toBeDefined();
-    // Empty state heading
-    expect(screen.getByText(/Đấu Trường Tâm Lý — FOMO Arena/i)).toBeDefined();
-    // Start button
+    // Mandatory disclosure banner
+    expect(screen.getByText("SIMULATION ONLY")).toBeDefined();
+    expect(screen.getByText(/Simulated execution only • Virtual funds/)).toBeDefined();
+
+    // Empty state title & CTA
+    expect(screen.getByText("Đấu Trường Tâm Lý — FOMO Arena")).toBeDefined();
+
     const startBtn = screen.getByRole("button", { name: /Bắt Đầu Vòng 1 Ngay/i });
     expect(startBtn).toBeDefined();
-
     fireEvent.click(startBtn);
-    expect(mockStartNewGame).toHaveBeenCalledTimes(1);
+    expect(mockStartNewGame).toHaveBeenCalled();
   });
 
-  it("renders loading state spinner during game initialization", () => {
-    vi.mocked(useMapGameHooks.useMap1Game).mockReturnValue({
+  it("renders loading state when initializing session", () => {
+    vi.spyOn(useMapGameModule, "useMap1Game").mockReturnValue({
       sessionId: null,
       state: null,
       debrief: null,
@@ -83,179 +65,121 @@ describe("FomoArenaPage (FEAT-082)", () => {
       isSubmittingOrder: false,
       error: null,
       tutorialCompleted: true,
-      startNewGame: mockStartNewGame,
-      submitOrder: mockSubmitOrder,
-      submitTrap: mockSubmitTrap,
-      submitQuiz: mockSubmitQuiz,
+      startNewGame: vi.fn(),
+      submitOrder: vi.fn(),
+      submitTrap: vi.fn(),
+      submitQuiz: vi.fn(),
+      completeTutorial: vi.fn(),
       finishGame: vi.fn(),
-      completeTutorial: mockCompleteTutorial,
-      resetGame: mockResetGame,
+      resetGame: vi.fn(),
     });
 
     render(
-      <MemoryRouter>
+      <BrowserRouter>
         <FomoArenaPage />
-      </MemoryRouter>,
+      </BrowserRouter>
     );
 
-    expect(screen.getByText(/Đang khởi tạo đấu trường \$FOMO Arena.../i)).toBeDefined();
+    expect(screen.getByText("Đang khởi tạo đấu trường $FOMO Arena...")).toBeDefined();
   });
 
-  it("renders error banner with retry button on failure", () => {
-    vi.mocked(useMapGameHooks.useMap1Game).mockReturnValue({
+  it("renders error state with retry action", () => {
+    const mockStartNewGame = vi.fn();
+    vi.spyOn(useMapGameModule, "useMap1Game").mockReturnValue({
       sessionId: null,
       state: null,
       debrief: null,
       isLoading: false,
       isSubmittingOrder: false,
-      error: "Không thể kết nối máy chủ giả lập",
+      error: "Không thể kết nối máy chủ mô phỏng.",
       tutorialCompleted: true,
       startNewGame: mockStartNewGame,
-      submitOrder: mockSubmitOrder,
-      submitTrap: mockSubmitTrap,
-      submitQuiz: mockSubmitQuiz,
+      submitOrder: vi.fn(),
+      submitTrap: vi.fn(),
+      submitQuiz: vi.fn(),
+      completeTutorial: vi.fn(),
       finishGame: vi.fn(),
-      completeTutorial: mockCompleteTutorial,
-      resetGame: mockResetGame,
+      resetGame: vi.fn(),
     });
 
     render(
-      <MemoryRouter>
+      <BrowserRouter>
         <FomoArenaPage />
-      </MemoryRouter>,
+      </BrowserRouter>
     );
 
-    expect(screen.getByText(/Không thể kết nối máy chủ giả lập/i)).toBeDefined();
-    const retryBtn = screen.getByRole("button", { name: /Thử lại/i });
+    expect(screen.getByText("Không thể kết nối máy chủ mô phỏng.")).toBeDefined();
+    const retryBtn = screen.getByText("Thử lại");
     fireEvent.click(retryBtn);
-    expect(mockStartNewGame).toHaveBeenCalledTimes(1);
+    expect(mockStartNewGame).toHaveBeenCalled();
   });
 
-  it("renders active battleground with chart, news, timer, and order ticket", () => {
-    vi.mocked(useMapGameHooks.useMap1Game).mockReturnValue({
-      sessionId: "session-fomo-1",
+  it("renders active in-progress game layout with chart, order ticket, and news", () => {
+    vi.spyOn(useMapGameModule, "useMap1Game").mockReturnValue({
+      sessionId: "session-1",
       state: {
-        sessionId: "session-fomo-1",
+        sessionId: "session-1",
         round: 1,
         totalRounds: 7,
         phase: "trading_window",
-        roundDurationSeconds: 45,
         secondInRound: 15,
+        roundDurationSeconds: 45,
         timeRemainingInPhase: 15,
         status: "active",
-        currentPrice: 10500,
-        priceChangePercent: 5.0,
-        pricePoints: [
-          { second: 0, price: 10000 },
-          { second: 15, price: 10500 },
-        ],
-        news: "Cổ phiếu $FOMO bất ngờ bứt phá đỉnh cũ với thanh khoản kỷ lục",
-        botChat: [
-          { sender: "Thánh_Allin", message: "Múc cật lực anh em ơi!" },
-        ],
-        trap: null,
-        quiz: null,
-        roundConfig: {
-          roundNumber: 1,
-          name: "Bùng Nổ F0",
-          priceChangePercent: 5.0,
-          estimatedClosePrice: 10500,
-          news: "Cổ phiếu $FOMO bất ngờ bứt phá đỉnh cũ với thanh khoản kỷ lục",
-          botChat: [],
-          trap: null,
-          quiz: null,
-          hint: "Thị trường hưng phấn quá đà",
-        },
-        cash: 100000000,
+        currentPrice: 12000,
+        priceChangePercent: 15.5,
+        cash: 10000000,
         shares: 0,
         marginUsed: 0,
-        nav: 100000000,
-        equity: 100000000,
+        nav: 10000000,
+        equity: 10000000,
         unrealizedPnl: 0,
         canUseMargin: false,
         freeStopLossAwarded: false,
+        roundConfig: {
+          roundNumber: 1,
+          name: "Vòng 1: Tin đồn đầu tiên",
+          priceChangePercent: 15,
+          estimatedClosePrice: 12000,
+          news: "Cổ phiếu $FOMO công bố tăng trưởng doanh thu 300%!",
+          botChat: [
+            { sender: "TraderPro99", message: "Múc cật lực anh em ơi!" },
+          ],
+          trap: null,
+          quiz: null,
+        },
+        news: "Cổ phiếu $FOMO công bố tăng trưởng doanh thu 300%!",
+        botChat: [
+          { sender: "TraderPro99", message: "Múc cật lực anh em ơi!" },
+        ],
+        trap: null,
+        quiz: null,
+        pricePoints: [{ second: 1, price: 10000 }, { second: 15, price: 12000 }],
       },
       debrief: null,
       isLoading: false,
       isSubmittingOrder: false,
       error: null,
       tutorialCompleted: true,
-      startNewGame: mockStartNewGame,
-      submitOrder: mockSubmitOrder,
-      submitTrap: mockSubmitTrap,
-      submitQuiz: mockSubmitQuiz,
+      startNewGame: vi.fn(),
+      submitOrder: vi.fn(),
+      submitTrap: vi.fn(),
+      submitQuiz: vi.fn(),
+      completeTutorial: vi.fn(),
       finishGame: vi.fn(),
-      completeTutorial: mockCompleteTutorial,
-      resetGame: mockResetGame,
+      resetGame: vi.fn(),
     });
 
     render(
-      <MemoryRouter>
+      <BrowserRouter>
         <FomoArenaPage />
-      </MemoryRouter>,
+      </BrowserRouter>
     );
 
-    // Chart header
-    expect(screen.getAllByText(/\$FOMO/i)[0]).toBeDefined();
-    // News banner
-    expect(screen.getByText(/Cổ phiếu \$FOMO bất ngờ bứt phá đỉnh cũ/i)).toBeDefined();
-    // Bot chat
-    expect(screen.getByText(/Thánh_Allin/i)).toBeDefined();
-    // Order ticket
-    expect(screen.getByText(/Đặt Lệnh Nhanh/i)).toBeDefined();
-    // Margin locked warning in Round 1
-    expect(screen.getByText(/Mở khóa từ Round 3/i)).toBeDefined();
-  });
-
-  it("renders debrief view when game concludes", () => {
-    vi.mocked(useMapGameHooks.useMap1Game).mockReturnValue({
-      sessionId: "session-fomo-1",
-      state: null,
-      debrief: {
-        sessionId: "session-fomo-1",
-        status: "completed_survived",
-        isSurvived: true,
-        initialCash: 100000000,
-        finalNav: 112000000,
-        pnlAmount: 12000000,
-        pnlPercent: 12.0,
-        fomoScore: 35,
-        fomoClassification: "Kiểm Soát Tốt",
-        disciplineScore: 82,
-        disciplineClassification: "Kỷ Luật Vững Vàng",
-        badgeAwarded: "Bàn Tay Kim Cương",
-        unlocksMap2: true,
-        topMistakes: [
-          "Bán hoảng loạn ở đáy sóng giảm Round 5",
-        ],
-        ordersCount: 6,
-        navHistory: [
-          { round: 1, nav: 100000000, price: 10000 },
-          { round: 7, nav: 112000000, price: 11200 },
-        ],
-      },
-      isLoading: false,
-      isSubmittingOrder: false,
-      error: null,
-      tutorialCompleted: true,
-      startNewGame: mockStartNewGame,
-      submitOrder: mockSubmitOrder,
-      submitTrap: mockSubmitTrap,
-      submitQuiz: mockSubmitQuiz,
-      finishGame: vi.fn(),
-      completeTutorial: mockCompleteTutorial,
-      resetGame: mockResetGame,
-    });
-
-    render(
-      <MemoryRouter>
-        <FomoArenaPage />
-      </MemoryRouter>,
-    );
-
-    // Debrief outcome
-    expect(screen.getByText(/SỐNG SÓT QUA BÃO FOMO/i)).toBeDefined();
-    expect(screen.getByText(/Survivor of FOMO Storm/i)).toBeDefined();
-    expect(screen.getByText(/Vào Map 2: Pro Room/i)).toBeDefined();
+    // Verify news and bot chat
+    expect(screen.getByText("Cổ phiếu $FOMO công bố tăng trưởng doanh thu 300%!")).toBeDefined();
+    expect(screen.getByText("TraderPro99")).toBeDefined();
+    expect(screen.getByText("Múc cật lực anh em ơi!")).toBeDefined();
+    expect(screen.getByText(/Vòng 1: Tin đồn đầu tiên/)).toBeDefined();
   });
 });

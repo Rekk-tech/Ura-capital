@@ -55,7 +55,9 @@ export const SimulationDashboardPage: React.FC<SimulationDashboardPageProps> = (
     (propMode === undefined &&
       !routeSessionId &&
       !location.pathname.endsWith("/live") &&
-      location.search.includes("view=maps"));
+      !location.pathname.endsWith("/cockpit") &&
+      !location.pathname.endsWith("/trading") &&
+      !location.search.includes("mode=cockpit"));
 
   const { accessToken, isAuthenticated, isLoading: isAuthLoading } = useAuth();
 
@@ -327,6 +329,7 @@ export const SimulationDashboardPage: React.FC<SimulationDashboardPageProps> = (
         onCompleteSession={handleCompleteSession}
         onCancelSession={handleCancelSession}
         onCreateSession={handleCreateSession}
+        onBackToMaps={() => navigate("/simulation")}
         isStarting={startSessionMutation.isPending}
         isResetting={resetSessionMutation.isPending}
         isCompleting={completeSessionMutation.isPending}

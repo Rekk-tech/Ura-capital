@@ -32,16 +32,22 @@ export const FomoTimer: React.FC<FomoTimerProps> = ({
 }) => {
   // Financial KPI Math (Resolving Review Issue 1.4)
   // TOTAL ASSETS must be dynamically evaluated as Available Cash + Current Market Value of Open Positions
-  const marketValueOfPositions = shares * currentPrice;
-  const totalAssets = cash + marketValueOfPositions;
-  const unrealizedPnlAmount = totalAssets - initialCash;
-  const unrealizedPnlPercent = Number(((unrealizedPnlAmount / (initialCash || 1)) * 100).toFixed(2));
+  const safeCash = cash ?? 0;
+  const safeShares = shares ?? 0;
+  const safePrice = currentPrice ?? 0;
+  const safeInitialCash = initialCash || 10000000;
+  const marketValueOfPositions = safeShares * safePrice;
+  const totalAssets = safeCash + marketValueOfPositions;
+  const unrealizedPnlAmount = totalAssets - safeInitialCash;
+  const unrealizedPnlPercent = Number(((unrealizedPnlAmount / safeInitialCash) * 100).toFixed(2));
   const isPnlPositive = unrealizedPnlAmount >= 0;
 
-  const secondsLeft = Math.max(0, roundDurationSeconds - secondInRound);
+  const safeRoundDuration = roundDurationSeconds ?? 45;
+  const safeSecondInRound = secondInRound ?? 0;
+  const secondsLeft = Math.max(0, safeRoundDuration - safeSecondInRound);
   const formattedSeconds = String(secondsLeft).padStart(2, "0");
 
-  const progressPercent = Math.round((round / totalRounds) * 100);
+  const progressPercent = Math.round(((round ?? 1) / (totalRounds || 7)) * 100);
 
   // 4-Phase Micro-Timeline configuration
   const phaseList: Array<{
@@ -147,7 +153,7 @@ export const FomoTimer: React.FC<FomoTimerProps> = ({
               AVAILABLE CASH
             </span>
             <div className="text-lg md:text-xl font-black font-mono text-slate-900 mt-0.5">
-              {cash.toLocaleString("vi-VN")}{" "}
+              {safeCash.toLocaleString("vi-VN")}{" "}
               <span className="text-xs font-semibold text-slate-500">VND</span>
             </div>
           </div>

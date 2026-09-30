@@ -110,4 +110,14 @@ describe("SimulationSessionBar (FEAT-074: AC-001, AC-006)", () => {
     fireEvent.change(select, { target: { value: session2.id } });
     expect(onSelect).toHaveBeenCalledWith(session2.id);
   });
+
+  it("triggers onBackToMaps when Maps button is clicked", () => {
+    const onBack = vi.fn();
+    render(<SimulationSessionBar session={mockSession} onBackToMaps={onBack} />);
+
+    const mapsBtn = screen.getByTestId("session-back-to-maps-button");
+    expect(mapsBtn).toBeInTheDocument();
+    fireEvent.click(mapsBtn);
+    expect(onBack).toHaveBeenCalledTimes(1);
+  });
 });

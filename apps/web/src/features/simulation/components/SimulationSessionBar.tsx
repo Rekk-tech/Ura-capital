@@ -1,5 +1,5 @@
 import React from "react";
-import { Play, RotateCcw, PlusCircle, CheckCircle2, Clock, XCircle, ChevronDown } from "lucide-react";
+import { Play, RotateCcw, PlusCircle, CheckCircle2, Clock, XCircle, ChevronDown, Compass } from "lucide-react";
 import { SimulationSessionDto } from "../types/simulation-ui.types";
 
 interface SimulationSessionBarProps {
@@ -11,6 +11,7 @@ interface SimulationSessionBarProps {
   onCompleteSession?: () => void;
   onCancelSession?: () => void;
   onCreateSession?: () => void;
+  onBackToMaps?: () => void;
   isStarting?: boolean;
   isResetting?: boolean;
   isCompleting?: boolean;
@@ -27,6 +28,7 @@ export const SimulationSessionBar: React.FC<SimulationSessionBarProps> = ({
   onCompleteSession,
   onCancelSession,
   onCreateSession,
+  onBackToMaps,
   isStarting = false,
   isResetting = false,
   isCompleting = false,
@@ -186,6 +188,19 @@ export const SimulationSessionBar: React.FC<SimulationSessionBarProps> = ({
           >
             <PlusCircle size={15} style={{ marginRight: "6px" }} />
             New
+          </button>
+        )}
+
+        {onBackToMaps && (
+          <button
+            type="button"
+            className="button button-outline"
+            onClick={onBackToMaps}
+            data-testid="session-back-to-maps-button"
+            title="Back to Simulation Maps Lobby"
+          >
+            <Compass size={15} style={{ marginRight: "6px" }} />
+            Maps
           </button>
         )}
       </div>

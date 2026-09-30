@@ -110,7 +110,7 @@ const mockTrades: SimulationTradeDto[] = [
   },
 ];
 
-function renderWithProviders(initialRoute = "/simulation", initialToken: string | null = "valid-mock-token") {
+function renderWithProviders(initialRoute = "/simulation/cockpit", initialToken: string | null = "valid-mock-token") {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: { retry: false },
@@ -122,8 +122,10 @@ function renderWithProviders(initialRoute = "/simulation", initialToken: string 
       <MemoryRouter initialEntries={[initialRoute]}>
         <AuthProvider initialToken={initialToken}>
           <Routes>
-            <Route path="/simulation" element={<SimulationDashboardPage />} />
-            <Route path="/simulation/sessions/:simulationId" element={<SimulationDashboardPage />} />
+            <Route path="/simulation" element={<SimulationDashboardPage mode="maps" />} />
+            <Route path="/simulation/cockpit" element={<SimulationDashboardPage mode="cockpit" />} />
+            <Route path="/simulation/trading" element={<SimulationDashboardPage mode="cockpit" />} />
+            <Route path="/simulation/sessions/:simulationId" element={<SimulationDashboardPage mode="cockpit" />} />
           </Routes>
         </AuthProvider>
       </MemoryRouter>
@@ -486,5 +488,39 @@ describe("SimulationDashboardPage (FEAT-038: AC-001..AC-016)", () => {
     await waitFor(() => {
       expect(cancelSpy).toHaveBeenCalledWith(mockSessionActive.id, "valid-mock-token");
     });
+  });
+
+  // Issue 2: Default entrypoint at /simulation displays Map Selection Lobby
+  it("renders 2-Map Selection Lobby by default when navigating to /simulation", async () => {
+    renderWithProviders("/simulation");
+
+    await waitFor(() => {
+      expect(screen.getByText("SIMULATION ARENA")).toBeDefined();
+    });
+
+    expect(screen.getByText("MAP 1 — FOMO ARENA")).toBeDefined();
+    expect(screen.getByText("MAP 2 — PRO ROOM")).toBeDefined();
+    expect(screen.getByTestId("enter-fomo-arena-button")).toBeDefined();
+    expect(screen.getByTestId("enter-pro-room-button")).toBeDefined();
+  });
+
+  // Issue 2: Back to Simulation Maps button navigates back to /simulation lobby
+  it("navigates back to Map Selection Lobby when clicking Back to Simulation Maps from cockpit", async () => {
+    renderWithProviders("/simulation/cockpit");
+
+    await waitFor(() => {
+      expect(screen.getByTestId("toggle-map-selector-button")).toBeDefined();
+    });
+
+    const backBtn = screen.getByTestId("toggle-map-selector-button");
+    expect(backBtn.textContent).toContain("Back to Simulation Maps");
+    fireEvent.click(backBtn);
+
+    // After clicking Back to Simulation Maps, router navigates to /simulation which renders MapSelectionView
+    await waitFor(() => {
+      expect(screen.getByText("SIMULATION ARENA")).toBeDefined();
+    });
+    expect(screen.getByText("MAP 1 — FOMO ARENA")).toBeDefined();
+    expect(screen.getByText("MAP 2 — PRO ROOM")).toBeDefined();
   });
 });
