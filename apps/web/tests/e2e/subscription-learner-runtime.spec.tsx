@@ -12,7 +12,23 @@ import { subscriptionApi } from "../../src/api/subscription.api";
 import { SubscriptionRoutes } from "../../src/app/router/subscription-routes";
 import { AuthProvider } from "../../src/features/auth/context/AuthContext";
 
-const testDbUrl = process.env.TEST_DATABASE_URL ?? process.env.DATABASE_URL;
+function getFallbackDbUrl(): string | undefined {
+  if (process.env.TEST_DATABASE_URL) return process.env.TEST_DATABASE_URL;
+  if (process.env.DATABASE_URL) return process.env.DATABASE_URL;
+  const envPath = path.resolve(__dirname, "../../../../.env");
+  if (fs.existsSync(envPath)) {
+    const lines = fs.readFileSync(envPath, "utf-8").split("\n");
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith("DATABASE_URL=")) {
+        return trimmed.slice("DATABASE_URL=".length).trim();
+      }
+    }
+  }
+  return undefined;
+}
+
+const testDbUrl = getFallbackDbUrl();
 
 describe.skipIf(!testDbUrl)("Subscription learner real runtime journey", () => {
   let server: http.Server;

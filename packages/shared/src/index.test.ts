@@ -32,6 +32,27 @@ import {
   SubscriptionPlansResponseSchema,
   SubscriptionMeDtoSchema,
   SubscriptionMeResponseSchema,
+  AI_GATEWAY_ERROR_CODES,
+  AI_PROVIDERS,
+  APPROVED_GEMINI_MODELS,
+  APPROVED_GEMINI_API_VERSIONS,
+  APPROVED_GEMINI_MAX_INPUT_TOKENS,
+  APPROVED_GEMINI_MAX_OUTPUT_TOKENS,
+  APPROVED_GEMINI_TIMEOUT_MS,
+  AI_INTENTS,
+  AI_REQUEST_CONTEXT_MODES,
+  AI_RESPONSE_CONTEXT_MODES,
+  AI_SAFETY_OUTCOMES,
+  AI_REFUSAL_CODES,
+  AI_DISCLAIMER_CODES,
+  AI_BUDGET_LIMITS,
+  AI_CONTRACT_VERSION_V1,
+  AIAssistRequestSchema,
+  AIAssistResponseSchema,
+  AIAssistProviderStructuredPayloadSchema,
+  countCodePoints,
+  countUtf8Bytes,
+  normalizeAIMessage,
 } from "./index.js";
 
 describe("@aura/shared package", () => {
@@ -126,7 +147,8 @@ describe("@aura/shared package", () => {
     // 4. Valid distinct secret (>= 32 chars)
     const validDistinctResult = EnvConfigSchema.safeParse({
       ...baseValidEnv,
-      COMMUNITY_RATE_LIMIT_KEY_SECRET: "completely-distinct-community-rate-limit-secret-32-chars-long",
+      COMMUNITY_RATE_LIMIT_KEY_SECRET:
+        "completely-distinct-community-rate-limit-secret-32-chars-long",
     });
     expect(validDistinctResult.success).toBe(true);
   });
@@ -153,7 +175,11 @@ describe("@aura/shared package", () => {
         completed: true,
       };
 
-      const result = validateProductAuditMetadata(validMetadata, ["lessonId", "timeSpentSec", "completed"]);
+      const result = validateProductAuditMetadata(validMetadata, [
+        "lessonId",
+        "timeSpentSec",
+        "completed",
+      ]);
       expect(result.valid).toBe(true);
       expect(result.errors).toHaveLength(0);
       expect(result.serializedBytes).toBeLessThan(2048);
@@ -380,30 +406,60 @@ describe("@aura/shared package", () => {
 
     it("rejects unsafe DB targets with production, staging, shared markers in query params or userinfo (DEF-002)", () => {
       // Query param with prod
-      expect(isLocalDevelopmentDatabaseUrl("postgresql://localhost:5432/aura_capital_dev?target=prod")).toBe(false);
-      expect(isIsolatedTestDatabaseUrl("postgresql://localhost:5432/aura_capital_test?target=prod")).toBe(false);
+      expect(
+        isLocalDevelopmentDatabaseUrl("postgresql://localhost:5432/aura_capital_dev?target=prod"),
+      ).toBe(false);
+      expect(
+        isIsolatedTestDatabaseUrl("postgresql://localhost:5432/aura_capital_test?target=prod"),
+      ).toBe(false);
 
       // Query param with shared
-      expect(isLocalDevelopmentDatabaseUrl("postgresql://localhost:5432/aura_capital_dev?target=shared")).toBe(false);
-      expect(isIsolatedTestDatabaseUrl("postgresql://localhost:5432/aura_capital_test?target=shared")).toBe(false);
+      expect(
+        isLocalDevelopmentDatabaseUrl("postgresql://localhost:5432/aura_capital_dev?target=shared"),
+      ).toBe(false);
+      expect(
+        isIsolatedTestDatabaseUrl("postgresql://localhost:5432/aura_capital_test?target=shared"),
+      ).toBe(false);
 
       // Query param with schema=production
-      expect(isIsolatedTestDatabaseUrl("postgresql://localhost:5432/aura_capital_test?schema=production")).toBe(false);
+      expect(
+        isIsolatedTestDatabaseUrl(
+          "postgresql://localhost:5432/aura_capital_test?schema=production",
+        ),
+      ).toBe(false);
 
       // Percent-encoded query param (%70%72%6f%64 = prod)
-      expect(isLocalDevelopmentDatabaseUrl("postgresql://localhost:5432/aura_capital_dev?target=%70%72%6f%64")).toBe(false);
+      expect(
+        isLocalDevelopmentDatabaseUrl(
+          "postgresql://localhost:5432/aura_capital_dev?target=%70%72%6f%64",
+        ),
+      ).toBe(false);
 
       // Userinfo trick (prod username)
-      expect(isLocalDevelopmentDatabaseUrl("postgresql://prod:secret@localhost:5432/aura_capital_dev")).toBe(false);
+      expect(
+        isLocalDevelopmentDatabaseUrl("postgresql://prod:secret@localhost:5432/aura_capital_dev"),
+      ).toBe(false);
 
       // Other prohibited markers (live, main, master, primary)
-      expect(isLocalDevelopmentDatabaseUrl("postgresql://localhost:5432/aura_capital_dev?target=live")).toBe(false);
-      expect(isLocalDevelopmentDatabaseUrl("postgresql://localhost:5432/aura_capital_dev?target=main")).toBe(false);
-      expect(isLocalDevelopmentDatabaseUrl("postgresql://localhost:5432/aura_capital_dev?target=master")).toBe(false);
-      expect(isLocalDevelopmentDatabaseUrl("postgresql://localhost:5432/aura_capital_dev?target=primary")).toBe(false);
+      expect(
+        isLocalDevelopmentDatabaseUrl("postgresql://localhost:5432/aura_capital_dev?target=live"),
+      ).toBe(false);
+      expect(
+        isLocalDevelopmentDatabaseUrl("postgresql://localhost:5432/aura_capital_dev?target=main"),
+      ).toBe(false);
+      expect(
+        isLocalDevelopmentDatabaseUrl("postgresql://localhost:5432/aura_capital_dev?target=master"),
+      ).toBe(false);
+      expect(
+        isLocalDevelopmentDatabaseUrl(
+          "postgresql://localhost:5432/aura_capital_dev?target=primary",
+        ),
+      ).toBe(false);
 
       // Remote host with dev DB name
-      expect(isLocalDevelopmentDatabaseUrl("postgresql://remote.host:5432/aura_capital_dev")).toBe(false);
+      expect(isLocalDevelopmentDatabaseUrl("postgresql://remote.host:5432/aura_capital_dev")).toBe(
+        false,
+      );
 
       // Missing DB name
       expect(isLocalDevelopmentDatabaseUrl("postgresql://localhost:5432/")).toBe(false);
@@ -485,7 +541,9 @@ describe("@aura/shared package", () => {
 
     it("rejects invalid or extra fields in SaveDraftAnswerBodySchema", () => {
       expect(SaveDraftAnswerBodySchema.safeParse({ optionId: "not-a-uuid" }).success).toBe(false);
-      expect(SaveDraftAnswerBodySchema.safeParse({ optionId: validUuid, isCorrect: true }).success).toBe(false);
+      expect(
+        SaveDraftAnswerBodySchema.safeParse({ optionId: validUuid, isCorrect: true }).success,
+      ).toBe(false);
       expect(SaveDraftAnswerBodySchema.safeParse({}).success).toBe(false);
     });
 
@@ -494,7 +552,8 @@ describe("@aura/shared package", () => {
       expect(QuizAttemptParamSchema.safeParse({ attemptId: "bad" }).success).toBe(false);
 
       expect(
-        QuizDraftAnswerParamSchema.safeParse({ attemptId: validUuid, questionId: validUuid2 }).success,
+        QuizDraftAnswerParamSchema.safeParse({ attemptId: validUuid, questionId: validUuid2 })
+          .success,
       ).toBe(true);
       expect(
         QuizDraftAnswerParamSchema.safeParse({ attemptId: validUuid, questionId: "bad" }).success,
@@ -592,7 +651,8 @@ describe("@aura/shared package", () => {
         false,
       );
       expect(
-        SubscriptionMeDtoSchema.safeParse({ ...validMe, providerSubscriptionId: "sub_123" }).success,
+        SubscriptionMeDtoSchema.safeParse({ ...validMe, providerSubscriptionId: "sub_123" })
+          .success,
       ).toBe(false);
     });
 
@@ -612,5 +672,333 @@ describe("@aura/shared package", () => {
       expect(SubscriptionMeResponseSchema.safeParse(freeProjection).success).toBe(true);
     });
   });
-});
 
+  describe("FEAT-058 AI Gateway Foundation & Configuration Schema", () => {
+    const baseValidEnv = {
+      NODE_ENV: "development",
+      JWT_SECRET: "11111111-2222-3333-4444-555555555555-jwt-secret-min32",
+      DATABASE_URL: "postgresql://postgres:postgrespassword@localhost:5432/aura_capital_dev",
+      AUTH_ACCESS_TOKEN_SECRET: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee-access-secret-32",
+      AUTH_REFRESH_TOKEN_SECRET: "11112222-3333-4444-5555-666677778888-refresh-secret-32",
+      AUTH_ACCESS_TOKEN_ISSUER: "aura-capital",
+      AUTH_ACCESS_TOKEN_AUDIENCE: "aura-client",
+      AUTH_RATE_LIMIT_ENABLED: "false",
+      COMMUNITY_RATE_LIMIT_ENABLED: "false",
+    };
+
+    const validGeminiConfig = {
+      ...baseValidEnv,
+      AI_ENABLED: "true",
+      AI_PROVIDER: "gemini",
+      GEMINI_MODEL_ID: "gemini-3.5-flash-lite",
+      GEMINI_API_VERSION: "v1",
+      GEMINI_MAX_INPUT_TOKENS: "4096",
+      GEMINI_MAX_OUTPUT_TOKENS: "1024",
+      GEMINI_TIMEOUT_MS: "15000",
+      GEMINI_AUTOMATIC_FALLBACK: "false",
+      GEMINI_AUTOMATIC_RETRY: "false",
+      GEMINI_API_KEY: "test-gemini-api-key-for-dev",
+    };
+
+    it("exports approved AI Gateway constants and error codes", () => {
+      expect(AI_GATEWAY_ERROR_CODES.AUTHENTICATION).toBe("AUTHENTICATION");
+      expect(AI_GATEWAY_ERROR_CODES.RATE_LIMITED).toBe("RATE_LIMITED");
+      expect(AI_GATEWAY_ERROR_CODES.TIMEOUT).toBe("TIMEOUT");
+      expect(AI_GATEWAY_ERROR_CODES.CANCELLED).toBe("CANCELLED");
+      expect(AI_GATEWAY_ERROR_CODES.UNAVAILABLE).toBe("UNAVAILABLE");
+      expect(AI_GATEWAY_ERROR_CODES.REFUSED).toBe("REFUSED");
+      expect(AI_GATEWAY_ERROR_CODES.MALFORMED_RESPONSE).toBe("MALFORMED_RESPONSE");
+      expect(AI_GATEWAY_ERROR_CODES.CONFIGURATION_ERROR).toBe("CONFIGURATION_ERROR");
+      expect(AI_GATEWAY_ERROR_CODES.UNKNOWN).toBe("UNKNOWN");
+
+      expect(AI_PROVIDERS.GEMINI).toBe("gemini");
+      expect(AI_PROVIDERS.MOCK).toBe("mock");
+      expect(APPROVED_GEMINI_MODELS).toContain("gemini-3.5-flash-lite");
+      expect(APPROVED_GEMINI_API_VERSIONS).toContain("v1");
+      expect(APPROVED_GEMINI_MAX_INPUT_TOKENS).toBe(4096);
+      expect(APPROVED_GEMINI_MAX_OUTPUT_TOKENS).toBe(1024);
+      expect(APPROVED_GEMINI_TIMEOUT_MS).toBe(15000);
+    });
+
+    it("passes validation when AI is disabled by default", () => {
+      const result = EnvConfigSchema.safeParse(baseValidEnv);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.AI_ENABLED).toBe(false);
+      }
+    });
+
+    it("passes validation with approved Gemini development configuration (AC-002)", () => {
+      const result = EnvConfigSchema.safeParse(validGeminiConfig);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.AI_ENABLED).toBe(true);
+        expect(result.data.AI_PROVIDER).toBe("gemini");
+        expect(result.data.GEMINI_MODEL_ID).toBe("gemini-3.5-flash-lite");
+        expect(result.data.GEMINI_API_VERSION).toBe("v1");
+        expect(result.data.GEMINI_MAX_INPUT_TOKENS).toBe(4096);
+        expect(result.data.GEMINI_MAX_OUTPUT_TOKENS).toBe(1024);
+        expect(result.data.GEMINI_TIMEOUT_MS).toBe(15000);
+        expect(result.data.GEMINI_AUTOMATIC_FALLBACK).toBe(false);
+        expect(result.data.GEMINI_AUTOMATIC_RETRY).toBe(false);
+      }
+    });
+
+    it("rejects production AI activation pending P8-D11/P8-D15 (AC-004, AC-009)", () => {
+      const prodResult = EnvConfigSchema.safeParse({
+        ...validGeminiConfig,
+        NODE_ENV: "production",
+        AUTH_REFRESH_COOKIE_SECURE: "true",
+      });
+      expect(prodResult.success).toBe(false);
+      if (!prodResult.success) {
+        expect(
+          prodResult.error.errors.some(
+            (e) =>
+              e.path.includes("AI_ENABLED") &&
+              e.message.includes("Production AI activation is disabled"),
+          ),
+        ).toBe(true);
+      }
+    });
+
+    it("rejects missing or unsupported provider (AC-002, AC-009)", () => {
+      const missingProvider = EnvConfigSchema.safeParse({
+        ...validGeminiConfig,
+        AI_PROVIDER: undefined,
+      });
+      expect(missingProvider.success).toBe(false);
+
+      const deepseekProvider = EnvConfigSchema.safeParse({
+        ...validGeminiConfig,
+        AI_PROVIDER: "deepseek",
+      });
+      expect(deepseekProvider.success).toBe(false);
+    });
+
+    it("rejects unapproved Gemini model (AC-002)", () => {
+      const wrongModel = EnvConfigSchema.safeParse({
+        ...validGeminiConfig,
+        GEMINI_MODEL_ID: "gemini-2.0-flash",
+      });
+      expect(wrongModel.success).toBe(false);
+    });
+
+    it("rejects unapproved Gemini API version (AC-002)", () => {
+      const wrongVersion = EnvConfigSchema.safeParse({
+        ...validGeminiConfig,
+        GEMINI_API_VERSION: "v1beta",
+      });
+      expect(wrongVersion.success).toBe(false);
+    });
+
+    it("rejects input token limit exceeding approved budget 4096 (AC-002)", () => {
+      const excessiveTokens = EnvConfigSchema.safeParse({
+        ...validGeminiConfig,
+        GEMINI_MAX_INPUT_TOKENS: "8192",
+      });
+      expect(excessiveTokens.success).toBe(false);
+    });
+
+    it("rejects output token limit exceeding approved budget 1024 (AC-002)", () => {
+      const excessiveTokens = EnvConfigSchema.safeParse({
+        ...validGeminiConfig,
+        GEMINI_MAX_OUTPUT_TOKENS: "2048",
+      });
+      expect(excessiveTokens.success).toBe(false);
+    });
+
+    it("rejects timeout exceeding approved budget 15000 ms (AC-002)", () => {
+      const excessiveTimeout = EnvConfigSchema.safeParse({
+        ...validGeminiConfig,
+        GEMINI_TIMEOUT_MS: "30000",
+      });
+      expect(excessiveTimeout.success).toBe(false);
+    });
+
+    it("rejects automatic fallback when enabled (AC-002)", () => {
+      const fallbackEnabled = EnvConfigSchema.safeParse({
+        ...validGeminiConfig,
+        GEMINI_AUTOMATIC_FALLBACK: "true",
+      });
+      expect(fallbackEnabled.success).toBe(false);
+    });
+
+    it("rejects automatic retry when enabled (AC-002)", () => {
+      const retryEnabled = EnvConfigSchema.safeParse({
+        ...validGeminiConfig,
+        GEMINI_AUTOMATIC_RETRY: "true",
+      });
+      expect(retryEnabled.success).toBe(false);
+    });
+
+    it("rejects missing or empty GEMINI_API_KEY when provider is gemini (AC-002)", () => {
+      const missingKey = EnvConfigSchema.safeParse({
+        ...validGeminiConfig,
+        GEMINI_API_KEY: "",
+      });
+      expect(missingKey.success).toBe(false);
+    });
+
+    it("allows mock provider only in dev/test environments (AC-004)", () => {
+      const validMockDev = EnvConfigSchema.safeParse({
+        ...baseValidEnv,
+        AI_ENABLED: "true",
+        AI_PROVIDER: "mock",
+      });
+      expect(validMockDev.success).toBe(true);
+
+      const invalidMockStaging = EnvConfigSchema.safeParse({
+        ...baseValidEnv,
+        NODE_ENV: "production",
+        AI_ENABLED: "true",
+        AI_PROVIDER: "mock",
+        AUTH_REFRESH_COOKIE_SECURE: "true",
+      });
+      expect(invalidMockStaging.success).toBe(false);
+    });
+  });
+
+  describe("Phase 8 AI Contracts & Schemas (FEAT-060)", () => {
+    it("exports approved closed intent constants", () => {
+      expect(AI_INTENTS.LEARNING_EXPLANATION).toBe("LEARNING_EXPLANATION");
+      expect(AI_INTENTS.ACADEMY_GUIDANCE).toBe("ACADEMY_GUIDANCE");
+      expect(AI_INTENTS.SIMULATION_ANALYSIS).toBe("SIMULATION_ANALYSIS");
+      expect(AI_INTENTS.PORTFOLIO_EDUCATION).toBe("PORTFOLIO_EDUCATION");
+      expect(AI_INTENTS.UNSUPPORTED_OR_REFUSED).toBe("UNSUPPORTED_OR_REFUSED");
+      expect(Object.keys(AI_INTENTS)).toHaveLength(5);
+    });
+
+    it("exports AI_BUDGET_LIMITS with frozen limits", () => {
+      expect(AI_BUDGET_LIMITS.MAX_REQUEST_BODY_BYTES).toBe(12288);
+      expect(AI_BUDGET_LIMITS.MAX_MESSAGE_CODE_POINTS).toBe(2000);
+      expect(AI_BUDGET_LIMITS.MAX_MESSAGE_UTF8_BYTES).toBe(8192);
+      expect(AI_BUDGET_LIMITS.MAX_ANSWER_CODE_POINTS).toBe(6000);
+      expect(AI_BUDGET_LIMITS.MAX_ANSWER_UTF8_BYTES).toBe(24576);
+      expect(AI_BUDGET_LIMITS.MAX_RESPONSE_BODY_BYTES).toBe(32768);
+      expect(AI_BUDGET_LIMITS.MAX_CONTEXT_ITEM_BYTES).toBe(2048);
+      expect(AI_BUDGET_LIMITS.MAX_ADAPTER_CONTEXT_BYTES).toBe(8192);
+      expect(AI_BUDGET_LIMITS.MAX_RETRIEVAL_ITEMS).toBe(5);
+      expect(AI_BUDGET_LIMITS.MAX_RETRIEVAL_BYTES).toBe(8192);
+      expect(AI_BUDGET_LIMITS.MAX_CITATIONS).toBe(5);
+    });
+
+    it("exports request and response context mode catalogs", () => {
+      expect(AI_REQUEST_CONTEXT_MODES.AUTO).toBe("AUTO");
+      expect(AI_REQUEST_CONTEXT_MODES.ACADEMY).toBe("ACADEMY");
+      expect(AI_REQUEST_CONTEXT_MODES.SIMULATION).toBe("SIMULATION");
+
+      expect(AI_RESPONSE_CONTEXT_MODES.GENERAL).toBe("GENERAL");
+      expect(AI_RESPONSE_CONTEXT_MODES.ACADEMY).toBe("ACADEMY");
+      expect(AI_RESPONSE_CONTEXT_MODES.SIMULATION).toBe("SIMULATION");
+    });
+
+    it("exports safety, refusal, and disclaimer catalogs", () => {
+      expect(AI_SAFETY_OUTCOMES.ALLOWED).toBe("ALLOWED");
+      expect(AI_SAFETY_OUTCOMES.REFUSED).toBe("REFUSED");
+
+      expect(AI_REFUSAL_CODES.UNSUPPORTED_REQUEST).toBe("UNSUPPORTED_REQUEST");
+      expect(AI_REFUSAL_CODES.PROHIBITED_FINANCIAL_ACTION).toBe("PROHIBITED_FINANCIAL_ACTION");
+      expect(AI_REFUSAL_CODES.INSUFFICIENT_SAFE_CONTEXT).toBe("INSUFFICIENT_SAFE_CONTEXT");
+      expect(AI_REFUSAL_CODES.SAFETY_POLICY).toBe("SAFETY_POLICY");
+
+      expect(AI_DISCLAIMER_CODES.EDUCATIONAL_ONLY).toBe("EDUCATIONAL_ONLY");
+      expect(AI_DISCLAIMER_CODES.SIMULATION_ONLY).toBe("SIMULATION_ONLY");
+      expect(AI_CONTRACT_VERSION_V1).toBe("v1");
+    });
+
+    it("correctly counts Unicode code points and UTF-8 bytes", () => {
+      const ascii = "hello";
+      expect(countCodePoints(ascii)).toBe(5);
+      expect(countUtf8Bytes(ascii)).toBe(5);
+
+      const vn = "tiền tệ";
+      expect(countCodePoints(vn)).toBe(7);
+      expect(countUtf8Bytes(vn)).toBe(11);
+
+      const emoji = "🚀💰";
+      expect(countCodePoints(emoji)).toBe(2);
+      expect(countUtf8Bytes(emoji)).toBe(8);
+    });
+
+    it("normalizes AI user queries via NFKC and trims whitespace", () => {
+      const raw = "   \u0041\u030Aura   ";
+      expect(normalizeAIMessage(raw)).toBe("Åura");
+    });
+
+    it("validates valid AIAssistRequestSchema successfully", () => {
+      const valid = AIAssistRequestSchema.safeParse({
+        message: "Explain the capital asset pricing model",
+        contextMode: "ACADEMY",
+      });
+      expect(valid.success).toBe(true);
+      if (valid.success) {
+        expect(valid.data.contextMode).toBe("ACADEMY");
+      }
+    });
+
+    it("rejects unknown fields in AIAssistRequestSchema (strict mode)", () => {
+      const invalid = AIAssistRequestSchema.safeParse({
+        message: "Explain CAPM",
+        role: "admin",
+      });
+      expect(invalid.success).toBe(false);
+    });
+
+    it("validates valid AIAssistResponseSchema successfully", () => {
+      const validResponse = {
+        data: {
+          contractVersion: "v1",
+          requestId: "req-12345",
+          answer: "CAPM calculates expected return based on systematic risk.",
+          intent: "LEARNING_EXPLANATION",
+          context: {
+            mode: "GENERAL",
+            isSimulation: false,
+          },
+          citations: [
+            {
+              citationId: "cit-1",
+              sourceType: "ACADEMY_CONTENT",
+              title: "Lesson on Asset Pricing",
+              locationLabel: null,
+            },
+          ],
+          safety: {
+            outcome: "ALLOWED",
+            refusalCode: null,
+            disclaimerCode: "EDUCATIONAL_ONLY",
+          },
+          quota: {
+            minuteLimit: 5,
+            minuteRemaining: 4,
+            minuteResetAt: "2030-01-01T00:00:01Z",
+            dailyLimit: 50,
+            dailyRemaining: 49,
+            dailyResetAt: "2030-01-02T00:00:00Z",
+          },
+        },
+      };
+
+      const result = AIAssistResponseSchema.safeParse(validResponse);
+      expect(result.success).toBe(true);
+    });
+
+    it("validates AIAssistProviderStructuredPayloadSchema successfully", () => {
+      const validPayload = {
+        answer: "Systematic risk is measured by beta.",
+        intent: "LEARNING_EXPLANATION",
+        suggestedMode: "GENERAL",
+        safety: {
+          outcome: "ALLOWED",
+          refusalCode: null,
+          disclaimerCode: "EDUCATIONAL_ONLY",
+        },
+        referencedCitationIds: ["cit-1"],
+      };
+
+      const result = AIAssistProviderStructuredPayloadSchema.safeParse(validPayload);
+      expect(result.success).toBe(true);
+    });
+  });
+});

@@ -2242,12 +2242,12 @@ Transform Aura Intelligence from generic chat into a context-aware learning assi
 Status:
 
 ```text
-Phase 8: FROZEN / DEFERRED FOR MVP (Human Strategic Decision)
+Phase 8: UNFROZEN / INTEGRATED (Human Strategic Decision)
 FEAT-058: DONE / HUMAN FEATURE GATE APPROVED
 FEAT-059: DONE / HUMAN FEATURE GATE APPROVED
 FEAT-060: COMPLETE (Implementation Complete / QA Pending)
 FEAT-061..FEAT-069: DEFERRED
-Note: Phase 8 Intelligent capabilities frozen on phase-8/antigravity-dev; will resume post-Phase 10 MVP deployment.
+Note: Phase 8 AI Gateway foundation and Gemini adapter merged into Phase 9 master to power AI Advisor in Map 2 (Pro Room).
 ```
 
 ---
@@ -2294,7 +2294,7 @@ FEAT-074: DONE / HUMAN FEATURE GATE APPROVED
 FEAT-075: DONE / HUMAN FEATURE GATE APPROVED
 FEAT-076: DONE / HUMAN FEATURE GATE APPROVED
 FEAT-077: DONE / HUMAN FEATURE GATE APPROVED
-FEAT-078: DEFERRED (Phase 8 AI Isolation)
+FEAT-078: DONE / HUMAN FEATURE GATE APPROVED
 FEAT-079: DONE / HUMAN FEATURE GATE APPROVED
 FEAT-080: DONE / HUMAN FEATURE GATE APPROVED
 ```
@@ -2564,6 +2564,37 @@ Outstanding P0/P1 Defects: ZERO
 Remote GitHub Actions CI: PASS (Run 36323637586, 15/15 steps PASS)
 Dependencies Unblocked: FEAT-079, FEAT-080
 Phase 9: IN PROGRESS
+```
+
+### FEAT-078: User Profile & Account Settings UI
+
+Status:
+
+```text
+FEAT-078: DONE / HUMAN FEATURE GATE APPROVED
+Planning: HUMAN MASTER PLANNING APPROVED
+Implementation: COMPLETE
+Implementation Owner: ANTIGRAVITY
+Implementation Self-Verification: PASS
+Targeted Tests: 5 files / 26 tests PASS
+AppShell Integration: 37 tests PASS (+4 new FEAT-078 tests)
+Full Web Suite: 51 files / 457 tests PASS
+Full API Suite: 95 files / 1074 tests PASS
+Typecheck: PASS (workspace clean)
+ESLint: 0 errors / 0 warnings
+Production Build: PASS (vite build clean, 811.18 kB / 208.49 kB gzip)
+Migration Impact: ZERO (exactly 10 migrations total)
+Database Mutations: ZERO
+Application Security Invariants: PRESERVED (Argon2id password verification, server-authoritative role evaluation, memory-only tokens, zero boundary violations)
+Human Feature Gate: APPROVED (Explicit Human Authority Decision, 2026-09-30)
+Implementation Commit: f97d99a
+Baseline: planning/phase-9-master (feat-081-approved)
+Branch: feat/FEAT-078-user-profile-settings
+Checkpoint Tag: feat-078-approved PUBLISHED
+Implementation Report: reports/implementation/phase-9/FEAT-078.md
+Acceptance Criteria: 8 PASS / 0 FAIL (AC-001..AC-008 PASS)
+Outstanding P0/P1 Defects: ZERO
+Phase 9: COMPLETED / APPROVED
 ```
 
 ### FEAT-079: Learning Path & Course Player UI
