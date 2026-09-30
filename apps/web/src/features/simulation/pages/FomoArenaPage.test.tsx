@@ -200,9 +200,9 @@ describe("FomoArenaPage (FEAT-082)", () => {
     // News banner
     expect(screen.getByText(/Cổ phiếu \$FOMO bất ngờ bứt phá đỉnh cũ/i)).toBeDefined();
     // Bot chat
-    expect(screen.getByText(/\[Thánh_Allin\]:/i)).toBeDefined();
+    expect(screen.getByText(/Thánh_Allin/i)).toBeDefined();
     // Order ticket
-    expect(screen.getByText(/LỆNH MUA NHANH/i)).toBeDefined();
+    expect(screen.getByText(/Đặt Lệnh Nhanh/i)).toBeDefined();
     // Margin locked warning in Round 1
     expect(screen.getByText(/Mở khóa từ Round 3/i)).toBeDefined();
   });

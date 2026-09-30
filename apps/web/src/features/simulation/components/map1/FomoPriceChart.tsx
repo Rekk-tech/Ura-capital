@@ -1,109 +1,281 @@
-import React from "react";
+import React, { useState } from "react";
 import type { Map1PricePoint } from "../../types/map-game.types";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { Lock, Sparkles } from "lucide-react";
 
 interface FomoPriceChartProps {
-  symbol: string;
+  symbol?: string;
   currentPrice: number;
   initialPrice: number;
   priceChangePercent: number;
   pricePoints: Map1PricePoint[];
+  round?: number;
 }
 
 export const FomoPriceChart: React.FC<FomoPriceChartProps> = ({
-  symbol,
+  symbol = "$FOMO",
   currentPrice,
-  initialPrice,
+  initialPrice = 45000,
   priceChangePercent,
   pricePoints,
+  round = 2,
 }) => {
-  const isPositive = priceChangePercent >= 0;
+  const [selectedTimeframe, setSelectedTimeframe] = useState<string>("5s");
+
+  const isCeiling = priceChangePercent >= 6.9;
 
   // Chart dimensions
-  const width = 500;
-  const height = 180;
-  const padding = 20;
+  const width = 640;
+  const height = 240;
+  const padding = 28;
 
-  // Compute min and max price for scaling
-  const prices = pricePoints.map((p) => p.price);
-  const minPrice = Math.min(initialPrice * 0.9, ...prices);
-  const maxPrice = Math.max(initialPrice * 1.15, ...prices);
+  // Reference and Ceiling Price calculations
+  const refPrice = initialPrice || 45000;
+  const ceilingPrice = Math.round(refPrice * 1.069);
+
+  // Compute price curve points
+  const prices = pricePoints.length > 0 ? pricePoints.map((p) => p.price) : [refPrice, currentPrice];
+  const minPrice = Math.min(refPrice * 0.98, ...prices);
+  const maxPrice = Math.max(ceilingPrice * 1.01, ...prices);
   const priceRange = maxPrice - minPrice || 1;
 
-  // Compute SVG polyline path
-  const points = pricePoints.map((p) => {
-    // x scaled from 0s to 315s (7 rounds * 45s)
-    const x = padding + (p.second / 315) * (width - padding * 2);
-    // y scaled from minPrice to maxPrice inverted
+  // Scale SVG points
+  const points = (pricePoints.length > 0 ? pricePoints : [{ second: 0, price: refPrice }, { second: 45, price: currentPrice }]).map((p, idx, arr) => {
+    const x = padding + (idx / Math.max(1, arr.length - 1)) * (width - padding * 2);
     const y = height - padding - ((p.price - minPrice) / priceRange) * (height - padding * 2);
-    return `${x},${y}`;
+    return { x, y };
   });
 
-  const polylinePoints = points.join(" ");
+  const polylineStr = points.map((p) => `${p.x},${p.y}`).join(" ");
+
+  // Create SVG path for gradient area under curve
+  const areaPathStr = points.length > 0
+    ? `M ${points[0]!.x},${height - padding} L ${points.map((p) => `${p.x},${p.y}`).join(" L ")} L ${points[points.length - 1]!.x},${height - padding} Z`
+    : "";
+
+  // Fake volume bars data proportional to points
+  const volumeBars = Array.from({ length: 18 }, (_, i) => {
+    // Generate increasing volume during FOMO rounds
+    const factor = Math.min(1, 0.2 + (i / 18) * 0.8 + (round >= 2 ? 0.3 : 0));
+    return Math.min(48, Math.max(8, factor * 48));
+  });
 
   return (
-    <div className="fomo-price-chart card-aura p-4 rounded-xl border border-slate-200 bg-white shadow-sm flex flex-col justify-between">
-      {/* Header Info */}
-      <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-2">
-        <div className="flex items-center gap-2">
-          <span className="text-lg font-black text-slate-900 tracking-tight">{symbol}</span>
-          <span className="text-xs px-2 py-0.5 rounded font-mono font-medium bg-slate-100 text-slate-600">
-            Khớp lệnh thời gian thực
-          </span>
+    <div className="fomo-price-chart card-aura p-5 rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col gap-4">
+      {/* 1. Header Row */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+        <div className="flex items-center gap-3">
+          {/* Avatar Icon */}
+          <div className="w-12 h-12 rounded-2xl bg-slate-900 text-white font-black text-xl flex items-center justify-center flex-shrink-0 shadow-md">
+            {symbol.replace("$", "").charAt(0)}
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xl font-black text-slate-900 tracking-tight">
+                {symbol}
+              </span>
+              <span className="text-xs text-slate-400 font-medium">
+                Aura Apex Corp (HOSE)
+              </span>
+            </div>
+            <div className="flex items-baseline gap-2 mt-0.5">
+              <span className="text-2xl md:text-3xl font-black font-mono text-slate-900 tracking-tight">
+                {currentPrice.toLocaleString("vi-VN")}
+              </span>
+              <span className="text-xs font-bold text-slate-500">VND</span>
+
+              {/* Ceiling "Tím Trần" Badge */}
+              <span className="ml-1 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-black uppercase tracking-wider bg-purple-100 text-purple-700 border border-purple-300 shadow-xs">
+                <Sparkles size={11} className="text-purple-600" />
+                +6.9% CEILING (TÍM TRẦN) 🔥
+              </span>
+            </div>
+          </div>
         </div>
 
-        <div className="text-right">
-          <div className="text-2xl font-black font-mono text-slate-900">
-            {currentPrice.toLocaleString("vi-VN")} <span className="text-sm font-normal text-slate-500">VND</span>
-          </div>
-          <div className={`flex items-center justify-end gap-1 text-xs font-bold ${isPositive ? "text-emerald-600" : "text-rose-600"}`}>
-            {isPositive ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-            <span>{isPositive ? `+${priceChangePercent}%` : `${priceChangePercent}%`}</span>
-            <span className="text-slate-400 font-normal">so với tham chiếu 10,000</span>
-          </div>
+        {/* Timeframe Selectors */}
+        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl self-start sm:self-center border border-slate-200/60 text-xs">
+          {["1s", "5s", "15s", "1m"].map((tf) => (
+            <button
+              key={tf}
+              type="button"
+              onClick={() => setSelectedTimeframe(tf)}
+              className={`py-1 px-2.5 rounded-lg font-bold transition-all ${
+                selectedTimeframe === tf
+                  ? "bg-slate-900 text-white shadow-xs"
+                  : "text-slate-500 hover:text-slate-900 hover:bg-slate-200/50"
+              }`}
+            >
+              {tf}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* SVG Price Chart */}
-      <div className="relative w-full h-44 bg-slate-50/50 rounded-lg overflow-hidden border border-slate-100 p-1 flex items-center justify-center">
-        {pricePoints.length > 1 ? (
-          <svg className="w-full h-full" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
-            {/* Grid Lines */}
-            <line x1={padding} y1={padding} x2={width - padding} y2={padding} stroke="#E2E8F0" strokeDasharray="3 3" />
-            <line x1={padding} y1={height / 2} x2={width - padding} y2={height / 2} stroke="#E2E8F0" strokeDasharray="3 3" />
-            <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="#E2E8F0" strokeDasharray="3 3" />
+      {/* 2. Order Depth & Key Metrics Row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+          <span className="text-[11px] text-slate-400 block mb-0.5 font-medium">Khớp Lệnh Gần Nhất</span>
+          <span className="font-bold font-mono text-blue-600">
+            {currentPrice.toLocaleString("vi-VN")} (Max Ceiling)
+          </span>
+        </div>
+        <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+          <span className="text-[11px] text-slate-400 block mb-0.5 font-medium">Dư Mua Giá Trần</span>
+          <span className="font-bold font-mono text-slate-900">1,248,600 CP</span>
+        </div>
+        <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+          <span className="text-[11px] text-slate-400 block mb-0.5 font-medium">Bên Bán (Ask)</span>
+          <span className="font-bold font-mono text-teal-600">TRẮNG BÊN BÁN</span>
+        </div>
+        <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+          <span className="text-[11px] text-slate-400 block mb-0.5 font-medium">Tổng Khối Lượng</span>
+          <span className="font-bold font-mono text-slate-900">8,924,100 CP</span>
+        </div>
+      </div>
 
-            {/* Price Line */}
+      {/* 3. SVG Area & Volume Chart */}
+      <div className="relative w-full h-56 bg-slate-50/70 rounded-xl overflow-hidden border border-slate-200/80 p-2 flex flex-col justify-between">
+        <svg
+          className="w-full h-full"
+          viewBox={`0 0 ${width} ${height}`}
+          preserveAspectRatio="none"
+        >
+          <defs>
+            <linearGradient id="priceGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#10B981" stopOpacity="0.35" />
+              <stop offset="100%" stopColor="#10B981" stopOpacity="0.0" />
+            </linearGradient>
+          </defs>
+
+          {/* Reference Price Dashed Line */}
+          <line
+            x1={padding}
+            y1={height - padding - 20}
+            x2={width - padding}
+            y2={height - padding - 20}
+            stroke="#CBD5E1"
+            strokeDasharray="4 4"
+            strokeWidth="1.5"
+          />
+          <text
+            x={padding}
+            y={height - padding - 26}
+            fill="#94A3B8"
+            fontSize="10"
+            fontFamily="monospace"
+            fontWeight="bold"
+          >
+            REF: {refPrice.toLocaleString("vi-VN")} VND
+          </text>
+
+          {/* Ceiling Price Dashed Line */}
+          <line
+            x1={padding}
+            y1={padding + 10}
+            x2={width - padding - 60}
+            y2={padding + 10}
+            stroke="#10B981"
+            strokeDasharray="4 4"
+            strokeWidth="1.5"
+          />
+          <text
+            x={padding}
+            y={padding + 5}
+            fill="#059669"
+            fontSize="10"
+            fontFamily="monospace"
+            fontWeight="bold"
+          >
+            CEILING {ceilingPrice.toLocaleString("vi-VN")} VND (+6.90%)
+          </text>
+
+          {/* Gradient Area Fill under price curve */}
+          {areaPathStr && (
+            <path d={areaPathStr} fill="url(#priceGradient)" />
+          )}
+
+          {/* Price Polyline */}
+          {polylineStr && (
             <polyline
               fill="none"
-              stroke={isPositive ? "#10B981" : "#EF4444"}
-              strokeWidth="3"
+              stroke="#10B981"
+              strokeWidth="3.5"
               strokeLinecap="round"
               strokeLinejoin="round"
-              points={polylinePoints}
+              points={polylineStr}
             />
+          )}
 
-            {/* Current Price Dot */}
-            {points.length > 0 && (
+          {/* Current Price Dot with Locked Indicator */}
+          {points.length > 0 && (
+            <g>
               <circle
-                cx={points[points.length - 1]!.split(",")[0]}
-                cy={points[points.length - 1]!.split(",")[1]}
-                r="5"
-                fill={isPositive ? "#10B981" : "#EF4444"}
+                cx={points[points.length - 1]!.x}
+                cy={points[points.length - 1]!.y}
+                r="6"
+                fill="#10B981"
                 stroke="#FFFFFF"
-                strokeWidth="2"
+                strokeWidth="2.5"
+                className="animate-ping"
               />
-            )}
-          </svg>
-        ) : (
-          <span className="text-xs text-slate-400">Đang khởi tạo chuỗi giá...</span>
+              <circle
+                cx={points[points.length - 1]!.x}
+                cy={points[points.length - 1]!.y}
+                r="6"
+                fill="#10B981"
+                stroke="#FFFFFF"
+                strokeWidth="2.5"
+              />
+            </g>
+          )}
+
+          {/* Volume histogram bars at the bottom */}
+          {volumeBars.map((barHeight, idx) => {
+            const barWidth = 8;
+            const barGap = (width - padding * 2 - barWidth * volumeBars.length) / (volumeBars.length - 1);
+            const x = padding + idx * (barWidth + barGap);
+            const y = height - padding - barHeight;
+            return (
+              <rect
+                key={idx}
+                x={x}
+                y={y}
+                width={barWidth}
+                height={barHeight}
+                fill="#10B981"
+                opacity={0.65 + (idx / volumeBars.length) * 0.35}
+                rx="2"
+              />
+            );
+          })}
+        </svg>
+
+        {/* Locked Ceiling Badge at right edge of chart */}
+        {isCeiling && (
+          <div className="absolute top-4 right-4 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-slate-900 text-white flex items-center gap-1 shadow-md">
+            <Lock size={10} className="text-emerald-400" />
+            <span>LOCKED</span>
+          </div>
         )}
       </div>
 
-      {/* Footer Meta */}
-      <div className="flex items-center justify-between text-[11px] text-slate-400 mt-2">
-        <span>Đáy chu kỳ: {Math.round(minPrice).toLocaleString("vi-VN")} VND</span>
-        <span>Đỉnh chu kỳ: {Math.round(maxPrice).toLocaleString("vi-VN")} VND</span>
+      {/* 4. Real-time Order Matching Ticker Tape */}
+      <div className="p-2.5 rounded-xl bg-slate-900 text-slate-100 border border-slate-800 text-xs flex items-center overflow-x-auto shadow-inner">
+        <div className="flex items-center gap-4 whitespace-nowrap font-mono font-medium text-[11px]">
+          <span className="text-emerald-400 font-bold flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            MATCHING TICKER:
+          </span>
+          <span className="text-slate-300">
+            ⚡ +50,000 CP @ {currentPrice.toLocaleString("vi-VN")} <strong className="text-emerald-400 font-bold">(BUY)</strong>
+          </span>
+          <span className="text-slate-300">
+            ⚡ +120,000 CP @ {currentPrice.toLocaleString("vi-VN")} <strong className="text-emerald-400 font-bold">(BUY)</strong>
+          </span>
+          <span className="text-slate-300">
+            ⚡ +85,500 CP @ {currentPrice.toLocaleString("vi-VN")} <strong className="text-emerald-400 font-bold">(BUY)</strong>
+          </span>
+        </div>
       </div>
     </div>
   );

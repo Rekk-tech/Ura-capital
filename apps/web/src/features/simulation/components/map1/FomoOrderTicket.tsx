@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import type { Map1OrderInput, Map1Phase } from "../../types/map-game.types";
-import { Zap, Shield, AlertCircle, Lock, ArrowUpCircle, ArrowDownCircle, PauseCircle } from "lucide-react";
+import { Zap, Shield, Lock, ArrowRight, ShoppingCart, TrendingDown } from "lucide-react";
 
 interface FomoOrderTicketProps {
   phase: Map1Phase;
+  round?: number;
   cash: number;
   shares: number;
   marginUsed: number;
@@ -17,208 +18,277 @@ interface FomoOrderTicketProps {
 
 export const FomoOrderTicket: React.FC<FomoOrderTicketProps> = ({
   phase,
+  round: _round = 2,
   cash,
   shares,
-  marginUsed,
-  nav,
+  marginUsed: _marginUsed,
+  nav: _nav,
   currentPrice,
   canUseMargin,
   freeStopLossAwarded,
   isSubmitting,
   onSubmitOrder,
 }) => {
+  const [activeTab, setActiveTab] = useState<"BUY" | "SELL">("BUY");
   const [selectedPercentage, setSelectedPercentage] = useState<number>(50);
-  const [useMargin, setUseMargin] = useState<boolean>(false);
+  const [leverageMode, setLeverageMode] = useState<"1x" | "2x">("1x");
   const [hasStopLoss, setHasStopLoss] = useState<boolean>(false);
 
   const isTradingOpen = phase === "trading_window";
 
-  // Calculate estimated buying power
-  const buyingPower = useMargin && canUseMargin ? cash * 2 : cash;
-  const estimatedCost = Math.floor(buyingPower * (selectedPercentage / 100));
-  void estimatedCost;
+  // Effective leverage & buying power
+  const useMargin = leverageMode === "2x" && canUseMargin;
+  const buyingPower = useMargin ? cash * 2 : cash;
 
-  const handleQuickBuy = async (pct: number) => {
-    setSelectedPercentage(pct);
-    await onSubmitOrder({
-      action: "BUY",
-      percentage: pct,
-      useMargin: useMargin && canUseMargin,
-      hasStopLoss: hasStopLoss || freeStopLossAwarded,
-    });
-  };
+  // Order summary calculations
+  const rawTargetAmount = activeTab === "BUY"
+    ? Math.floor(buyingPower * (selectedPercentage / 100))
+    : Math.floor(shares * (selectedPercentage / 100)) * currentPrice;
 
-  const handleSell = async (pct = 100) => {
-    await onSubmitOrder({
-      action: "SELL",
-      percentage: pct,
-    });
-  };
+  // Shares calculated in lots of 10 or single units
+  const sharesCalculated = activeTab === "BUY"
+    ? Math.floor(rawTargetAmount / (currentPrice || 1))
+    : Math.floor(shares * (selectedPercentage / 100));
 
-  const handleHold = async () => {
-    await onSubmitOrder({
-      action: "HOLD",
-      hasStopLoss: hasStopLoss || freeStopLossAwarded,
-    });
+  const actualTradeValue = sharesCalculated * currentPrice;
+  // Transparent 0.15% transaction fee (Resolving Review Issue 2.1)
+  const transactionFee = Math.round(actualTradeValue * 0.0015);
+  const totalSettlementCost = actualTradeValue + transactionFee;
+
+  const handleExecute = async () => {
+    if (!isTradingOpen || isSubmitting) return;
+
+    if (activeTab === "BUY") {
+      await onSubmitOrder({
+        action: "BUY",
+        percentage: selectedPercentage,
+        useMargin,
+        hasStopLoss: hasStopLoss || freeStopLossAwarded,
+      });
+    } else {
+      await onSubmitOrder({
+        action: "SELL",
+        percentage: selectedPercentage,
+      });
+    }
   };
 
   return (
-    <div className="fomo-order-ticket card-aura p-4 rounded-xl border border-slate-200 bg-white shadow-sm flex flex-col gap-4">
-      {/* Balances Strip */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 pb-3 border-b border-slate-100 text-xs">
-        <div className="p-2 rounded-lg bg-slate-50 border border-slate-100">
-          <span className="text-slate-400 block mb-0.5">Tiền mặt</span>
-          <span className="font-bold font-mono text-slate-800">{cash.toLocaleString("vi-VN")} đ</span>
+    <div className="fomo-order-ticket card-aura p-5 rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col justify-between gap-4">
+      {/* 1. Header */}
+      <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div>
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-black text-slate-900 tracking-tight">
+              Đặt Lệnh Nhanh
+            </h3>
+          </div>
+          <p className="text-xs text-slate-400">
+            Fast Execution Desk • Kỳ hạn: 45 giây
+          </p>
         </div>
-        <div className="p-2 rounded-lg bg-slate-50 border border-slate-100">
-          <span className="text-slate-400 block mb-0.5">Cổ phiếu $FOMO</span>
-          <span className="font-bold font-mono text-slate-800">{shares.toLocaleString("vi-VN")} cp</span>
-        </div>
-        <div className="p-2 rounded-lg bg-slate-50 border border-slate-100">
-          <span className="text-slate-400 block mb-0.5">Margin đang vay</span>
-          <span className={`font-bold font-mono ${marginUsed > 0 ? "text-rose-600" : "text-slate-800"}`}>
-            {marginUsed.toLocaleString("vi-VN")} đ
-          </span>
-        </div>
-        <div className="p-2 rounded-lg bg-blue-50 border border-blue-100">
-          <span className="text-blue-600 block mb-0.5 font-semibold">Tài sản ròng (NAV)</span>
-          <span className="font-black font-mono text-blue-900">{nav.toLocaleString("vi-VN")} đ</span>
+
+        <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-xs">
+          <Zap size={18} />
         </div>
       </div>
 
-      {/* Trading Window Alert */}
-      {!isTradingOpen && (
-        <div className="p-2.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 text-xs flex items-center gap-2">
-          <AlertCircle size={15} className="text-slate-500 flex-shrink-0" />
-          <span>Lệnh giao dịch chỉ được tiếp nhận trong <strong>Cửa sổ đặt lệnh (giây 10s - 30s)</strong>.</span>
-        </div>
-      )}
+      {/* 2. Buy / Sell Tab Switcher */}
+      <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-slate-100 border border-slate-200/60">
+        <button
+          type="button"
+          onClick={() => setActiveTab("BUY")}
+          className={`py-2 px-3 rounded-lg font-bold text-xs transition-all flex items-center justify-center gap-1.5 ${
+            activeTab === "BUY"
+              ? "bg-emerald-600 text-white shadow-sm"
+              : "text-slate-600 hover:text-slate-900"
+          }`}
+        >
+          <ShoppingCart size={14} />
+          <span>MUA (BUY)</span>
+        </button>
 
-      {/* Quick Buy Buttons */}
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-bold text-slate-700 flex items-center gap-1">
-            <Zap size={13} className="text-amber-500" />
-            LỆNH MUA NHANH (QUICK BUY)
+        <button
+          type="button"
+          onClick={() => setActiveTab("SELL")}
+          className={`py-2 px-3 rounded-lg font-bold text-xs transition-all flex items-center justify-center gap-1.5 ${
+            activeTab === "SELL"
+              ? "bg-rose-600 text-white shadow-sm"
+              : "text-slate-600 hover:text-slate-900"
+          }`}
+        >
+          <TrendingDown size={14} />
+          <span>BÁN (SELL)</span>
+        </button>
+      </div>
+
+      {/* 3. KHỐI LƯỢNG VÀO LỆNH */}
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+            KHỐI LƯỢNG VÀO LỆNH:
           </span>
-          <span className="text-[11px] text-slate-400">Phí giao dịch: 0.15%</span>
+          <span className="text-[11px] text-slate-400">
+            {activeTab === "BUY" ? `Khả dụng: ${cash.toLocaleString("vi-VN")} đ` : `Cổ phiếu: ${shares} cp`}
+          </span>
         </div>
 
         <div className="grid grid-cols-3 gap-2">
-          {[25, 50, 100].map((pct) => (
-            <button
-              key={pct}
-              type="button"
-              disabled={!isTradingOpen || isSubmitting || cash < currentPrice}
-              onClick={() => handleQuickBuy(pct)}
-              className={`py-2 px-3 rounded-lg font-bold text-xs border transition-all flex flex-col items-center justify-center gap-0.5 ${
-                pct === 100
-                  ? "bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100 active:scale-95"
-                  : "bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100 active:scale-95"
-              } disabled:opacity-40 disabled:pointer-events-none`}
-            >
-              <span>MUA {pct}% VỐN</span>
-              <span className="text-[10px] font-normal opacity-80">
-                ~{Math.floor((buyingPower * (pct / 100)) / (currentPrice || 1))} cp
-              </span>
-            </button>
-          ))}
+          {[25, 50, 100].map((pct) => {
+            const isAllIn = pct === 100;
+            const isSelected = selectedPercentage === pct;
+            return (
+              <button
+                key={pct}
+                type="button"
+                onClick={() => setSelectedPercentage(pct)}
+                className={`py-2 px-2.5 rounded-xl text-xs font-bold transition-all border ${
+                  isSelected
+                    ? isAllIn
+                      ? "bg-amber-500 text-white border-amber-600 shadow-sm"
+                      : "bg-slate-900 text-white border-slate-900 shadow-sm"
+                    : isAllIn
+                    ? "bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100"
+                    : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
+                }`}
+              >
+                {isAllIn ? "100% ALL-IN" : `${pct}%`}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Leverage & Protection Controls */}
-      <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 flex flex-col gap-2.5 text-xs">
-        {/* Margin x2 */}
-        <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              disabled={!canUseMargin}
-              checked={useMargin && canUseMargin}
-              onChange={(e) => setUseMargin(e.target.checked)}
-              className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4 disabled:opacity-50"
-            />
-            <span className="font-semibold text-slate-800">Kích hoạt Margin x2 (Đòn bẩy 1:1)</span>
-          </label>
-          {!canUseMargin ? (
-            <span className="flex items-center gap-1 text-[10px] font-semibold text-slate-400 bg-slate-200 px-2 py-0.5 rounded">
+      {/* 4. ĐÒN BẨY (LEVERAGE) — Strict Margin Lock (Resolving Review Issue 1.5) */}
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+            ĐÒN BẨY (LEVERAGE):
+          </span>
+          {!canUseMargin && (
+            <span className="text-[10px] font-semibold text-amber-700 flex items-center gap-1">
               <Lock size={10} /> Mở khóa từ Round 3
             </span>
-          ) : (
-            <span className="text-[10px] font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded">
-              Đã mở khóa
-            </span>
           )}
         </div>
 
-        {/* Margin x5 Disabled Button with Tooltip */}
-        <div className="flex items-center justify-between opacity-50">
-          <div className="flex items-center gap-2">
-            <Lock size={12} className="text-slate-400" />
-            <span className="text-slate-500">Margin x5 (Kho hàng nóng)</span>
-          </div>
-          <span
-            className="text-[10px] text-slate-500 bg-slate-200 px-2 py-0.5 rounded cursor-not-allowed"
-            title="Mức đòn bẩy quá cao - Khóa để bảo vệ kỷ luật"
+        <div className="grid grid-cols-3 gap-2">
+          {/* 1x (Gốc) */}
+          <button
+            type="button"
+            onClick={() => setLeverageMode("1x")}
+            className={`py-2 px-2 rounded-xl text-xs font-bold transition-all border ${
+              leverageMode === "1x"
+                ? "bg-slate-900 text-white border-slate-900 shadow-xs"
+                : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
+            }`}
           >
-            Khóa bảo vệ kỷ luật
+            1x (Gốc)
+          </button>
+
+          {/* MARGIN x2 (Strictly unlocked from Round 3) */}
+          <button
+            type="button"
+            disabled={!canUseMargin}
+            onClick={() => setLeverageMode("2x")}
+            title={!canUseMargin ? "Mở khóa đòn bẩy từ Round 3" : "Kích hoạt đòn bẩy Margin x2"}
+            className={`py-2 px-2 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-1 ${
+              leverageMode === "2x" && canUseMargin
+                ? "bg-emerald-600 text-white border-emerald-700 shadow-xs"
+                : canUseMargin
+                ? "bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100"
+                : "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-60"
+            }`}
+          >
+            {!canUseMargin && <Lock size={11} />}
+            <span>MARGIN x2</span>
+          </button>
+
+          {/* MARGIN x5 HIGH RISK (Locked for MVP) */}
+          <div className="relative">
+            <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[9px] font-black uppercase px-1.5 py-0.2 rounded-full bg-rose-500 text-white shadow-xs z-10 whitespace-nowrap">
+              FOMO Booster
+            </span>
+            <button
+              type="button"
+              disabled
+              title="Khóa bảo vệ kỷ luật - Không khuyến khích đầu cơ đòn bẩy quá cao"
+              className="w-full py-2 px-1 rounded-xl text-[11px] font-bold border bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed flex items-center justify-center gap-0.5 opacity-60"
+            >
+              <Lock size={10} />
+              <span>MARGIN x5</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* 5. Stop-loss Hedge Toggle */}
+      <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between text-xs">
+        <label className="flex items-center gap-2 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={hasStopLoss || freeStopLossAwarded}
+            onChange={(e) => setHasStopLoss(e.target.checked)}
+            className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
+          />
+          <span className="font-semibold text-slate-800 flex items-center gap-1">
+            <Shield size={13} className="text-blue-600" />
+            Cắt lỗ tự động (-7%)
+          </span>
+        </label>
+        {freeStopLossAwarded && (
+          <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+            Thưởng từ Quiz
+          </span>
+        )}
+      </div>
+
+      {/* 6. Order Summary Calculation with Transparent 0.15% Fee (Review Issue 2.1) */}
+      <div className="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200 flex flex-col gap-2 text-xs">
+        <div className="flex items-center justify-between text-slate-600">
+          <span>Khối lượng dự tính:</span>
+          <span className="font-bold font-mono text-slate-900">
+            {sharesCalculated.toLocaleString("vi-VN")} Cổ phiếu $FOMO
           </span>
         </div>
-
-        {/* Stop Loss Toggle */}
-        <div className="flex items-center justify-between pt-1 border-t border-slate-200">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={hasStopLoss || freeStopLossAwarded}
-              onChange={(e) => setHasStopLoss(e.target.checked)}
-              className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4"
-            />
-            <span className="font-semibold text-slate-800 flex items-center gap-1">
-              <Shield size={12} className="text-blue-600" />
-              Đặt lệnh cắt lỗ Stop-loss tự động (-7%)
+        <div className="flex items-center justify-between text-slate-600">
+          <span>Mức giá khớp:</span>
+          <span className="font-bold font-mono text-slate-900">
+            {currentPrice.toLocaleString("vi-VN")} VND (Giá Trần)
+          </span>
+        </div>
+        <div className="flex items-center justify-between text-slate-500">
+          <span>Phí giao dịch mô phỏng (0.15%):</span>
+          <span className="font-mono text-slate-700">
+            {transactionFee.toLocaleString("vi-VN")} VND
+          </span>
+        </div>
+        <div className="pt-2 border-t border-slate-200 flex items-baseline justify-between">
+          <span className="font-bold text-slate-900">Tổng tiền thanh toán:</span>
+          <div className="text-right">
+            <span className="text-base md:text-lg font-black font-mono text-slate-900">
+              {totalSettlementCost.toLocaleString("vi-VN")}
             </span>
-          </label>
-          {freeStopLossAwarded && (
-            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded">
-              Thưởng miễn phí từ Quiz
-            </span>
-          )}
+            <span className="text-xs font-semibold text-slate-500 ml-1">VND</span>
+          </div>
         </div>
       </div>
 
-      {/* Main Order Buttons */}
-      <div className="grid grid-cols-3 gap-2 pt-1">
-        <button
-          type="button"
-          disabled={!isTradingOpen || isSubmitting || cash < currentPrice}
-          onClick={() => handleQuickBuy(selectedPercentage)}
-          className="btn btn-primary py-2.5 rounded-lg font-bold text-sm bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center gap-1.5 shadow-sm active:scale-95 disabled:opacity-40"
-        >
-          <ArrowUpCircle size={16} />
-          <span>MUA ({selectedPercentage}%)</span>
-        </button>
+      {/* 7. Big Execution Action Button */}
+      <button
+        type="button"
+        disabled={!isTradingOpen || isSubmitting || (activeTab === "BUY" && cash < currentPrice) || (activeTab === "SELL" && shares <= 0)}
+        onClick={handleExecute}
+        className="w-full py-3.5 px-4 rounded-xl font-black text-sm bg-slate-900 hover:bg-slate-800 active:scale-98 text-white flex items-center justify-center gap-2 shadow-md transition-all disabled:opacity-40 disabled:pointer-events-none"
+      >
+        <span>Khớp Lệnh Ngay (Execute Order)</span>
+        <ArrowRight size={16} />
+      </button>
 
-        <button
-          type="button"
-          disabled={!isTradingOpen || isSubmitting || shares <= 0}
-          onClick={() => handleSell(100)}
-          className="btn btn-danger py-2.5 rounded-lg font-bold text-sm bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center gap-1.5 shadow-sm active:scale-95 disabled:opacity-40"
-        >
-          <ArrowDownCircle size={16} />
-          <span>BÁN HẾT (100%)</span>
-        </button>
-
-        <button
-          type="button"
-          disabled={!isTradingOpen || isSubmitting}
-          onClick={handleHold}
-          className="btn btn-secondary py-2.5 rounded-lg font-bold text-sm bg-slate-700 hover:bg-slate-800 text-white flex items-center justify-center gap-1.5 shadow-sm active:scale-95 disabled:opacity-40"
-        >
-          <PauseCircle size={16} />
-          <span>GIỮ NGUYÊN</span>
-        </button>
-      </div>
+      {/* 8. Disclaimer Notice */}
+      <p className="text-[11px] text-amber-700 leading-snug bg-amber-500/10 p-2 rounded-lg border border-amber-500/20 text-center">
+        ⚠️ Chế độ mô phỏng tâm lý đầu cơ. Hãy cảnh giác với bẫy FOMO khi giá đã chạm trần liên tục.
+      </p>
     </div>
   );
 };

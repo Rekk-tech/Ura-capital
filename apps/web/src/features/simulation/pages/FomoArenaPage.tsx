@@ -3,7 +3,7 @@ import { useAuth } from "../../auth/context/AuthContext";
 import { useMap1Game } from "../hooks/use-map-game";
 import { SimulationDisclosureBanner } from "../components/SimulationDisclosureBanner";
 import { FomoTimer } from "../components/map1/FomoTimer";
-import { FomoNewsFeed } from "../components/map1/FomoNewsFeed";
+import { FomoNewsCard, FomoHypeRoom } from "../components/map1/FomoNewsFeed";
 import { FomoPriceChart } from "../components/map1/FomoPriceChart";
 import { FomoOrderTicket } from "../components/map1/FomoOrderTicket";
 import { FomoTrapQuizModal } from "../components/map1/FomoTrapQuizModal";
@@ -143,41 +143,51 @@ export const FomoArenaPage: React.FC = () => {
         </div>
       )}
 
-      {/* 5. Success State: Active In-Game Arena View */}
+      {/* 5. Success State: Active In-Game Arena View matching Figma Cockpit */}
       {!isLoading && !debrief && state && (
-        <div className="flex flex-col gap-4 animate-in fade-in duration-200">
-          {/* Top Timer & Timeline */}
+        <div className="flex flex-col gap-5 animate-in fade-in duration-200">
+          {/* Top Cockpit Header & Strict KPI Math (Resolving Review Issue 1.4) */}
           <FomoTimer
             round={state.round}
             totalRounds={state.totalRounds}
+            roundName={state.roundConfig?.name || `Giai Đoạn ${state.round}`}
             phase={state.phase}
             secondInRound={state.secondInRound}
             roundDurationSeconds={state.roundDurationSeconds}
             timeRemainingInPhase={state.timeRemainingInPhase}
+            cash={state.cash}
+            shares={state.shares}
+            currentPrice={state.currentPrice}
+            nav={state.nav}
+            initialCash={10000000}
           />
 
-          {/* Main 2-Column Battleground */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-            {/* Left Column: Real-time Chart & Newsfeed (7 cols) */}
-            <div className="lg:col-span-7 flex flex-col gap-4">
+          {/* Main 2-Column Battleground Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+            {/* Left Column (7 cols): Price Chart + Community VIP Hype Room */}
+            <div className="lg:col-span-7 flex flex-col gap-5">
               <FomoPriceChart
                 symbol="$FOMO"
                 currentPrice={state.currentPrice}
                 initialPrice={10000}
                 priceChangePercent={state.priceChangePercent}
                 pricePoints={state.pricePoints}
+                round={state.round}
               />
-              <FomoNewsFeed
-                news={state.news}
-                botChat={state.botChat}
-                hint={state.roundConfig?.hint}
-              />
+
+              <FomoHypeRoom botChat={state.botChat} />
             </div>
 
-            {/* Right Column: Interactive Order Ticket (5 cols) */}
-            <div className="lg:col-span-5 flex flex-col gap-4">
+            {/* Right Column (5 cols): Breaking News Card + Fast Execution Desk */}
+            <div className="lg:col-span-5 flex flex-col gap-5">
+              <FomoNewsCard
+                news={state.news}
+                hint={state.roundConfig?.hint}
+              />
+
               <FomoOrderTicket
                 phase={state.phase}
+                round={state.round}
                 cash={state.cash}
                 shares={state.shares}
                 marginUsed={state.marginUsed}
@@ -193,7 +203,7 @@ export const FomoArenaPage: React.FC = () => {
         </div>
       )}
 
-      {/* Modals */}
+      {/* Interactive Modals */}
       <FomoTutorialModal
         isOpen={showTutorial}
         onClose={() => setShowTutorial(false)}
