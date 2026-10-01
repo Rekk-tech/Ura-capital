@@ -587,7 +587,7 @@ export const CoursePlayerView: React.FC = () => {
             /* Sanitized Educational Content (FR-005 / DOMPurify) */
             <article
               className="player-reading-content"
-              style={{ lineHeight: 1.7, fontSize: "1.05rem", color: "var(--text-secondary, #cbd5e1)" }}
+              style={{ lineHeight: 1.75, fontSize: "1.0625rem", color: "#1E293B" }}
             >
               <LessonContent content={lesson.content} />
             </article>

@@ -56,8 +56,9 @@ export const QuizPlayer: React.FC<QuizPlayerProps> = ({
         marginTop: "2.5rem",
         padding: "1.75rem",
         borderRadius: "0.75rem",
-        border: "1px solid var(--color-border, #334155)",
-        backgroundColor: "var(--color-surface, #1e293b)",
+        border: "1px solid #E2E8F0",
+        backgroundColor: "#FFFFFF",
+        boxShadow: "0 4px 12px rgba(15, 23, 42, 0.05)",
       }}
     >
       {/* Quiz Header */}
@@ -71,12 +72,12 @@ export const QuizPlayer: React.FC<QuizPlayerProps> = ({
       >
         <HelpCircle
           size={20}
-          style={{ color: "var(--color-primary, #38bdf8)" }}
+          style={{ color: "var(--aura-blue-600, #1D6FF2)" }}
           aria-hidden="true"
         />
         <h2
           id="quiz-player-title"
-          style={{ fontSize: "1.25rem", fontWeight: 600, margin: 0 }}
+          style={{ fontSize: "1.25rem", fontWeight: 700, margin: 0, color: "#0F172A" }}
         >
           {quiz.title}
         </h2>
@@ -85,9 +86,10 @@ export const QuizPlayer: React.FC<QuizPlayerProps> = ({
       {quiz.description && (
         <p
           style={{
-            color: "var(--color-text-muted, #94a3b8)",
+            color: "#475569",
             marginBottom: "1rem",
             fontSize: "0.9375rem",
+            lineHeight: 1.6,
           }}
         >
           {quiz.description}
@@ -111,9 +113,9 @@ export const QuizPlayer: React.FC<QuizPlayerProps> = ({
             padding: "0.25rem 0.75rem",
             borderRadius: "9999px",
             fontSize: "0.875rem",
-            backgroundColor: "rgba(56, 189, 248, 0.1)",
-            color: "#38bdf8",
-            fontWeight: 500,
+            backgroundColor: "rgba(29, 111, 242, 0.1)",
+            color: "#1D6FF2",
+            fontWeight: 600,
           }}
           data-testid="quiz-question-count"
         >
@@ -129,7 +131,7 @@ export const QuizPlayer: React.FC<QuizPlayerProps> = ({
             fontSize: "0.875rem",
             backgroundColor: "rgba(16, 185, 129, 0.1)",
             color: "#10b981",
-            fontWeight: 500,
+            fontWeight: 600,
           }}
           data-testid="quiz-passing-score"
         >
@@ -144,9 +146,9 @@ export const QuizPlayer: React.FC<QuizPlayerProps> = ({
               padding: "0.25rem 0.75rem",
               borderRadius: "9999px",
               fontSize: "0.875rem",
-              backgroundColor: "rgba(234, 179, 8, 0.1)",
-              color: "#eab308",
-              fontWeight: 500,
+              backgroundColor: "rgba(245, 158, 11, 0.1)",
+              color: "#d97706",
+              fontWeight: 600,
             }}
             data-testid="attempt-status-badge"
           >
@@ -197,11 +199,11 @@ export const QuizPlayer: React.FC<QuizPlayerProps> = ({
                 style={{
                   margin: "0.25rem 0 0 0",
                   fontSize: "0.875rem",
-                  color: "var(--color-text-muted, #94a3b8)",
+                  color: "#475569",
                 }}
               >
                 Final Score:{" "}
-                <strong style={{ color: "var(--color-text, #fff)" }}>
+                <strong style={{ color: "#0F172A" }}>
                   {gradedResult.score}%
                 </strong>
               </p>
@@ -216,7 +218,7 @@ export const QuizPlayer: React.FC<QuizPlayerProps> = ({
                 backgroundColor: gradedResult.passed
                   ? "rgba(34, 197, 94, 0.2)"
                   : "rgba(239, 68, 68, 0.2)",
-                color: gradedResult.passed ? "#22c55e" : "#ef4444",
+                color: gradedResult.passed ? "#15803d" : "#b91c1c",
               }}
             >
               {gradedResult.passed ? "PASSED" : "FAILED"}
@@ -233,7 +235,7 @@ export const QuizPlayer: React.FC<QuizPlayerProps> = ({
                 padding: "0.5rem 0.75rem",
                 borderRadius: "0.375rem",
                 backgroundColor: "rgba(234, 179, 8, 0.15)",
-                color: "#facc15",
+                color: "#b45309",
                 fontSize: "0.875rem",
                 fontWeight: 600,
                 marginBottom: "1rem",
@@ -265,14 +267,16 @@ export const QuizPlayer: React.FC<QuizPlayerProps> = ({
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    padding: "0.5rem 0.75rem",
+                    padding: "0.6rem 0.85rem",
                     borderRadius: "0.375rem",
-                    backgroundColor: "rgba(255, 255, 255, 0.02)",
+                    backgroundColor: "#F8FAFC",
+                    border: "1px solid #E2E8F0",
                     fontSize: "0.875rem",
+                    color: "#1E293B",
                     gap: "1rem",
                   }}
                 >
-                  <span>
+                  <span style={{ fontWeight: 500 }}>
                     {idx + 1}. {q.prompt}
                   </span>
                   <span
@@ -395,8 +399,8 @@ export const QuizPlayer: React.FC<QuizPlayerProps> = ({
                 style={{
                   padding: "1rem",
                   borderRadius: "0.5rem",
-                  backgroundColor: "rgba(255, 255, 255, 0.03)",
-                  border: "1px solid var(--color-border, #334155)",
+                  backgroundColor: "#F8FAFC",
+                  border: "1px solid #E2E8F0",
                 }}
               >
                 <div
@@ -408,14 +412,14 @@ export const QuizPlayer: React.FC<QuizPlayerProps> = ({
                   }}
                 >
                   <h3
-                    style={{ fontSize: "1rem", fontWeight: 600, margin: 0 }}
+                    style={{ fontSize: "1rem", fontWeight: 700, margin: 0, color: "#0F172A" }}
                     data-testid={`question-prompt-${q.id}`}
                   >
                     {qIndex + 1}. {q.prompt}
                   </h3>
                   {isSavingThis && (
                     <span
-                      style={{ fontSize: "0.75rem", color: "#38bdf8" }}
+                      style={{ fontSize: "0.75rem", color: "#1D6FF2", fontWeight: 500 }}
                       data-testid="saving-indicator"
                     >
                       Saving...
@@ -438,15 +442,18 @@ export const QuizPlayer: React.FC<QuizPlayerProps> = ({
                           display: "flex",
                           alignItems: "center",
                           gap: "0.75rem",
-                          padding: "0.5rem 0.75rem",
+                          padding: "0.625rem 0.85rem",
                           borderRadius: "0.375rem",
                           backgroundColor: isSelected
-                            ? "rgba(56, 189, 248, 0.15)"
-                            : "rgba(255, 255, 255, 0.02)",
+                            ? "rgba(29, 111, 242, 0.08)"
+                            : "#FFFFFF",
                           border: isSelected
-                            ? "1px solid #38bdf8"
-                            : "1px solid transparent",
+                            ? "1px solid #1D6FF2"
+                            : "1px solid #E2E8F0",
+                          color: isSelected ? "#0F172A" : "#1E293B",
                           cursor: isSavingThis ? "wait" : "pointer",
+                          fontWeight: isSelected ? 600 : 400,
+                          transition: "all 0.15s ease",
                         }}
                         data-testid={`option-${opt.id}`}
                       >
@@ -459,7 +466,7 @@ export const QuizPlayer: React.FC<QuizPlayerProps> = ({
                           onChange={() => onSelectOption(q.id, opt.id)}
                           data-testid={`radio-${opt.id}`}
                           style={{
-                            accentColor: "var(--color-primary, #38bdf8)",
+                            accentColor: "#1D6FF2",
                             cursor: "pointer",
                           }}
                         />
@@ -503,7 +510,7 @@ export const QuizPlayer: React.FC<QuizPlayerProps> = ({
               <span
                 style={{
                   fontSize: "0.875rem",
-                  color: "var(--color-text-muted, #94a3b8)",
+                  color: "#64748B",
                 }}
                 data-testid="answered-counter"
               >

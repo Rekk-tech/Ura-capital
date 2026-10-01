@@ -142,8 +142,8 @@ export const CourseDetailPage: React.FC = () => {
               marginTop: "1.5rem",
               padding: "1.25rem",
               borderRadius: "0.75rem",
-              border: "1px solid var(--color-border, #334155)",
-              backgroundColor: "var(--color-surface, #1e293b)",
+              border: "1px solid #E2E8F0",
+              backgroundColor: "#F8FAFC",
             }}
           >
             <div
@@ -155,7 +155,7 @@ export const CourseDetailPage: React.FC = () => {
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <span style={{ fontSize: "0.875rem", fontWeight: 600 }}>Course Progress</span>
+                <span style={{ fontSize: "0.875rem", fontWeight: 600, color: "#0F172A" }}>Course Progress</span>
                 {progress.completed && (
                   <span
                     className="badge badge-completed"
@@ -178,7 +178,7 @@ export const CourseDetailPage: React.FC = () => {
                 style={{
                   fontSize: "0.875rem",
                   fontWeight: 600,
-                  color: "var(--color-primary, #38bdf8)",
+                  color: "var(--aura-blue-600, #1D6FF2)",
                 }}
                 data-testid="course-progress-percent"
               >
@@ -190,7 +190,7 @@ export const CourseDetailPage: React.FC = () => {
               style={{
                 width: "100%",
                 height: "8px",
-                backgroundColor: "rgba(255, 255, 255, 0.1)",
+                backgroundColor: "#E2E8F0",
                 borderRadius: "4px",
                 overflow: "hidden",
                 marginBottom: "0.5rem",
@@ -203,7 +203,7 @@ export const CourseDetailPage: React.FC = () => {
                   height: "100%",
                   backgroundColor: progress.completed
                     ? "#10b981"
-                    : "var(--color-primary, #38bdf8)",
+                    : "var(--aura-blue-600, #1D6FF2)",
                   borderRadius: "4px",
                   transition: "width 0.3s ease",
                 }}
@@ -215,7 +215,7 @@ export const CourseDetailPage: React.FC = () => {
                 display: "flex",
                 justifyContent: "space-between",
                 fontSize: "0.75rem",
-                color: "var(--color-text-muted, #94a3b8)",
+                color: "#64748B",
               }}
             >
               <span data-testid="course-progress-count">

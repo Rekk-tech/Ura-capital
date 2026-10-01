@@ -2361,10 +2361,11 @@ a {
 }
 
 .course-hero-header {
-  background: linear-gradient(180deg, rgba(24, 34, 52, 0.7) 0%, rgba(18, 24, 36, 0.9) 100%);
-  border: 1px solid var(--border-subtle);
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
   border-radius: var(--radius-lg);
   padding: 2.25rem;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
 }
 
 .course-hero-meta {
@@ -2375,6 +2376,7 @@ a {
 }
 
 .course-detail-title {
+  color: #0F172A;
   font-size: 2.25rem;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -2383,7 +2385,7 @@ a {
 }
 
 .course-detail-description {
-  color: var(--text-secondary);
+  color: #334155;
   font-size: 1.05rem;
   line-height: 1.7;
   max-width: 800px;
@@ -2500,6 +2502,7 @@ a {
 }
 
 .lesson-main-title {
+  color: #0F172A;
   font-size: 2.25rem;
   font-weight: 800;
   letter-spacing: -0.02em;
@@ -2508,7 +2511,7 @@ a {
 
 /* Educational Prose Styling */
 .lesson-prose-content {
-  color: #cbd5e1;
+  color: #1E293B;
   font-size: 1.0625rem;
   line-height: 1.75;
 }
@@ -2517,7 +2520,7 @@ a {
 .lesson-prose-content h2,
 .lesson-prose-content h3,
 .lesson-prose-content h4 {
-  color: var(--text-primary);
+  color: #0F172A;
   margin-top: 2rem;
   margin-bottom: 0.75rem;
   font-weight: 700;
@@ -2543,12 +2546,12 @@ a {
 }
 
 .lesson-prose-content blockquote {
-  border-left: 4px solid var(--accent-primary);
+  border-left: 4px solid var(--accent-primary, #1D6FF2);
   padding-left: 1.25rem;
   margin: 1.5rem 0;
-  color: var(--text-secondary);
+  color: #334155;
   font-style: italic;
-  background-color: rgba(59, 130, 246, 0.05);
+  background-color: #F1F5F9;
   padding: 0.75rem 1rem;
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
@@ -2944,62 +2947,153 @@ a {
   border-color: var(--border-active);
 }
 
-/* Flashcard Card Surface */
-.flashcard-card-surface {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+/* ==========================================================================
+   Quizlet-Style 3D Flashcard System
+   ========================================================================== */
+
+/* Flashcard Progress Bar */
+.flashcard-progress-bar-container {
+  width: 100%;
+  height: 6px;
+  background-color: #E2E8F0;
+  border-radius: 9999px;
   overflow: hidden;
-  transition: border-color 0.2s ease;
+  margin-bottom: 0.25rem;
 }
 
-.flashcard-card-surface:hover {
-  border-color: rgba(59, 130, 246, 0.4);
+.flashcard-progress-bar-fill {
+  height: 100%;
+  background: var(--aura-blue-600, #1D6FF2);
+  border-radius: 9999px;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 3D Flashcard Scene */
+.flashcard-scene {
+  width: 100%;
+  max-width: 680px;
+  min-height: 360px;
+  perspective: 1000px;
+  margin: 0 auto;
+  cursor: pointer;
+  outline: none;
+}
+
+.flashcard-card-3d {
+  width: 100%;
+  min-height: 360px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 1rem;
+}
+
+.flashcard-card-3d.is-flipped {
+  transform: rotateY(180deg);
 }
 
 /* Card Faces */
-.flashcard-front-section {
-  padding: 2.25rem 2rem;
-  min-height: 180px;
+.flashcard-face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 1rem;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  padding: 2.25rem 2.25rem;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.flashcard-back-section {
-  padding: 2.25rem 2rem;
-  min-height: 180px;
-  display: flex;
-  flex-direction: column;
-  background: rgba(6, 182, 212, 0.04);
-  border-top: 1px solid var(--border-subtle);
+.flashcard-card-3d:hover .flashcard-face {
+  border-color: rgba(29, 111, 242, 0.4);
+  box-shadow: 0 14px 28px -5px rgba(29, 111, 242, 0.12), 0 10px 10px -5px rgba(15, 23, 42, 0.04);
+}
+
+.flashcard-face-front {
+  background: #FFFFFF;
+}
+
+.flashcard-face-back {
+  transform: rotateY(180deg);
+  background: #F8FAFC;
+  border-top: 4px solid #10B981;
 }
 
 .flashcard-face-badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   align-self: flex-start;
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 0.25rem 0.6rem;
-  border-radius: var(--radius-sm);
-  background: rgba(59, 130, 246, 0.12);
-  color: var(--accent-primary);
-  margin-bottom: 1.25rem;
+  letter-spacing: 0.06em;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  background: rgba(29, 111, 242, 0.1);
+  color: #1D6FF2;
 }
 
 .flashcard-back-badge {
   background: rgba(16, 185, 129, 0.12);
-  color: var(--status-success);
+  color: #059669;
+}
+
+.flashcard-center-content {
+  margin: auto 0;
+  text-align: center;
+  width: 100%;
+}
+
+.flashcard-term-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0F172A;
+  line-height: 1.4;
+  margin: 0;
+  word-wrap: break-word;
+}
+
+.flashcard-def-text {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #1E293B;
+  line-height: 1.65;
+  margin: 0;
+  word-wrap: break-word;
+}
+
+.flashcard-example-box {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: #EFF6FF;
+  border-left: 3px solid #1D6FF2;
+  border-radius: 0.375rem;
+  font-size: 0.9375rem;
+  color: #1E3A8A;
+  text-align: left;
+}
+
+.flashcard-flip-hint {
+  font-size: 0.85rem;
+  color: #64748B;
+  text-align: center;
+  margin-top: 1rem;
+  user-select: none;
 }
 
 .flashcard-content-prose {
   font-size: 1.15rem;
   line-height: 1.7;
-  color: var(--text-primary);
+  color: #1E293B;
   word-wrap: break-word;
-  overflow-wrap: break-word;
 }
 
 .flashcard-content-prose p:not(:last-child) {
@@ -3007,62 +3101,23 @@ a {
 }
 
 .flashcard-content-prose code {
-  background: var(--bg-surface);
+  background: #F1F5F9;
   padding: 0.2rem 0.4rem;
   border-radius: var(--radius-sm);
   font-family: var(--font-mono);
   font-size: 0.9em;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid #E2E8F0;
+  color: #0F172A;
 }
 
-.flashcard-content-prose pre {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 1rem;
-  overflow-x: auto;
-  margin: 1rem 0;
-}
-
-.flashcard-content-prose pre code {
+/* Backward compatibility surface aliases */
+.flashcard-card-surface {
   background: transparent;
-  padding: 0;
   border: none;
 }
-
-/* Reveal Prompt */
-.flashcard-reveal-prompt {
-  padding: 2rem;
-  text-align: center;
-  background: rgba(18, 24, 36, 0.6);
-  border-top: 1px solid var(--border-subtle);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.flashcard-reveal-btn {
-  padding: 0.75rem 2rem;
-  font-size: 1rem;
-  font-weight: 600;
-  border-radius: var(--radius-md);
-}
-
-.flashcard-shortcut-hint {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-
-.flashcard-shortcut-hint kbd,
-.flashcard-keyboard-guide kbd {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: 4px;
-  padding: 0.15rem 0.4rem;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--text-secondary);
+.flashcard-front-section,
+.flashcard-back-section {
+  display: contents;
 }
 
 /* Navigation Bar */
@@ -3086,42 +3141,53 @@ a {
 /* Keyboard Guide */
 .flashcard-keyboard-guide {
   text-align: center;
-  color: var(--text-muted);
-  font-size: 0.8rem;
+  color: #64748B;
+  font-size: 0.825rem;
   padding-top: 0.5rem;
+  user-select: none;
+}
+
+.flashcard-keyboard-guide kbd {
+  background: #F1F5F9;
+  border: 1px solid #CBD5E1;
+  border-radius: 4px;
+  padding: 0.15rem 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: #334155;
 }
 
 /* Completion Card */
 .flashcard-deck-completed {
-  max-width: 580px;
+  max-width: 600px;
   margin: 2rem auto 3rem auto;
 }
 
 .flashcard-completion-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 1rem;
   padding: 3rem 2rem;
   text-align: center;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
 }
 
 .flashcard-completion-icon {
   width: 56px;
   height: 56px;
-  color: var(--status-success);
+  color: #10B981;
   margin: 0 auto 1.25rem auto;
 }
 
 .flashcard-completion-title {
   font-size: 1.75rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: #0F172A;
   margin-bottom: 0.75rem;
 }
 
 .flashcard-completion-desc {
-  color: var(--text-secondary);
+  color: #475569;
   font-size: 1rem;
   line-height: 1.6;
   margin-bottom: 2rem;
