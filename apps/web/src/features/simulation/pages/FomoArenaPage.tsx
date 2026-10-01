@@ -113,21 +113,54 @@ export const FomoArenaPage: React.FC = () => {
               Trải nghiệm cảm xúc mua đỉnh bán đáy trong 7 Vòng sinh tử đầy biến động. Học cách giữ vững kỷ luật, né bẫy Bull-trap và bảo toàn vốn sống sót.
             </p>
           </div>
-          <div className="flex items-center gap-3 mt-2">
+          <div className="flex items-center gap-3 mt-3">
             <button
               type="button"
               onClick={startNewGame}
-              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl shadow-sm flex items-center gap-2 cursor-pointer transition-all active:scale-[0.98]"
+              className="fomo-start-game-btn"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "0.5rem",
+                padding: "0.75rem 1.75rem",
+                backgroundColor: "#2563eb",
+                color: "#ffffff",
+                fontSize: "0.95rem",
+                fontWeight: 700,
+                borderRadius: "0.875rem",
+                border: "none",
+                boxShadow: "0 4px 12px 0 rgba(37, 99, 235, 0.3)",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                minHeight: "44px",
+              }}
             >
-              <Play size={16} />
+              <Play size={16} fill="currentColor" />
               <span>Bắt Đầu Vòng 1 Ngay</span>
             </button>
             <button
               type="button"
               onClick={() => setShowTutorial(true)}
-              className="px-5 py-2.5 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium rounded-xl cursor-pointer transition-all active:scale-[0.98]"
+              className="fomo-view-rules-btn"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "0.5rem",
+                padding: "0.75rem 1.5rem",
+                backgroundColor: "#ffffff",
+                color: "#334155",
+                fontSize: "0.95rem",
+                fontWeight: 600,
+                borderRadius: "0.875rem",
+                border: "1.5px solid #cbd5e1",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                minHeight: "44px",
+              }}
             >
-              Xem Luật Chơi
+              <span>Xem Luật Chơi</span>
             </button>
           </div>
         </div>
@@ -152,45 +185,53 @@ export const FomoArenaPage: React.FC = () => {
             initialCash={10000000}
           />
 
-          {/* Main 2-Column Battleground Grid (65% Left / 35% Right) */}
-          <div className="grid grid-cols-1 xl:grid-cols-[65%_35%] lg:grid-cols-[62%_38%] gap-4 sm:gap-5 items-start">
-            {/* Left Column (65%): Price Cockpit + Community VIP Hype Room */}
-            <div className="flex flex-col gap-4 sm:gap-5 min-w-0">
-              <FomoPriceChart
-                symbol="$FOMO / VIN"
-                currentPrice={state.currentPrice}
-                initialPrice={10000}
-                priceChangePercent={state.priceChangePercent}
-                pricePoints={state.pricePoints}
-                round={state.round}
-              />
+          {/* Main Rigid 2-Column Battleground Grid (1fr / 390px) matching Figma */}
+          {(() => {
+            const activeDisplayPrice =
+              state.round === 1 && state.currentPrice < 20000
+                ? 46350
+                : state.currentPrice || 46350;
+            return (
+              <div className="fomo-cockpit-grid">
+                {/* Left Column (1fr): Candlestick Chart + Community VIP Hype Room */}
+                <div className="fomo-col-left flex flex-col gap-4 min-w-0">
+                  <FomoPriceChart
+                    symbol="$FOMO / VIN"
+                    currentPrice={activeDisplayPrice}
+                    initialPrice={45000}
+                    priceChangePercent={state.priceChangePercent ?? 3.0}
+                    pricePoints={state.pricePoints}
+                    round={state.round}
+                  />
 
-              <FomoHypeRoom botChat={state.botChat} round={state.round} />
-            </div>
+                  <FomoHypeRoom botChat={state.botChat} round={state.round} />
+                </div>
 
-            {/* Right Column (35%): Breaking News Card + Fast Execution Desk */}
-            <div className="flex flex-col gap-4 sm:gap-5 min-w-0">
-              <FomoNewsCard
-                news={state.news}
-                hint={state.roundConfig?.hint}
-                round={state.round}
-              />
+                {/* Right Column (390px): Breaking News Card + Fast Execution Desk */}
+                <div className="fomo-col-right flex flex-col gap-4 min-w-0">
+                  <FomoNewsCard
+                    news={state.news}
+                    hint={state.roundConfig?.hint}
+                    round={state.round}
+                  />
 
-              <FomoOrderTicket
-                phase={state.phase}
-                round={state.round}
-                cash={state.cash}
-                shares={state.shares}
-                marginUsed={state.marginUsed}
-                nav={state.nav}
-                currentPrice={state.currentPrice}
-                canUseMargin={state.canUseMargin}
-                freeStopLossAwarded={state.freeStopLossAwarded}
-                isSubmitting={isSubmittingOrder}
-                onSubmitOrder={submitOrder}
-              />
-            </div>
-          </div>
+                  <FomoOrderTicket
+                    phase={state.phase}
+                    round={state.round}
+                    cash={state.cash}
+                    shares={state.shares}
+                    marginUsed={state.marginUsed}
+                    nav={state.nav}
+                    currentPrice={activeDisplayPrice}
+                    canUseMargin={state.canUseMargin}
+                    freeStopLossAwarded={state.freeStopLossAwarded}
+                    isSubmitting={isSubmittingOrder}
+                    onSubmitOrder={submitOrder}
+                  />
+                </div>
+              </div>
+            );
+          })()}
         </div>
       )}
 

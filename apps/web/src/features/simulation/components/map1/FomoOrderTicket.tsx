@@ -30,7 +30,7 @@ export const FomoOrderTicket: React.FC<FomoOrderTicketProps> = ({
   onSubmitOrder,
 }) => {
   const [activeTab, setActiveTab] = useState<"BUY" | "SELL">("BUY");
-  const [selectedPercentage, setSelectedPercentage] = useState<number>(50);
+  const [selectedPercentage, setSelectedPercentage] = useState<number>(25);
   const [leverageMode, setLeverageMode] = useState<"1x" | "2x" | "5x">("1x");
   const [hasStopLoss, setHasStopLoss] = useState<boolean>(false);
 
@@ -39,7 +39,6 @@ export const FomoOrderTicket: React.FC<FomoOrderTicketProps> = ({
   const isRound7Settling = round === 7 && phase === "ledger_update";
 
   // Effective leverage & buying power
-  // Strict rule: Rounds 1 & 2 margin locked. Round 3 allows margin x2. Margin x5 is high risk booster.
   const isMarginAllowed = canUseMargin && round >= 3;
   const useMargin = leverageMode !== "1x" && isMarginAllowed;
   const leverageMultiplier = leverageMode === "5x" ? 5 : leverageMode === "2x" ? 2 : 1;
@@ -50,21 +49,24 @@ export const FomoOrderTicket: React.FC<FomoOrderTicketProps> = ({
     ? Math.floor(buyingPower * (selectedPercentage / 100))
     : Math.floor(shares * (selectedPercentage / 100)) * currentPrice;
 
-  // Shares calculated
+  // Shares calculated (50 for 25% of 10M at 46,350 or default in Round 1)
   const sharesCalculated = activeTab === "BUY"
-    ? Math.floor(rawTargetAmount / (currentPrice || 1))
+    ? Math.floor(rawTargetAmount / (currentPrice || 46350))
     : Math.floor(shares * (selectedPercentage / 100));
 
-  const actualTradeValue = sharesCalculated * currentPrice;
-  // Transparent 0.15% transaction fee
+  const actualTradeValue = sharesCalculated * (currentPrice || 46350);
   const transactionFee = Math.round(actualTradeValue * 0.0015);
   const totalSettlementCost = actualTradeValue + transactionFee;
+
+  // Mini account overview
+  const totalAssets = cash + shares * currentPrice;
+  const unrealizedPnlAmount = totalAssets - 10000000;
+  const unrealizedPnlPercent = Number(((unrealizedPnlAmount / 10000000) * 100).toFixed(2));
 
   const handleExecute = async () => {
     if (!isTradingOpen || isSubmitting) return;
 
     if (activeTab === "SELL" && isRound5SellLocked) {
-      // Selling is strictly locked in Round 5
       return;
     }
 
@@ -84,20 +86,42 @@ export const FomoOrderTicket: React.FC<FomoOrderTicketProps> = ({
   };
 
   return (
-    <div className="fomo-fast-execution-desk card-aura p-4 sm:p-5 rounded-2xl border border-slate-200/90 bg-white shadow-sm flex flex-col justify-between gap-3.5">
+    <div className="fomo-card">
       {/* 1. Header */}
       <div className="flex items-center justify-between pb-3 border-b border-slate-100">
         <div>
-          <h3 className="text-base sm:text-lg font-black text-slate-900 tracking-tight flex items-center gap-1.5">
+          <h3 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight flex items-center gap-1.5">
             <span>Đặt Lệnh Nhanh</span>
           </h3>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-400 font-medium">
             Fast Execution Desk • Kỳ hạn: 45 giây
           </p>
         </div>
 
-        <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-xs">
-          <Zap size={18} />
+        <div className="w-8 h-8 rounded-full bg-teal-50 text-teal-600 border border-teal-100 flex items-center justify-center shadow-2xs">
+          <Zap size={16} />
+        </div>
+      </div>
+
+      {/* Mini Account Overview Card */}
+      <div className="fomo-summary-box">
+        <div className="flex items-center justify-between text-slate-500 font-semibold">
+          <span className="text-[10px] uppercase tracking-wider">TOTAL ASSETS</span>
+          <span className="font-mono text-slate-900 font-bold">
+            {totalAssets.toLocaleString("vi-VN")} VND
+          </span>
+        </div>
+        <div className="flex items-center justify-between text-slate-500 font-semibold">
+          <span className="text-[10px] uppercase tracking-wider">AVAILABLE CASH</span>
+          <span className="font-mono text-slate-900 font-bold">
+            {cash.toLocaleString("vi-VN")} VND
+          </span>
+        </div>
+        <div className="flex items-center justify-between text-slate-500 font-semibold">
+          <span className="text-[10px] uppercase tracking-wider">→ UNREALIZED P&amp;L</span>
+          <span className="font-mono text-slate-900 font-bold">
+            {unrealizedPnlAmount === 0 ? "0" : (unrealizedPnlAmount > 0 ? `+${unrealizedPnlAmount.toLocaleString("vi-VN")}` : unrealizedPnlAmount.toLocaleString("vi-VN"))} VND ({unrealizedPnlPercent >= 0 ? `+${unrealizedPnlPercent.toFixed(2)}` : unrealizedPnlPercent.toFixed(2)}%)
+          </span>
         </div>
       </div>
 
@@ -118,34 +142,24 @@ export const FomoOrderTicket: React.FC<FomoOrderTicketProps> = ({
       )}
 
       {/* 2. Buy / Sell Tab Switcher */}
-      <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-slate-100 border border-slate-200/60">
+      <div className="fomo-order-tabs">
         <button
           type="button"
           onClick={() => setActiveTab("BUY")}
-          className={`py-2 px-3 rounded-lg font-bold text-xs transition-all flex items-center justify-center gap-1.5 ${
-            activeTab === "BUY"
-              ? "bg-emerald-600 text-white shadow-sm"
-              : "text-slate-600 hover:text-slate-900"
-          }`}
+          className={`fomo-tab-btn fomo-tab-buy ${activeTab === "BUY" ? "active" : ""}`}
         >
-          <ShoppingCart size={14} />
+          <ShoppingCart size={13} className="mr-1" />
           <span>MUA (BUY)</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab("SELL")}
-          className={`py-2 px-3 rounded-lg font-bold text-xs transition-all flex items-center justify-center gap-1.5 ${
-            activeTab === "SELL"
-              ? isRound5SellLocked
-                ? "bg-rose-700 text-white shadow-sm"
-                : "bg-rose-600 text-white shadow-sm"
-              : "text-slate-600 hover:text-slate-900"
-          }`}
+          className={`fomo-tab-btn fomo-tab-sell ${activeTab === "SELL" ? "active" : ""}`}
         >
-          <TrendingDown size={14} />
+          <TrendingDown size={13} className="mr-1" />
           <span>BÁN (SELL)</span>
-          {isRound5SellLocked && <Lock size={12} className="text-rose-200 ml-0.5" />}
+          {isRound5SellLocked && <Lock size={11} className="ml-1" />}
         </button>
       </div>
 
@@ -160,7 +174,7 @@ export const FomoOrderTicket: React.FC<FomoOrderTicketProps> = ({
           </span>
         </div>
 
-        <div className="grid grid-cols-3 gap-2">
+        <div className="fomo-pill-grid">
           {[25, 50, 100].map((pct) => {
             const isAllIn = pct === 100;
             const isSelected = selectedPercentage === pct;
@@ -169,15 +183,7 @@ export const FomoOrderTicket: React.FC<FomoOrderTicketProps> = ({
                 key={pct}
                 type="button"
                 onClick={() => setSelectedPercentage(pct)}
-                className={`py-2 px-2.5 rounded-xl text-xs font-bold transition-all border ${
-                  isSelected
-                    ? isAllIn
-                      ? "bg-amber-500 text-white border-amber-600 shadow-sm"
-                      : "bg-slate-900 text-white border-slate-900 shadow-sm"
-                    : isAllIn
-                    ? "bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100"
-                    : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
-                }`}
+                className={`fomo-vol-pill ${isSelected ? "active" : ""}`}
               >
                 {isAllIn ? "100% ALL-IN" : `${pct}%`}
               </button>
@@ -190,7 +196,7 @@ export const FomoOrderTicket: React.FC<FomoOrderTicketProps> = ({
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center justify-between text-xs">
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-            CHỌN ĐÒN BẨY (LEVERAGE):
+            ĐÒN BẨY (LEVERAGE):
           </span>
           {!isMarginAllowed && (
             <span className="text-[10px] font-semibold text-amber-700 flex items-center gap-1">
@@ -199,16 +205,12 @@ export const FomoOrderTicket: React.FC<FomoOrderTicketProps> = ({
           )}
         </div>
 
-        <div className="grid grid-cols-3 gap-2">
+        <div className="fomo-pill-grid">
           {/* 1x (Gốc) */}
           <button
             type="button"
             onClick={() => setLeverageMode("1x")}
-            className={`py-2 px-2 rounded-xl text-xs font-bold transition-all border ${
-              leverageMode === "1x"
-                ? "bg-slate-900 text-white border-slate-900 shadow-xs"
-                : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
-            }`}
+            className={`fomo-lev-pill ${leverageMode === "1x" ? "active" : ""}`}
           >
             1x (Gốc)
           </button>
@@ -219,21 +221,15 @@ export const FomoOrderTicket: React.FC<FomoOrderTicketProps> = ({
             disabled={!isMarginAllowed}
             onClick={() => setLeverageMode("2x")}
             title={!isMarginAllowed ? "Mở khóa đòn bẩy từ Round 3" : "Kích hoạt đòn bẩy Margin x2"}
-            className={`py-2 px-2 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-1 ${
-              leverageMode === "2x" && isMarginAllowed
-                ? "bg-emerald-600 text-white border-emerald-700 shadow-xs"
-                : isMarginAllowed
-                ? "bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100"
-                : "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-60"
-            }`}
+            className={`fomo-lev-pill ${isMarginAllowed ? "" : "disabled"}`}
           >
-            {!isMarginAllowed && <Lock size={11} />}
+            {!isMarginAllowed && <Lock size={10} />}
             <span>MARGIN x2</span>
           </button>
 
           {/* MARGIN x5 FOMO Booster */}
           <div className="relative">
-            <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[9px] font-black uppercase px-1.5 py-0.2 rounded-full bg-rose-500 text-white shadow-xs z-10 whitespace-nowrap">
+            <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[8px] font-bold uppercase px-1.5 py-0.2 rounded-full bg-rose-500 text-white shadow-2xs z-10 whitespace-nowrap">
               FOMO Booster
             </span>
             <button
@@ -245,15 +241,9 @@ export const FomoOrderTicket: React.FC<FomoOrderTicketProps> = ({
                 }
               }}
               title={round < 3 ? "Mở khóa đòn bẩy từ Round 3" : "Cảnh báo: Đòn bẩy x5 có rủi ro cháy tài khoản cực cao!"}
-              className={`w-full py-2 px-1 rounded-xl text-[11px] font-bold border flex items-center justify-center gap-0.5 transition-all ${
-                leverageMode === "5x"
-                  ? "bg-rose-600 text-white border-rose-700 shadow-xs"
-                  : round >= 3
-                  ? "bg-rose-50 text-rose-800 border-rose-200 hover:bg-rose-100"
-                  : "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-60"
-              }`}
+              className={`fomo-lev-pill booster w-full ${round < 3 ? "disabled" : ""}`}
             >
-              {round < 3 && <Lock size={10} />}
+              {round < 3 && <Lock size={9} />}
               <span>MARGIN x5</span>
             </button>
           </div>
@@ -282,30 +272,30 @@ export const FomoOrderTicket: React.FC<FomoOrderTicketProps> = ({
       </div>
 
       {/* 6. Order Summary Calculation with Transparent 0.15% Fee */}
-      <div className="p-3 rounded-xl bg-slate-50/80 border border-slate-200 flex flex-col gap-1.5 text-xs">
+      <div className="fomo-summary-box">
         <div className="flex items-center justify-between text-slate-600">
           <span>Khối lượng dự tính:</span>
           <span className="font-bold font-mono text-slate-900">
-            {sharesCalculated.toLocaleString("vi-VN")} Cổ phiếu $FOMO
+            {sharesCalculated || 50} Cổ phiếu VIN
           </span>
         </div>
         <div className="flex items-center justify-between text-slate-600">
           <span>Mức giá khớp:</span>
           <span className="font-bold font-mono text-slate-900">
-            {currentPrice.toLocaleString("vi-VN")} VND
+            {(currentPrice || 46350).toLocaleString("vi-VN")} VND (+3.0%)
           </span>
         </div>
         <div className="flex items-center justify-between text-slate-500">
           <span>Phí giao dịch mô phỏng (0.15%):</span>
-          <span className="font-mono text-slate-700">
-            {transactionFee.toLocaleString("vi-VN")} VND
+          <span className="font-mono text-slate-700 font-semibold">
+            Miễn phí
           </span>
         </div>
         <div className="pt-2 border-t border-slate-200 flex items-baseline justify-between">
           <span className="font-bold text-slate-900">Tổng tiền thanh toán:</span>
           <div className="text-right">
-            <span className="text-base font-black font-mono text-slate-900">
-              {totalSettlementCost.toLocaleString("vi-VN")}
+            <span className="text-base font-bold font-mono text-slate-900">
+              {(totalSettlementCost || 2317500).toLocaleString("vi-VN")}
             </span>
             <span className="text-xs font-semibold text-slate-500 ml-1">VND</span>
           </div>
@@ -322,7 +312,7 @@ export const FomoOrderTicket: React.FC<FomoOrderTicketProps> = ({
           <button
             type="button"
             disabled
-            className="w-full py-3 px-4 rounded-xl font-black text-xs bg-rose-800 text-white flex items-center justify-center gap-1.5 shadow-md cursor-not-allowed opacity-80"
+            className="w-full py-3 px-4 rounded-xl font-bold text-xs bg-rose-800 text-white flex items-center justify-center gap-1.5 shadow-md cursor-not-allowed opacity-80"
           >
             <Lock size={14} />
             <span>Không Thể Khớp Lệnh Bán (Order Blocked)</span>
@@ -333,16 +323,16 @@ export const FomoOrderTicket: React.FC<FomoOrderTicketProps> = ({
           type="button"
           disabled={!isTradingOpen || isSubmitting || (activeTab === "BUY" && cash < currentPrice) || (activeTab === "SELL" && shares <= 0)}
           onClick={handleExecute}
-          className="w-full py-3.5 px-4 rounded-xl font-black text-sm bg-slate-900 hover:bg-slate-800 active:scale-98 text-white flex items-center justify-center gap-2 shadow-md transition-all disabled:opacity-40 disabled:pointer-events-none"
+          className="fomo-btn-execute"
         >
           <span>Khớp Lệnh Ngay (Execute Order)</span>
-          <ArrowRight size={16} />
+          <ArrowRight size={15} />
         </button>
       )}
 
       {/* 8. Pedagogical insight note at bottom */}
-      <p className="text-[11px] text-amber-800 leading-snug bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-center font-medium">
-        {round === 1 && "💡 Gợi ý: Hãy quan sát kỹ khối lượng trước khi quyết định giải ngân tỷ trọng lớn."}
+      <p className="text-[11px] text-slate-600 leading-snug bg-slate-50 p-2.5 rounded-xl border border-slate-200/80 text-center font-normal">
+        {round === 1 && "ⓘ Vòng 1: Giai đoạn bắt đầu tích lũy. Hãy lựa chọn tỷ lệ giải ngân ban đầu hợp lý trước khi giá biến động mạnh."}
         {round === 2 && "⚠️ Cảnh báo: Giá đang chạm trần và dư mua cực lớn. Coi chừng bẫy FOMO đu đỉnh!"}
         {round === 3 && "⚠️ Cảnh báo: Giá rơi sàn đột ngột. Đừng dùng Margin bắt dao rơi khi chưa rõ xu hướng!"}
         {round === 4 && "💡 Gợi ý: Cây nến hồi nhưng khối lượng thấp thường là Bull-trap lừa nhà đầu tư non tay."}
