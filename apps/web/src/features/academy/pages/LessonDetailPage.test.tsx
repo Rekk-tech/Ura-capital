@@ -576,6 +576,92 @@ describe("LessonDetailPage (Dual-Query, Navigation, Auth, Security - AC-007..AC-
       );
     });
   });
+
+  describe("Quiz Completion Gate (§3.1 Enforced Gate)", () => {
+    it("disables Mark Lesson as Complete button with tooltip when lesson has unpassed quiz", async () => {
+      vi.spyOn(academyApi, "getLessonBySlug").mockResolvedValue(mockLessonDetail);
+      vi.spyOn(academyApi, "getCourseBySlug").mockResolvedValue(mockCourseDetail);
+      vi.spyOn(academyApi, "getLessonQuiz").mockResolvedValue({
+        data: {
+          id: "quiz-uuid-1",
+          courseSlug: "crypto-fundamentals",
+          lessonSlug: "proof-of-work",
+          lessonTitle: "Proof of Work Consensus",
+          title: "Proof of Work Mastery Quiz",
+          description: "Test your understanding of mining consensus.",
+          passingScore: 80,
+          totalQuestions: 1,
+          questions: [],
+        },
+      });
+      vi.spyOn(academyApi, "getCurrentQuizAttempt").mockRejectedValue(
+        new AcademyApiError(404, "QUIZ_ATTEMPT_NOT_FOUND", "Quiz attempt not found")
+      );
+
+      renderWithProviders();
+
+      await waitFor(() => {
+        expect(screen.getByTestId("informational-lesson-completion")).toBeDefined();
+      });
+
+      const completeBtn = screen.getByTestId("mark-lesson-complete-button") as HTMLButtonElement;
+      expect(completeBtn.disabled).toBe(true);
+      expect(completeBtn.getAttribute("title")).toBe("Pass the quiz to complete this lesson");
+      expect(screen.getByTestId("quiz-gate-hint")).toBeDefined();
+      expect(screen.getByText("Pass the quiz to complete this lesson")).toBeDefined();
+    });
+
+    it("enables Mark Lesson as Complete button once quiz is graded and passed", async () => {
+      vi.spyOn(academyApi, "getLessonBySlug").mockResolvedValue(mockLessonDetail);
+      vi.spyOn(academyApi, "getCourseBySlug").mockResolvedValue(mockCourseDetail);
+      vi.spyOn(academyApi, "getLessonQuiz").mockResolvedValue({
+        data: {
+          id: "quiz-uuid-1",
+          courseSlug: "crypto-fundamentals",
+          lessonSlug: "proof-of-work",
+          lessonTitle: "Proof of Work Consensus",
+          title: "Proof of Work Mastery Quiz",
+          description: "Test your understanding of mining consensus.",
+          passingScore: 80,
+          totalQuestions: 1,
+          questions: [],
+        },
+      });
+      vi.spyOn(academyApi, "getCurrentQuizAttempt").mockResolvedValue({
+        data: {
+          id: "attempt-uuid-1",
+          quizId: "quiz-uuid-1",
+          attemptNumber: 1,
+          status: "GRADED",
+          startedAt: new Date().toISOString(),
+          answers: [],
+        },
+      });
+      vi.spyOn(academyApi, "getGradedQuizResult").mockResolvedValue({
+        data: {
+          attemptId: "attempt-uuid-1",
+          quizId: "quiz-uuid-1",
+          status: "GRADED",
+          score: 100,
+          passed: true,
+          submittedAt: new Date().toISOString(),
+          gradedAt: new Date().toISOString(),
+          answers: [],
+        },
+      });
+
+      renderWithProviders();
+
+      await waitFor(() => {
+        expect(screen.getByTestId("informational-lesson-completion")).toBeDefined();
+        const completeBtn = screen.getByTestId("mark-lesson-complete-button") as HTMLButtonElement;
+        expect(completeBtn.disabled).toBe(false);
+      });
+
+      expect(screen.queryByTestId("quiz-gate-hint")).toBeNull();
+    });
+  });
 });
+
 
 

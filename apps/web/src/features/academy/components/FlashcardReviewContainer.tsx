@@ -27,36 +27,37 @@ export const FlashcardReviewContainer: React.FC<FlashcardReviewContainerProps> =
   lessonSlug,
 }) => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const [isRevealed, setIsRevealed] = useState<boolean>(false);
+  const [isFlipped, setIsFlipped] = useState<boolean>(false);
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
 
   const total = flashcards.length;
   const currentCard = flashcards[currentIndex];
+  const progressPercent = total > 0 ? Math.round(((currentIndex + (isCompleted ? 1 : 0)) / total) * 100) : 0;
 
-  const handleReveal = useCallback(() => {
-    setIsRevealed(true);
+  const handleToggleFlip = useCallback(() => {
+    setIsFlipped((prev) => !prev);
   }, []);
 
   const handleNext = useCallback(() => {
     if (currentIndex < total - 1) {
       setCurrentIndex((prev) => prev + 1);
-      setIsRevealed(false);
+      setIsFlipped(false);
     } else {
       setIsCompleted(true);
-      setIsRevealed(false);
+      setIsFlipped(false);
     }
   }, [currentIndex, total]);
 
   const handlePrevious = useCallback(() => {
     if (currentIndex > 0) {
       setCurrentIndex((prev) => prev - 1);
-      setIsRevealed(false);
+      setIsFlipped(false);
     }
   }, [currentIndex]);
 
   const handleRestart = useCallback(() => {
     setCurrentIndex(0);
-    setIsRevealed(false);
+    setIsFlipped(false);
     setIsCompleted(false);
   }, []);
 
@@ -68,9 +69,9 @@ export const FlashcardReviewContainer: React.FC<FlashcardReviewContainerProps> =
       }
 
       if (e.key === " " || e.key === "Enter") {
-        if (!isRevealed && !isCompleted) {
+        if (!isCompleted) {
           e.preventDefault();
-          handleReveal();
+          handleToggleFlip();
         }
       } else if (e.key === "ArrowRight") {
         if (!isCompleted) {
@@ -92,7 +93,7 @@ export const FlashcardReviewContainer: React.FC<FlashcardReviewContainerProps> =
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isRevealed, isCompleted, currentIndex, handleReveal, handleNext, handlePrevious, handleRestart]);
+  }, [isCompleted, currentIndex, handleToggleFlip, handleNext, handlePrevious, handleRestart]);
 
   if (isCompleted) {
     const lessonUrl =
@@ -138,7 +139,7 @@ export const FlashcardReviewContainer: React.FC<FlashcardReviewContainerProps> =
               style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
             >
               <RotateCcw className="w-4 h-4" aria-hidden="true" />
-              <span>Restart Review</span>
+              <span>Restart Deck</span>
             </button>
           </div>
         </div>
@@ -152,6 +153,18 @@ export const FlashcardReviewContainer: React.FC<FlashcardReviewContainerProps> =
 
   return (
     <div className="flashcard-review-container" data-testid="flashcard-review-container">
+      {/* Top Header: Progress Bar */}
+      <div
+        className="flashcard-progress-bar-container"
+        role="progressbar"
+        aria-valuenow={progressPercent}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label="Flashcard Deck Progress"
+      >
+        <div className="flashcard-progress-bar-fill" style={{ width: `${progressPercent}%` }} />
+      </div>
+
       {/* Top Header Controls: Position Counter & Restart */}
       <div className="flashcard-toolbar">
         <span
@@ -173,50 +186,87 @@ export const FlashcardReviewContainer: React.FC<FlashcardReviewContainerProps> =
         </button>
       </div>
 
-      {/* Main Flashcard View */}
-      <div className="flashcard-card-surface" data-testid="flashcard-active-card">
-        {/* Front Section (Always rendered) */}
-        <div className="flashcard-front-section" data-testid="flashcard-front-section">
-          <div className="flashcard-face-badge">Prompt</div>
-          <div
-            className="flashcard-content-prose"
-            data-testid="flashcard-front-content"
-            dangerouslySetInnerHTML={{ __html: sanitizeLessonMarkdown(currentCard.front) }}
-          />
-        </div>
+      {/* Quizlet 3D Card Scene */}
+      <div
+        className="flashcard-scene"
+        data-testid="flashcard-active-card"
+        onClick={handleToggleFlip}
+        role="button"
+        tabIndex={0}
+        aria-label={isFlipped ? "Flip to front side" : "Flip to back side"}
+        onKeyDown={(e) => {
+          if (e.key === " " || e.key === "Enter") {
+            e.preventDefault();
+            handleToggleFlip();
+          }
+        }}
+      >
+        <div className={`flashcard-card-3d ${isFlipped ? "is-flipped" : ""}`}>
+          {/* Front Face: Term / Prompt */}
+          <div className="flashcard-face flashcard-face-front" data-testid="flashcard-front-section">
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span className="flashcard-face-badge">PROMPT</span>
+              {!isFlipped && (
+                <button
+                  type="button"
+                  className="btn btn-outline flashcard-reveal-btn"
+                  data-testid="flashcard-reveal-button"
+                  aria-expanded="false"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleToggleFlip();
+                  }}
+                  style={{ fontSize: "0.75rem", padding: "0.2rem 0.55rem" }}
+                >
+                  <Eye className="w-3.5 h-3.5 mr-1 inline" aria-hidden="true" />
+                  <span>Reveal</span>
+                </button>
+              )}
+            </div>
 
-        {/* Divider & Reveal / Back Section */}
-        {!isRevealed ? (
-          <div className="flashcard-reveal-prompt">
-            <button
-              type="button"
-              className="btn btn-primary flashcard-reveal-btn"
-              onClick={handleReveal}
-              aria-expanded="false"
-              aria-label="Reveal Answer"
-              data-testid="flashcard-reveal-button"
-            >
-              <Eye className="w-4 h-4 mr-2 inline" aria-hidden="true" />
-              Reveal Answer
-            </button>
-            <p className="flashcard-shortcut-hint" aria-hidden="true">
-              Press <kbd>Space</kbd> or <kbd>Enter</kbd> to reveal
-            </p>
+            <div className="flashcard-center-content">
+              <div
+                className="flashcard-term-title"
+                data-testid="flashcard-front-content"
+                dangerouslySetInnerHTML={{ __html: sanitizeLessonMarkdown(currentCard.front) }}
+              />
+            </div>
+
+            <div className="flashcard-flip-hint">
+              Click to flip or press <kbd>Space</kbd>
+            </div>
           </div>
-        ) : (
-          <div
-            className="flashcard-back-section"
-            aria-live="polite"
-            data-testid="flashcard-back-section"
-          >
-            <div className="flashcard-face-badge flashcard-back-badge">Answer</div>
+
+          {/* Back Face: Definition / Answer (Rendered when flipped) */}
+          {isFlipped && (
             <div
-              className="flashcard-content-prose flashcard-back-content"
-              data-testid="flashcard-back-content"
-              dangerouslySetInnerHTML={{ __html: sanitizeLessonMarkdown(currentCard.back) }}
-            />
-          </div>
-        )}
+              className="flashcard-face flashcard-face-back"
+              aria-live="polite"
+              data-testid="flashcard-back-section"
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span className="flashcard-face-badge flashcard-back-badge">
+                  DEFINITION <span className="sr-only" aria-hidden="true">Answer</span>
+                </span>
+                <span style={{ fontSize: "0.75rem", color: "#64748B", fontWeight: 600 }}>
+                  {currentIndex + 1} / {total}
+                </span>
+              </div>
+
+              <div className="flashcard-center-content">
+                <div
+                  className="flashcard-def-text"
+                  data-testid="flashcard-back-content"
+                  dangerouslySetInnerHTML={{ __html: sanitizeLessonMarkdown(currentCard.back) }}
+                />
+              </div>
+
+              <div className="flashcard-flip-hint">
+                Click to flip back or press <kbd>Space</kbd>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Navigation Footer */}
@@ -245,9 +295,9 @@ export const FlashcardReviewContainer: React.FC<FlashcardReviewContainerProps> =
         </button>
       </div>
 
-      {/* Keyboard Helper Footnote */}
+      {/* Keyboard Shortcut Hints Guide */}
       <div className="flashcard-keyboard-guide" aria-hidden="true">
-        <span>Shortcuts: <kbd>Space</kbd> / <kbd>Enter</kbd> flip &bull; <kbd>&larr;</kbd> prev &bull; <kbd>&rarr;</kbd> next &bull; <kbd>R</kbd> restart</span>
+        <span>Space: Flip &bull; &larr; / &rarr;: Navigate &bull; R: Restart</span>
       </div>
     </div>
   );

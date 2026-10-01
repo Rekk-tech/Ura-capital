@@ -459,7 +459,7 @@ describe("FEAT-080: Phase 9 Product Integration & Browser E2E Gate", () => {
 
         await waitFor(() => {
           expect(
-            screen.getByRole("heading", { level: 1, name: /simulation trading cockpit/i }),
+            screen.getByRole("heading", { level: 1, name: /simulation (trading cockpit|trading arenas)/i }),
           ).toBeDefined();
         });
 

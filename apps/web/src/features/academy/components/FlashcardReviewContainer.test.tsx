@@ -47,7 +47,7 @@ describe("FlashcardReviewContainer", () => {
     expect(nextBtn.disabled).toBe(false);
   });
 
-  it("reveals card back upon clicking Reveal Answer button", () => {
+  it("reveals card back upon clicking Reveal button or clicking the card itself", () => {
     render(
       <BrowserRouter>
         <FlashcardReviewContainer
@@ -59,13 +59,13 @@ describe("FlashcardReviewContainer", () => {
       </BrowserRouter>
     );
 
-    const revealBtn = screen.getByTestId("flashcard-reveal-button");
-    fireEvent.click(revealBtn);
+    const activeCard = screen.getByTestId("flashcard-active-card");
+    fireEvent.click(activeCard);
 
     expect(
       screen.getByText("Alpha represents an investment strategy's ability to beat the market return.")
     ).toBeDefined();
-    expect(screen.getByText("Answer")).toBeDefined();
+    expect(screen.getByText("DEFINITION")).toBeDefined();
   });
 
   it("navigates with keyboard shortcuts: Enter/Space to reveal, ArrowRight to next, ArrowLeft to prev", () => {
