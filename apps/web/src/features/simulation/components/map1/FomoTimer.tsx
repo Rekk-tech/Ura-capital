@@ -1,6 +1,6 @@
 import React from "react";
 import type { Map1Phase } from "../../types/map-game.types";
-import { Clock, ShieldAlert, Zap, TrendingUp, Flame } from "lucide-react";
+import { Clock, TrendingUp, TrendingDown, Flame, Radio } from "lucide-react";
 
 interface FomoTimerProps {
   round: number;
@@ -30,8 +30,7 @@ export const FomoTimer: React.FC<FomoTimerProps> = ({
   nav: _nav,
   initialCash,
 }) => {
-  // Financial KPI Math (Resolving Review Issue 1.4)
-  // TOTAL ASSETS must be dynamically evaluated as Available Cash + Current Market Value of Open Positions
+  // Strict Financial KPI Math
   const safeCash = cash ?? 0;
   const safeShares = shares ?? 0;
   const safePrice = currentPrice ?? 0;
@@ -46,141 +45,152 @@ export const FomoTimer: React.FC<FomoTimerProps> = ({
   const safeSecondInRound = secondInRound ?? 0;
   const secondsLeft = Math.max(0, safeRoundDuration - safeSecondInRound);
   const formattedSeconds = String(secondsLeft).padStart(2, "0");
+  const isWarningTimer = secondsLeft <= 10;
 
-  const progressPercent = Math.round(((round ?? 1) / (totalRounds || 7)) * 100);
+  const currentRoundNum = round || 1;
+  const totalRoundNum = totalRounds || 7;
+  const progressPercent = Math.round((currentRoundNum / totalRoundNum) * 100);
 
   // 4-Phase Micro-Timeline configuration
   const phaseList: Array<{
     key: Map1Phase;
     label: string;
     range: string;
-    startSec: number;
-    endSec: number;
   }> = [
-    { key: "news_and_trap", label: "NEWS & TRAP", range: "0-10s", startSec: 0, endSec: 10 },
-    { key: "trading_window", label: "TRADING WINDOW", range: "10-30s", startSec: 10, endSec: 30 },
-    { key: "trap_or_quiz", label: "TRAP / QUIZ", range: "30-40s", startSec: 30, endSec: 40 },
-    { key: "ledger_update", label: "LEDGER UPDATE", range: "40-45s", startSec: 40, endSec: 45 },
+    { key: "news_and_trap", label: "1. ĐỌC TIN TỨC", range: "0-10s" },
+    { key: "trading_window", label: "2. ĐẶT LỆNH", range: "10-30s" },
+    { key: "trap_or_quiz", label: "3. NÉ BẪY / QUIZ", range: "30-40s" },
+    { key: "ledger_update", label: "4. KHỚP LỆNH & NAV", range: "40-45s" },
   ];
 
   return (
-    <div className="fomo-cockpit-header flex flex-col gap-3">
-      {/* Top Banner Row */}
-      <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+    <header className="fomo-cockpit-status-bar card-aura p-3.5 sm:p-4 rounded-2xl border border-slate-200/90 bg-white shadow-sm flex flex-col gap-3">
+      {/* Top Bar: Left Tag & Feed, Right Phase Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-2.5">
         <div className="flex items-center gap-2">
-          <span className="px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider text-[11px] bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center gap-1 shadow-xs">
-            <Flame size={12} className="text-amber-500" />
-            MAP 1: FOMO ARENA
+          <span className="px-2.5 py-1 rounded-lg font-black uppercase tracking-wider text-[11px] bg-gradient-to-r from-amber-500/15 to-orange-500/15 text-amber-700 border border-amber-500/30 flex items-center gap-1.5 shadow-xs">
+            <Flame size={13} className="text-amber-500" />
+            <span>🔥 MAP 1: FOMO ARENA</span>
           </span>
-          <span className="px-2.5 py-0.5 rounded-full font-semibold text-[11px] bg-blue-50 text-blue-600 border border-blue-200 flex items-center gap-1.5 shadow-xs">
-            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-            Simulated VN-Index Live Feed
+
+          <span className="px-2.5 py-1 rounded-lg font-bold text-[11px] bg-slate-100 text-slate-700 border border-slate-200/80 flex items-center gap-1.5 shadow-xs">
+            <Radio size={12} className="text-emerald-500 animate-pulse" />
+            <span className="font-mono">VN-INDEX: 1,284.50 (+0.42%)</span>
           </span>
         </div>
 
-        <div className="flex items-center gap-1 text-[11px] font-semibold text-slate-500">
-          <ShieldAlert size={13} className="text-rose-500" />
-          <span>Psychological Stress Test Active</span>
+        {/* 4-Phase Micro-Timeline indicators */}
+        <div className="flex items-center gap-1">
+          {phaseList.map((p) => {
+            const isActive = phase === p.key;
+            return (
+              <span
+                key={p.key}
+                className={`px-2 py-0.5 rounded-md text-[10px] font-bold tracking-tight transition-all ${
+                  isActive
+                    ? "bg-slate-900 text-white shadow-xs ring-1 ring-slate-900"
+                    : "bg-slate-50 text-slate-400 border border-slate-200/60"
+                }`}
+                title={p.range}
+              >
+                {p.label}
+              </span>
+            );
+          })}
         </div>
       </div>
 
-      {/* Main KPI Status Card */}
-      <div className="card-aura p-4 md:p-5 rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-5">
-        {/* Left: Round & Progress Bar */}
-        <div className="flex-1 flex flex-col justify-between">
-          <div className="flex items-center gap-3 mb-1">
-            <h2 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-              <span>Round {round}/{totalRounds}: {roundName}</span>
-            </h2>
-            <div className="px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-rose-50 text-rose-600 border border-rose-200 flex items-center gap-1 shadow-xs animate-pulse">
-              <Clock size={13} />
+      {/* Main KPI Row: Center-Left Round & Countdown | Right 3 KPI Cards */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center pt-1 border-t border-slate-100">
+        {/* Center-Left: Round Title, Timer & Progress (5 cols) */}
+        <div className="lg:col-span-5 flex flex-col gap-2">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight flex items-center gap-1.5">
+                <span>Round {currentRoundNum}/{totalRoundNum}:</span>
+                <span className="text-blue-600">{roundName}</span>
+              </h2>
+            </div>
+
+            {/* Circular / Pill 45s Countdown Timer */}
+            <div
+              className={`px-3 py-1 rounded-xl text-xs sm:text-sm font-mono font-black flex items-center gap-1.5 shadow-xs border transition-all ${
+                isWarningTimer
+                  ? "bg-rose-50 text-rose-700 border-rose-300 animate-pulse shadow-rose-100"
+                  : "bg-blue-50 text-blue-700 border-blue-200"
+              }`}
+            >
+              <Clock size={14} className={isWarningTimer ? "text-rose-600" : "text-blue-600"} />
               <span>00:{formattedSeconds}</span>
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-xs text-slate-500 font-medium mb-1.5">
-            <span>Progress: {round} of {totalRounds} Rounds Complete</span>
-            <span className="font-bold text-slate-700 font-mono">{progressPercent}% Complete</span>
-          </div>
-
-          {/* Overall Round Progress Bar */}
-          <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200/60 mb-3">
-            <div
-              className="h-full bg-blue-600 rounded-full transition-all duration-300"
-              style={{ width: `${progressPercent}%` }}
-            />
-          </div>
-
-          {/* 4-Phase Micro-Timeline Bar */}
+          {/* Progress bar ({n}/7 Rounds Complete) */}
           <div className="flex flex-col gap-1">
-            <div className="grid grid-cols-4 gap-1 text-[10px] font-bold uppercase tracking-wider">
-              {phaseList.map((p) => {
-                const isActive = phase === p.key;
-                return (
-                  <div
-                    key={p.key}
-                    className={`py-1 px-1.5 rounded-lg text-center border transition-all ${
-                      isActive
-                        ? "bg-slate-900 text-white border-slate-900 shadow-sm"
-                        : "bg-slate-50 text-slate-400 border-slate-200/70"
-                    }`}
-                  >
-                    <div className="overflow-hidden text-ellipsis whitespace-nowrap">{p.label}</div>
-                    <div className="text-[9px] font-normal opacity-80">{p.range}</div>
-                  </div>
-                );
-              })}
+            <div className="flex items-center justify-between text-[11px] text-slate-500 font-semibold">
+              <span>Tiến độ: {currentRoundNum}/{totalRoundNum} Vòng sinh tử</span>
+              <span className="font-mono text-slate-700 font-bold">{progressPercent}% Hoàn thành</span>
+            </div>
+            <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200/60">
+              <div
+                className="h-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full transition-all duration-300"
+                style={{ width: `${progressPercent}%` }}
+              />
             </div>
           </div>
         </div>
 
-        {/* Right: Strict Financial KPI Math (Resolving Review Issue 1.4) */}
-        <div className="flex items-center justify-between lg:justify-end gap-3 md:gap-5 pt-3 lg:pt-0 border-t lg:border-t-0 border-slate-100">
+        {/* Right: 3 KPI Cards (7 cols) */}
+        <div className="lg:col-span-7 grid grid-cols-3 gap-2.5 sm:gap-3">
           {/* TOTAL ASSETS */}
-          <div className="flex flex-col text-left">
-            <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-wider text-slate-400">
+          <div className="p-2.5 sm:p-3 rounded-xl bg-slate-50/80 border border-slate-200/80 flex flex-col justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
               TOTAL ASSETS
             </span>
-            <div className="text-lg md:text-xl font-black font-mono text-slate-900 mt-0.5">
-              {totalAssets.toLocaleString("vi-VN")}{" "}
-              <span className="text-xs font-semibold text-slate-500">VND</span>
+            <div className="mt-0.5 flex items-baseline gap-1">
+              <span className="text-sm sm:text-base md:text-lg font-black font-mono text-slate-900 tracking-tight">
+                {totalAssets.toLocaleString("vi-VN")}
+              </span>
+              <span className="text-[10px] font-bold text-slate-400">VND</span>
             </div>
           </div>
 
           {/* AVAILABLE CASH */}
-          <div className="flex flex-col text-left">
-            <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-wider text-slate-400">
+          <div className="p-2.5 sm:p-3 rounded-xl bg-slate-50/80 border border-slate-200/80 flex flex-col justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
               AVAILABLE CASH
             </span>
-            <div className="text-lg md:text-xl font-black font-mono text-slate-900 mt-0.5">
-              {safeCash.toLocaleString("vi-VN")}{" "}
-              <span className="text-xs font-semibold text-slate-500">VND</span>
+            <div className="mt-0.5 flex items-baseline gap-1">
+              <span className="text-sm sm:text-base md:text-lg font-black font-mono text-slate-900 tracking-tight">
+                {safeCash.toLocaleString("vi-VN")}
+              </span>
+              <span className="text-[10px] font-bold text-slate-400">VND</span>
             </div>
           </div>
 
           {/* UNREALIZED P&L */}
-          <div className="flex flex-col text-left">
-            <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-wider text-slate-400">
+          <div
+            className={`p-2.5 sm:p-3 rounded-xl border flex flex-col justify-between transition-colors ${
+              isPnlPositive
+                ? "bg-emerald-50/70 border-emerald-200/80 text-emerald-800"
+                : "bg-rose-50/70 border-rose-200/80 text-rose-800"
+            }`}
+          >
+            <span className="text-[10px] font-bold uppercase tracking-wider opacity-80">
               UNREALIZED P&amp;L
             </span>
-            <div
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs md:text-sm font-black font-mono mt-0.5 shadow-xs border ${
-                isPnlPositive
-                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                  : "bg-rose-50 text-rose-700 border-rose-200"
-              }`}
-            >
-              {isPnlPositive ? <TrendingUp size={14} /> : <Zap size={14} />}
-              <span>
-                {isPnlPositive ? `+${unrealizedPnlAmount.toLocaleString("vi-VN")}` : unrealizedPnlAmount.toLocaleString("vi-VN")} VND
+            <div className="mt-0.5 flex items-baseline gap-1">
+              <span className="text-xs sm:text-sm md:text-base font-black font-mono tracking-tight flex items-center gap-0.5">
+                {isPnlPositive ? <TrendingUp size={13} className="text-emerald-600" /> : <TrendingDown size={13} className="text-rose-600" />}
+                {isPnlPositive ? `+${unrealizedPnlAmount.toLocaleString("vi-VN")}` : unrealizedPnlAmount.toLocaleString("vi-VN")}
               </span>
-              <span className="text-[11px] font-bold">
+              <span className="text-[10px] font-bold">
                 ({isPnlPositive ? `+${unrealizedPnlPercent}%` : `${unrealizedPnlPercent}%`})
               </span>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </header>
   );
 };
