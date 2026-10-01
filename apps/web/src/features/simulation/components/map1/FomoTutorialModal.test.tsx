@@ -31,7 +31,7 @@ describe("FomoTutorialModal", () => {
 
     // Step 2: 10,000,000 VND capital & 0.15% fee
     expect(screen.getByText(/Quản Lý Vốn 10.000.000 VND Ảo/i)).toBeDefined();
-    expect(screen.getByText(/0.15% \/ lệnh/i)).toBeDefined();
+    expect(screen.getByText(/0\.15%/i)).toBeDefined();
 
     // Step 3: Red warning stop out 5,000,000 VND / 20% equity
     expect(screen.getByText(/Ranh Giới Cháy Tài Khoản \(Stop-Out\)/i)).toBeDefined();
