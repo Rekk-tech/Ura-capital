@@ -1128,10 +1128,10 @@ The largest peak-to-trough decline in portfolio value during a period. Two portf
 
         for (const lessonData of courseData.lessons) {
           const lesson = await tx.academyLesson.upsert({
-            where: { courseId_slug: { courseId: course.id, slug: lessonData.slug } },
+            where: { courseId_order: { courseId: course.id, order: lessonData.order } },
             update: {
+              slug: lessonData.slug,
               title: lessonData.title,
-              order: lessonData.order,
               status: "PUBLISHED",
               content: lessonData.content,
             },
