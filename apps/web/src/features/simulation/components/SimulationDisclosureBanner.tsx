@@ -4,7 +4,7 @@ import { AlertTriangle, Shield } from "lucide-react";
 export const SimulationDisclosureBanner: React.FC = () => {
   return (
     <div
-      className="simulation-disclosure-banner"
+      className="simulation-disclosure-banner w-full rounded-xl bg-amber-50/80 border border-amber-200 p-4 mb-6"
       role="region"
       aria-label="Simulation Environment Disclosure"
       data-testid="simulation-disclosure-banner"

@@ -9,7 +9,7 @@ import { FomoOrderTicket } from "../components/map1/FomoOrderTicket";
 import { FomoTrapQuizModal } from "../components/map1/FomoTrapQuizModal";
 import { FomoTutorialModal } from "../components/map1/FomoTutorialModal";
 import { FomoDebriefView } from "../components/map1/FomoDebriefView";
-import { Flame, Play, HelpCircle, ArrowLeft, RefreshCw, AlertTriangle } from "lucide-react";
+import { Play, ArrowLeft, RefreshCw, AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const FomoArenaPage: React.FC = () => {
@@ -48,27 +48,20 @@ export const FomoArenaPage: React.FC = () => {
 
   return (
     <div className="fomo-arena-page min-h-screen bg-slate-50/80 p-3 sm:p-5 md:p-6 lg:p-7 flex flex-col gap-4">
-      {/* Mandatory Virtual Funds Disclosure Banner */}
-      <SimulationDisclosureBanner />
-
-      {/* Navigation Header */}
-      <div className="flex items-center justify-between">
+      {/* 1. Nút Quay lại: Đặt riêng ở hàng trên cùng góc trái */}
+      <div className="flex items-center">
         <Link
           to="/simulation"
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors"
         >
-          <ArrowLeft size={14} />
+          <ArrowLeft size={16} />
           <span>Về Sảnh Giả Lập</span>
         </Link>
+      </div>
 
-        <button
-          type="button"
-          onClick={() => setShowTutorial(true)}
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-200/60 shadow-2xs hover:bg-blue-100/60 transition-all"
-        >
-          <HelpCircle size={14} />
-          <span>Luật Chơi &amp; Quy Tắc Sinh Tồn</span>
-        </button>
+      {/* 2. Banner Cảnh Báo (Disclaimer Card): Trải rộng toàn bộ chiều ngang container */}
+      <div className="w-full mb-6">
+        <SimulationDisclosureBanner />
       </div>
 
       {/* 5 Async UI States Handling */}
@@ -109,25 +102,22 @@ export const FomoArenaPage: React.FC = () => {
         />
       )}
 
-      {/* 4. Empty State (No active game yet) */}
+      {/* 4. Thẻ Đấu Trường FOMO Arena (Empty State before starting game) */}
       {!isLoading && !debrief && !sessionId && (
-        <div className="max-w-2xl mx-auto my-12 p-8 sm:p-10 rounded-3xl bg-white border border-slate-200 shadow-xl text-center flex flex-col items-center gap-5">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 via-rose-500 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-amber-500/20">
-            <Flame size={32} />
-          </div>
+        <div className="w-full bg-white rounded-2xl border border-slate-200 p-6 md:p-8 shadow-sm flex flex-col gap-4">
           <div>
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight whitespace-nowrap">
               Đấu Trường Tâm Lý — FOMO Arena
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto mt-2.5 leading-relaxed font-medium">
+            <p className="text-slate-600 max-w-3xl leading-relaxed text-base mt-2">
               Trải nghiệm cảm xúc mua đỉnh bán đáy trong 7 Vòng sinh tử đầy biến động. Học cách giữ vững kỷ luật, né bẫy Bull-trap và bảo toàn vốn sống sót.
             </p>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-3 mt-1">
+          <div className="flex items-center gap-3 mt-2">
             <button
               type="button"
               onClick={startNewGame}
-              className="btn btn-primary py-3.5 px-7 rounded-2xl font-black text-sm bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white flex items-center gap-2 shadow-lg shadow-indigo-500/20 active:scale-95 transition-all"
+              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl shadow-sm flex items-center gap-2 cursor-pointer transition-all active:scale-[0.98]"
             >
               <Play size={16} />
               <span>Bắt Đầu Vòng 1 Ngay</span>
@@ -135,7 +125,7 @@ export const FomoArenaPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowTutorial(true)}
-              className="btn btn-outline py-3.5 px-6 rounded-2xl font-bold text-sm border-slate-300 text-slate-700 hover:bg-slate-100"
+              className="px-5 py-2.5 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium rounded-xl cursor-pointer transition-all active:scale-[0.98]"
             >
               Xem Luật Chơi
             </button>
