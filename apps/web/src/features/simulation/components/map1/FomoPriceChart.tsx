@@ -77,42 +77,35 @@ export const FomoPriceChart: React.FC<FomoPriceChartProps> = ({
   const floorPrice = Math.round(refPrice * 0.93);
 
   // Dynamic theme colors per round
-  let primaryStroke = "#10B981"; // emerald default up
   let statusBadgeBg = "bg-emerald-50 text-emerald-700 border-emerald-300";
   let statusBadgeText = `+${priceChangePercent > 0 ? priceChangePercent.toFixed(1) : "3.0"}% TĂNG NHẸ`;
   let statusBadgeSubText = "(TÍCH LŨY)";
   let StatusIcon = Activity;
 
   if (isCeiling) {
-    primaryStroke = "#8B5CF6"; // purple ceiling
     statusBadgeBg = "bg-purple-100 text-purple-700 border-purple-300";
     statusBadgeText = "+6.9% CEILING (TÍM TRẦN) 🔥";
     statusBadgeSubText = "";
     StatusIcon = Sparkles;
   } else if (isLiquidityFreeze) {
-    primaryStroke = "#06B6D4"; // frozen cyan / ice
     statusBadgeBg = "bg-cyan-50 text-cyan-800 border-cyan-300";
     statusBadgeText = "-7.0% GIẢM SÀN MẤT THANH KHOẢN ❄️";
     statusBadgeSubText = "";
     StatusIcon = Snowflake;
   } else if (isFloor) {
-    primaryStroke = "#EF4444"; // floor red
     statusBadgeBg = "bg-rose-100 text-rose-700 border-rose-300";
     statusBadgeText = "-7.0% GIẢM SÀN (LAO DỐC) ⚠️";
     statusBadgeSubText = "";
     StatusIcon = AlertTriangle;
   } else if (isBullTrap) {
-    primaryStroke = "#10B981";
     statusBadgeBg = "bg-emerald-50 text-emerald-700 border-emerald-300";
     statusBadgeText = "+4.0% HỒI PHỤC KỸ THUẬT (BULL-TRAP)";
     statusBadgeSubText = "";
   } else if (isExhaustion) {
-    primaryStroke = "#64748B";
     statusBadgeBg = "bg-slate-100 text-slate-700 border-slate-300";
     statusBadgeText = "-1.0% ĐI NGANG TÍCH LŨY ĐÁY";
     statusBadgeSubText = "";
   } else if (isDifferentiation) {
-    primaryStroke = "#10B981";
     statusBadgeBg = "bg-blue-50 text-blue-700 border-blue-300";
     statusBadgeText = "+2.0% PHÂN HÓA - DÒNG TIỀN THÔNG MINH";
     statusBadgeSubText = "";
@@ -488,28 +481,7 @@ export const FomoPriceChart: React.FC<FomoPriceChartProps> = ({
             );
           })}
 
-          {/* Pulsing Beacon at latest point */}
-          {trendPoints.length > 0 && (
-            <g className="fomo-pulse-dot">
-              <circle
-                cx={trendPoints[trendPoints.length - 1]!.x}
-                cy={trendPoints[trendPoints.length - 1]!.y}
-                r="8"
-                fill={primaryStroke}
-                stroke="#FFFFFF"
-                strokeWidth="2"
-                opacity="0.3"
-              />
-              <circle
-                cx={trendPoints[trendPoints.length - 1]!.x}
-                cy={trendPoints[trendPoints.length - 1]!.y}
-                r="4.5"
-                fill={primaryStroke}
-                stroke="#FFFFFF"
-                strokeWidth="2"
-              />
-            </g>
-          )}
+
 
           {/* Bottom Volume Histogram Panel (Accumulation Volume) */}
           {candles.map((c, idx) => {

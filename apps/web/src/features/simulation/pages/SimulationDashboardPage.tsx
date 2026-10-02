@@ -264,7 +264,7 @@ export const SimulationDashboardPage: React.FC<SimulationDashboardPageProps> = (
           </div>
           <h2 className="card-title" style={{ marginTop: "1rem" }}>Welcome to Simulation Lab</h2>
           <p className="card-description" style={{ margin: "0.5rem 0 1.5rem" }}>
-            Start your investment journey in a safe sandbox. You will receive $100,000.0000 virtual USD to practice trading equities across discrete market cycles.
+            Start your investment journey in a safe sandbox. You will receive 100.000.000 VND virtual capital to practice trading equities across discrete market cycles.
           </p>
           <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>
             <button

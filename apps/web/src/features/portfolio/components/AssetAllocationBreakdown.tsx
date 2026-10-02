@@ -163,9 +163,9 @@ export const AssetAllocationBreakdown: React.FC<AssetAllocationBreakdownProps> =
                     {formatPercentage(cashPercentage, 1, false)}
                   </td>
                   <td className="text-right font-mono">—</td>
-                  <td className="text-right font-mono">$1.00</td>
+                  <td className="text-right font-mono">1 VND</td>
                   <td className="text-right font-mono">{formatCurrency(cashBalance)}</td>
-                  <td className="text-right font-mono text-muted">$0.00</td>
+                  <td className="text-right font-mono text-muted">{formatCurrency(0)}</td>
                 </tr>
 
                 {/* Positions rows */}

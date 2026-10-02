@@ -20,8 +20,8 @@ describe("MarketPriceView (FEAT-074: AC-002, AC-007)", () => {
 
     expect(screen.getByTestId("market-price-view")).toBeInTheDocument();
     expect(screen.getByTestId("market-cycle-badge")).toHaveTextContent("Cycle 1");
-    expect(screen.getByTestId("asset-price-AAPL")).toHaveTextContent("$185.5000");
-    expect(screen.getByTestId("asset-price-MSFT")).toHaveTextContent("$420.0000");
+    expect(screen.getByTestId("asset-price-AAPL")).toHaveTextContent("186 VND");
+    expect(screen.getByTestId("asset-price-MSFT")).toHaveTextContent("420 VND");
   });
 
   it("filters assets by search term", () => {

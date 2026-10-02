@@ -8,21 +8,25 @@ import {
 } from "../types/portfolio-ui.types";
 
 /**
- * Formats a numeric or decimal string value into a currency format with thousands separator.
- * Safely handles negative values (e.g. -$1,234.56).
+ * Formats a numeric or decimal string value into VND currency format with dot thousands separator.
+ * Safely handles negative values (e.g. -1.234.567 VND).
  */
-export function formatCurrency(val: string | number | null | undefined, decimals = 2): string {
-  if (val === null || val === undefined || val === "") return "$0.00";
+export function formatCurrency(
+  val: string | number | null | undefined,
+  decimals = 0,
+  currency = "VND"
+): string {
+  if (val === null || val === undefined || val === "") return `0 ${currency}`;
   const num = typeof val === "number" ? val : parseFloat(val);
-  if (isNaN(num)) return "$0.00";
+  if (isNaN(num)) return `0 ${currency}`;
 
   const isNegative = num < 0;
-  const absFormatted = Math.abs(num).toLocaleString("en-US", {
+  const absFormatted = Math.abs(num).toLocaleString("vi-VN", {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   });
 
-  return isNegative ? `-$${absFormatted}` : `$${absFormatted}`;
+  return `${isNegative ? "-" : ""}${absFormatted} ${currency}`;
 }
 
 /**

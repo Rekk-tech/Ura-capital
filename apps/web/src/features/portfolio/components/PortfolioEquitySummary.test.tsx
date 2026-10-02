@@ -19,11 +19,11 @@ describe("PortfolioEquitySummary (FEAT-075 / AC-003)", () => {
     render(<PortfolioEquitySummary summary={mockSummary} />);
 
     expect(screen.getByTestId("portfolio-equity-summary")).toBeInTheDocument();
-    expect(screen.getByTestId("kpi-total-equity")).toHaveTextContent("$107,000.00");
-    expect(screen.getByTestId("kpi-cash-balance")).toHaveTextContent("$65,000.00");
-    expect(screen.getByTestId("kpi-market-value")).toHaveTextContent("$42,000.00");
-    expect(screen.getByTestId("kpi-cost-basis")).toHaveTextContent("$37,500.00");
-    expect(screen.getByTestId("nav-badge")).toHaveTextContent("NAV: $107,000.00");
+    expect(screen.getByTestId("kpi-total-equity")).toHaveTextContent("107.000 VND");
+    expect(screen.getByTestId("kpi-cash-balance")).toHaveTextContent("65.000 VND");
+    expect(screen.getByTestId("kpi-market-value")).toHaveTextContent("42.000 VND");
+    expect(screen.getByTestId("kpi-cost-basis")).toHaveTextContent("37.500 VND");
+    expect(screen.getByTestId("nav-badge")).toHaveTextContent("NAV: 107.000 VND");
   });
 
   it("renders accessible progress bar representing cash to asset ratio", () => {

@@ -39,9 +39,9 @@ describe("EquityTrendViewer (FEAT-075 / AC-006)", () => {
 
     expect(screen.getByTestId("equity-trend-viewer")).toBeInTheDocument();
     expect(screen.getByTestId("trend-step-0")).toHaveTextContent("Session Start (Cycle 0)");
-    expect(screen.getByTestId("trend-step-0")).toHaveTextContent("$100,000.00");
+    expect(screen.getByTestId("trend-step-0")).toHaveTextContent("100.000 VND");
     expect(screen.getByTestId("trend-step-2")).toHaveTextContent("Current Valuation (Cycle 2)");
-    expect(screen.getByTestId("trend-step-2")).toHaveTextContent("$106,000.00");
+    expect(screen.getByTestId("trend-step-2")).toHaveTextContent("106.000 VND");
 
     expect(screen.getByTestId("equity-trend-table")).toBeInTheDocument();
     expect(screen.getByTestId("trend-row-0")).toHaveTextContent("Session Start (Cycle 0)");

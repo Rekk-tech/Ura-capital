@@ -1,6 +1,7 @@
 import React from "react";
 import { Play, RotateCcw, PlusCircle, CheckCircle2, Clock, XCircle, ChevronDown, Compass } from "lucide-react";
 import { SimulationSessionDto } from "../types/simulation-ui.types";
+import { formatCurrency } from "../../portfolio/utils/portfolioCalculations";
 
 interface SimulationSessionBarProps {
   session: SimulationSessionDto;
@@ -88,7 +89,7 @@ export const SimulationSessionBar: React.FC<SimulationSessionBarProps> = ({
           </div>
           <div className="session-meta-item">
             <span className="meta-label">Starting Cash</span>
-            <span className="meta-value" data-testid="session-starting-cash">${session.startingCash}</span>
+            <span className="meta-value" data-testid="session-starting-cash">{formatCurrency(session.startingCash)}</span>
           </div>
           <div className="session-meta-item">
             <span className="meta-label">Session ID</span>

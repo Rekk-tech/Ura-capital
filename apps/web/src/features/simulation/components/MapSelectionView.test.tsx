@@ -29,7 +29,7 @@ describe("MapSelectionView", () => {
 
     // Map 1 Card verification
     expect(screen.getByText("MAP 1 — FOMO ARENA")).toBeDefined();
-    expect(screen.getByText("$10,000.00 virtual cash")).toBeDefined();
+    expect(screen.getByText("10.000.000 VND virtual cash")).toBeDefined();
     expect(screen.getByText("Real-time · 7 rounds × 45s")).toBeDefined();
 
     const fomoBtn = screen.getByTestId("enter-fomo-arena-button");
@@ -41,7 +41,7 @@ describe("MapSelectionView", () => {
     // Map 2 Card verification
     expect(screen.getByText("MAP 2 — PRO ROOM")).toBeDefined();
     expect(screen.getByText("Locked until Map 1 is survived")).toBeDefined();
-    expect(screen.getByText("$100,000.00 virtual cash")).toBeDefined();
+    expect(screen.getByText("100.000.000 VND virtual cash")).toBeDefined();
     expect(screen.getByText("Turn-based · 12 quarters")).toBeDefined();
     expect(screen.getByText("Graham & Buffett AI Advisor")).toBeDefined();
 

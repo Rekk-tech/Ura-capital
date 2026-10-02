@@ -92,22 +92,22 @@ describe("portfolioCalculations (FEAT-075 / AC-003, AC-004, AC-005, AC-006)", ()
   ];
 
   describe("formatCurrency", () => {
-    it("formats positive numbers with dollar sign and commas", () => {
-      expect(formatCurrency(107000)).toBe("$107,000.00");
-      expect(formatCurrency("65000.5")).toBe("$65,000.50");
+    it("formats positive numbers with VND and dot separators", () => {
+      expect(formatCurrency(107000)).toBe("107.000 VND");
+      expect(formatCurrency("65000.5")).toBe("65.001 VND");
     });
 
-    it("formats negative numbers with leading minus before dollar sign", () => {
-      expect(formatCurrency(-500)).toBe("-$500.00");
-      expect(formatCurrency("-1250.75")).toBe("-$1,250.75");
+    it("formats negative numbers with leading minus before amount", () => {
+      expect(formatCurrency(-500)).toBe("-500 VND");
+      expect(formatCurrency("-1250.75")).toBe("-1.251 VND");
     });
 
     it("handles zero, null, undefined, or empty values safely", () => {
-      expect(formatCurrency(0)).toBe("$0.00");
-      expect(formatCurrency("0.0000")).toBe("$0.00");
-      expect(formatCurrency(null)).toBe("$0.00");
-      expect(formatCurrency(undefined)).toBe("$0.00");
-      expect(formatCurrency("")).toBe("$0.00");
+      expect(formatCurrency(0)).toBe("0 VND");
+      expect(formatCurrency("0.0000")).toBe("0 VND");
+      expect(formatCurrency(null)).toBe("0 VND");
+      expect(formatCurrency(undefined)).toBe("0 VND");
+      expect(formatCurrency("")).toBe("0 VND");
     });
   });
 

@@ -1,6 +1,7 @@
 import React from "react";
-import { DollarSign, PieChart, TrendingUp, TrendingDown, ShieldCheck } from "lucide-react";
+import { Coins, PieChart, TrendingUp, TrendingDown, ShieldCheck } from "lucide-react";
 import { SimulationPortfolioValuationDto } from "../types/simulation-ui.types";
+import { formatCurrency } from "../../portfolio/utils/portfolioCalculations";
 
 interface PortfolioSummaryCardProps {
   portfolio: SimulationPortfolioValuationDto;
@@ -12,14 +13,6 @@ export const PortfolioSummaryCard: React.FC<PortfolioSummaryCardProps> = ({ port
 
   const isPositiveUnrealized = !portfolio.unrealizedPnl.startsWith("-") && portfolio.unrealizedPnl !== "0.0000";
   const isNegativeUnrealized = portfolio.unrealizedPnl.startsWith("-");
-
-  const formatCurrency = (val: string) => {
-    // Retain fixed-scale precision from server DTO
-    if (val.startsWith("-")) {
-      return `-$${val.slice(1)}`;
-    }
-    return `$${val}`;
-  };
 
   return (
     <div className="card portfolio-summary-card" data-testid="portfolio-summary-card">
@@ -39,8 +32,8 @@ export const PortfolioSummaryCard: React.FC<PortfolioSummaryCardProps> = ({ port
       {/* Portfolio Allocation Mini Ratio Bar */}
       <div className="portfolio-ratio-bar-wrap" style={{ margin: "0.6rem 0 1rem", padding: "0.5rem 0.75rem", background: "var(--bg-page)", borderRadius: "var(--radius-sm)", border: "1px solid var(--border-subtle)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", color: "var(--text-muted)", marginBottom: "4px" }}>
-          <span>Cash Power: <strong className="font-mono text-primary">${portfolio.cashBalance}</strong></span>
-          <span>Equities Value: <strong className="font-mono text-primary">${portfolio.marketValue}</strong> ({portfolio.positions.length} active)</span>
+          <span>Cash Power: <strong className="font-mono text-primary">{formatCurrency(portfolio.cashBalance)}</strong></span>
+          <span>Equities Value: <strong className="font-mono text-primary">{formatCurrency(portfolio.marketValue)}</strong> ({portfolio.positions.length} active)</span>
         </div>
         <div style={{ height: "6px", width: "100%", background: "var(--aura-blue-100)", borderRadius: "9999px", overflow: "hidden", display: "flex" }}>
           <div style={{ height: "100%", width: `${Math.min(100, Math.max(0, (Number(portfolio.cashBalance) / Number(portfolio.totalEquity || 1)) * 100))}%`, background: "var(--aura-green-500)", transition: "width 0.3s ease" }} title="Cash Balance Ratio" />
@@ -68,7 +61,7 @@ export const PortfolioSummaryCard: React.FC<PortfolioSummaryCardProps> = ({ port
           <div className="metric-top">
             <span className="metric-label">Cash Balance</span>
             <span className="metric-icon-wrap" style={{ background: "rgba(16, 185, 129, 0.15)", color: "var(--status-success)" }}>
-              <DollarSign size={18} />
+              <Coins size={18} />
             </span>
           </div>
           <span className="metric-value font-mono" data-testid="portfolio-cash-balance">

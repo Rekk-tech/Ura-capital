@@ -19,9 +19,11 @@ import {
 import { useAuth } from "../../features/auth/context/AuthContext";
 
 /**
- * Modern Corporate Landing Page (Inspired by Jabil & Institutional FinTech Platforms)
- * 100% English Localization per User Request
- * Ref: AURA_UI_REDESIGN_SPEC.md (Sections S1 - S10)
+ * Modern Corporate Landing Page (Vietnamese - English Financial Hybrid)
+ * Refined per institutional brokerage standards:
+ * - Clear Vietnamese value propositions with professional English financial terminology
+ * - 100% standardized VND currency (100.000.000 ₫ / 10.000.000 VND)
+ * - Authoritative 2-Map spotlight and educational framework
  */
 export const LandingPage: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -29,44 +31,42 @@ export const LandingPage: React.FC = () => {
   return (
     <main id="main-content" className="landing-container">
       {/* ====================================================================
-          S1. HERO SECTION (Jabil-inspired: Made Possible. Made Better.)
+          S1. HERO SECTION (Vietnamese-English Financial Hybrid)
           ==================================================================== */}
       <section className="hero-jabil" aria-labelledby="hero-heading">
         <div className="hero-content">
           <div className="hero-chip-badge">
             <Sparkles size={14} className="chip-icon" aria-hidden="true" />
-            <span>INTERACTIVE INVESTMENT PLATFORM</span>
+            <span>NỀN TẢNG HỌC &amp; MÔ PHỎNG ĐẦU TƯ TÀI CHÍNH THÔNG MINH</span>
           </div>
 
-          <h2 id="hero-heading" className="hero-title-main">
-            LEARN SMART. <br />
-            <span className="text-gradient">INVEST SAFE.</span>
-          </h2>
+          <h1 id="hero-heading" className="hero-title-main">
+            HỌC ĐẦU TƯ THÔNG MINH. <br />
+            <span className="text-gradient">THỰC CHIẾN GIAO DỊCH AN TOÀN.</span>
+          </h1>
 
           <h2 className="hero-subtitle-lead">
-            AI-Assisted Financial Learning & Investment Simulation
+            AI-Assisted Financial Learning &amp; Institutional Simulation Platform
           </h2>
 
           <p className="hero-description">
-            A standardized pedagogical ecosystem for financial markets.
-            Conquer emotional volatility in the <strong>FOMO Arena</strong>, master asset allocation in the <strong>Pro Room</strong>,
-            and build lasting wealth discipline with zero capital risk.
+            Rèn luyện tư duy tài chính bài bản, giải phóng áp lực tâm lý và trải nghiệm thị trường qua 2 đấu trường mô phỏng độc quyền (<strong>FOMO Arena</strong> &amp; <strong>Pro Room</strong>) với 100% vốn ảo không rủi ro.
           </p>
 
           <div className="hero-cta-group">
             <Link to="/academy" className="btn btn-gradient btn-lg">
               <BookOpen size={18} aria-hidden="true" />
-              <span>Explore Courses</span>
+              <span>Bắt Đầu Học Ngay (Start Learning)</span>
             </Link>
             <Link to="/simulation" className="btn btn-secondary btn-lg">
               <TrendingUp size={18} aria-hidden="true" />
-              <span>Open Simulation Desk</span>
+              <span>Khám Phá Sàn Giả Lập (Simulation Arena)</span>
             </Link>
           </div>
 
           <div className="hero-guarantee">
             <CheckCircle2 size={15} className="text-success" aria-hidden="true" />
-            <span>$100,000.00 Virtual Capital · Zero Real Money · Risk-Free Learning Environment</span>
+            <span>100.000.000 ₫ Vốn Ảo Thực Chiến · 100% Không Rủi Ro Tiền Thật · Môi Trường Chuẩn Định Chế</span>
           </div>
         </div>
 
@@ -79,15 +79,15 @@ export const LandingPage: React.FC = () => {
                 <span className="dot yellow" />
                 <span className="dot green" />
               </div>
-              <span className="mockup-ticker">AURA CAPITAL · SIMULATION CYCLE 01</span>
+              <span className="mockup-ticker">AURA CAPITAL · SIMULATION COCKPIT</span>
             </div>
             <div className="mockup-body">
               <div className="mockup-stat-row">
                 <div>
-                  <span className="mockup-label">Virtual Portfolio NAV</span>
-                  <div className="mockup-value text-gradient">$100,000.00</div>
+                  <span className="mockup-label">Tổng Giá Trị Tài Sản (Portfolio NAV)</span>
+                  <div className="mockup-value text-gradient">100.000.000 ₫</div>
                 </div>
-                <div className="mockup-badge">+5.24%</div>
+                <div className="mockup-badge">+6.89%</div>
               </div>
               <div className="mockup-graph">
                 <div className="graph-bar h-40" />
@@ -99,9 +99,9 @@ export const LandingPage: React.FC = () => {
                 <div className="graph-bar h-95" />
               </div>
               <div className="mockup-pills">
-                <span className="mini-pill">🔥 FOMO Arena</span>
-                <span className="mini-pill">📊 Pro Room</span>
-                <span className="mini-pill">🛡️ Risk-Free</span>
+                <span className="mini-pill">🔥 Map 1: FOMO Arena</span>
+                <span className="mini-pill">📊 Map 2: Pro Room</span>
+                <span className="mini-pill">🛡️ 100% Vốn Ảo</span>
               </div>
             </div>
           </div>
@@ -109,34 +109,33 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* ====================================================================
-          S2. ABOUT — PLATFORM MISSION
+          S2. ABOUT — PLATFORM MISSION (Sứ Mệnh Nền Tảng)
           ==================================================================== */}
       <section className="section-about" aria-labelledby="about-heading">
         <div className="about-grid">
           <div className="about-text-col">
-            <span className="section-tag">PLATFORM MISSION</span>
+            <span className="section-tag">SỨ MỆNH NỀN TẢNG • PLATFORM MISSION</span>
             <h2 id="about-heading" className="section-title">
-              WELCOME TO <span className="text-gradient">AURA CAPITAL</span>
+              CHÀO MỪNG ĐẾN VỚI <span className="text-gradient">AURA CAPITAL</span>
             </h2>
             <p className="about-lead">
-              Aura Capital was founded to eliminate the fear of market volatility and costly beginners' losses for aspiring investors.
+              Aura Capital ra đời nhằm xóa bỏ rào cản sợ hãi biến động thị trường và loại bỏ những bài học &quot;học phí đắt đỏ&quot; bằng tiền thật của nhà đầu tư mới bắt đầu.
             </p>
             <p className="about-body">
-              We unite structured curricula, deterministic market simulation, and institutional portfolio analytics.
-              Here, every decision is a learning milestone—without risking a single dollar of hard-earned capital.
+              Chúng tôi kết hợp lộ trình đào tạo bài bản, đấu trường mô phỏng tâm lý thời gian thực và công cụ phân tích danh mục chuẩn định chế quốc tế. Mỗi quyết định giao dịch là một cột mốc tích lũy kinh nghiệm quý báu mà không cần mạo hiểm bất kỳ đồng vốn thật nào.
             </p>
             <div className="about-features-list">
               <div className="about-feature-item">
                 <CheckCircle2 size={18} className="text-success" />
-                <span>100% Server-Authoritative Execution & Settlement Matching</span>
+                <span>100% Khớp Lệnh &amp; Hạch Toán Chuẩn Xác (Server-Authoritative Settlement)</span>
               </div>
               <div className="about-feature-item">
                 <CheckCircle2 size={18} className="text-success" />
-                <span>Real-Time Emotional Discipline & Cognitive Trap Neutralization</span>
+                <span>Rèn Luyện Kỷ Luật Cảm Xúc &amp; Hóa Giải Bẫy Tâm Lý FOMO Thời Gian Thực</span>
               </div>
               <div className="about-feature-item">
                 <CheckCircle2 size={18} className="text-success" />
-                <span>Collaborative Knowledge Sharing with Serious Learners</span>
+                <span>Đồng Hành &amp; Phản Biện Chiến Lược Cùng Cộng Đồng Nhà Đầu Tư Nghiêm Túc</span>
               </div>
             </div>
           </div>
@@ -146,12 +145,12 @@ export const LandingPage: React.FC = () => {
               <div className="highlight-icon-wrap">
                 <BrainCircuit size={32} />
               </div>
-              <h3>Experiential Learning Framework</h3>
+              <h3>Mô Hình Học Tập Thực Chiến (Experiential Framework)</h3>
               <p>
-                Move beyond static textbooks. Master concepts in the <strong>Academy Curriculum</strong>, execute trades in <strong>Simulation</strong>, and verify results inside <strong>Portfolio</strong> analytics.
+                Vượt ra ngoài lý thuyết sách vở khô khan. Nắm vững bản chất tại <strong>Học Viện (Academy)</strong>, thực chiến tại <strong>Sàn Giả Lập (Simulation)</strong>, và phân tích hiệu quả trên <strong>Danh Mục (Portfolio)</strong>.
               </p>
               <Link to="/academy" className="btn btn-ghost btn-sm">
-                <span>Explore Learning Roadmap →</span>
+                <span>Khám Phá Lộ Trình Học Tập →</span>
               </Link>
             </div>
           </div>
@@ -159,54 +158,54 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* ====================================================================
-          S3. STATS COUNTER GRID
+          S3. STATS COUNTER GRID (Chỉ Số Đáng Tin Cậy)
           ==================================================================== */}
       <section className="section-stats" aria-label="Platform Statistics">
         <div className="stats-container">
           <div className="stat-card">
-            <div className="stat-number text-gradient">2</div>
-            <div className="stat-label">Specialized Simulation Maps</div>
-            <div className="stat-sub">FOMO Arena & Pro Room</div>
+            <div className="stat-number text-gradient">100%</div>
+            <div className="stat-label">Vốn Ảo (Zero Risk)</div>
+            <div className="stat-sub">Tuyệt đối an toàn, không rủi ro tiền thật</div>
           </div>
           <div className="stat-card">
-            <div className="stat-number text-gradient">7</div>
-            <div className="stat-label">High-Pressure Rounds</div>
-            <div className="stat-sub">45-second execution windows</div>
+            <div className="stat-number text-gradient">2</div>
+            <div className="stat-label">Bản Đồ Thực Chiến Độc Quyền</div>
+            <div className="stat-sub">FOMO Arena &amp; Pro Room vĩ mô</div>
           </div>
           <div className="stat-card">
             <div className="stat-number text-gradient">12</div>
-            <div className="stat-label">Macroeconomic Quarters</div>
-            <div className="stat-sub">Financial statements & market cycles</div>
+            <div className="stat-label">Quý Chu Kỳ Vĩ Mô</div>
+            <div className="stat-sub">Báo cáo tài chính &amp; chu kỳ kinh tế</div>
           </div>
           <div className="stat-card">
-            <div className="stat-number text-gradient">4</div>
-            <div className="stat-label">Core Asset Allocation Classes</div>
-            <div className="stat-sub">Growth, Value, Fixed Income & Cash</div>
+            <div className="stat-number text-gradient">Minh Bạch</div>
+            <div className="stat-label">Tuyệt Đối (Server-Authoritative)</div>
+            <div className="stat-sub">Hạch toán số dư và khớp lệnh chính xác</div>
           </div>
           <div className="stat-card">
-            <div className="stat-number text-gradient">100%</div>
-            <div className="stat-label">Virtual Capital — Risk Free</div>
-            <div className="stat-sub">Zero financial downside</div>
+            <div className="stat-number text-gradient">7</div>
+            <div className="stat-label">Vòng Đấu Nghẹt Thở (45s)</div>
+            <div className="stat-sub">Rèn luyện bản lĩnh cắt lỗ &amp; chốt lời</div>
           </div>
           <div className="stat-card">
             <div className="stat-number text-gradient">24/7</div>
-            <div className="stat-label">AI Advisor Companion</div>
-            <div className="stat-sub">Disciplined portfolio analytics</div>
+            <div className="stat-label">Cố Vấn AI Phân Tích</div>
+            <div className="stat-sub">Định giá Graham &amp; Buffett chuẩn mực</div>
           </div>
         </div>
       </section>
 
       {/* ====================================================================
-          S4. CORE CAPABILITIES (Features Showcase Grid)
+          S4. CORE CAPABILITIES (4 Trụ Cột Cốt Lõi)
           ==================================================================== */}
       <section className="section-features" aria-labelledby="features-heading">
         <div className="section-header-center">
-          <span className="section-tag">ECOSYSTEM ARCHITECTURE</span>
+          <span className="section-tag">HỆ SINH THÁI TỔNG THỂ • ECOSYSTEM ARCHITECTURE</span>
           <h2 id="features-heading" className="section-title">
-            CORE <span className="text-gradient">CAPABILITIES</span>
+            4 TRỤ CỘT <span className="text-gradient">CỐT LÕI (CORE CAPABILITIES)</span>
           </h2>
           <p className="section-subtitle">
-            Everything required to graduate from beginner speculation to disciplined, systematic investing
+            Hạ tầng toàn diện giúp người học tiến bộ từ phản xạ đầu cơ cảm tính sang đầu tư có phương pháp và kỷ luật
           </p>
         </div>
 
@@ -217,15 +216,18 @@ export const LandingPage: React.FC = () => {
               <div className="card-icon-wrap bg-blue-subtle">
                 <BookOpen size={22} className="text-blue" aria-hidden="true" />
               </div>
-              <h3 className="card-title">Academy</h3>
+              <div>
+                <h3 className="card-title">Học Viện Aura Academy</h3>
+                <span className="text-muted font-mono" style={{ fontSize: "0.8rem", display: "block" }}>Academy</span>
+              </div>
             </div>
             <p className="card-description">
-              Progressive financial curriculum with interactive quiz challenges, flashcards, and verified XP milestone tracking.
+              Lộ trình bài bản, thẻ nhớ Quizlet 3D và mini-quiz chấm điểm tự động kiểm tra kiến thức trước khi bước vào thực chiến.
             </p>
             <div className="card-footer-action">
-              <span className="badge badge-success-subtle">Ready</span>
+              <span className="badge badge-success-subtle">Sẵn Sàng</span>
               <Link to="/academy" className="card-action-link">
-                <span>View Courses →</span>
+                <span>Khám Phá Khóa Học →</span>
               </Link>
             </div>
           </div>
@@ -236,105 +238,142 @@ export const LandingPage: React.FC = () => {
               <div className="card-icon-wrap bg-teal-subtle">
                 <TrendingUp size={22} className="text-teal" aria-hidden="true" />
               </div>
-              <h3 className="card-title">Simulation Engine</h3>
+              <div>
+                <h3 className="card-title">Đấu Trường FOMO Arena (Map 1)</h3>
+                <span className="text-muted font-mono" style={{ fontSize: "0.8rem", display: "block" }}>Simulation Engine</span>
+              </div>
             </div>
             <p className="card-description">
-              Execute simulated trades in two dedicated maps: manage psychological herd traps in FOMO Arena, and master valuation in Pro Room.
+              7 vòng đấu nghẹt thở 45s, đối mặt với bẫy đu đỉnh, bẫy margin x5 và cú sốc cắt thanh khoản múa bên trăng.
             </p>
             <div className="card-footer-action">
-              <span className="badge badge-success-subtle">Ready</span>
+              <span className="badge badge-success-subtle">Sẵn Sàng</span>
               <Link to="/simulation" className="card-action-link">
-                <span>Open Trading Desk →</span>
+                <span>Vào Sàn Đấu Ngay →</span>
               </Link>
             </div>
           </div>
 
-          {/* 3. Community Domain */}
+          {/* 3. Pro Room Domain */}
+          <div className="card card-aura">
+            <div className="card-header">
+              <div className="card-icon-wrap bg-purple-subtle">
+                <BrainCircuit size={22} className="text-purple" aria-hidden="true" />
+              </div>
+              <div>
+                <h3 className="card-title">Phòng Đầu Tư Vĩ Mô Pro Room (Map 2)</h3>
+                <span className="text-muted font-mono" style={{ fontSize: "0.8rem", display: "block" }}>Pro Room</span>
+              </div>
+            </div>
+            <p className="card-description">
+              Chiến lược giá trị dài hạn qua 12 quý kinh tế: phân bổ danh mục đa tài sản cùng Cố vấn AI (Graham &amp; Buffett Advisor).
+            </p>
+            <div className="card-footer-action">
+              <span className="badge badge-amber-subtle">Mở Khóa Sau Map 1</span>
+              <Link to="/simulation" className="card-action-link">
+                <span>Khám Phá Bản Đồ 2 →</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* 4. Community Domain */}
           <div className="card card-aura">
             <div className="card-header">
               <div className="card-icon-wrap bg-green-subtle">
                 <Users size={22} className="text-green" aria-hidden="true" />
               </div>
-              <h3 className="card-title">Community</h3>
+              <div>
+                <h3 className="card-title">Cộng Đồng Nhà Đầu Tư</h3>
+                <span className="text-muted font-mono" style={{ fontSize: "0.8rem", display: "block" }}>Community</span>
+              </div>
             </div>
             <p className="card-description">
-              Share market perspectives, formulate trade theses, and collaborate with like-minded learners in moderated discussion channels.
+              Diễn đàn thảo luận tài chính, trao đổi kinh nghiệm, phản biện chiến lược và học hỏi từ các nhà đầu tư khác.
             </p>
             <div className="card-footer-action">
-              <span className="badge badge-success-subtle">Ready</span>
+              <span className="badge badge-success-subtle">Hoạt Động</span>
               <Link to="/community" className="card-action-link">
-                <span>Join Discussions →</span>
+                <span>Tham Gia Thảo Luận →</span>
               </Link>
             </div>
           </div>
 
-          {/* 4. Subscription Domain */}
+          {/* 5. Subscription Domain */}
           <div className="card card-aura">
             <div className="card-header">
               <div className="card-icon-wrap bg-amber-subtle">
                 <BadgeDollarSign size={22} className="text-amber" aria-hidden="true" />
               </div>
-              <h3 className="card-title">Membership & Plans</h3>
+              <div>
+                <h3 className="card-title">Gói Hội Viên</h3>
+                <span className="text-muted font-mono" style={{ fontSize: "0.8rem", display: "block" }}>Membership &amp; Plans</span>
+              </div>
             </div>
             <p className="card-description">
-              Start completely free. Upgrade when you require advanced institutional analytics and enhanced simulation quotas.
+              Bắt đầu hoàn toàn miễn phí. Nâng cấp khi cần công cụ phân tích danh mục chuyên sâu và mở rộng hạn ngạch giao dịch.
             </p>
             <div className="card-footer-action">
-              <span className="badge badge-amber-subtle">Coming Soon</span>
+              <span className="badge badge-amber-subtle">Sắp Ra Mắt</span>
               <Link to="/subscription" className="card-action-link">
-                <span>Explore Plans →</span>
+                <span>Xem Chi Tiết Gói →</span>
               </Link>
             </div>
           </div>
 
-          {/* 5. Security & Protection */}
+          {/* 6. Security & Protection */}
           <div className="card card-aura">
             <div className="card-header">
               <div className="card-icon-wrap bg-blue-subtle">
                 <ShieldCheck size={22} className="text-blue" aria-hidden="true" />
               </div>
-              <h3 className="card-title">Security & Protection</h3>
+              <div>
+                <h3 className="card-title">Bảo Mật &amp; Minh Bạch</h3>
+                <span className="text-muted font-mono" style={{ fontSize: "0.8rem", display: "block" }}>Security &amp; Protection</span>
+              </div>
             </div>
             <p className="card-description">
-              Strict Argon2id password hashing, revocable refresh token rotation, in-memory access tokens, and server-side role validation.
+              Mã hóa mật khẩu Argon2id, luân chuyển refresh token an toàn, hạch toán danh mục minh bạch theo thời gian thực.
             </p>
             <div className="card-footer-action">
-              <span className="badge badge-success-subtle">Active</span>
-              <span className="text-muted" style={{ fontSize: "0.85rem" }}>Protected</span>
+              <span className="badge badge-success-subtle">Kích Hoạt</span>
+              <span className="text-muted" style={{ fontSize: "0.85rem" }}>Được Bảo Vệ</span>
             </div>
           </div>
 
-          {/* 6. Aura Intelligence */}
+          {/* 7. Aura Intelligence */}
           <div className="card card-aura card-deferred">
             <div className="card-header">
               <div className="card-icon-wrap bg-purple-subtle">
                 <Cpu size={22} className="text-purple" aria-hidden="true" />
               </div>
-              <h3 className="card-title">Aura Intelligence</h3>
+              <div>
+                <h3 className="card-title">Aura Intelligence</h3>
+                <span className="text-muted font-mono" style={{ fontSize: "0.8rem", display: "block" }}>AI Learning Coach</span>
+              </div>
             </div>
             <p className="card-description">
-              Context-aware AI financial learning coach powered by isolated gateway adapters, strict retrieval grounding, and educational safety guardrails.
+              Cố vấn AI đồng hành thông minh, giải thích biến động thị trường theo thời gian thực và định hình kỷ luật giao dịch an toàn.
             </p>
             <div className="card-footer-action">
               <span className="badge badge-neutral">Phase 8 Intelligence — Coming Soon</span>
-              <span className="text-muted" style={{ fontSize: "0.85rem" }}>Deferred for MVP</span>
+              <span className="text-muted" style={{ fontSize: "0.85rem" }}>Đang Phát Triển</span>
             </div>
           </div>
         </div>
       </section>
 
       {/* ====================================================================
-          S5. DUAL SIMULATION MAPS (Navy Band)
+          S5. DUAL SIMULATION MAPS (Tiêu Điểm 2 Bản Đồ)
           ==================================================================== */}
       <section className="section-navy-band" aria-labelledby="maps-showcase-heading">
         <div className="navy-band-inner">
           <div className="section-header-center text-white">
-            <span className="section-tag-navy">SIMULATION SPOTLIGHT</span>
+            <span className="section-tag-navy">TIÊU ĐIỂM ĐẤU TRƯỜNG • SIMULATION SPOTLIGHT</span>
             <h2 id="maps-showcase-heading" className="section-title text-white">
-              INVESTMENT EXPERIENCE <span className="text-gradient-navy">ACROSS 2 MAPS</span>
+              TRẢI NGHIỆM ĐẦU TƯ <span className="text-gradient-navy">QUA 2 BẢN ĐỒ THỰC CHIẾN</span>
             </h2>
             <p className="section-subtitle-navy">
-              Evolve from panic-driven retail speculation to systematic, institutional-grade portfolio management
+              Chuyển hóa từ phản xạ mua đỉnh bán đáy theo đám đông sang tư duy phân bổ vốn định chế bền vững
             </p>
           </div>
 
@@ -343,34 +382,34 @@ export const LandingPage: React.FC = () => {
             <div className="map-showcase-card map1-card">
               <div className="map-card-badge-row">
                 <span className="map-chip map1-chip">
-                  <Flame size={14} /> MAP 1
+                  <Flame size={14} /> MAP 1 • FOMO ARENA
                 </span>
-                <span className="badge badge-success-subtle">AVAILABLE</span>
+                <span className="badge badge-success-subtle">SẴN SÀNG</span>
               </div>
               <h3 className="map-card-title">FOMO ARENA</h3>
-              <p className="map-card-tagline">Psychological Endurance & Short-Term Speculation</p>
+              <p className="map-card-tagline">Đấu Trường Tâm Lý &amp; Lướt Sóng Ngắn Hạn</p>
 
               <div className="map-specs-list">
                 <div className="map-spec-item">
-                  <span className="spec-label">⏱ Mechanics:</span>
-                  <span className="spec-val">Real-time · 7 rounds × 45s</span>
+                  <span className="spec-label">⏱ Cơ Chế:</span>
+                  <span className="spec-val">Thời gian thực · 7 vòng × 45s</span>
                 </div>
                 <div className="map-spec-item">
-                  <span className="spec-label">💰 Capital:</span>
-                  <span className="spec-val">$10,000.00 Virtual Funds</span>
+                  <span className="spec-label">💰 Vốn Ảo:</span>
+                  <span className="spec-val">10.000.000 VND tiền vốn thực hành</span>
                 </div>
                 <div className="map-spec-item">
-                  <span className="spec-label">🎯 Objective:</span>
-                  <span className="spec-val">Survive rumor traps, achieve +5–10%</span>
+                  <span className="spec-label">🎯 Mục Tiêu:</span>
+                  <span className="spec-val">Vượt bẫy tâm lý, đạt lợi nhuận +5% đến +10%</span>
                 </div>
                 <div className="map-spec-item">
-                  <span className="spec-label">🏆 Rewards:</span>
-                  <span className="spec-val">"Survivor" Badge + Map 2 Access Key</span>
+                  <span className="spec-label">🏆 Phần Thưởng:</span>
+                  <span className="spec-val">Huy hiệu &quot;Kẻ Sinh Tồn&quot; + Mở khóa Bản Đồ 2</span>
                 </div>
               </div>
 
               <Link to="/simulation" className="btn btn-primary btn-md map-cta-btn">
-                <span>Start Map 1 (FOMO Arena) →</span>
+                <span>Vào Map 1 (FOMO Arena) →</span>
               </Link>
             </div>
 
@@ -378,60 +417,60 @@ export const LandingPage: React.FC = () => {
             <div className="map-showcase-card map2-card">
               <div className="map-card-badge-row">
                 <span className="map-chip map2-chip">
-                  <BrainCircuit size={14} /> MAP 2
+                  <BrainCircuit size={14} /> MAP 2 • PRO ROOM
                 </span>
                 <span className="badge badge-amber-subtle">
-                  <Lock size={12} /> UNLOCK REQUIRED
+                  <Lock size={12} /> YÊU CẦU MỞ KHÓA
                 </span>
               </div>
               <h3 className="map-card-title">PRO ROOM</h3>
-              <p className="map-card-tagline">Disciplined Value Investing & Macro Allocation</p>
+              <p className="map-card-tagline">Đầu Tư Giá Trị &amp; Phân Bổ Vĩ Mô 12 Quý</p>
 
               <div className="map-specs-list">
                 <div className="map-spec-item">
-                  <span className="spec-label">📅 Mechanics:</span>
-                  <span className="spec-val">Turn-based · 12 economic quarters</span>
+                  <span className="spec-label">📅 Cơ Chế:</span>
+                  <span className="spec-val">Theo lượt (Turn-based) · 12 quý kinh tế</span>
                 </div>
                 <div className="map-spec-item">
-                  <span className="spec-label">💰 Capital:</span>
-                  <span className="spec-val">$100,000.00 Virtual Funds</span>
+                  <span className="spec-label">💰 Vốn Ảo:</span>
+                  <span className="spec-val">100.000.000 VND vốn định chế</span>
                 </div>
                 <div className="map-spec-item">
-                  <span className="spec-label">🎯 Objective:</span>
-                  <span className="spec-val">Consistent Alpha, Max Drawdown &lt; 15%</span>
+                  <span className="spec-label">🎯 Mục Tiêu:</span>
+                  <span className="spec-val">Lợi nhuận bền vững (Alpha), Giảm sụt giảm &lt; 15%</span>
                 </div>
                 <div className="map-spec-item">
-                  <span className="spec-label">🤖 AI Support:</span>
-                  <span className="spec-val">CrediFin AI Advisor Insights</span>
+                  <span className="spec-label">🤖 Cố Vấn AI:</span>
+                  <span className="spec-val">Phân tích Graham &amp; Buffett Advisor</span>
                 </div>
               </div>
 
               <div className="map-locked-box">
                 <Lock size={14} className="text-amber" />
-                <span>Complete Map 1 to unlock Pro Room</span>
+                <span>Hoàn thành Map 1 để mở khóa Phòng Pro Room</span>
               </div>
             </div>
           </div>
 
           <div className="navy-band-action">
             <Link to="/simulation" className="btn btn-gradient btn-lg">
-              <span>Go to Simulation Map Picker →</span>
+              <span>Đến Sàn Giả Lập &amp; Chọn Bản Đồ →</span>
             </Link>
           </div>
         </div>
       </section>
 
       {/* ====================================================================
-          S6. 4-STEP ROADMAP
+          S6. 4-STEP ROADMAP (Lộ Trình 4 Bước Chuẩn Mực)
           ==================================================================== */}
       <section className="section-how-it-works" aria-labelledby="steps-heading">
         <div className="section-header-center">
-          <span className="section-tag">LEARNER PATHWAY</span>
+          <span className="section-tag">LỘ TRÌNH PHÁT TRIỂN • LEARNER PATHWAY</span>
           <h2 id="steps-heading" className="section-title">
-            4-STEP <span className="text-gradient">SYSTEMATIC ROADMAP</span>
+            LỘ TRÌNH 4 BƯỚC <span className="text-gradient">CHUẨN MỰC (4-STEP ROADMAP)</span>
           </h2>
           <p className="section-subtitle">
-            A proven pedagogy engineered to build autonomous, confident investors
+            Phương pháp sư phạm đã được kiểm chứng giúp người học tự tin ra quyết định đầu tư
           </p>
         </div>
 
@@ -441,8 +480,8 @@ export const LandingPage: React.FC = () => {
             <div className="step-icon-wrap">
               <BookOpen size={24} />
             </div>
-            <h4>LEARN AT ACADEMY</h4>
-            <p>Master 9 practical stations: equity ownership, order books, balance sheets, P/E ratios, and macro drivers.</p>
+            <h4>HỌC TẠI ACADEMY</h4>
+            <p>Nắm vững 9 trạm kiến thức nền tảng: quyền sở hữu cổ phiếu, đọc sổ lệnh, bảng cân đối kế toán, chỉ số P/E và chu kỳ vĩ mô.</p>
           </div>
 
           <div className="roadmap-step">
@@ -450,8 +489,8 @@ export const LandingPage: React.FC = () => {
             <div className="step-icon-wrap">
               <Flame size={24} />
             </div>
-            <h4>TEST IN MAP 1</h4>
-            <p>Face 7 rounds of high-speed FOMO waves, breaking news, and herd traps to solidify stop-loss discipline.</p>
+            <h4>THỬ LỬA TẠI MAP 1</h4>
+            <p>Đối mặt với 7 vòng sóng gió FOMO, tin đồn giật gân và bẫy đám đông 45s để tôi luyện kỷ luật cắt lỗ dứt khoát.</p>
           </div>
 
           <div className="roadmap-step">
@@ -459,8 +498,8 @@ export const LandingPage: React.FC = () => {
             <div className="step-icon-wrap">
               <BrainCircuit size={24} />
             </div>
-            <h4>UPGRADE IN MAP 2</h4>
-            <p>Manage multi-asset portfolios across 12 macroeconomic quarters with AI-guided valuation and risk budgeting.</p>
+            <h4>NÂNG TẦM TẠI MAP 2</h4>
+            <p>Quản trị danh mục đa tài sản qua 12 quý kinh tế với sự đồng hành và phản biện của Cố vấn AI theo triết lý giá trị.</p>
           </div>
 
           <div className="roadmap-step">
@@ -468,25 +507,25 @@ export const LandingPage: React.FC = () => {
             <div className="step-icon-wrap">
               <Users size={24} />
             </div>
-            <h4>SHARE IN COMMUNITY</h4>
-            <p>Publish market analyses, debate investment theses, and sharpen your rationale alongside ambitious peers.</p>
+            <h4>CHIA SẺ CÙNG CỘNG ĐỒNG</h4>
+            <p>Đăng tải phân tích, tranh luận luận điểm đầu tư và mài sắc tư duy cùng những người học nghiêm túc khác.</p>
           </div>
         </div>
       </section>
 
       {/* ====================================================================
-          S7. LATEST COMMUNITY INSIGHTS
+          S7. LATEST COMMUNITY INSIGHTS (Thảo Luận Nổi Bật)
           ==================================================================== */}
       <section className="section-community-insights" aria-labelledby="community-preview-heading">
         <div className="community-insights-header">
           <div>
-            <span className="section-tag">REAL DISCUSSIONS</span>
+            <span className="section-tag">THẢO LUẬN THỰC CHIẾN • REAL DISCUSSIONS</span>
             <h2 id="community-preview-heading" className="section-title">
-              COMMUNITY <span className="text-gradient">HIGHLIGHTS</span>
+              GÓC <span className="text-gradient">THẢO LUẬN CỘNG ĐỒNG</span>
             </h2>
           </div>
           <Link to="/community" className="btn btn-ghost">
-            <span>View All Discussions →</span>
+            <span>Xem Tất Cả Thảo Luận →</span>
           </Link>
         </div>
 
@@ -496,16 +535,16 @@ export const LandingPage: React.FC = () => {
               <div className="author-avatar">AM</div>
               <div>
                 <span className="author-name">Alex Morgan</span>
-                <span className="post-date">Just now</span>
+                <span className="post-date">Vừa xong</span>
               </div>
             </div>
-            <h4 className="post-title">Risk Management During High Volatility Cycles</h4>
+            <h4 className="post-title">Quản trị rủi ro trong chu kỳ biến động mạnh</h4>
             <p className="post-snippet">
-              Maintaining at least a 30% cash buffer during rapid multiple contraction keeps psychology grounded and capital preserved...
+              Duy trì ít nhất 30% tỷ trọng tiền mặt khi thị trường bước vào pha co hẹp định giá giúp tâm lý ổn định và bảo toàn vốn an toàn...
             </p>
             <div className="post-meta-row">
               <span className="like-badge">❤️ 1 like</span>
-              <span className="topic-tag">Risk Management</span>
+              <span className="topic-tag">Quản Trị Rủi Ro</span>
             </div>
           </div>
 
@@ -513,17 +552,17 @@ export const LandingPage: React.FC = () => {
             <div className="card-author-row">
               <div className="author-avatar bg-teal">LT</div>
               <div>
-                <span className="author-name">Learner Tour</span>
-                <span className="post-date">1 day ago</span>
+                <span className="author-name">Thành Long</span>
+                <span className="post-date">1 ngày trước</span>
               </div>
             </div>
-            <h4 className="post-title">Key Takeaways from Round 4 in the FOMO Arena</h4>
+            <h4 className="post-title">Bài học sống còn sau Vòng 4 tại FOMO Arena</h4>
             <p className="post-snippet">
-              Never deploy 5x margin before news confirmation. Maintaining strict limit order entries preserved my account to +8.5%...
+              Tuyệt đối không dùng margin x5 khi chưa có xác nhận từ sổ lệnh. Kiên nhẫn đặt lệnh limit đã giúp tài khoản của mình đạt +8.5%...
             </p>
             <div className="post-meta-row">
               <span className="like-badge">❤️ 4 likes</span>
-              <span className="topic-tag">Simulation Map 1</span>
+              <span className="topic-tag">Đấu Trường Map 1</span>
             </div>
           </div>
 
@@ -531,46 +570,46 @@ export const LandingPage: React.FC = () => {
             <div className="card-author-row">
               <div className="author-avatar bg-purple">VI</div>
               <div>
-                <span className="author-name">Global Trader</span>
-                <span className="post-date">2 days ago</span>
+                <span className="author-name">Văn Hùng</span>
+                <span className="post-date">2 ngày trước</span>
               </div>
             </div>
-            <h4 className="post-title">Impact of Central Bank Rate Adjustments on Equity Multiple</h4>
+            <h4 className="post-title">Tác động của lãi suất điều hành đến định giá cổ phiếu</h4>
             <p className="post-snippet">
-              When interest rates decline, the present value of future earnings rises, sparking multiple expansion in growth stocks...
+              Khi ngân hàng trung ương giảm lãi suất, chiết khấu dòng tiền trong tương lai giảm xuống, tạo động lực mở rộng hệ số P/E nhóm tăng trưởng...
             </p>
             <div className="post-meta-row">
               <span className="like-badge">❤️ 7 likes</span>
-              <span className="topic-tag">Macro Economics</span>
+              <span className="topic-tag">Kinh Tế Vĩ Mô</span>
             </div>
           </div>
         </div>
       </section>
 
       {/* ====================================================================
-          S8. STUDENT-CENTERED CTA
+          S8. STUDENT-CENTERED CTA (Cộng Đồng Học Viên)
           ==================================================================== */}
       <section className="section-people-centered" aria-label="Student Community Call to Action">
         <div className="people-card">
           <div className="people-text">
-            <span className="section-tag">COMMUNITY POWERED</span>
+            <span className="section-tag">SỨC MẠNH CỘNG ĐỒNG • COMMUNITY POWERED</span>
             <h2 className="section-title">
-              LEARN TOGETHER, <br />
-              <span className="text-gradient">PROGRESS EVERY DAY</span>
+              CÙNG NHAU HỌC TẬP, <br />
+              <span className="text-gradient">TIẾN BỘ MỖI NGÀY</span>
             </h2>
             <p className="people-desc">
-              Over 10,000 risk-free trade simulations have been executed on Aura Capital.
-              Equip yourself with unbreakable habits before stepping into live capital markets.
+              Hơn 10.000 phiên giao dịch mô phỏng an toàn đã được thực hiện trên Aura Capital.
+              Trang bị cho bản thân thói quen đầu tư vững vàng trước khi bước vào thị trường thật.
             </p>
             <div className="people-actions">
               {isAuthenticated ? (
                 <Link to="/dashboard" className="btn btn-primary btn-lg">
-                  <span>Open Your Dashboard →</span>
+                  <span>Mở Bảng Điều Khiển Của Bạn →</span>
                 </Link>
               ) : (
                 <Link to="/register" className="btn btn-gradient btn-lg">
                   <Sparkles size={18} />
-                  <span>Get Started for Free</span>
+                  <span>Đăng Ký Tài Khoản Miễn Phí (Get Started)</span>
                 </Link>
               )}
             </div>
@@ -579,15 +618,15 @@ export const LandingPage: React.FC = () => {
             <div className="floating-badge fb-1">
               <Award size={20} className="text-amber" />
               <div>
-                <strong>Survivor Badge</strong>
-                <span>Overcame the FOMO Storm</span>
+                <strong>Huy Hiệu Sinh Tồn</strong>
+                <span>Vượt qua bão FOMO Arena</span>
               </div>
             </div>
             <div className="floating-badge fb-2">
               <Coins size={20} className="text-green" />
               <div>
-                <strong>+50 XP Awarded</strong>
-                <span>Station 1 Completed</span>
+                <strong>+50 XP Thưởng</strong>
+                <span>Hoàn thành Trạm 1</span>
               </div>
             </div>
           </div>
@@ -595,23 +634,24 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* ====================================================================
-          S9. FINAL CONVERSION CTA BAND
+          S9. FINAL CONVERSION CTA BAND (Kêu Gọi Hành Động Cuối Trang)
           ==================================================================== */}
       <section className="section-final-cta" aria-labelledby="cta-final-heading">
         <div className="final-cta-content">
           <h2 id="cta-final-heading" className="final-cta-title">
-            Ready to trade without the fear of losing money?
+            Sẵn sàng làm chủ tâm lý giao dịch mà không sợ mất tiền thật?
           </h2>
           <p className="final-cta-sub">
-            Experience both simulation maps completely free with $100,000.00 in pedagogical funds.
+            Trải nghiệm cả 2 đấu trường mô phỏng hoàn toàn miễn phí với 100.000.000 ₫ vốn học tập.
           </p>
           <div className="final-cta-buttons">
-            <Link to="/simulation" className="btn btn-gradient btn-lg">
+            <Link to="/register" className="btn btn-gradient btn-lg">
               <Zap size={18} />
-              <span>Launch Simulation (Map 1)</span>
+              <span>Đăng Ký Tài Khoản Miễn Phí</span>
             </Link>
-            <Link to="/academy" className="btn btn-secondary btn-lg">
-              <span>Explore 9 Academy Stations</span>
+            <Link to="/simulation" className="btn btn-secondary btn-lg">
+              <TrendingUp size={18} />
+              <span>Khám Phá Sàn Giả Lập</span>
             </Link>
           </div>
         </div>

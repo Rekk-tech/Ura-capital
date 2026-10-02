@@ -34,9 +34,9 @@ describe("PnLAnalyticsCard (FEAT-075 / AC-004)", () => {
 
     expect(screen.getByTestId("pnl-analytics-card")).toBeInTheDocument();
     expect(screen.getByTestId("roi-badge")).toHaveTextContent("ROI: +7.00%");
-    expect(screen.getByTestId("metric-realized-pnl")).toHaveTextContent("$2,500.00");
-    expect(screen.getByTestId("metric-unrealized-pnl")).toHaveTextContent("$4,500.00");
-    expect(screen.getByTestId("metric-total-pnl")).toHaveTextContent("$7,000.00");
+    expect(screen.getByTestId("metric-realized-pnl")).toHaveTextContent("2.500 VND");
+    expect(screen.getByTestId("metric-unrealized-pnl")).toHaveTextContent("4.500 VND");
+    expect(screen.getByTestId("metric-total-pnl")).toHaveTextContent("7.000 VND");
     expect(screen.getByTestId("metric-win-loss")).toHaveTextContent("75.00%");
     expect(screen.getByTestId("metric-win-loss")).toHaveTextContent("3 Wins");
     expect(screen.getByTestId("metric-win-loss")).toHaveTextContent("1 Losses");
@@ -46,9 +46,9 @@ describe("PnLAnalyticsCard (FEAT-075 / AC-004)", () => {
     render(<PnLAnalyticsCard analytics={mockNegativeAnalytics} />);
 
     expect(screen.getByTestId("roi-badge")).toHaveTextContent("ROI: -2.00%");
-    expect(screen.getByTestId("metric-realized-pnl")).toHaveTextContent("-$1,200.00");
-    expect(screen.getByTestId("metric-unrealized-pnl")).toHaveTextContent("-$800.00");
-    expect(screen.getByTestId("metric-total-pnl")).toHaveTextContent("-$2,000.00");
+    expect(screen.getByTestId("metric-realized-pnl")).toHaveTextContent("-1.200 VND");
+    expect(screen.getByTestId("metric-unrealized-pnl")).toHaveTextContent("-800 VND");
+    expect(screen.getByTestId("metric-total-pnl")).toHaveTextContent("-2.000 VND");
     expect(screen.getByTestId("metric-win-loss")).toHaveTextContent("0.00%");
     expect(screen.getByTestId("metric-win-loss")).toHaveTextContent("2 Losses");
   });

@@ -226,8 +226,8 @@ describe("DashboardPage (FEAT-072: AC-001..AC-008)", () => {
       // Simulation facts
       await waitFor(() => {
         expect(screen.getByText("Q3 Tech Volatility")).toBeDefined();
-        expect(screen.getByTestId("portfolio-equity-value").textContent).toContain("105,950.00");
-        expect(screen.getByTestId("portfolio-pnl-value").textContent).toContain("+$4,750.00");
+        expect(screen.getByTestId("portfolio-equity-value").textContent).toContain("105.950 VND");
+        expect(screen.getByTestId("portfolio-pnl-value").textContent).toContain("+4.750 VND");
       });
 
       // Community facts
@@ -267,7 +267,7 @@ describe("DashboardPage (FEAT-072: AC-001..AC-008)", () => {
 
       // Other widgets MUST continue to render successfully
       await waitFor(() => {
-        expect(screen.getByTestId("portfolio-equity-value").textContent).toContain("105,950.00");
+        expect(screen.getByTestId("portfolio-equity-value").textContent).toContain("105.950 VND");
         expect(screen.getByText("Samantha H.")).toBeDefined();
         expect(screen.getByTestId("subscription-plan-value").textContent).toBe("Institutional Premium");
       });

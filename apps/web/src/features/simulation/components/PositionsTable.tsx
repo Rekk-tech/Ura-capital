@@ -1,6 +1,7 @@
 import React from "react";
 import { Package, TrendingUp, TrendingDown } from "lucide-react";
 import { SimulationPositionValuationDto } from "../types/simulation-ui.types";
+import { formatCurrency } from "../../portfolio/utils/portfolioCalculations";
 
 interface PositionsTableProps {
   positions: SimulationPositionValuationDto[];
@@ -11,12 +12,6 @@ export const PositionsTable: React.FC<PositionsTableProps> = ({
   positions,
   onSelectAsset,
 }) => {
-  const formatCurrency = (val: string) => {
-    if (val.startsWith("-")) {
-      return `-$${val.slice(1)}`;
-    }
-    return `$${val}`;
-  };
 
   return (
     <div className="card simulation-positions-card" data-testid="simulation-positions-card">
@@ -63,9 +58,9 @@ export const PositionsTable: React.FC<PositionsTableProps> = ({
                       </div>
                     </td>
                     <td className="text-right font-mono font-medium">{pos.quantity}</td>
-                    <td className="text-right font-mono text-muted">${pos.averageCost}</td>
-                    <td className="text-right font-mono">${pos.currentPrice}</td>
-                    <td className="text-right font-mono font-medium">${pos.marketValue}</td>
+                    <td className="text-right font-mono text-muted">{formatCurrency(pos.averageCost)}</td>
+                    <td className="text-right font-mono">{formatCurrency(pos.currentPrice)}</td>
+                    <td className="text-right font-mono font-medium">{formatCurrency(pos.marketValue)}</td>
                     <td className="text-right font-mono">
                       <span className={`pnl-inline ${isPositive ? "pnl-text-pos" : isNegative ? "pnl-text-neg" : ""}`}>
                         {isNegative ? (

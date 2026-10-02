@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Activity, Search, TrendingUp, TrendingDown, DollarSign } from "lucide-react";
+import { Activity, Search, TrendingUp, TrendingDown, Coins } from "lucide-react";
+import { formatCurrency } from "../../portfolio/utils/portfolioCalculations";
 import {
   SimulationAssetDto,
   SimulationMarketSnapshotDto,
@@ -57,7 +58,7 @@ export const MarketPriceView: React.FC<MarketPriceViewProps> = ({
       {assets.length === 0 ? (
         <div className="empty-state-wrap" data-testid="market-empty-state">
           <div className="empty-state-icon">
-            <DollarSign size={24} />
+            <Coins size={24} />
           </div>
           <p className="empty-state-title">No Assets Available</p>
           <p className="empty-state-desc">The asset universe is currently unpopulated for this simulation scenario.</p>
@@ -103,7 +104,7 @@ export const MarketPriceView: React.FC<MarketPriceViewProps> = ({
                       </span>
                     </td>
                     <td className="text-right font-mono font-medium" data-testid={`asset-price-${asset.symbol}`}>
-                      {price !== "—" ? `$${price}` : <span className="text-muted">Awaiting Snapshot</span>}
+                      {price !== "—" ? formatCurrency(price) : <span className="text-muted">Awaiting Snapshot</span>}
                     </td>
                     <td className="text-right font-mono text-muted" style={{ fontSize: "0.85rem" }}>
                       {snapshot ? `C${snapshot.cycle}` : `C${currentCycle}`}

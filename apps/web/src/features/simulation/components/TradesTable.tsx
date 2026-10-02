@@ -1,18 +1,13 @@
 import React from "react";
 import { CheckCheck, TrendingUp, TrendingDown } from "lucide-react";
 import { SimulationTradeDto } from "../types/simulation-ui.types";
+import { formatCurrency } from "../../portfolio/utils/portfolioCalculations";
 
 interface TradesTableProps {
   trades: SimulationTradeDto[];
 }
 
 export const TradesTable: React.FC<TradesTableProps> = ({ trades }) => {
-  const formatCurrency = (val: string) => {
-    if (val.startsWith("-")) {
-      return `-$${val.slice(1)}`;
-    }
-    return `$${val}`;
-  };
 
   return (
     <div className="card simulation-trades-card" data-testid="simulation-trades-card">
@@ -60,8 +55,8 @@ export const TradesTable: React.FC<TradesTableProps> = ({ trades }) => {
                       </span>
                     </td>
                     <td className="text-right font-mono">{trade.quantity}</td>
-                    <td className="text-right font-mono">${trade.executionPrice}</td>
-                    <td className="text-right font-mono font-medium">${trade.notional}</td>
+                    <td className="text-right font-mono">{formatCurrency(trade.executionPrice)}</td>
+                    <td className="text-right font-mono font-medium">{formatCurrency(trade.notional)}</td>
                     <td className="text-right font-mono">
                       {trade.realizedPnl !== "0.0000" ? (
                         <span className={`pnl-inline ${isPositive ? "pnl-text-pos" : isNegative ? "pnl-text-neg" : ""}`}>
@@ -69,7 +64,7 @@ export const TradesTable: React.FC<TradesTableProps> = ({ trades }) => {
                           {isPositive ? `+${formatCurrency(trade.realizedPnl)}` : formatCurrency(trade.realizedPnl)}
                         </span>
                       ) : (
-                        <span className="text-muted">$0.0000</span>
+                        <span className="text-muted">{formatCurrency(0)}</span>
                       )}
                     </td>
                   </tr>

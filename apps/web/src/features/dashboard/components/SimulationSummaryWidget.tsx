@@ -5,6 +5,7 @@ import { TrendingUp, Activity, AlertTriangle } from "lucide-react";
 import { useAuth } from "../../auth/context/AuthContext";
 import { simulationApi } from "../../../api/simulation.api";
 import { DashboardWidgetWrapper } from "./DashboardWidgetWrapper";
+import { formatCurrency } from "../../portfolio/utils/portfolioCalculations";
 
 /**
  * FEAT-072: Simulation Portfolio Summary Widget (FR-001, FR-003, FR-004, AC-001..AC-008)
@@ -102,14 +103,14 @@ export const SimulationSummaryWidget: React.FC = () => {
               <div className="portfolio-metric-box">
                 <span className="metric-box-label">Portfolio Equity</span>
                 <span className="metric-box-value font-mono" data-testid="portfolio-equity-value">
-                  ${valuation ? parseFloat(valuation.totalEquity).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "0.00"}
+                  {valuation ? formatCurrency(valuation.totalEquity) : "0 VND"}
                 </span>
               </div>
 
               <div className="portfolio-metric-box">
                 <span className="metric-box-label">Cash Balance</span>
                 <span className="metric-box-value font-mono">
-                  ${valuation ? parseFloat(valuation.cashBalance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "0.00"}
+                  {valuation ? formatCurrency(valuation.cashBalance) : "0 VND"}
                 </span>
               </div>
 
@@ -119,7 +120,7 @@ export const SimulationSummaryWidget: React.FC = () => {
                   className={`metric-box-value font-mono ${isPnlPositive ? "text-success" : "text-error"}`}
                   data-testid="portfolio-pnl-value"
                 >
-                  {isPnlPositive ? "+" : ""}${valuation ? parseFloat(valuation.unrealizedPnl).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "0.00"}
+                  {valuation ? (isPnlPositive ? `+${formatCurrency(valuation.unrealizedPnl)}` : formatCurrency(valuation.unrealizedPnl)) : "0 VND"}
                 </span>
               </div>
             </div>

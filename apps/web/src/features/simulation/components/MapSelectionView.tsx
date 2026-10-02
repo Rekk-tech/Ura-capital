@@ -91,7 +91,7 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
               <span className="spec-icon-label">
                 <Coins size={15} className="text-muted" /> Virtual Capital:
               </span>
-              <strong>$10,000.00 virtual cash</strong>
+              <strong>10.000.000 VND virtual cash</strong>
             </div>
             <div className="spec-row">
               <span className="spec-icon-label">
@@ -157,7 +157,7 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
               <span className="spec-icon-label">
                 <Coins size={15} className="text-muted" /> Virtual Capital:
               </span>
-              <strong>$100,000.00 virtual cash</strong>
+              <strong>100.000.000 VND virtual cash</strong>
             </div>
             <div className="spec-row">
               <span className="spec-icon-label">
@@ -242,7 +242,7 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
               {briefingMap === "map1-fomo" ? (
                 <>
                   <p className="briefing-lead">
-                    You have been allocated <strong>$10,000.00</strong> in virtual capital.
+                    You have been allocated <strong>10.000.000 VND</strong> in virtual capital.
                     Your objective is to survive 7 consecutive rounds (45 seconds each) without blowing up your account.
                   </p>
                   <div className="briefing-rules">
@@ -269,7 +269,7 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
               ) : (
                 <>
                   <p className="briefing-lead">
-                    You have been allocated <strong>$100,000.00</strong> in institutional virtual capital across 12 economic quarters.
+                    You have been allocated <strong>100.000.000 VND</strong> in institutional virtual capital across 12 economic quarters.
                   </p>
                   <div className="briefing-rules">
                     <div className="rule-item">

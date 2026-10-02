@@ -28,7 +28,7 @@ describe("SimulationSessionBar (FEAT-074: AC-001, AC-006)", () => {
 
     expect(screen.getByText("Tech Growth Cycle")).toBeInTheDocument();
     expect(screen.getByTestId("session-cycle-value")).toHaveTextContent("Cycle 2");
-    expect(screen.getByTestId("session-starting-cash")).toHaveTextContent("$100000.0000");
+    expect(screen.getByTestId("session-starting-cash")).toHaveTextContent("100.000 VND");
     expect(screen.getByTestId("session-status-badge")).toHaveTextContent("ACTIVE");
   });
 

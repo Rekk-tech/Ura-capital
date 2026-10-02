@@ -167,7 +167,7 @@ describe("SimulationDashboardPage (FEAT-038: AC-001..AC-016)", () => {
       expect(screen.getByText("MVP Market Scenario")).toBeDefined();
       expect(screen.getByTestId("session-status-badge")).toBeDefined();
       expect(screen.getByTestId("session-cycle-value").textContent).toBe("Cycle 2");
-      expect(screen.getByTestId("session-starting-cash").textContent).toBe("$100000.0000");
+      expect(screen.getByTestId("session-starting-cash").textContent).toBe("100.000 VND");
     });
   });
 
@@ -176,11 +176,11 @@ describe("SimulationDashboardPage (FEAT-038: AC-001..AC-016)", () => {
     renderWithProviders();
 
     await waitFor(() => {
-      expect(screen.getByTestId("portfolio-total-equity").textContent).toBe("$100000.0000");
-      expect(screen.getByTestId("portfolio-cash-balance").textContent).toBe("$94000.0000");
-      expect(screen.getByTestId("portfolio-market-value").textContent).toBe("$6000.0000");
-      expect(screen.getByTestId("portfolio-unrealized-pnl").textContent).toBe("+$1000.0000");
-      expect(screen.getByTestId("portfolio-realized-pnl").textContent).toBe("$0.0000");
+      expect(screen.getByTestId("portfolio-total-equity").textContent).toBe("100.000 VND");
+      expect(screen.getByTestId("portfolio-cash-balance").textContent).toBe("94.000 VND");
+      expect(screen.getByTestId("portfolio-market-value").textContent).toBe("6.000 VND");
+      expect(screen.getByTestId("portfolio-unrealized-pnl").textContent).toBe("+1.000 VND");
+      expect(screen.getByTestId("portfolio-realized-pnl").textContent).toBe("0 VND");
     });
   });
 
@@ -193,10 +193,10 @@ describe("SimulationDashboardPage (FEAT-038: AC-001..AC-016)", () => {
       expect(posRow).toBeDefined();
       expect(within(posRow).getByText("AURA")).toBeDefined();
       expect(within(posRow).getByText("Aura Capital")).toBeDefined();
-      expect(within(posRow).getByText("$100.000000")).toBeDefined();
-      expect(within(posRow).getByText("$120.000000")).toBeDefined();
-      expect(within(posRow).getByText("$6000.0000")).toBeDefined();
-      expect(within(posRow).getByText("+$1000.0000")).toBeDefined();
+      expect(within(posRow).getByText("100 VND")).toBeDefined();
+      expect(within(posRow).getByText("120 VND")).toBeDefined();
+      expect(within(posRow).getByText("6.000 VND")).toBeDefined();
+      expect(within(posRow).getByText("+1.000 VND")).toBeDefined();
     });
   });
 
@@ -364,7 +364,7 @@ describe("SimulationDashboardPage (FEAT-038: AC-001..AC-016)", () => {
     await waitFor(() => {
       expect(screen.getByTestId("trades-table")).toBeDefined();
       expect(screen.getByTestId("trade-row-trd-1")).toBeDefined();
-      expect(screen.getByText("$5000.0000")).toBeDefined();
+      expect(screen.getByText("5.000 VND")).toBeDefined();
     });
   });
 
