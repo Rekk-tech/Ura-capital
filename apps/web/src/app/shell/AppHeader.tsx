@@ -32,6 +32,15 @@ const NAV_ICONS: Record<string, React.ReactNode> = {
   "/subscription": <BadgeDollarSign size={16} aria-hidden="true" />,
 };
 
+const VI_NAV_LABELS: Record<string, string> = {
+  "/": "Trang Chủ",
+  "/dashboard": "Tổng Quan",
+  "/academy": "Khóa Học",
+  "/simulation": "Đấu Trường Giả Lập",
+  "/portfolio": "Danh Mục",
+  "/community": "Cộng Đồng",
+};
+
 /**
  * Modern Corporate Single-Row Application Header
  * (Ref: AURA_UI_REDESIGN_SPEC.md - Section 2 & AURA_UX_IMPROVEMENTS_SPEC.md - Section 2)
@@ -42,6 +51,23 @@ export const AppHeader: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [currentLang, setCurrentLang] = useState<"VI" | "EN">(() => {
+    try {
+      return (localStorage.getItem("aura_app_lang") as "VI" | "EN") || "VI";
+    } catch {
+      return "VI";
+    }
+  });
+
+  const toggleLang = () => {
+    const next = currentLang === "VI" ? "EN" : "VI";
+    setCurrentLang(next);
+    try {
+      localStorage.setItem("aura_app_lang", next);
+    } catch {
+      // ignore
+    }
+  };
 
   const isAdmin = Boolean(
     user &&
@@ -135,15 +161,18 @@ export const AppHeader: React.FC = () => {
         <nav className="header-nav desktop-nav" aria-label="Primary Navigation">
           {navRoutes.filter((route) => route.path !== "/subscription").map((route) => {
             const active = isRouteActive(location.pathname, route.path);
+            const englishLabel = route.navLabel || route.title;
+            const displayLabel = currentLang === "VI" ? (VI_NAV_LABELS[route.path] || englishLabel) : englishLabel;
             return (
               <Link
                 key={route.path}
                 to={route.path}
                 className={`nav-link ${active ? "nav-link-active" : ""}`}
                 aria-current={active ? "page" : undefined}
+                aria-label={englishLabel}
               >
                 {NAV_ICONS[route.path] || null}
-                <span>{route.navLabel || route.title}</span>
+                <span>{displayLabel}</span>
               </Link>
             );
           })}
@@ -190,10 +219,17 @@ export const AppHeader: React.FC = () => {
             </Link>
           )}
 
-          {/* Language Indicator */}
-          <span className="lang-pill" title="Language: English (US)">
-            EN
-          </span>
+          {/* Language Indicator & Toggle */}
+          <button
+            type="button"
+            onClick={toggleLang}
+            className="lang-pill"
+            title={`Ngôn ngữ: ${currentLang === "VI" ? "Tiếng Việt" : "English"} (Bấm để chuyển đổi)`}
+            aria-label="Toggle language"
+            style={{ cursor: "pointer", border: "none", background: "transparent" }}
+          >
+            {currentLang}
+          </button>
 
           {isAuthenticated && user ? (
             /* Authenticated User Menu Dropdown */
@@ -308,15 +344,18 @@ export const AppHeader: React.FC = () => {
           <div className="mobile-nav-links">
             {navRoutes.map((route) => {
               const active = isRouteActive(location.pathname, route.path);
+              const englishLabel = route.navLabel || route.title;
+              const displayLabel = currentLang === "VI" ? (VI_NAV_LABELS[route.path] || englishLabel) : englishLabel;
               return (
                 <Link
                   key={route.path}
                   to={route.path}
                   className={`mobile-nav-link ${active ? "mobile-nav-link-active" : ""}`}
                   aria-current={active ? "page" : undefined}
+                  aria-label={englishLabel}
                 >
                   {NAV_ICONS[route.path] || null}
-                  <span>{route.navLabel || route.title}</span>
+                  <span>{displayLabel}</span>
                 </Link>
               );
             })}

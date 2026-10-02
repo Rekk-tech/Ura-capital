@@ -32,6 +32,7 @@ export const FomoArenaPage: React.FC = () => {
 
   const [showTutorial, setShowTutorial] = useState(!tutorialCompleted);
   const [activeTrapQuizClosedForRound, setActiveTrapQuizClosedForRound] = useState<number | null>(null);
+  const [liveTickPrice, setLiveTickPrice] = useState<number | null>(null);
 
   // Trigger tutorial on initial view if not completed
   useEffect(() => {
@@ -47,7 +48,12 @@ export const FomoArenaPage: React.FC = () => {
     Boolean(isTrapOrQuizPhase && hasTrapOrQuiz && activeTrapQuizClosedForRound !== state?.round);
 
   return (
-    <div className="fomo-arena-page min-h-screen bg-slate-50/80 p-3 sm:p-5 md:p-6 lg:p-7 flex flex-col gap-4">
+    <div className="fomo-arena-page min-h-screen bg-slate-50/80 p-3 sm:p-5 md:p-6 lg:p-7 flex flex-col gap-4 relative">
+      {/* Visual Tension Red Vignette Flash on Crash Rounds 3 & 5 */}
+      {state && (state.round === 3 || state.round === 5) && (
+        <div className="fixed inset-0 pointer-events-none z-30 fomo-vignette-active" aria-hidden="true" />
+      )}
+
       {/* 1. Nút Quay lại: Đặt riêng ở hàng trên cùng góc trái */}
       <div className="flex items-center">
         <Link
@@ -59,10 +65,12 @@ export const FomoArenaPage: React.FC = () => {
         </Link>
       </div>
 
-      {/* 2. Banner Cảnh Báo (Disclaimer Card): Trải rộng toàn bộ chiều ngang container */}
-      <div className="w-full mb-6">
-        <SimulationDisclosureBanner />
-      </div>
+      {/* 2. Banner Cảnh Báo (Disclaimer Card): Chỉ hiện ở sảnh chờ, ẩn hoàn toàn khi vào game */}
+      {(!sessionId || !state) && (
+        <div className="w-full mb-6">
+          <SimulationDisclosureBanner />
+        </div>
+      )}
 
       {/* 5 Async UI States Handling */}
 
@@ -202,6 +210,7 @@ export const FomoArenaPage: React.FC = () => {
                     priceChangePercent={state.priceChangePercent ?? 3.0}
                     pricePoints={state.pricePoints}
                     round={state.round}
+                    onTickPriceChange={(newPrice) => setLiveTickPrice(newPrice)}
                   />
 
                   <FomoHypeRoom botChat={state.botChat} round={state.round} />
@@ -222,7 +231,7 @@ export const FomoArenaPage: React.FC = () => {
                     shares={state.shares}
                     marginUsed={state.marginUsed}
                     nav={state.nav}
-                    currentPrice={activeDisplayPrice}
+                    currentPrice={liveTickPrice || activeDisplayPrice}
                     canUseMargin={state.canUseMargin}
                     freeStopLossAwarded={state.freeStopLossAwarded}
                     isSubmitting={isSubmittingOrder}
@@ -232,6 +241,11 @@ export const FomoArenaPage: React.FC = () => {
               </div>
             );
           })()}
+
+          {/* Subtle bottom disclaimer badge inside active game */}
+          <div className="fomo-subtle-disclaimer mt-1">
+            🛡️ Sàn đấu thực chiến giả lập • 100% vốn ảo
+          </div>
         </div>
       )}
 

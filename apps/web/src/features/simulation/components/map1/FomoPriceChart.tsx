@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import type { Map1PricePoint } from "../../types/map-game.types";
 import { Sparkles, AlertTriangle, Snowflake, Activity } from "lucide-react";
+import { MAP1_ROUNDS_DATA } from "../../data/map1-fomo-dataset";
 
 interface FomoPriceChartProps {
   symbol?: string;
@@ -9,6 +10,7 @@ interface FomoPriceChartProps {
   priceChangePercent: number;
   pricePoints: Map1PricePoint[];
   round?: number;
+  onTickPriceChange?: (price: number) => void;
 }
 
 interface CandleData {
@@ -27,8 +29,39 @@ export const FomoPriceChart: React.FC<FomoPriceChartProps> = ({
   priceChangePercent,
   pricePoints: _pricePoints,
   round = 1,
+  onTickPriceChange,
 }) => {
   const [selectedTimeframe, setSelectedTimeframe] = useState<string>("5s");
+
+  // Load round data from dataset
+  const roundData = MAP1_ROUNDS_DATA[round] || MAP1_ROUNDS_DATA[1];
+  const tickSeries = roundData?.tickSeries || [];
+
+  const [tickIndex, setTickIndex] = useState(0);
+
+  // Reset tick index when round changes
+  useEffect(() => {
+    setTickIndex(0);
+  }, [round]);
+
+  // Dynamic 1.5s tick simulation loop
+  useEffect(() => {
+    if (!tickSeries.length) return;
+    const interval = setInterval(() => {
+      setTickIndex((prev) => (prev < tickSeries.length - 1 ? prev + 1 : prev));
+    }, 1500);
+    return () => clearInterval(interval);
+  }, [tickSeries.length, round]);
+
+  const activeTick = tickSeries[tickIndex] || tickSeries[0];
+  const activePrice = activeTick?.price || currentPrice || 46350;
+
+  // Sync price change to parent if callback provided
+  useEffect(() => {
+    if (onTickPriceChange && activePrice) {
+      onTickPriceChange(activePrice);
+    }
+  }, [activePrice, onTickPriceChange]);
 
   // Round-specific visual state matrix
   const isCeiling = round === 2 || priceChangePercent >= 6.8;
@@ -123,31 +156,20 @@ export const FomoPriceChart: React.FC<FomoPriceChartProps> = ({
         : "2,450,000 CP",
   };
 
-  // Generate realistic Japanese Candlestick sequence for Round 1 / current price action
+  // Generate realistic Japanese Candlestick sequence incorporating live tick state
   const candles: CandleData[] = useMemo(() => {
-    const totalCandles = 20;
+    const totalBaseCandles = 16;
     const baseP = refPrice; // 45,000
-    const targetP = currentPrice || 46350;
+    const targetP = activePrice;
 
-    // Pattern for Round 1: gentle accumulation with small pullbacks rising from 45,000 to target
     const result: CandleData[] = [];
     let currentOpen = baseP;
 
-    for (let i = 0; i < totalCandles; i++) {
-      const progress = i / (totalCandles - 1);
-      const isLast = i === totalCandles - 1;
-
-      // Realistic price trajectory
-      let cClose: number;
-      if (isLast) {
-        cClose = targetP;
-      } else {
-        const trendPrice = baseP + (targetP - baseP) * progress;
-        // Minor noise: every 4th candle is a small red pullback
-        const noise = (i % 4 === 1) ? -120 : (i % 3 === 0) ? 80 : 150;
-        cClose = Math.round(trendPrice + noise);
-      }
-
+    for (let i = 0; i < totalBaseCandles - 1; i++) {
+      const progress = i / (totalBaseCandles - 1);
+      const trendPrice = baseP + (targetP - baseP) * progress;
+      const noise = (i % 4 === 1) ? -120 : (i % 3 === 0) ? 80 : 150;
+      const cClose = Math.round(trendPrice + noise);
       const isBull = cClose >= currentOpen;
       const wickHigh = Math.round(Math.max(currentOpen, cClose) + (isBull ? 160 : 70));
       const wickLow = Math.round(Math.min(currentOpen, cClose) - (isBull ? 80 : 140));
@@ -162,19 +184,34 @@ export const FomoPriceChart: React.FC<FomoPriceChartProps> = ({
         isBullish: isBull,
       });
 
-      // Next candle opens near current close
       currentOpen = cClose;
     }
 
+    // Active live candle at the end (stretching wicks and close)
+    const liveOpen = activeTick?.candleState?.open || currentOpen;
+    const liveHigh = Math.max(activeTick?.candleState?.high || activePrice, liveOpen, activePrice);
+    const liveLow = Math.min(activeTick?.candleState?.low || activePrice, liveOpen, activePrice);
+    const liveClose = activePrice;
+    const isLiveBull = liveClose >= liveOpen;
+
+    result.push({
+      open: liveOpen,
+      high: liveHigh,
+      low: liveLow,
+      close: liveClose,
+      volume: activeTick?.volume || 185000,
+      isBullish: isLiveBull,
+    });
+
     return result;
-  }, [refPrice, currentPrice]);
+  }, [refPrice, activePrice, activeTick]);
 
   // Live OHLC reading from the latest candle
   const latestCandle = candles[candles.length - 1] || {
     open: 45000,
     high: 46500,
     low: 45000,
-    close: currentPrice,
+    close: activePrice,
     volume: 180000,
     isBullish: true,
   };
@@ -453,16 +490,15 @@ export const FomoPriceChart: React.FC<FomoPriceChartProps> = ({
 
           {/* Pulsing Beacon at latest point */}
           {trendPoints.length > 0 && (
-            <g>
+            <g className="fomo-pulse-dot">
               <circle
                 cx={trendPoints[trendPoints.length - 1]!.x}
                 cy={trendPoints[trendPoints.length - 1]!.y}
-                r="7"
+                r="8"
                 fill={primaryStroke}
                 stroke="#FFFFFF"
                 strokeWidth="2"
-                opacity="0.4"
-                className="animate-ping"
+                opacity="0.3"
               />
               <circle
                 cx={trendPoints[trendPoints.length - 1]!.x}
@@ -509,24 +545,35 @@ export const FomoPriceChart: React.FC<FomoPriceChartProps> = ({
       </div>
 
       {/* 4. Real-time Order Matching Ticker Tape */}
-      <div className="fomo-matching-tape">
-        <div className="flex items-center gap-4 whitespace-nowrap font-mono font-medium text-[11px]">
-          <span className="text-emerald-700 font-bold flex items-center gap-1.5 flex-shrink-0">
+      <div className="fomo-matching-tape" aria-label="Order Matching Ticker">
+        <div className="fomo-tape-track">
+          <span className="text-emerald-700 font-bold flex items-center gap-1.5 flex-shrink-0 mr-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            MATCHING TICKER:
+            KHỚP LỆNH:
           </span>
-
-          <span className="text-emerald-700 font-semibold flex items-center gap-1">
-            ↑ +15,000 CP @ 46,200 (BUY)
-          </span>
-          <span className="text-slate-300">•</span>
-          <span className="text-emerald-700 font-semibold flex items-center gap-1">
-            ↑ +28,000 CP @ 46,300 (BUY)
-          </span>
-          <span className="text-slate-300">•</span>
-          <span className="text-emerald-700 font-semibold flex items-center gap-1">
-            ↑ +40,000 CP @ 46,350 (BUY)
-          </span>
+          {(roundData?.matchingTape && roundData.matchingTape.length > 0
+            ? [...roundData.matchingTape, ...roundData.matchingTape]
+            : [
+                { id: "m1", side: "BUY" as const, shares: 15000, price: 46200, text: "↑ +15,000 CP @ 46,200 (BUY)" },
+                { id: "m2", side: "BUY" as const, shares: 28000, price: 46300, text: "↑ +28,000 CP @ 46,300 (BUY)" },
+                { id: "m3", side: "BUY" as const, shares: 40000, price: 46350, text: "↑ +40,000 CP @ 46,350 (BUY)" },
+              ]
+          ).map((item, idx) => {
+            const isBuy = item.side === "BUY";
+            const displayText = item.text || `${isBuy ? "↑ +" : "↓ -"}${item.shares?.toLocaleString("vi-VN") || "15,000"} CP @ ${item.price?.toLocaleString("vi-VN")} (${isBuy ? "BUY" : "SELL"})`;
+            const textColor = isBuy ? "#10B981" : "#EF4444";
+            return (
+              <React.Fragment key={`${item.id}-${idx}`}>
+                <span
+                  style={{ color: textColor }}
+                  className="font-semibold flex items-center gap-1"
+                >
+                  {displayText}
+                </span>
+                <span className="text-slate-300">•</span>
+              </React.Fragment>
+            );
+          })}
         </div>
       </div>
     </div>

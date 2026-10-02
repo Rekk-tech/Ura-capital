@@ -63,13 +63,13 @@ export const FomoTimer: React.FC<FomoTimerProps> = ({
 
           <span className="fomo-badge-vnindex">
             <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
-            <span>Simulated VN-Index Live Feed</span>
+            <span>Mô phỏng VN-Index Real-time</span>
           </span>
         </div>
 
         <div className="fomo-stress-badge">
           <span>🧠</span>
-          <span>Psychological Stress Test Active</span>
+          <span>Thử Thách Tâm Lý 45s Đang Bật</span>
         </div>
       </div>
 
@@ -79,7 +79,7 @@ export const FomoTimer: React.FC<FomoTimerProps> = ({
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-3">
             <h2 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-1.5">
-              <span>Round {currentRoundNum}/{totalRoundNum}:</span>
+              <span>Vòng {currentRoundNum}/{totalRoundNum}:</span>
               <span>{roundName}</span>
             </h2>
 
@@ -103,7 +103,7 @@ export const FomoTimer: React.FC<FomoTimerProps> = ({
               />
             </div>
             <span className="text-[11px] text-slate-500 font-medium">
-              Progress: {currentRoundNum} of {totalRoundNum} Rounds Complete &nbsp;{progressPercent}% Complete
+              Tiến độ: Vòng {currentRoundNum}/{totalRoundNum} ({progressPercent}%)
             </span>
           </div>
         </div>
@@ -113,7 +113,7 @@ export const FomoTimer: React.FC<FomoTimerProps> = ({
           {/* TOTAL ASSETS */}
           <div className="fomo-kpi-card">
             <span className="fomo-kpi-label">
-              TOTAL ASSETS
+              TỔNG TÀI SẢN (NAV)
             </span>
             <div className="flex items-baseline">
               <span className="fomo-kpi-value">
@@ -126,7 +126,7 @@ export const FomoTimer: React.FC<FomoTimerProps> = ({
           {/* AVAILABLE CASH */}
           <div className="fomo-kpi-card">
             <span className="fomo-kpi-label">
-              AVAILABLE CASH
+              TIỀN MẶT (CASH)
             </span>
             <div className="flex items-baseline">
               <span className="fomo-kpi-value">
@@ -139,7 +139,7 @@ export const FomoTimer: React.FC<FomoTimerProps> = ({
           {/* UNREALIZED P&L */}
           <div className="fomo-kpi-card">
             <span className="fomo-kpi-label">
-              → UNREALIZED P&amp;L
+              LÃI/LỖ (P&amp;L)
             </span>
             <div className="flex items-baseline">
               <span className="fomo-kpi-value flex items-center gap-0.5">

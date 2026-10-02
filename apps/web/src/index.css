@@ -5999,4 +5999,209 @@ a {
   cursor: not-allowed !important;
 }
 
+/* =========================================================================
+   FOMO ARENA FEAT-081 ANIMATIONS & ADVANCED STYLES
+   ========================================================================= */
+
+/* Pulsing Glowing Dot Animation on Live Candlestick */
+@keyframes fomo-pulse-dot {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.8;
+    filter: drop-shadow(0 0 2px rgba(16, 185, 129, 0.6));
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 1;
+    filter: drop-shadow(0 0 8px rgba(16, 185, 129, 1));
+  }
+  100% {
+    transform: scale(0.9);
+    opacity: 0.8;
+    filter: drop-shadow(0 0 2px rgba(16, 185, 129, 0.6));
+  }
+}
+
+.fomo-pulse-dot {
+  animation: fomo-pulse-dot 1.2s infinite ease-in-out;
+  transform-origin: center;
+}
+
+/* Shake Animation for Locked Action Button */
+@keyframes fomo-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.fomo-shake {
+  animation: fomo-shake 0.4s ease-in-out !important;
+}
+
+/* Red Vignette Flash Screen Effect (Crash Stress) */
+@keyframes fomo-vignette-pulse {
+  0%, 100% {
+    box-shadow: inset 0 0 30px rgba(239, 68, 68, 0.25);
+  }
+  50% {
+    box-shadow: inset 0 0 80px rgba(239, 68, 68, 0.55);
+  }
+}
+
+.fomo-vignette-active {
+  position: relative;
+}
+
+.fomo-vignette-active::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+  animation: fomo-vignette-pulse 1.8s infinite ease-in-out;
+}
+
+/* Smooth Chat Streaming Slide-Up Fade-In */
+@keyframes fomo-msg-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fomo-stream-msg {
+  animation: fomo-msg-fade-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Continuously Scrolling Matching Ticker Tape */
+@keyframes fomo-tape-scroll {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.fomo-tape-track {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  width: max-content;
+  animation: fomo-tape-scroll 24s linear infinite;
+}
+
+.fomo-tape-track:hover {
+  animation-play-state: paused;
+}
+
+/* Subtle Footer Disclaimer Badge */
+.fomo-subtle-disclaimer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  padding: 0.45rem 1rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  margin: 0.5rem auto 0;
+  width: fit-content;
+}
+
+/* Locked SELL Button in Round 5 */
+.fomo-btn-locked-sell {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+  border: 1px solid #b91c1c !important;
+  cursor: not-allowed !important;
+  opacity: 0.95 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 0 10px rgba(220, 38, 38, 0.35) !important;
+}
+
+/* Redesigned 600px Quiz Modal */
+.fomo-quiz-dialog {
+  width: 100%;
+  max-width: 600px;
+  background: #ffffff;
+  border-radius: 1.25rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.fomo-quiz-progress-track {
+  width: 100%;
+  height: 6px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.fomo-quiz-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981 0%, #f59e0b 60%, #ef4444 100%);
+  transition: width 1s linear;
+}
+
+.fomo-quiz-option-card {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 1.1rem;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 0.875rem;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+  width: 100%;
+}
+
+.fomo-quiz-option-card:hover:not(:disabled) {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  transform: translateY(-1px);
+}
+
+.fomo-quiz-option-card.selected-correct {
+  background: #ecfdf5 !important;
+  border-color: #10b981 !important;
+  color: #065f46 !important;
+}
+
+.fomo-quiz-option-card.selected-wrong {
+  background: #fef2f2 !important;
+  border-color: #ef4444 !important;
+  color: #991b1b !important;
+}
+
+.fomo-quiz-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 0.5rem;
+  background: #e2e8f0;
+  color: #334155;
+  font-weight: 800;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.fomo-quiz-option-card:hover .fomo-quiz-badge {
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+
 

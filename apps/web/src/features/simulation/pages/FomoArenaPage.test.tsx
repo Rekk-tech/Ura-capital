@@ -181,5 +181,18 @@ describe("FomoArenaPage", () => {
     expect(screen.getByText("TraderPro99")).toBeDefined();
     expect(screen.getByText("Múc cật lực anh em ơi!")).toBeDefined();
     expect(screen.getByText(/Vòng 1: Tin đồn đầu tiên/)).toBeDefined();
+
+    // Verify 100px yellow disclaimer banner is completely HIDDEN during gameplay
+    expect(screen.queryByText("SIMULATION ONLY")).toBeNull();
+
+    // Verify subtle footer disclaimer badge is present
+    expect(screen.getByText(/🛡️ Sàn đấu thực chiến giả lập • 100% vốn ảo/)).toBeDefined();
+
+    // Verify Vietnamese Financial Hybrid terminology in Cockpit
+    expect(screen.getAllByText(/TỔNG TÀI SẢN \(NAV\)/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/TIỀN MẶT \(CASH\)/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/LÃI\/LỖ \(P&L\)/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/MUA \(BUY\)/i)).toBeDefined();
+    expect(screen.getByText(/BÁN \(SELL\)/i)).toBeDefined();
   });
 });

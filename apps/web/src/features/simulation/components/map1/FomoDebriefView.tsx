@@ -76,6 +76,67 @@ export const FomoDebriefView: React.FC<FomoDebriefViewProps> = ({
         </div>
       </div>
 
+      {/* NAV Comparison: Your Strategy vs Buy & Hold Benchmark */}
+      <div className="card-aura p-5 rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col gap-4">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+              HIỆU SUẤT ĐẦU TƯ SO VỚI BENCHMARK
+            </span>
+            <h3 className="text-base font-bold text-slate-900">
+              Chiến Lược Của Bạn vs Mua &amp; Giữ (Buy &amp; Hold)
+            </h3>
+          </div>
+          <span className="text-xs font-mono font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">
+            Vốn khởi điểm: 10.000.000 đ
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Player NAV Card */}
+          <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 flex flex-col gap-1.5">
+            <span className="text-xs font-semibold text-slate-500 uppercase">
+              Tài Sản Của Bạn (Active Trading)
+            </span>
+            <div className="flex items-baseline gap-2">
+              <span className="text-xl sm:text-2xl font-black font-mono text-slate-900">
+                {report.finalNav.toLocaleString("vi-VN")} đ
+              </span>
+              <span
+                className={`text-xs font-bold ${
+                  report.pnlPercent >= 0 ? "text-emerald-600" : "text-rose-600"
+                }`}
+              >
+                {report.pnlPercent >= 0 ? `+${report.pnlPercent}%` : `${report.pnlPercent}%`}
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+              {report.finalNav >= 9271111
+                ? "✓ Bạn đã kiểm soát vị thế tốt và bảo toàn vốn vượt trội so với việc nắm giữ thụ động."
+                : "⚠️ Hiệu suất thấp hơn Mua & Giữ do áp lực cắt lỗ hoặc bị bào mòn bởi đòn bẩy Margin."}
+            </p>
+          </div>
+
+          {/* Buy & Hold Benchmark Card */}
+          <div className="p-4 rounded-xl border border-blue-200 bg-blue-50/60 flex flex-col gap-1.5">
+            <span className="text-xs font-semibold text-blue-700 uppercase">
+              Mua &amp; Giữ Nguyên (Buy &amp; Hold Benchmark)
+            </span>
+            <div className="flex items-baseline gap-2">
+              <span className="text-xl sm:text-2xl font-black font-mono text-blue-950">
+                9.271.111 đ
+              </span>
+              <span className="text-xs font-bold text-rose-600">
+                -7.29%
+              </span>
+            </div>
+            <p className="text-[11px] text-blue-800 mt-1 leading-snug">
+              Nếu bạn mua toàn bộ cổ phiếu ở Vòng 1 (45.000 đ) và không làm gì suốt 7 vòng đến khi giá về 41.720 đ.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Behavioral Metric Meters */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* FOMO Score Card */}

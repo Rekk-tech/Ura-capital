@@ -33,10 +33,18 @@ export const FomoOrderTicket: React.FC<FomoOrderTicketProps> = ({
   const [selectedPercentage, setSelectedPercentage] = useState<number>(25);
   const [leverageMode, setLeverageMode] = useState<"1x" | "2x" | "5x">("1x");
   const [hasStopLoss, setHasStopLoss] = useState<boolean>(false);
+  const [isShaking, setIsShaking] = useState<boolean>(false);
+  const [showLockedTooltip, setShowLockedTooltip] = useState<boolean>(false);
 
   const isTradingOpen = phase === "trading_window";
   const isRound5SellLocked = round === 5;
   const isRound7Settling = round === 7 && phase === "ledger_update";
+
+  const triggerLockedSellAnimation = () => {
+    setIsShaking(true);
+    setShowLockedTooltip(true);
+    setTimeout(() => setIsShaking(false), 800);
+  };
 
   // Effective leverage & buying power
   const isMarginAllowed = canUseMargin && round >= 3;
@@ -67,6 +75,7 @@ export const FomoOrderTicket: React.FC<FomoOrderTicketProps> = ({
     if (!isTradingOpen || isSubmitting) return;
 
     if (activeTab === "SELL" && isRound5SellLocked) {
+      triggerLockedSellAnimation();
       return;
     }
 
@@ -106,19 +115,19 @@ export const FomoOrderTicket: React.FC<FomoOrderTicketProps> = ({
       {/* Mini Account Overview Card */}
       <div className="fomo-summary-box">
         <div className="flex items-center justify-between text-slate-500 font-semibold">
-          <span className="text-[10px] uppercase tracking-wider">TOTAL ASSETS</span>
+          <span className="text-[10px] uppercase tracking-wider">TỔNG TÀI SẢN (NAV)</span>
           <span className="font-mono text-slate-900 font-bold">
             {totalAssets.toLocaleString("vi-VN")} VND
           </span>
         </div>
         <div className="flex items-center justify-between text-slate-500 font-semibold">
-          <span className="text-[10px] uppercase tracking-wider">AVAILABLE CASH</span>
+          <span className="text-[10px] uppercase tracking-wider">TIỀN MẶT (CASH)</span>
           <span className="font-mono text-slate-900 font-bold">
             {cash.toLocaleString("vi-VN")} VND
           </span>
         </div>
         <div className="flex items-center justify-between text-slate-500 font-semibold">
-          <span className="text-[10px] uppercase tracking-wider">→ UNREALIZED P&amp;L</span>
+          <span className="text-[10px] uppercase tracking-wider">LÃI/LỖ (P&amp;L)</span>
           <span className="font-mono text-slate-900 font-bold">
             {unrealizedPnlAmount === 0 ? "0" : (unrealizedPnlAmount > 0 ? `+${unrealizedPnlAmount.toLocaleString("vi-VN")}` : unrealizedPnlAmount.toLocaleString("vi-VN"))} VND ({unrealizedPnlPercent >= 0 ? `+${unrealizedPnlPercent.toFixed(2)}` : unrealizedPnlPercent.toFixed(2)}%)
           </span>
@@ -304,15 +313,22 @@ export const FomoOrderTicket: React.FC<FomoOrderTicketProps> = ({
 
       {/* 7. Big Execution Action Button / Special Round 5 State */}
       {isRound5SellLocked && activeTab === "SELL" ? (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 relative">
           <div className="p-3 rounded-xl bg-rose-50 border border-rose-300 text-rose-800 text-xs font-bold flex items-center gap-2">
             <AlertOctagon size={16} className="text-rose-600 flex-shrink-0" />
             <span>LỆNH BÁN BỊ KHÓA (NO LIQUIDITY / SÀN NGHẼN LỆNH)</span>
           </div>
+          {showLockedTooltip && (
+            <div className="p-2.5 rounded-xl bg-rose-100 border border-rose-400 text-rose-900 text-xs font-semibold flex items-center gap-2 animate-in fade-in">
+              <AlertOctagon size={14} className="text-rose-600 flex-shrink-0" />
+              <span>LỆNH BÁN BỊ KHÓA DO KHÔNG CÓ BÊN MUA ĐỐI ỨNG (MẤT THANH KHOẢN)</span>
+            </div>
+          )}
           <button
             type="button"
-            disabled
-            className="w-full py-3 px-4 rounded-xl font-bold text-xs bg-rose-800 text-white flex items-center justify-center gap-1.5 shadow-md cursor-not-allowed opacity-80"
+            onClick={triggerLockedSellAnimation}
+            className={`fomo-btn-locked-sell ${isShaking ? "fomo-shake" : ""}`}
+            title="Nhấp chuột để kiểm tra trạng thái thanh khoản"
           >
             <Lock size={14} />
             <span>Không Thể Khớp Lệnh Bán (Order Blocked)</span>
