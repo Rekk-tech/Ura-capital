@@ -103,7 +103,7 @@ export const FomoHypeRoom: React.FC<FomoHypeRoomProps> = ({ botChat, round = 1 }
   const [streamedMessages, setStreamedMessages] = useState<StreamedChatMessage[]>([]);
   const [userMessages, setUserMessages] = useState<StreamedChatMessage[]>([]);
   const [currentTime, setCurrentTime] = useState(Date.now());
-  const chatBottomRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const roundData = MAP1_ROUNDS_DATA[round] || MAP1_ROUNDS_DATA[1];
   const sentiment = roundData?.sentiment || { label: "Tham Lam / Tích Lũy", score: 68, color: "amber" };
@@ -189,10 +189,10 @@ export const FomoHypeRoom: React.FC<FomoHypeRoomProps> = ({ botChat, round = 1 }
     return () => clearTimeout(timeoutId);
   }, [round, roundData?.hypeRoomFeed]);
 
-  // Auto-scroll to bottom on new messages
+  // Auto-scroll strictly inside the chat container without touching window scroll
   useEffect(() => {
-    if (typeof chatBottomRef.current?.scrollIntoView === "function") {
-      chatBottomRef.current.scrollIntoView({ behavior: "smooth" });
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
   }, [streamedMessages.length, userMessages.length, botChat?.length]);
 
@@ -280,7 +280,10 @@ export const FomoHypeRoom: React.FC<FomoHypeRoomProps> = ({ botChat, round = 1 }
       </div>
 
       {/* Chat Messages Feed with Streaming Bot Animation */}
-      <div className="chat-feed-list flex flex-col gap-1 max-h-48 overflow-y-auto pr-1 text-xs">
+      <div
+        ref={chatContainerRef}
+        className="chat-feed-list flex flex-col gap-1 max-h-48 overflow-y-auto pr-1 text-xs"
+      >
         {streamedMessages.map((chat, idx) => (
           <div
             key={chat.id || `stream-${idx}`}
@@ -344,8 +347,6 @@ export const FomoHypeRoom: React.FC<FomoHypeRoomProps> = ({ botChat, round = 1 }
             </div>
           </div>
         ))}
-
-        <div ref={chatBottomRef} />
       </div>
 
       {/* Quick Emoji Reactions */}
