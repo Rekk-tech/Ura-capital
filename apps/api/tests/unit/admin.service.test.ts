@@ -1,51 +1,34 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { AdminService } from "../../src/modules/admin/admin.service.js";
+import type { IAdminRepository, AdminUserRecord } from "../../src/modules/admin/admin.repository.js";
 import { AppError } from "../../src/shared/errors/error-envelope.js";
 import { HTTP_STATUS } from "@aura/shared";
 
-interface MockPrisma {
-  user: {
-    findUnique: ReturnType<typeof vi.fn>;
-    update: ReturnType<typeof vi.fn>;
+describe("AdminService (FEAT-083: RBAC Self-Protection Guards & Boundaries)", () => {
+  let mockRepo: {
+    findUserById: ReturnType<typeof vi.fn>;
+    updateUserStatus: ReturnType<typeof vi.fn>;
+    findRoleByName: ReturnType<typeof vi.fn>;
+    setUserRole: ReturnType<typeof vi.fn>;
+    findSimulationSessionById: ReturnType<typeof vi.fn>;
+    cancelSimulationSession: ReturnType<typeof vi.fn>;
+    getOperationalMetrics: ReturnType<typeof vi.fn>;
+    listUsers: ReturnType<typeof vi.fn>;
   };
-  role: {
-    findUnique: ReturnType<typeof vi.fn>;
-  };
-  userRole: {
-    deleteMany: ReturnType<typeof vi.fn>;
-    create: ReturnType<typeof vi.fn>;
-  };
-  simulationSession: {
-    findUnique: ReturnType<typeof vi.fn>;
-    update: ReturnType<typeof vi.fn>;
-  };
-  $transaction: ReturnType<typeof vi.fn>;
-}
-
-describe("AdminService (FEAT-083: RBAC Self-Protection Guards)", () => {
-  let mockPrisma: MockPrisma;
   let adminService: AdminService;
 
   beforeEach(() => {
-    mockPrisma = {
-      user: {
-        findUnique: vi.fn(),
-        update: vi.fn(),
-      },
-      role: {
-        findUnique: vi.fn(),
-      },
-      userRole: {
-        deleteMany: vi.fn(),
-        create: vi.fn(),
-      },
-      simulationSession: {
-        findUnique: vi.fn(),
-        update: vi.fn(),
-      },
-      $transaction: vi.fn(async (cb) => cb(mockPrisma)),
+    mockRepo = {
+      findUserById: vi.fn(),
+      updateUserStatus: vi.fn(),
+      findRoleByName: vi.fn(),
+      setUserRole: vi.fn(),
+      findSimulationSessionById: vi.fn(),
+      cancelSimulationSession: vi.fn(),
+      getOperationalMetrics: vi.fn(),
+      listUsers: vi.fn(),
     };
-    adminService = new AdminService(mockPrisma as unknown as ConstructorParameters<typeof AdminService>[0]);
+    adminService = new AdminService(mockRepo as unknown as IAdminRepository);
   });
 
   describe("updateUserStatus - Self-Protection Guard", () => {
@@ -65,56 +48,63 @@ describe("AdminService (FEAT-083: RBAC Self-Protection Guards)", () => {
         expect((err as AppError).message).toContain("cannot suspend their own account");
       }
 
-      expect(mockPrisma.user.update).not.toHaveBeenCalled();
+      expect(mockRepo.updateUserStatus).not.toHaveBeenCalled();
     });
 
     it("allows administrator to suspend a different user account", async () => {
       const actorId = "admin-123";
       const targetUserId = "learner-456";
 
-      mockPrisma.user.findUnique.mockResolvedValue({
+      mockRepo.findUserById.mockResolvedValue({
         id: targetUserId,
         email: "learner@example.com",
         displayName: "Learner One",
         status: "ACTIVE",
-      });
+        role: "LEARNER",
+        createdAt: new Date("2026-01-01"),
+        updatedAt: new Date("2026-01-01"),
+      } as AdminUserRecord);
 
-      mockPrisma.user.update.mockResolvedValue({
+      mockRepo.updateUserStatus.mockResolvedValue({
         id: targetUserId,
         email: "learner@example.com",
         displayName: "Learner One",
         status: "SUSPENDED",
+        role: "LEARNER",
         createdAt: new Date("2026-01-01"),
-      });
+        updatedAt: new Date("2026-01-01"),
+      } as AdminUserRecord);
 
       const result = await adminService.updateUserStatus(actorId, targetUserId, "SUSPENDED", "Misconduct");
 
       expect(result.success).toBe(true);
       expect(result.user.status).toBe("SUSPENDED");
-      expect(mockPrisma.user.update).toHaveBeenCalledWith({
-        where: { id: targetUserId },
-        data: { status: "SUSPENDED" },
-      });
+      expect(mockRepo.updateUserStatus).toHaveBeenCalledWith(targetUserId, "SUSPENDED");
     });
 
     it("allows administrator to reactivate a user account", async () => {
       const actorId = "admin-123";
       const targetUserId = "learner-456";
 
-      mockPrisma.user.findUnique.mockResolvedValue({
+      mockRepo.findUserById.mockResolvedValue({
         id: targetUserId,
         email: "learner@example.com",
         displayName: "Learner One",
         status: "SUSPENDED",
-      });
+        role: "LEARNER",
+        createdAt: new Date("2026-01-01"),
+        updatedAt: new Date("2026-01-01"),
+      } as AdminUserRecord);
 
-      mockPrisma.user.update.mockResolvedValue({
+      mockRepo.updateUserStatus.mockResolvedValue({
         id: targetUserId,
         email: "learner@example.com",
         displayName: "Learner One",
         status: "ACTIVE",
+        role: "LEARNER",
         createdAt: new Date("2026-01-01"),
-      });
+        updatedAt: new Date("2026-01-01"),
+      } as AdminUserRecord);
 
       const result = await adminService.updateUserStatus(actorId, targetUserId, "ACTIVE");
 
@@ -145,19 +135,22 @@ describe("AdminService (FEAT-083: RBAC Self-Protection Guards)", () => {
       const actorId = "admin-123";
       const targetUserId = "learner-456";
 
-      mockPrisma.user.findUnique.mockResolvedValue({ id: targetUserId });
-      mockPrisma.role.findUnique.mockResolvedValue({ id: "role-admin-id", name: "ADMIN" });
+      mockRepo.findUserById.mockResolvedValue({
+        id: targetUserId,
+        email: "learner@example.com",
+        displayName: "Learner One",
+        status: "ACTIVE",
+        role: "LEARNER",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as AdminUserRecord);
+      mockRepo.findRoleByName.mockResolvedValue({ id: "role-admin-id", name: "ADMIN" });
 
       const result = await adminService.updateUserRole(actorId, targetUserId, "ADMIN");
 
       expect(result.success).toBe(true);
       expect(result.role).toBe("ADMIN");
-      expect(mockPrisma.userRole.create).toHaveBeenCalledWith({
-        data: {
-          userId: targetUserId,
-          roleId: "role-admin-id",
-        },
-      });
+      expect(mockRepo.setUserRole).toHaveBeenCalledWith(targetUserId, "role-admin-id");
     });
   });
 
@@ -166,24 +159,56 @@ describe("AdminService (FEAT-083: RBAC Self-Protection Guards)", () => {
       const actorId = "admin-123";
       const sessionId = "session-broken-789";
 
-      mockPrisma.simulationSession.findUnique.mockResolvedValue({
+      mockRepo.findSimulationSessionById.mockResolvedValue({
         id: sessionId,
         status: "ACTIVE",
       });
 
-      mockPrisma.simulationSession.update.mockResolvedValue({
+      mockRepo.cancelSimulationSession.mockResolvedValue({
         id: sessionId,
-        status: "CANCELLED",
       });
 
       const result = await adminService.resetSimulationSession(actorId, sessionId);
 
       expect(result.success).toBe(true);
       expect(result.sessionId).toBe(sessionId);
-      expect(mockPrisma.simulationSession.update).toHaveBeenCalledWith({
-        where: { id: sessionId },
-        data: expect.objectContaining({ status: "CANCELLED" }),
+      expect(mockRepo.cancelSimulationSession).toHaveBeenCalledWith(sessionId);
+    });
+  });
+
+  describe("getSystemMetrics and listUsers", () => {
+    it("returns operational metrics from repository", async () => {
+      mockRepo.getOperationalMetrics.mockResolvedValue({
+        totalUsers: 1500,
+        activeSimulationSessions: 50,
       });
+
+      const res = await adminService.getSystemMetrics();
+      expect(res.data.totalUsers).toBe(1500);
+      expect(res.data.activeSimulationSessions).toBe(50);
+      expect(res.data.systemHealth).toBe("HEALTHY");
+    });
+
+    it("returns users list from repository", async () => {
+      mockRepo.listUsers.mockResolvedValue({
+        users: [
+          {
+            id: "u-1",
+            email: "test@aura.test",
+            displayName: "Test User",
+            status: "ACTIVE",
+            role: "ADMIN",
+            createdAt: new Date("2026-01-01"),
+            updatedAt: new Date("2026-01-02"),
+          },
+        ],
+        total: 1,
+      });
+
+      const res = await adminService.listUsers({ page: 1, limit: 10 });
+      expect(res.data.length).toBe(1);
+      expect(res.data[0].role).toBe("ADMIN");
+      expect(res.total).toBe(1);
     });
   });
 });

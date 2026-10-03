@@ -18,6 +18,31 @@ export class AdminController {
     });
   }
 
+  async getSystemMetrics(_req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await this.service.getSystemMetrics();
+      res.status(HTTP_STATUS.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async listUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { search, status, role, page, limit } = req.query;
+      const result = await this.service.listUsers({
+        search: typeof search === "string" ? search : undefined,
+        status: typeof status === "string" ? status : undefined,
+        role: typeof role === "string" ? role : undefined,
+        page: page ? Number(page) : undefined,
+        limit: limit ? Number(limit) : undefined,
+      });
+      res.status(HTTP_STATUS.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async updateUserStatus(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const actorId = req.user?.id;

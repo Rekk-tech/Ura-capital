@@ -10,6 +10,16 @@ adminRouter.get("/admin/ping", authenticate, requireAdmin({ auditDenied: true })
   adminController.ping(req, res);
 });
 
+// GET /admin/metrics & /api/admin/metrics
+const handleGetMetrics = (req: Request, res: Response, next: NextFunction) => adminController.getSystemMetrics(req, res, next);
+adminRouter.get("/admin/metrics", authenticate, requireAdmin({ auditDenied: true }), handleGetMetrics);
+adminRouter.get("/api/admin/metrics", authenticate, requireAdmin({ auditDenied: true }), handleGetMetrics);
+
+// GET /admin/users & /api/admin/users
+const handleListUsers = (req: Request, res: Response, next: NextFunction) => adminController.listUsers(req, res, next);
+adminRouter.get("/admin/users", authenticate, requireAdmin({ auditDenied: true }), handleListUsers);
+adminRouter.get("/api/admin/users", authenticate, requireAdmin({ auditDenied: true }), handleListUsers);
+
 // PATCH /admin/users/:userId/status & /api/admin/users/:userId/status
 const handleStatusUpdate = (req: Request, res: Response, next: NextFunction) => adminController.updateUserStatus(req, res, next);
 adminRouter.patch("/admin/users/:userId/status", authenticate, requireAdmin({ auditDenied: true }), handleStatusUpdate);
