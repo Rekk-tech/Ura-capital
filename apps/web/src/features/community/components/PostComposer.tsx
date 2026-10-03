@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Send, Loader2 } from "lucide-react";
 import { useCreatePostMutation } from "../hooks/use-community";
 import { CommunityApiError } from "../types/community-ui.types";
@@ -10,14 +10,26 @@ import {
 interface PostComposerProps {
   accessToken?: string;
   onPostCreated?: () => void;
+  initialTitle?: string;
+  initialContent?: string;
 }
 
 const MAX_POST_LENGTH = 5000;
 
-export const PostComposer: React.FC<PostComposerProps> = ({ accessToken, onPostCreated }) => {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+export const PostComposer: React.FC<PostComposerProps> = ({
+  accessToken,
+  onPostCreated,
+  initialTitle = "",
+  initialContent = "",
+}) => {
+  const [title, setTitle] = useState(initialTitle);
+  const [content, setContent] = useState(initialContent);
   const [validationError, setValidationError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (initialTitle) setTitle(initialTitle);
+    if (initialContent) setContent(initialContent);
+  }, [initialTitle, initialContent]);
 
   const createPostMutation = useCreatePostMutation(accessToken);
 

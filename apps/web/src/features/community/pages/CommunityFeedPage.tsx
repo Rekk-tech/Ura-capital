@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "../../auth/context/AuthContext";
 import { useCommunityFeedQuery } from "../hooks/use-community";
@@ -14,6 +15,8 @@ import {
 export const CommunityFeedPage: React.FC = () => {
   const { accessToken, isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const [sortBy, setSortBy] = useState<"LATEST" | "POPULAR">("LATEST");
+  const location = useLocation();
+  const prefillState = location.state as { prefillTitle?: string; prefillContent?: string } | null;
 
   // Auth boundary: If unauthenticated, no community HTTP requests are dispatched (AC-003)
   const feedQuery = useCommunityFeedQuery(accessToken ?? undefined, 20, sortBy);
@@ -56,7 +59,11 @@ export const CommunityFeedPage: React.FC = () => {
       </section>
 
       {/* Post Composer */}
-      <PostComposer accessToken={accessToken} />
+      <PostComposer
+        accessToken={accessToken}
+        initialTitle={prefillState?.prefillTitle}
+        initialContent={prefillState?.prefillContent}
+      />
 
       {/* Sorting Tabs */}
       <div

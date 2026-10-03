@@ -427,17 +427,20 @@ export class Map2MacroEngineService {
     const n = session.history.length;
     let sumDefensive = 0;
     let sumGrowth = 0;
+    let sumValue = 0;
     const growthAllocations: number[] = [];
 
     for (const h of session.history) {
       const defensive = h.allocation.value + h.allocation.bond + h.allocation.cash;
       sumDefensive += defensive;
       sumGrowth += h.allocation.growth;
+      sumValue += h.allocation.value;
       growthAllocations.push(h.allocation.growth);
     }
 
     const avgDefensive = sumDefensive / n;
     const avgGrowth = sumGrowth / n;
+    const avgValue = sumValue / n;
 
     // Calculate std deviation of growth allocation
     const meanGrowth = avgGrowth;
@@ -450,44 +453,49 @@ export class Map2MacroEngineService {
 
     // Rule 1: alloc_value + alloc_bond + alloc_cash avg >= 60%
     if (avgDefensive >= 60) {
+      if (avgValue >= 35) {
+        return {
+          style: "Nhà đầu tư Giá trị (Value Investor)",
+          description:
+            "Bạn kiên định phân bổ vào các doanh nghiệp nền tảng tài chính lành mạnh, P/E hấp dẫn và dòng cổ tức tiền mặt bền vững vượt qua biến động thị trường.",
+        };
+      }
       return {
-        style: "Nhà đầu tư phòng thủ kỷ luật",
+        style: "Nhà đầu tư Phòng thủ (Defensive Investor)",
         description:
-          "Bạn ưu tiên bảo toàn vốn và quản trị rủi ro vững chắc, duy trì dòng tiền ổn định xuyên suốt các chu kỳ thắt chặt tiền tệ.",
+          "Bạn ưu tiên bảo toàn vốn và quản trị rủi ro vững chắc, duy trì đệm tiền mặt và trái phiếu ổn định xuyên suốt các chu kỳ thắt chặt tiền tệ.",
       };
     }
 
-    // Rule 2: std dev of allocation > 15%
+    // Rule 2: std dev of allocation > 15% (active tactical rebalancing)
     if (stdDevAlloc > 15) {
       return {
-        style: "Nhà phân bổ tài sản linh hoạt",
+        style: "Nhà đầu cơ Năng động (Tactical Allocator)",
         description:
-          "Bạn chủ động tái cân bằng danh mục nhạy bén theo từng bước ngoặt vĩ mô, tận dụng hiệu quả chu kỳ chuyển pha của thị trường.",
+          "Bạn chủ động luân chuyển tài sản nhạy bén theo từng bước ngoặt vĩ mô, tận dụng hiệu quả chu kỳ chuyển pha của thị trường.",
       };
     }
 
-    // Rule 3: avg growth >= 60% and Sharpe > 1.0
-    if (avgGrowth >= 60 && sharpeRatio > 1.0) {
+    // Rule 3: avg growth >= 60%
+    if (avgGrowth >= 60) {
+      if (sharpeRatio > 1.0) {
+        return {
+          style: "Nhà đầu tư Tăng trưởng (Growth Investor)",
+          description:
+            "Bạn khai thác tối đa tiềm năng sinh lời của nhóm cổ phiếu tăng trưởng cao với tỷ số Sharpe ấn tượng, kiểm soát tốt biến động danh mục.",
+        };
+      }
       return {
-        style: "Nhà đầu tư tăng trưởng có kỷ luật",
+        style: "Nhà đầu tư Tăng trưởng (Growth Investor)",
         description:
-          "Bạn khai thác tối đa tiềm năng sinh lời vượt trội của cổ phiếu tăng trưởng nhưng vẫn kiểm soát tốt biến động danh mục.",
-      };
-    }
-
-    // Rule 4: avg growth >= 60% and Sharpe <= 1.0
-    if (avgGrowth >= 60 && sharpeRatio <= 1.0) {
-      return {
-        style: "Nhà đầu tư tăng trưởng mạo hiểm",
-        description:
-          "Bạn chấp nhận rủi ro biến động lớn để tìm kiếm siêu lợi nhuận, cần trang bị thêm đệm phòng thủ khi lãi suất leo thang.",
+          "Bạn khai thác tối đa tiềm năng sinh lời của nhóm cổ phiếu tăng trưởng cao nhưng luôn cần củng cố kỷ luật quản trị drawdown danh mục.",
       };
     }
 
     return {
-      style: "Nhà đầu tư cân bằng thực chiến",
+      style: "Nhà đầu tư Giá trị (Value Investor)",
       description:
-        "Bạn kết hợp hài hòa giữa tăng trưởng và an toàn, giữ tỷ trọng đa dạng hóa chuẩn mực theo trường phái đầu tư giá trị hiện đại.",
+        "Bạn duy trì kỷ luật phân bổ tài sản hài hòa giữa cổ phiếu giá trị và đệm an toàn theo trường phái đầu tư giá trị kinh điển Benjamin Graham & Warren Buffett.",
     };
   }
 

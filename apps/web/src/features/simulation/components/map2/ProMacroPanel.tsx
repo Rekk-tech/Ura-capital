@@ -1,5 +1,6 @@
 import React from "react";
 import { Activity, Percent, ArrowUpRight, HelpCircle, Shield, Award } from "lucide-react";
+import { formatCurrency } from "../../../portfolio/utils/portfolioCalculations";
 
 interface ProMacroPanelProps {
   currentQuarter: number;
@@ -71,7 +72,7 @@ export const ProMacroPanel: React.FC<ProMacroPanelProps> = ({
           className="btn btn-outline py-1.5 px-3 rounded-lg text-xs font-semibold text-blue-600 border-blue-200 hover:bg-blue-50 flex items-center gap-1.5"
         >
           <HelpCircle size={14} />
-          <span>Sơ đồ phản ứng dây chuyền vĩ mô</span>
+          <span>Sơ đồ truyền dẫn vĩ mô</span>
         </button>
       </div>
 
@@ -144,10 +145,10 @@ export const ProMacroPanel: React.FC<ProMacroPanelProps> = ({
         <div className="p-3 rounded-xl bg-blue-50/50 border border-blue-100 flex flex-col justify-between">
           <span className="text-[11px] text-blue-600 font-semibold">Tài Sản Ròng (NAV)</span>
           <div className="text-xl font-black font-mono text-slate-900 mt-1">
-            {currentNav.toLocaleString("vi-VN")} đ
+            {formatCurrency(currentNav)}
           </div>
           <span className={`text-[10px] font-bold ${isPnlPositive ? "text-emerald-600" : "text-rose-600"}`}>
-            {isPnlPositive ? `+${pnlPercent}%` : `${pnlPercent}%`} tổng chu kỳ
+            {isPnlPositive ? `+${pnlPercent}%` : `${pnlPercent}%`} chu kỳ
           </span>
         </div>
 
@@ -165,7 +166,7 @@ export const ProMacroPanel: React.FC<ProMacroPanelProps> = ({
               {creditScore}đ
             </span>
           </div>
-          <span className="text-[10px] text-slate-400">Mục tiêu MDD &lt; 15%</span>
+          <span className="text-[10px] text-slate-400">Chuẩn VN-Index (+8.5%)</span>
         </div>
       </div>
     </div>

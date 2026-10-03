@@ -5,9 +5,9 @@ import { SimulationDisclosureBanner } from "../components/SimulationDisclosureBa
 import { ProMacroPanel } from "../components/map2/ProMacroPanel";
 import { MacroExplanationModal } from "../components/map2/MacroExplanationModal";
 import { ProAllocationSliders } from "../components/map2/ProAllocationSliders";
-import { ProAdvisorSpeechBox } from "../components/map2/ProAdvisorSpeechBox";
+import { ProRoomAiAdvisor } from "../components/map2/ProRoomAiAdvisor";
 import { ProQuizDialog } from "../components/map2/ProQuizDialog";
-import { ProPortfolioReport } from "../components/map2/ProPortfolioReport";
+import { ProRoomReportView } from "../components/map2/ProRoomReportView";
 import { BrainCircuit, Play, ArrowLeft, RefreshCw, AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -155,7 +155,7 @@ export const ProRoomPage: React.FC = () => {
 
       {/* 3. Report State (Completed 12 Quarters) */}
       {!isLoading && report && (
-        <ProPortfolioReport
+        <ProRoomReportView
           report={report}
           onReplay={() => {
             resetGame();
@@ -175,7 +175,7 @@ export const ProRoomPage: React.FC = () => {
               Phòng Quản Trị Danh Mục — Pro Room
             </h2>
             <p className="text-xs text-slate-500 max-w-md mx-auto mt-2 leading-relaxed">
-              Quản trị số vốn định chế <strong>100,000,000 VND</strong> qua 12 quý kinh tế (Bùng nổ, Đình lạm, Suy thoái, Hồi phục). Nhận cố vấn trực tiếp từ AI Advisor theo triết lý Benjamin Graham &amp; Warren Buffett.
+              Quản trị số vốn định chế <strong>100.000.000 VND</strong> qua 12 quý kinh tế (Bùng nổ, Đình lạm, Suy thoái, Hồi phục). Nhận cố vấn trực tiếp từ AI Advisor theo triết lý Benjamin Graham &amp; Warren Buffett.
             </p>
           </div>
           <button
@@ -209,7 +209,10 @@ export const ProRoomPage: React.FC = () => {
           />
 
           {/* AI Advisor Speech Feedback Box */}
-          <ProAdvisorSpeechBox lastRecord={lastQuarterRecord} />
+          <ProRoomAiAdvisor
+            lastRecord={lastQuarterRecord}
+            currentQuarter={session.currentQuarter}
+          />
 
           {/* Allocation Sliders */}
           <ProAllocationSliders
@@ -246,3 +249,6 @@ export const ProRoomPage: React.FC = () => {
     </div>
   );
 };
+
+export const FomoProRoomView = ProRoomPage;
+export default ProRoomPage;
