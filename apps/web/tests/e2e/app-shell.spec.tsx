@@ -30,8 +30,8 @@ describe("Web Application Shell (Smoke Test)", () => {
     );
 
     // Phase 9 shell renders the brand heading
-    const heading = screen.getByRole("heading", { level: 1 });
-    expect(heading.textContent).toContain("Aura Capital");
+    const headings = screen.getAllByRole("heading", { level: 1 });
+    expect(headings.some((h) => h.textContent?.includes("Aura Capital"))).toBe(true);
 
     // Product-oriented navigation links exist (desktop + mobile may both render)
     expect(screen.getAllByRole("link", { name: /home/i }).length).toBeGreaterThanOrEqual(1);

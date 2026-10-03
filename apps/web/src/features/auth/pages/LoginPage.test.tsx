@@ -36,6 +36,7 @@ describe("LoginPage (FEAT-071: AC-001..AC-006)", () => {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/account" element={<div>Account Target Page</div>} />
               <Route path="/simulation" element={<div>Simulation Target Page</div>} />
+              <Route path="/admin" element={<div>Admin Target Page</div>} />
             </Routes>
           </MemoryRouter>
         </AuthProvider>
@@ -302,4 +303,34 @@ describe("LoginPage (FEAT-071: AC-001..AC-006)", () => {
     renderLoginPage(["/login?returnTo=/simulation"], "existing-token");
     expect(screen.getByText("Simulation Target Page")).toBeDefined();
   });
+
+  it("redirects admin user directly to /admin when no returnTo query is specified (FEAT-083 / US-2)", async () => {
+    vi.spyOn(authApi, "login").mockResolvedValue({
+      accessToken: "mock-admin-token",
+      tokenType: "Bearer",
+      expiresIn: 3600,
+      user: {
+        id: "usr-admin-1",
+        email: "admin.aura2026@aura.internal",
+        displayName: "Aura System Admin",
+        role: "ADMIN",
+        status: "ACTIVE",
+      },
+    });
+
+    renderLoginPage(["/login"]);
+
+    fireEvent.change(screen.getByLabelText(/email address/i), {
+      target: { value: "admin.aura2026@aura.internal" },
+    });
+    fireEvent.change(screen.getByLabelText(/^password$/i), {
+      target: { value: "AdminSecretPassword123!" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /sign in/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Admin Target Page")).toBeDefined();
+    });
+  });
 });
+

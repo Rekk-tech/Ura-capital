@@ -67,7 +67,8 @@ describe("AdminDashboardPage (FEAT-077 / AC-003, AC-008)", () => {
 
       const h1Headings = screen.getAllByRole("heading", { level: 1 });
       expect(h1Headings).toHaveLength(1);
-      expect(h1Headings[0]?.textContent).toBe("Admin Control Surface");
+      expect(h1Headings[0]?.textContent).toContain("Bảng Điều Khiển Quản Trị Hệ Thống");
+      expect(h1Headings[0]?.textContent).toContain("Admin Control Surface");
     });
 
     it("renders the mandatory Server Authority Disclosure notice", async () => {
@@ -272,4 +273,72 @@ describe("AdminDashboardPage (FEAT-077 / AC-003, AC-008)", () => {
       expect(auditTab.getAttribute("aria-selected")).toBe("true");
     });
   });
+
+  describe("Domain Simulation & Academy Oversight (FEAT-083 / US-5)", () => {
+    it("renders simulation arena breakdown and allows resetting a stalled session", async () => {
+      vi.spyOn(adminApi, "getSystemMetrics").mockResolvedValue({
+        data: {
+          totalUsers: 250,
+          activeUsers24h: 50,
+          activeSimulationSessions: 10,
+          flaggedContentCount: 0,
+          pendingReviewCount: 0,
+          systemHealth: "HEALTHY",
+          uptimeSeconds: 7200,
+          databaseStatus: "CONNECTED",
+          lastAuditTimestamp: "2026-09-27T00:00:00Z",
+        },
+      });
+
+      const resetSpy = vi.spyOn(adminApi, "resetSimulationSession").mockResolvedValue({
+        success: true,
+        sessionId: "sim-sess-9104",
+        message: "Session reset",
+      });
+
+      renderDashboard("overview");
+
+      // Verify Simulation Arena Oversight section is rendered
+      const oversightSection = await screen.findByTestId("simulation-arena-oversight");
+      expect(oversightSection).toBeDefined();
+      expect(screen.getByText("Map 1: FOMO Arena")).toBeDefined();
+      expect(screen.getByText("Map 2: Pro Order Desk")).toBeDefined();
+      expect(screen.getByText("42.8% (Survivor)")).toBeDefined();
+
+      // Trigger reset on stalled session
+      const resetStalledBtn = screen.getByTestId("reset-stalled-session-btn");
+      fireEvent.click(resetStalledBtn);
+
+      await waitFor(() => {
+        expect(resetSpy).toHaveBeenCalledWith("sim-sess-9104", "admin-token");
+      });
+      expect(await screen.findByRole("alert")).toBeDefined();
+    });
+
+    it("renders academy course overview with completion rates", async () => {
+      vi.spyOn(adminApi, "getSystemMetrics").mockResolvedValue({
+        data: {
+          totalUsers: 100,
+          activeUsers24h: 20,
+          activeSimulationSessions: 2,
+          flaggedContentCount: 0,
+          pendingReviewCount: 0,
+          systemHealth: "HEALTHY",
+          uptimeSeconds: 3600,
+          databaseStatus: "CONNECTED",
+          lastAuditTimestamp: "2026-09-27T00:00:00Z",
+        },
+      });
+
+      renderDashboard("overview");
+
+      const academyWidget = await screen.findByTestId("academy-overview-widget");
+      expect(academyWidget).toBeDefined();
+      expect(screen.getByText("Stock Investing 101")).toBeDefined();
+      expect(screen.getByText("Options & Derivatives")).toBeDefined();
+      expect(screen.getByText("Macro Economics & Cycles")).toBeDefined();
+      expect(screen.getByText("980 / 1,250 (78.4%)")).toBeDefined();
+    });
+  });
 });
+

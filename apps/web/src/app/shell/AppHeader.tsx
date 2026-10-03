@@ -145,7 +145,7 @@ export const AppHeader: React.FC = () => {
       <div className="header-inner">
         {/* Brand Logo */}
         <div className="brand">
-          <Link to="/" className="brand-link" aria-label={`${APP_NAME} Home`}>
+          <Link to={isAdmin ? "/admin" : "/"} className="brand-link" aria-label={isAdmin ? "Aura Capital Admin Console" : `${APP_NAME} Home`}>
             <div className="brand-icon" aria-hidden="true">A</div>
             <div>
               {isHome ? (

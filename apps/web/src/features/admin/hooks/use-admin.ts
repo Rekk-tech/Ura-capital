@@ -11,6 +11,8 @@ import {
   ModerationResolutionAction,
   ListAuditParams,
   ListAuditResponse,
+  UserRole,
+  LearnerProgressDetail,
 } from "../../../api/admin.api";
 
 /**
@@ -102,6 +104,64 @@ export function useUpdateUserStatus() {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
       void queryClient.invalidateQueries({ queryKey: ["admin", "audit"] });
+      void queryClient.invalidateQueries({ queryKey: ["admin", "metrics"] });
+    },
+  });
+}
+
+/**
+ * Mutation to update user role (LEARNER / ADMIN).
+ */
+export function useUpdateUserRole() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      userId,
+      role,
+      accessToken,
+    }: {
+      userId: string;
+      role: UserRole;
+      accessToken: string;
+    }) => adminApi.updateUserRole(userId, role, accessToken),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+      void queryClient.invalidateQueries({ queryKey: ["admin", "audit"] });
+    },
+  });
+}
+
+/**
+ * Fetches real-time learner progress and domain stats.
+ */
+export function useLearnerDetails(userId: string | null, accessToken: string | null, enabled = true) {
+  return useQuery<{ data: LearnerProgressDetail }>({
+    queryKey: ["admin", "learner-details", userId, accessToken],
+    queryFn: ({ signal }) => {
+      if (!accessToken || !userId) throw new AdminApiError("Unauthenticated", 401, "UNAUTHENTICATED");
+      return adminApi.getLearnerDetails(userId, accessToken, { signal });
+    },
+    enabled: Boolean(accessToken && userId && enabled),
+    ...ADMIN_QUERY_DEFAULTS,
+  });
+}
+
+/**
+ * Mutation to reset a stalled simulation session.
+ */
+export function useResetSimulationSession() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      sessionId,
+      accessToken,
+    }: {
+      sessionId: string;
+      accessToken: string;
+    }) => adminApi.resetSimulationSession(sessionId, accessToken),
+    onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["admin", "metrics"] });
     },
   });

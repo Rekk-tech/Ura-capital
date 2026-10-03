@@ -24,7 +24,7 @@ export interface AuthContextType {
   accessToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<AuthUser>;
   register: (email: string, password: string, displayName?: string) => Promise<AuthUser>;
   logout: () => Promise<void>;
   refreshSession: () => Promise<void>;
@@ -74,6 +74,7 @@ export const AuthProvider: React.FC<{
       setAccessToken(res.accessToken);
       const userWithRole = await enrichUserRole(res.user, res.accessToken);
       setUser(userWithRole);
+      return userWithRole;
     } finally {
       setIsLoading(false);
     }
@@ -140,7 +141,7 @@ export function useAuth(): AuthContextType {
       accessToken: token,
       isAuthenticated: Boolean(token),
       isLoading: false,
-      login: async () => {},
+      login: async () => ({ id: "", email: "" }),
       register: async () => ({ id: "", email: "", status: "ACTIVE", createdAt: "" }),
       logout: async () => {},
       refreshSession: async () => {},

@@ -529,7 +529,7 @@ describe("AppShell & Route Governance (FEAT-070 / AC-001..AC-008)", () => {
       });
 
       expect(await screen.findByTestId("admin-dashboard-page")).toBeDefined();
-      expect(screen.getByRole("heading", { name: "Admin Control Surface" })).toBeDefined();
+      expect(screen.getByRole("heading", { name: /Admin Control Surface/i })).toBeDefined();
       expect(screen.getByTestId("server-authority-notice")).toBeDefined();
       expect(screen.getByTestId("admin-tab-overview")).toBeDefined();
       expect(screen.getByTestId("admin-tab-users")).toBeDefined();

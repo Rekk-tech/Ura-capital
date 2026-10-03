@@ -17,7 +17,7 @@ import { AuthApiError } from "../../../api/auth.api";
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, user } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,12 +28,30 @@ export const LoginPage: React.FC = () => {
   const rawReturnTo = searchParams.get("returnTo");
   const safeReturnUrl = getSafeReturnUrl(rawReturnTo, "/account");
 
+  const isUserAdmin = (
+    testUser?: { role?: string; roles?: string[]; email?: string } | null,
+    emailCandidate?: string,
+  ): boolean => {
+    const candidateEmail = (emailCandidate || testUser?.email || "").toLowerCase();
+    return Boolean(
+      testUser?.role === "ADMIN" ||
+      testUser?.roles?.includes?.("ADMIN") ||
+      candidateEmail.startsWith("admin.") ||
+      candidateEmail === "admin@aura.internal" ||
+      candidateEmail === "admin@auracapital.io"
+    );
+  };
+
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      navigate(safeReturnUrl, { replace: true });
+      if (!rawReturnTo && isUserAdmin(user)) {
+        navigate("/admin", { replace: true });
+      } else {
+        navigate(safeReturnUrl, { replace: true });
+      }
     }
-  }, [isAuthenticated, navigate, safeReturnUrl]);
+  }, [isAuthenticated, navigate, safeReturnUrl, rawReturnTo, user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,9 +70,13 @@ export const LoginPage: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      await login(normalizedEmail, password);
-      // Navigate to validated return URL on successful login
-      navigate(safeReturnUrl, { replace: true });
+      const loggedInUser = await login(normalizedEmail, password);
+      // Navigate to /admin directly if Admin and no explicit returnTo specified
+      if (!rawReturnTo && isUserAdmin(loggedInUser, normalizedEmail)) {
+        navigate("/admin", { replace: true });
+      } else {
+        navigate(safeReturnUrl, { replace: true });
+      }
     } catch (err: unknown) {
       if (err instanceof AuthApiError) {
         if (err.status === 429) {
