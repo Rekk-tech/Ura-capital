@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../../auth/context/AuthContext";
 import { useMap2Game } from "../hooks/use-map-game";
+import type { Map2Allocation } from "../types/map-game.types";
 import { SimulationDisclosureBanner } from "../components/SimulationDisclosureBanner";
-import { ProMacroPanel } from "../components/map2/ProMacroPanel";
-import { MacroExplanationModal } from "../components/map2/MacroExplanationModal";
-import { ProAllocationSliders } from "../components/map2/ProAllocationSliders";
+import { ProMacroTopRibbon } from "../components/map2/ProMacroTopRibbon";
+import { ProBenchmarkChart } from "../components/map2/ProBenchmarkChart";
+import { ProMacroClimatePanel } from "../components/map2/ProMacroClimatePanel";
+import { ProAllocationCockpit } from "../components/map2/ProAllocationCockpit";
+import { ProOrderDeskTable } from "../components/map2/ProOrderDeskTable";
 import { ProRoomAiAdvisor } from "../components/map2/ProRoomAiAdvisor";
+import { MacroExplanationModal } from "../components/map2/MacroExplanationModal";
 import { ProQuizDialog } from "../components/map2/ProQuizDialog";
 import { ProRoomReportView } from "../components/map2/ProRoomReportView";
 import { BrainCircuit, Play, ArrowLeft, RefreshCw, AlertTriangle } from "lucide-react";
@@ -30,20 +34,34 @@ export const ProRoomPage: React.FC = () => {
   const [showMacroExplainer, setShowMacroExplainer] = useState(false);
   const [activeQuizClosedForQuarter, setActiveQuizClosedForQuarter] = useState<number | null>(null);
 
+  // Draft allocation state synchronized with session allocation
+  const [draftAllocation, setDraftAllocation] = useState<Map2Allocation>({
+    growth: 35,
+    value: 25,
+    bond: 20,
+    cash: 20,
+  });
+
+  useEffect(() => {
+    if (session?.currentAllocation) {
+      setDraftAllocation(session.currentAllocation);
+    }
+  }, [session?.currentAllocation, session?.currentQuarter]);
+
   // Static macro stage definitions corresponding to 12 quarters
   const quartersConfig = [
-    { quarter: 1, stage: "BÙNG NỔ", stageKey: "BOOM", rate: 5.0, inflation: 2.5, gdp: 7.5 },
-    { quarter: 2, stage: "BÙNG NỔ", stageKey: "BOOM", rate: 5.0, inflation: 2.5, gdp: 7.5 },
-    { quarter: 3, stage: "BÙNG NỔ", stageKey: "BOOM", rate: 5.0, inflation: 2.5, gdp: 7.5 },
-    { quarter: 4, stage: "ĐÌNH LẠM & SIẾT TIỀN TỆ", stageKey: "STAGFLATION", rate: 8.5, inflation: 6.0, gdp: 4.0 },
-    { quarter: 5, stage: "ĐÌNH LẠM & SIẾT TIỀN TỆ", stageKey: "STAGFLATION", rate: 8.5, inflation: 6.0, gdp: 4.0 },
-    { quarter: 6, stage: "ĐÌNH LẠM & SIẾT TIỀN TỆ", stageKey: "STAGFLATION", rate: 8.5, inflation: 6.0, gdp: 4.0 },
-    { quarter: 7, stage: "SUY THOÁI & TẠO ĐÁY", stageKey: "RECESSION", rate: 7.0, inflation: 4.0, gdp: 3.0 },
-    { quarter: 8, stage: "SUY THOÁI & TẠO ĐÁY", stageKey: "RECESSION", rate: 7.0, inflation: 4.0, gdp: 3.0 },
-    { quarter: 9, stage: "SUY THOÁI & TẠO ĐÁY", stageKey: "RECESSION", rate: 7.0, inflation: 4.0, gdp: 3.0 },
-    { quarter: 10, stage: "HỒI PHỤC & TÁI THIẾT", stageKey: "RECOVERY", rate: 6.0, inflation: 3.0, gdp: 6.0 },
-    { quarter: 11, stage: "HỒI PHỤC & TÁI THIẾT", stageKey: "RECOVERY", rate: 6.0, inflation: 3.0, gdp: 6.0 },
-    { quarter: 12, stage: "HỒI PHỤC & TÁI THIẾT", stageKey: "RECOVERY", rate: 6.0, inflation: 3.0, gdp: 6.0 },
+    { quarter: 1, stage: "BÙNG NỔ", stageKey: "BOOM", stageDescription: "Initial Capital Deployment & Base Macro Positioning", rate: 5.0, inflation: 2.5, gdp: 7.5 },
+    { quarter: 2, stage: "BÙNG NỔ", stageKey: "BOOM", stageDescription: "Initial Capital Deployment & Base Macro Positioning", rate: 5.0, inflation: 2.5, gdp: 7.5 },
+    { quarter: 3, stage: "BÙNG NỔ", stageKey: "BOOM", stageDescription: "Initial Capital Deployment & Base Macro Positioning", rate: 5.0, inflation: 2.5, gdp: 7.5 },
+    { quarter: 4, stage: "ĐÌNH LẠM", stageKey: "STAGFLATION", stageDescription: "Macroeconomic Peak & Systemic Liquidity Squeeze", rate: 8.5, inflation: 6.0, gdp: 4.5 },
+    { quarter: 5, stage: "ĐÌNH LẠM", stageKey: "STAGFLATION", stageDescription: "Macroeconomic Peak & Systemic Liquidity Squeeze", rate: 8.5, inflation: 6.0, gdp: 4.5 },
+    { quarter: 6, stage: "ĐÌNH LẠM", stageKey: "STAGFLATION", stageDescription: "Macroeconomic Peak & Systemic Liquidity Squeeze", rate: 8.5, inflation: 6.0, gdp: 4.5 },
+    { quarter: 7, stage: "SUY THOÁI", stageKey: "RECESSION", stageDescription: "Market Capitulation & Deep Value Accumulation", rate: 7.0, inflation: 4.0, gdp: 3.0 },
+    { quarter: 8, stage: "SUY THOÁI", stageKey: "RECESSION", stageDescription: "Market Capitulation & Deep Value Accumulation", rate: 7.0, inflation: 4.0, gdp: 3.0 },
+    { quarter: 9, stage: "SUY THOÁI", stageKey: "RECESSION", stageDescription: "Market Capitulation & Deep Value Accumulation", rate: 7.0, inflation: 4.0, gdp: 3.0 },
+    { quarter: 10, stage: "HỒI PHỤC", stageKey: "RECOVERY", stageDescription: "Monetary Easing & Asset Expansion Rebound", rate: 6.0, inflation: 3.0, gdp: 6.0 },
+    { quarter: 11, stage: "HỒI PHỤC", stageKey: "RECOVERY", stageDescription: "Monetary Easing & Asset Expansion Rebound", rate: 6.0, inflation: 3.0, gdp: 6.0 },
+    { quarter: 12, stage: "HỒI PHỤC", stageKey: "RECOVERY", stageDescription: "Monetary Easing & Asset Expansion Rebound", rate: 6.0, inflation: 3.0, gdp: 6.0 },
   ];
 
   const currentQ = session?.currentQuarter ?? 1;
@@ -189,39 +207,80 @@ export const ProRoomPage: React.FC = () => {
         </div>
       )}
 
-      {/* 5. Success State: Active Pro Room Cockpit */}
+      {/* 5. Success State: Active Pro Room Cockpit (Figma Layout) */}
       {!isLoading && !report && session && (
         <div className="flex flex-col gap-5 animate-in fade-in duration-200">
-          {/* Top Macro Panel */}
-          <ProMacroPanel
+          {/* Top Macro Ribbon (Hero Quarter, Progression & 4 KPIs) */}
+          <ProMacroTopRibbon
             currentQuarter={session.currentQuarter}
             totalQuarters={12}
             stageName={currentQConfig.stage}
             stageKey={currentQConfig.stageKey}
-            interestRate={currentQConfig.rate}
-            inflation={currentQConfig.inflation}
-            gdpGrowth={currentQConfig.gdp}
+            stageDescription={currentQConfig.stageDescription}
             currentNav={session.currentNav}
             initialCash={session.initialCash}
+            unallocatedCash={Math.round((session.currentNav * draftAllocation.cash) / 100)}
+            unallocatedPercent={draftAllocation.cash}
+            alpha={
+              session.currentQuarter === 1
+                ? 1.85
+                : session.currentQuarter <= 3
+                ? 1.85
+                : session.currentQuarter <= 6
+                ? -0.85
+                : session.currentQuarter <= 9
+                ? 2.10
+                : 3.45
+            }
             maxDrawdown={session.maxDrawdown}
-            creditScore={session.creditScore}
-            onOpenMacroExplainer={() => setShowMacroExplainer(true)}
+            pnlQoQPercent={lastQuarterRecord?.pnlQuarterPercent ?? 0}
           />
 
-          {/* AI Advisor Speech Feedback Box */}
-          <ProRoomAiAdvisor
-            lastRecord={lastQuarterRecord}
-            currentQuarter={session.currentQuarter}
-          />
+          {/* 2-Column Grid matching Figma Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+            {/* Left Column: VN-Index Benchmark & Macro Climate (7 Cols) */}
+            <div className="lg:col-span-7 flex flex-col gap-5">
+              <ProBenchmarkChart
+                currentQuarter={session.currentQuarter}
+                stageKey={currentQConfig.stageKey}
+              />
+              <ProMacroClimatePanel
+                currentQuarter={session.currentQuarter}
+                stageKey={currentQConfig.stageKey}
+                interestRate={currentQConfig.rate}
+                inflation={currentQConfig.inflation}
+                gdpGrowth={currentQConfig.gdp}
+                onOpenMacroExplainer={() => setShowMacroExplainer(true)}
+              />
+            </div>
 
-          {/* Allocation Sliders */}
-          <ProAllocationSliders
-            currentAllocation={session.currentAllocation}
+            {/* Right Column: AI Advisor & Allocation Cockpit (5 Cols) */}
+            <div className="lg:col-span-5 flex flex-col gap-5">
+              <ProRoomAiAdvisor
+                lastRecord={lastQuarterRecord}
+                currentQuarter={session.currentQuarter}
+                stageKey={currentQConfig.stageKey}
+              />
+              <ProAllocationCockpit
+                currentQuarter={session.currentQuarter}
+                stageKey={currentQConfig.stageKey}
+                allocation={draftAllocation}
+                currentNav={session.currentNav}
+                isCommitting={isCommitting}
+                onAllocationChange={setDraftAllocation}
+                onCommit={async () => {
+                  await commitQuarter(draftAllocation);
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Bottom Full-Width Table: Order Desk */}
+          <ProOrderDeskTable
             currentQuarter={session.currentQuarter}
-            isCommitting={isCommitting}
-            onCommitQuarter={async (alloc) => {
-              await commitQuarter(alloc);
-            }}
+            stageKey={currentQConfig.stageKey}
+            allocation={draftAllocation}
+            currentNav={session.currentNav}
           />
         </div>
       )}
