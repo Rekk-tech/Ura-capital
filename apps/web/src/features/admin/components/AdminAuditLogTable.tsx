@@ -139,9 +139,13 @@ export const AdminAuditLogTable: React.FC = () => {
           style={{ padding: "2rem", borderColor: "rgba(239, 68, 68, 0.3)" }}
         >
           <AlertTriangle size={36} style={{ color: "#ef4444", margin: "0 auto 0.75rem" }} aria-hidden="true" />
-          <h2 style={{ fontSize: "1.2rem", marginBottom: "0.5rem" }}>Unable to load audit records</h2>
+          <h2 style={{ fontSize: "1.2rem", marginBottom: "0.5rem" }}>Unable to load audit records (Không thể tải nhật ký kiểm toán)</h2>
           <p className="text-muted" style={{ marginBottom: "1.25rem" }}>
-            {error instanceof Error ? error.message : "Failed to fetch audit log."}
+            {error instanceof Error
+              ? (error.message.toLowerCase().includes("moderation")
+                  ? "The requested security audit log records were not found."
+                  : error.message)
+              : "Failed to fetch security audit log records."}
           </p>
           <button
             type="button"

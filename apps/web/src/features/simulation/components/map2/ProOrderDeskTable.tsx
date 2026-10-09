@@ -92,53 +92,99 @@ export const ProOrderDeskTable: React.FC<ProOrderDeskTableProps> = ({
   ];
 
   return (
-    <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex flex-col gap-3">
+    <div className="pro-card" style={{ padding: "1.25rem", borderRadius: "1rem" }}>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
-        <div className="flex items-center gap-2">
-          <span className="p-1 rounded-md bg-blue-50 text-blue-600 border border-blue-200">
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "0.5rem",
+          paddingBottom: "0.75rem",
+          borderBottom: "1px solid #f1f5f9",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+          <span
+            style={{
+              padding: "4px",
+              borderRadius: "6px",
+              backgroundColor: "#f0fdf4",
+              color: "#16a34a",
+              border: "1px solid #bbf7d0",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <FileText size={16} />
           </span>
-          <h3 className="text-base font-bold text-slate-900 tracking-tight">
+          <h3 style={{ margin: 0, fontSize: "1rem", fontWeight: 800, color: "#0f172a", letterSpacing: "-0.01em" }}>
             Sổ Lệnh &amp; Biên Bản Khởi Tạo Quý (Order Desk)
           </h3>
         </div>
-        <span className="text-[11px] font-mono text-slate-400">
+        <span style={{ fontSize: "0.72rem", fontFamily: "monospace", color: "#94a3b8" }}>
           Audit Hash: #0x82A...FD4 · Q{currentQuarter}
         </span>
       </div>
 
       {/* Structured Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-xs text-slate-700">
-          <thead className="bg-slate-50/80 text-[10px] uppercase font-bold text-slate-400 border-b border-slate-200/60">
+      <div style={{ overflowX: "auto", width: "100%" }}>
+        <table className="pro-order-desk-table">
+          <thead>
             <tr>
-              <th className="py-2.5 px-3">Mã Tài Sản</th>
-              <th className="py-2.5 px-3">Loại Lệnh</th>
-              <th className="py-2.5 px-3">Tỷ Trọng Dự Kiến</th>
-              <th className="py-2.5 px-3">Giá Trị Quy Đổi</th>
-              <th className="py-2.5 px-3">Rủi Ro / Sharpe</th>
-              <th className="py-2.5 px-3 text-right">Trạng Thái</th>
+              <th>Mã Tài Sản</th>
+              <th>Loại Lệnh</th>
+              <th>Tỷ Trọng Dự Kiến</th>
+              <th>Giá Trị Quy Đổi</th>
+              <th>Rủi Ro / Sharpe</th>
+              <th style={{ textAlign: "right" }}>Trạng Thái</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody>
             {rows.map((r) => (
-              <tr key={r.ticker} className="hover:bg-slate-50/60 transition-colors">
-                <td className="py-3 px-3">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: r.color }} />
+              <tr key={r.ticker}>
+                <td>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <span
+                      style={{
+                        width: "8px",
+                        height: "8px",
+                        borderRadius: "50%",
+                        backgroundColor: r.color,
+                        flexShrink: 0,
+                      }}
+                    />
                     <div>
-                      <strong className="font-mono font-bold text-slate-900 block">{r.ticker}</strong>
-                      <span className="text-[11px] text-slate-400">{r.name}</span>
+                      <strong style={{ fontFamily: "monospace", fontWeight: 700, color: "#0f172a" }}>
+                        {r.ticker}
+                      </strong>
                     </div>
                   </div>
                 </td>
-                <td className="py-3 px-3 text-slate-700 font-medium">{r.orderType}</td>
-                <td className="py-3 px-3 font-mono font-bold text-slate-900">{r.pct.toFixed(1)}%</td>
-                <td className="py-3 px-3 font-mono font-bold text-slate-900">{formatCurrency(r.amount)}</td>
-                <td className={`py-3 px-3 font-medium ${r.riskColor}`}>{r.riskSharpe}</td>
-                <td className="py-3 px-3 text-right">
-                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${r.statusBadge}`}>
+                <td style={{ color: "#334155", fontWeight: 500 }}>{r.orderType}</td>
+                <td style={{ fontFamily: "monospace", fontWeight: 700, color: "#0f172a" }}>
+                  {r.pct.toFixed(1)}%
+                </td>
+                <td style={{ fontFamily: "monospace", fontWeight: 700, color: "#0f172a" }}>
+                  {formatCurrency(r.amount)}
+                </td>
+                <td style={{ fontWeight: 600, color: isStagflation ? "#e11d48" : "#16a34a" }}>
+                  {r.riskSharpe}
+                </td>
+                <td style={{ textAlign: "right" }}>
+                  <span
+                    style={{
+                      padding: "3px 8px",
+                      borderRadius: "6px",
+                      fontSize: "0.7rem",
+                      fontWeight: 700,
+                      backgroundColor: r.status === "Tối ưu" ? "#f0fdfa" : "#f1f5f9",
+                      color: r.status === "Tối ưu" ? "#0f766e" : "#475569",
+                      border: `1px solid ${r.status === "Tối ưu" ? "#99f6e4" : "#e2e8f0"}`,
+                    }}
+                  >
                     {r.status}
                   </span>
                 </td>

@@ -88,63 +88,134 @@ export const ProBenchmarkChart: React.FC<ProBenchmarkChartProps> = ({
       ];
 
   return (
-    <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex flex-col gap-4">
-      {/* Header with Title, Status Badge, Price & Controls */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+    <div className="pro-card" style={{ padding: "1.5rem" }}>
+      {/* Header with Title, Live Feed Badge, Price & Controls */}
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "1rem",
+          paddingBottom: "1rem",
+          borderBottom: "1px solid #f1f5f9",
+        }}
+      >
         <div>
-          <div className="flex items-center gap-2 flex-wrap mb-1">
-            <span className="p-1 rounded-md bg-blue-50 text-blue-600 border border-blue-200">
-              <BarChart2 size={16} />
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap", marginBottom: "0.25rem" }}>
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "32px",
+                height: "32px",
+                borderRadius: "8px",
+                backgroundColor: "#eff6ff",
+                color: "#2563eb",
+              }}
+            >
+              <BarChart2 size={18} />
             </span>
-            <h3 className="text-base font-bold text-slate-900 tracking-tight">
-              VN-Index &amp; Multi-Asset Benchmark
+            <h3 style={{ fontSize: "1.05rem", fontWeight: 800, color: "#0f172a", margin: 0, letterSpacing: "-0.02em" }}>
+              VN30 Index &amp; Multi-Asset Benchmark
             </h3>
             <span
-              className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider ${
-                compositePrice.bullish
-                  ? "bg-emerald-500/15 text-emerald-700 border border-emerald-300"
-                  : "bg-rose-500/15 text-rose-700 border border-rose-300"
-              }`}
+              style={{
+                display: "inline-block",
+                padding: "0.2rem 0.55rem",
+                borderRadius: "9999px",
+                fontSize: "0.65rem",
+                fontWeight: 900,
+                letterSpacing: "0.05em",
+                backgroundColor: "#dcfce7",
+                color: "#15803d",
+                textTransform: "uppercase",
+              }}
             >
-              {compositePrice.status}
+              LIVE FEED
             </span>
           </div>
-          <div className="flex items-center gap-2 text-xs text-slate-500">
+          <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.8rem", color: "#64748b" }}>
             <span>Real-time simulation composite rate</span>
             <span>•</span>
-            <strong className="text-slate-900 font-mono text-sm">{compositePrice.index}</strong>
-            <span className={`font-mono font-bold ${compositePrice.bullish ? "text-emerald-600" : "text-rose-600"}`}>
+            <strong style={{ color: "#0f172a", fontFamily: "var(--font-mono)", fontWeight: 800 }}>
+              {compositePrice.index}
+            </strong>
+            <span
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontWeight: 700,
+                color: compositePrice.bullish ? "#16a34a" : "#dc2626",
+              }}
+            >
               ({compositePrice.change} / {compositePrice.pct})
             </span>
           </div>
         </div>
 
         {/* Toggles (Candles/Line/Heikin & Timeframes) */}
-        <div className="flex items-center gap-2 self-stretch sm:self-auto justify-between sm:justify-end">
-          <div className="p-0.5 rounded-lg bg-slate-100 border border-slate-200 flex items-center gap-0.5 text-xs font-semibold">
+        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", flexWrap: "wrap" }}>
+          {/* Chart Type Toggle */}
+          <div
+            style={{
+              display: "inline-flex",
+              backgroundColor: "#f1f5f9",
+              padding: "2px",
+              borderRadius: "8px",
+              border: "1px solid #e2e8f0",
+            }}
+          >
             {(["candles", "line", "heikin"] as const).map((t) => (
               <button
                 key={t}
                 type="button"
                 onClick={() => setChartType(t)}
-                className={`px-2 py-1 rounded-md text-[11px] font-bold capitalize transition-all ${
-                  chartType === t ? "bg-white text-slate-950 shadow-xs" : "text-slate-500 hover:text-slate-900"
-                }`}
+                style={{
+                  padding: "0.3rem 0.65rem",
+                  borderRadius: "6px",
+                  fontSize: "0.75rem",
+                  fontWeight: chartType === t ? 700 : 500,
+                  border: "none",
+                  backgroundColor: chartType === t ? "#ffffff" : "transparent",
+                  color: chartType === t ? "#0f172a" : "#64748b",
+                  boxShadow: chartType === t ? "0 1px 2px rgba(0,0,0,0.06)" : "none",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                }}
               >
                 {t === "candles" ? "Candles" : t === "line" ? "Line" : "Heikin Ashi"}
               </button>
             ))}
           </div>
 
-          <div className="p-0.5 rounded-lg bg-slate-100 border border-slate-200 flex items-center gap-0.5 text-xs font-semibold">
+          {/* Timeframe Toggle */}
+          <div
+            style={{
+              display: "inline-flex",
+              backgroundColor: "#f1f5f9",
+              padding: "2px",
+              borderRadius: "8px",
+              border: "1px solid #e2e8f0",
+            }}
+          >
             {(["1Q", "2Q", "1Y", "3Y"] as const).map((tf) => (
               <button
                 key={tf}
                 type="button"
                 onClick={() => setTimeframe(tf)}
-                className={`px-2 py-1 rounded-md text-[11px] font-bold transition-all ${
-                  timeframe === tf ? "bg-slate-900 text-white shadow-xs" : "text-slate-500 hover:text-slate-900"
-                }`}
+                style={{
+                  padding: "0.3rem 0.65rem",
+                  borderRadius: "6px",
+                  fontSize: "0.75rem",
+                  fontWeight: timeframe === tf ? 700 : 500,
+                  border: "none",
+                  backgroundColor: timeframe === tf ? "#0f172a" : "transparent",
+                  color: timeframe === tf ? "#ffffff" : "#64748b",
+                  boxShadow: timeframe === tf ? "0 1px 2px rgba(0,0,0,0.1)" : "none",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                }}
               >
                 {tf}
               </button>
@@ -154,132 +225,218 @@ export const ProBenchmarkChart: React.FC<ProBenchmarkChartProps> = ({
       </div>
 
       {/* Technical Indicators Ribbon */}
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 py-1.5 px-3 rounded-xl bg-slate-50 border border-slate-200/60 text-xs font-mono">
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-emerald-500" />
-          <span className="text-slate-500">MA(20):</span>
-          <strong className="text-slate-800">{compositePrice.ma20}</strong>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          gap: "1rem",
+          padding: "0.55rem 0.85rem",
+          borderRadius: "8px",
+          backgroundColor: "#f8fafc",
+          border: "1px solid #e2e8f0",
+          fontSize: "0.78rem",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+          <span style={{ width: "8px", height: "8px", borderRadius: "50%", backgroundColor: "#0d9488" }} />
+          <span style={{ color: "#64748b" }}>MA(20):</span>
+          <strong style={{ color: "#0f172a", fontFamily: "var(--font-mono)" }}>{compositePrice.ma20}</strong>
         </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-blue-500" />
-          <span className="text-slate-500">MA(50):</span>
-          <strong className="text-slate-800">{compositePrice.ma50}</strong>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+          <span style={{ width: "8px", height: "8px", borderRadius: "50%", backgroundColor: "#1e293b" }} />
+          <span style={{ color: "#64748b" }}>MA(50):</span>
+          <strong style={{ color: "#0f172a", fontFamily: "var(--font-mono)" }}>{compositePrice.ma50}</strong>
         </div>
-        <div className="flex items-center gap-1.5 text-slate-600 font-sans">
-          <span className="text-slate-500 font-mono">RSI(14):</span>
-          <strong>{compositePrice.rsi}</strong>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+          <span style={{ color: "#64748b" }}>RSI (14):</span>
+          <strong style={{ color: "#0d9488", fontWeight: 700 }}>{compositePrice.rsi}</strong>
         </div>
-        <div className="flex items-center gap-1.5 text-slate-500 font-sans ml-auto">
-          <span>Vol:</span>
-          <strong className="text-slate-700 font-mono">{compositePrice.vol}</strong>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", marginLeft: "auto" }}>
+          <span style={{ color: "#64748b" }}>Vol:</span>
+          <strong style={{ color: "#0f172a", fontFamily: "var(--font-mono)" }}>{compositePrice.vol}</strong>
         </div>
       </div>
 
-      {/* SVG Financial Chart */}
-      <div className="relative w-full h-56 bg-slate-950 rounded-xl overflow-hidden p-2 flex flex-col justify-between border border-slate-800">
-        {/* Grid lines */}
-        <div className="absolute inset-0 grid grid-rows-4 pointer-events-none opacity-20">
-          <div className="border-b border-slate-400" />
-          <div className="border-b border-slate-400" />
-          <div className="border-b border-slate-400" />
-        </div>
+      {/* Institutional Light SVG Candlestick Canvas with Y-Axis */}
+      <div
+        style={{
+          position: "relative",
+          width: "100%",
+          height: "230px",
+          backgroundColor: "#ffffff",
+          borderRadius: "10px",
+          border: "1px solid #f1f5f9",
+          padding: "0.5rem 0",
+          display: "flex",
+        }}
+      >
+        {/* Main Chart Canvas Area */}
+        <div style={{ flex: 1, position: "relative", height: "100%" }}>
+          {/* Grid lines */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              pointerEvents: "none",
+              padding: "10px 0",
+            }}
+          >
+            <div style={{ borderBottom: "1px dashed #e2e8f0", width: "100%" }} />
+            <div style={{ borderBottom: "1px dashed #e2e8f0", width: "100%" }} />
+            <div style={{ borderBottom: "1px dashed #e2e8f0", width: "100%" }} />
+            <div style={{ borderBottom: "1px dashed #e2e8f0", width: "100%" }} />
+          </div>
 
-        {/* Dynamic Candlesticks SVG Canvas */}
-        <svg className="w-full h-40 overflow-visible" viewBox="0 0 480 100" preserveAspectRatio="none">
-          {/* Moving Average Line (MA20) */}
-          <path
-            d={
-              isBoom
-                ? "M 10 72 Q 120 58 240 40 T 470 12"
-                : isStagflation
-                ? "M 10 20 Q 120 40 240 60 T 470 88"
-                : "M 10 82 Q 120 78 240 70 T 470 58"
-            }
-            fill="none"
-            stroke="#10b981"
-            strokeWidth="1.8"
-            strokeOpacity="0.85"
-          />
-
-          {/* Moving Average Line (MA50) */}
-          <path
-            d={
-              isBoom
-                ? "M 10 78 Q 120 66 240 50 T 470 24"
-                : isStagflation
-                ? "M 10 15 Q 120 30 240 52 T 470 78"
-                : "M 10 86 Q 120 84 240 76 T 470 66"
-            }
-            fill="none"
-            stroke="#3b82f6"
-            strokeWidth="1.5"
-            strokeDasharray="4 3"
-            strokeOpacity="0.75"
-          />
-
-          {/* Candlesticks */}
-          {chartType !== "line" ? (
-            candles.map((c, i) => {
-              const x = 20 + i * 38;
-              const candleColor = c.bull ? "#10b981" : "#ef4444";
-              const bodyTop = Math.min(c.open, c.close);
-              const bodyHeight = Math.max(3, Math.abs(c.open - c.close));
-
-              return (
-                <g key={i}>
-                  {/* High/Low Wick */}
-                  <line x1={x} y1={c.high} x2={x} y2={c.low} stroke={candleColor} strokeWidth="1.2" />
-                  {/* Candle Body */}
-                  <rect
-                    x={x - 6}
-                    y={bodyTop}
-                    width={12}
-                    height={bodyHeight}
-                    fill={c.bull ? "#10b981" : "#ef4444"}
-                    rx={1.5}
-                  />
-                </g>
-              );
-            })
-          ) : (
-            /* Line mode */
+          {/* SVG Canvas for Candles & Lines */}
+          <svg
+            style={{ width: "100%", height: "100%", overflow: "visible" }}
+            viewBox="0 0 520 180"
+            preserveAspectRatio="none"
+          >
+            {/* MA50 Line (Dark Slate) */}
             <path
               d={
                 isBoom
-                  ? "M 10 70 L 60 55 L 120 48 L 180 42 L 240 35 L 300 28 L 360 22 L 420 15 L 470 10"
-                  : "M 10 20 L 60 35 L 120 45 L 180 55 L 240 65 L 300 72 L 360 78 L 420 85 L 470 90"
+                  ? "M 15 140 Q 140 120 280 88 T 505 45"
+                  : isStagflation
+                  ? "M 15 35 Q 140 60 280 100 T 505 145"
+                  : "M 15 145 Q 140 135 280 120 T 505 105"
               }
               fill="none"
-              stroke="#10b981"
-              strokeWidth="2.5"
+              stroke="#1e293b"
+              strokeWidth="1.8"
+              strokeOpacity="0.85"
             />
-          )}
-        </svg>
 
-        {/* Volume Histogram along bottom */}
-        <div className="w-full h-9 flex items-end justify-between px-2 pt-1 border-t border-slate-800/80">
-          {candles.map((c, i) => (
-            <div
-              key={i}
-              className="w-2.5 rounded-t-xs transition-all duration-300"
-              style={{
-                height: `${Math.min(100, (c.vol / 120) * 100)}%`,
-                backgroundColor: c.bull ? "rgba(16, 185, 129, 0.45)" : "rgba(239, 68, 68, 0.45)",
-              }}
+            {/* MA20 Line (Teal) */}
+            <path
+              d={
+                isBoom
+                  ? "M 15 130 Q 140 105 280 72 T 505 28"
+                  : isStagflation
+                  ? "M 15 45 Q 140 75 280 115 T 505 155"
+                  : "M 15 140 Q 140 125 280 105 T 505 85"
+              }
+              fill="none"
+              stroke="#0d9488"
+              strokeWidth="2.2"
+              strokeOpacity="0.9"
             />
-          ))}
+
+            {/* Candlesticks */}
+            {chartType !== "line" ? (
+              candles.map((c, i) => {
+                const x = 25 + i * 41;
+                const candleColor = c.bull ? "#0d9488" : "#e11d48";
+                const bodyTop = Math.min(c.open, c.close) * 1.5 + 10;
+                const bodyHeight = Math.max(5, Math.abs(c.open - c.close) * 1.5);
+                const wickHigh = c.high * 1.5 + 10;
+                const wickLow = c.low * 1.5 + 10;
+
+                return (
+                  <g key={i}>
+                    {/* Wick */}
+                    <line x1={x} y1={wickHigh} x2={x} y2={wickLow} stroke={candleColor} strokeWidth="1.5" />
+                    {/* Candle Body */}
+                    <rect
+                      x={x - 6.5}
+                      y={bodyTop}
+                      width={13}
+                      height={bodyHeight}
+                      fill={candleColor}
+                      rx={1}
+                    />
+                  </g>
+                );
+              })
+            ) : (
+              <path
+                d={
+                  isBoom
+                    ? "M 20 125 L 75 105 L 130 95 L 190 85 L 250 70 L 310 58 L 370 48 L 430 35 L 500 20"
+                    : "M 20 35 L 75 60 L 130 80 L 190 98 L 250 118 L 310 130 L 370 142 L 430 155 L 500 165"
+                }
+                fill="none"
+                stroke="#0d9488"
+                strokeWidth="2.5"
+              />
+            )}
+          </svg>
+        </div>
+
+        {/* Right-Hand Price Y-Axis Labels */}
+        <div
+          style={{
+            width: "48px",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            padding: "5px 0.5rem 5px 0",
+            fontSize: "0.7rem",
+            color: "#94a3b8",
+            fontFamily: "var(--font-mono)",
+            textAlign: "right",
+            borderLeft: "1px solid #f1f5f9",
+          }}
+        >
+          <span>1,320</span>
+          <span>1,280</span>
+          <span>1,240</span>
+          <span>1,200</span>
         </div>
       </div>
 
+      {/* Volume Histogram along bottom */}
+      <div
+        style={{
+          width: "100%",
+          height: "44px",
+          display: "flex",
+          alignItems: "flex-end",
+          justifyContent: "space-between",
+          padding: "4px 48px 0 10px",
+          boxSizing: "border-box",
+        }}
+      >
+        {candles.map((c, i) => (
+          <div
+            key={i}
+            style={{
+              width: "22px",
+              height: `${Math.min(100, Math.max(15, (c.vol / 120) * 100))}%`,
+              backgroundColor: c.bull ? "rgba(13, 148, 136, 0.45)" : "rgba(225, 29, 72, 0.45)",
+              borderRadius: "3px 3px 0 0",
+              transition: "height 0.25s ease",
+            }}
+          />
+        ))}
+      </div>
+
       {/* Timeline X-Axis Labels */}
-      <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono px-1">
-        <span>Previous Cycle (Q{Math.max(1, currentQuarter - 1)})</span>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          fontSize: "0.75rem",
+          color: "#94a3b8",
+          padding: "0 0.5rem",
+          borderTop: "1px solid #f1f5f9",
+          paddingTop: "0.5rem",
+        }}
+      >
+        <span>Previous Cycle (Q4)</span>
         <span>Month 1 (Allocated)</span>
         <span>Month 2 (Consolidation)</span>
-        <strong className="text-slate-900 font-bold font-sans">
+        <strong style={{ color: "#0f172a", fontWeight: 700 }}>
           Current Target (Q{currentQuarter} End)
         </strong>
       </div>
     </div>
   );
 };
+

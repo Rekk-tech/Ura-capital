@@ -6203,5 +6203,240 @@ a {
   color: #ffffff;
 }
 
+/* ============================================================================
+   Map 2 (Pro Room) Cockpit — High Fidelity Institutional Styling
+   ============================================================================ */
+
+.pro-room-page {
+  min-height: 100vh;
+  background-color: #f8fafc;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .pro-room-page {
+    padding: 1rem;
+    gap: 1rem;
+  }
+}
+
+/* 2-Column Responsive Cockpit Grid */
+.pro-room-grid-cockpit {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+  .pro-room-grid-cockpit {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pro-room-main-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+.pro-room-sidebar-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+/* Standardized Pro Room Card */
+.pro-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* 4-Column KPI Grid */
+.pro-kpi-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.85rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+  .pro-kpi-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .pro-kpi-grid-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 3-Column Macro Drivers Grid */
+.pro-kpi-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .pro-kpi-grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Custom Cross-Browser Range Slider Reset */
+.pro-slider-input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 6px;
+  border-radius: 9999px;
+  background: #e2e8f0;
+  outline: none;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  border: none;
+  box-sizing: border-box;
+  transition: background 0.15s ease;
+}
+
+.pro-slider-input::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 6px;
+  cursor: pointer;
+  border-radius: 9999px;
+  background: transparent;
+  border: none;
+}
+
+.pro-slider-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2.5px solid #0f766e;
+  cursor: grab;
+  margin-top: -6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.pro-slider-input::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.pro-slider-input::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.2);
+}
+
+.pro-slider-input::-moz-range-track {
+  width: 100%;
+  height: 6px;
+  cursor: pointer;
+  border-radius: 9999px;
+  background: transparent;
+  border: none;
+}
+
+.pro-slider-input::-moz-range-thumb {
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2.5px solid #0f766e;
+  cursor: grab;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.pro-slider-input::-moz-range-thumb:hover {
+  transform: scale(1.15);
+}
+
+/* Color variations for asset sliders */
+.pro-slider-growth::-webkit-slider-thumb {
+  border-color: #3b82f6;
+}
+.pro-slider-growth::-moz-range-thumb {
+  border-color: #3b82f6;
+}
+
+.pro-slider-value::-webkit-slider-thumb {
+  border-color: #06b6d4;
+}
+.pro-slider-value::-moz-range-thumb {
+  border-color: #06b6d4;
+}
+
+.pro-slider-bond::-webkit-slider-thumb {
+  border-color: #10b981;
+}
+.pro-slider-bond::-moz-range-thumb {
+  border-color: #10b981;
+}
+
+.pro-slider-cash::-webkit-slider-thumb {
+  border-color: #f59e0b;
+}
+.pro-slider-cash::-moz-range-thumb {
+  border-color: #f59e0b;
+}
+
+/* Institutional Order Desk Table */
+.pro-order-desk-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.pro-order-desk-table th {
+  padding: 0.75rem 0.85rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  font-weight: 700;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.pro-order-desk-table td {
+  padding: 0.85rem 0.85rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.pro-order-desk-table tr:hover td {
+  background-color: #f8fafc;
+}
+
+
 
 

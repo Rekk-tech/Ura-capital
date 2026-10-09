@@ -1,6 +1,6 @@
 import React from "react";
 import type { Map2QuarterHistoryRecord } from "../../types/map-game.types";
-import { Bot, Lightbulb, Quote } from "lucide-react";
+import { Bot, Lightbulb } from "lucide-react";
 
 interface ProRoomAiAdvisorProps {
   lastRecord: Map2QuarterHistoryRecord | null;
@@ -36,58 +36,98 @@ export const ProRoomAiAdvisor: React.FC<ProRoomAiAdvisorProps> = ({
     : "Gia tăng tỷ trọng Growth ($EQ_GROWTH) lên 40–50% khi lãi suất duy trì ở mức thấp và chỉ số CPI ổn định.";
 
   return (
-    <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex flex-col gap-3">
-      {/* Header with Avatar & Level Badge */}
-      <div className="flex items-center justify-between gap-3 pb-2.5 border-b border-slate-100">
-        <div className="flex items-center gap-2.5">
-          {/* Avatar with beacon */}
-          <div className="relative flex-shrink-0">
-            <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-xs">
-              <Bot size={20} className="text-teal-400" />
-            </div>
-            <span
-              className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white"
-              title="CrediFin Online"
-            />
+    <div className="pro-card" style={{ padding: "1.5rem" }}>
+      {/* Header with Avatar & Online Dot */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          paddingBottom: "0.85rem",
+          borderBottom: "1px solid #f1f5f9",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          {/* Avatar box */}
+          <div
+            style={{
+              width: "38px",
+              height: "38px",
+              borderRadius: "10px",
+              backgroundColor: "#0f172a",
+              color: "#2dd4bf",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <Bot size={20} />
           </div>
 
           <div>
-            <h4 className="text-sm font-bold text-slate-900 tracking-tight flex items-center gap-1.5">
-              <span>CrediFin AI Advisor</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <h4 style={{ margin: 0, fontSize: "0.95rem", fontWeight: 800, color: "#0f172a", letterSpacing: "-0.01em" }}>
+              CrediFin AI Advisor
             </h4>
-            <span className="text-[10px] text-slate-500 font-medium flex items-center gap-1">
-              <span>Cố Vấn Đầu Tư Giá Trị (AI Advisor)</span>
-              <span>•</span>
-              <span>Level 2 Verified</span>
+            <span style={{ fontSize: "0.72rem", color: "#64748b", fontWeight: 500, display: "block", marginTop: "1px" }}>
+              AI Strategic Co-Pilot • Level 2 Verified
             </span>
           </div>
         </div>
 
-        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
-          Q{currentQuarter} Directive
-        </span>
+        {/* Online Indicator Green Dot */}
+        <span
+          style={{
+            width: "10px",
+            height: "10px",
+            borderRadius: "50%",
+            backgroundColor: "#10b981",
+            boxShadow: "0 0 0 3px rgba(16, 185, 129, 0.2)",
+          }}
+          title="CrediFin Active"
+        />
       </div>
 
-      {/* Core Directive Quote Bubble */}
-      <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/60 relative flex flex-col gap-1.5">
-        <div className="text-slate-400 mb-0.5">
-          <Quote size={16} className="rotate-180 text-blue-500" />
+      {/* Quote Card (Ice Blue Tint) */}
+      <div
+        style={{
+          padding: "1.15rem 1.25rem",
+          borderRadius: "12px",
+          backgroundColor: "#f0f7ff",
+          border: "1px solid #e0f2fe",
+          display: "flex",
+          flexDirection: "column",
+          gap: "0.5rem",
+        }}
+      >
+        <div style={{ color: "#0284c7", fontSize: "1.5rem", lineHeight: 1, fontWeight: 900, fontFamily: "serif" }}>
+          “
         </div>
-        <p className="text-xs text-slate-800 italic leading-relaxed font-serif">
-          "{lastRecord?.advisorNote || coreQuote}"
+        <p
+          style={{
+            margin: 0,
+            fontSize: "0.85rem",
+            color: "#0f172a",
+            fontStyle: "italic",
+            lineHeight: 1.6,
+            fontFamily: "Georgia, serif",
+          }}
+        >
+          {lastRecord?.advisorNote || coreQuote}
         </p>
-        <span className="text-[10px] text-slate-400 font-sans font-semibold text-right block">
+        <span style={{ fontSize: "0.72rem", color: "#64748b", textAlign: "right", display: "block" }}>
           — CrediFin Core Directive
         </span>
       </div>
 
-      {/* Strategic Recommendation */}
-      <div className="p-3 rounded-xl bg-amber-50/50 border border-amber-200/60 flex items-start gap-2.5">
-        <Lightbulb size={16} className="text-amber-600 flex-shrink-0 mt-0.5" />
-        <div className="text-xs text-slate-700 leading-relaxed">
-          <strong className="text-slate-900 font-bold block mb-0.5">
-            Gợi ý chiến lược Q{currentQuarter}:
+      {/* Actionable Strategy Tip */}
+      <div style={{ display: "flex", alignItems: "flex-start", gap: "0.6rem", fontSize: "0.8rem", lineHeight: 1.6, color: "#334155" }}>
+        <span style={{ color: "#0d9488", flexShrink: 0, marginTop: "2px" }}>
+          <Lightbulb size={16} />
+        </span>
+        <div>
+          <strong style={{ color: "#0f172a", fontWeight: 800 }}>
+            Gợi ý chiến lược Q{currentQuarter}:{" "}
           </strong>
           <span>{strategySuggestion}</span>
         </div>
@@ -95,3 +135,4 @@ export const ProRoomAiAdvisor: React.FC<ProRoomAiAdvisorProps> = ({
     </div>
   );
 };
+

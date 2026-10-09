@@ -56,22 +56,54 @@ export const ProMacroClimatePanel: React.FC<ProMacroClimatePanelProps> = ({
     : "Chính sách tiền tệ nới lỏng phát huy tác dụng kích thích tăng trưởng kinh tế. Thanh khoản dồi dào trở lại, mở đường cho chu kỳ tăng trưởng mới của thị trường chứng khoán.";
 
   return (
-    <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex flex-col gap-4">
+    <div className="pro-card" style={{ padding: "1.5rem" }}>
       {/* Header with Title & Explainer Modal Button */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "1rem",
+          paddingBottom: "1rem",
+          borderBottom: "1px solid #f1f5f9",
+        }}
+      >
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="p-1 rounded-md bg-blue-50 text-blue-600 border border-blue-200">
-              <Globe size={16} />
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap", marginBottom: "0.25rem" }}>
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "32px",
+                height: "32px",
+                borderRadius: "8px",
+                backgroundColor: "#eff6ff",
+                color: "#2563eb",
+              }}
+            >
+              <Globe size={18} />
             </span>
-            <h3 className="text-base font-bold text-slate-900 tracking-tight">
+            <h3 style={{ fontSize: "1.05rem", fontWeight: 800, color: "#0f172a", margin: 0, letterSpacing: "-0.02em" }}>
               Macroeconomic Climate &amp; Systemic Drivers (Q{currentQuarter})
             </h3>
-            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+            <span
+              style={{
+                display: "inline-block",
+                padding: "0.2rem 0.55rem",
+                borderRadius: "9999px",
+                fontSize: "0.65rem",
+                fontWeight: 700,
+                backgroundColor: "#f1f5f9",
+                color: "#475569",
+                border: "1px solid #e2e8f0",
+              }}
+            >
               Macro Engine v3.4
             </span>
           </div>
-          <p className="text-xs text-slate-500">
+          <p style={{ margin: 0, fontSize: "0.8rem", color: "#64748b" }}>
             Core macroeconomic conditions influencing equity yield &amp; sovereign bond yields
           </p>
         </div>
@@ -79,78 +111,214 @@ export const ProMacroClimatePanel: React.FC<ProMacroClimatePanelProps> = ({
         <button
           type="button"
           onClick={onOpenMacroExplainer}
-          className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 hover:underline transition-all"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.35rem",
+            background: "none",
+            border: "none",
+            color: "#2563eb",
+            fontSize: "0.8rem",
+            fontWeight: 600,
+            cursor: "pointer",
+          }}
         >
           <span>Xem sơ đồ truyền dẫn vĩ mô</span>
-          <ArrowUpRight size={13} />
+          <ArrowUpRight size={14} />
         </button>
       </div>
 
       {/* 3 Macro KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div className="pro-kpi-grid-3">
         {/* Card 1: Interest Rate */}
-        <div className="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/60 flex flex-col justify-between">
-          <div className="flex items-center justify-between text-xs text-slate-500 font-semibold mb-1">
-            <span>LÃI SUẤT ĐIỀU HÀNH</span>
-            <span className="font-mono text-[11px]">%</span>
+        <div
+          style={{
+            padding: "1rem 1.15rem",
+            borderRadius: "12px",
+            backgroundColor: "#f8fafc",
+            border: "1px solid #e2e8f0",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.25rem" }}>
+            <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#64748b", textTransform: "uppercase" }}>
+              INTEREST RATE
+            </span>
+            <span
+              style={{
+                width: "22px",
+                height: "22px",
+                borderRadius: "6px",
+                backgroundColor: "#ccfbf1",
+                color: "#0f766e",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "0.75rem",
+                fontWeight: 800,
+              }}
+            >
+              %
+            </span>
           </div>
-          <div className="text-3xl font-black font-mono text-slate-900 tracking-tight my-1">
+          <div style={{ fontSize: "1.85rem", fontWeight: 900, fontFamily: "var(--font-mono)", color: "#0f172a", margin: "0.25rem 0" }}>
             {interestRate.toFixed(1)}%
           </div>
-          <div className="flex items-center justify-between gap-1 text-[11px] text-slate-500 mt-1">
+          <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", fontSize: "0.75rem", color: "#64748b" }}>
             <span>Trend:</span>
-            <strong className="text-slate-700">{rateTrend.trend}</strong>
+            <strong style={{ color: "#0f766e" }}>{rateTrend.trend}</strong>
           </div>
-          <div className={`mt-2 px-2 py-0.5 rounded text-[10px] font-bold text-center ${rateTrend.badge}`}>
+          <div
+            style={{
+              marginTop: "0.75rem",
+              padding: "0.3rem 0.6rem",
+              borderRadius: "6px",
+              fontSize: "0.72rem",
+              fontWeight: 700,
+              textAlign: "center",
+              backgroundColor: "#ffffff",
+              border: "1px solid #e2e8f0",
+              color: "#334155",
+            }}
+          >
             {rateTrend.note}
           </div>
         </div>
 
         {/* Card 2: Inflation CPI */}
-        <div className="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/60 flex flex-col justify-between">
-          <div className="flex items-center justify-between text-xs text-slate-500 font-semibold mb-1">
-            <span>LẠM PHÁT (CPI)</span>
-            <span className="font-mono text-[11px]">CPI</span>
+        <div
+          style={{
+            padding: "1rem 1.15rem",
+            borderRadius: "12px",
+            backgroundColor: "#f8fafc",
+            border: "1px solid #e2e8f0",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.25rem" }}>
+            <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#64748b", textTransform: "uppercase" }}>
+              INFLATION (CPI)
+            </span>
+            <span
+              style={{
+                width: "22px",
+                height: "22px",
+                borderRadius: "6px",
+                backgroundColor: "#dcfce7",
+                color: "#16a34a",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "0.7rem",
+                fontWeight: 800,
+              }}
+            >
+              CPI
+            </span>
           </div>
-          <div className="text-3xl font-black font-mono text-slate-900 tracking-tight my-1">
+          <div style={{ fontSize: "1.85rem", fontWeight: 900, fontFamily: "var(--font-mono)", color: "#0f172a", margin: "0.25rem 0" }}>
             {inflation.toFixed(1)}%
           </div>
-          <div className="flex items-center justify-between gap-1 text-[11px] text-slate-500 mt-1">
+          <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", fontSize: "0.75rem", color: "#64748b" }}>
             <span>Trend:</span>
-            <strong className="text-slate-700">{cpiTrend.trend}</strong>
+            <strong style={{ color: "#0f766e" }}>{cpiTrend.trend}</strong>
           </div>
-          <div className={`mt-2 px-2 py-0.5 rounded text-[10px] font-bold text-center ${cpiTrend.badge}`}>
+          <div
+            style={{
+              marginTop: "0.75rem",
+              padding: "0.3rem 0.6rem",
+              borderRadius: "6px",
+              fontSize: "0.72rem",
+              fontWeight: 700,
+              textAlign: "center",
+              backgroundColor: "#ffffff",
+              border: "1px solid #e2e8f0",
+              color: "#334155",
+            }}
+          >
             {cpiTrend.note}
           </div>
         </div>
 
         {/* Card 3: GDP Growth */}
-        <div className="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/60 flex flex-col justify-between">
-          <div className="flex items-center justify-between text-xs text-slate-500 font-semibold mb-1">
-            <span>TĂNG TRƯỞNG GDP</span>
-            <span className="font-mono text-[11px]">GDP</span>
+        <div
+          style={{
+            padding: "1rem 1.15rem",
+            borderRadius: "12px",
+            backgroundColor: "#f8fafc",
+            border: "1px solid #e2e8f0",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.25rem" }}>
+            <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#64748b", textTransform: "uppercase" }}>
+              GDP GROWTH
+            </span>
+            <span
+              style={{
+                width: "22px",
+                height: "22px",
+                borderRadius: "6px",
+                backgroundColor: "#ccfbf1",
+                color: "#0f766e",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "0.75rem",
+              }}
+            >
+              <TrendingUp size={13} />
+            </span>
           </div>
-          <div className="text-3xl font-black font-mono text-slate-900 tracking-tight my-1">
+          <div style={{ fontSize: "1.85rem", fontWeight: 900, fontFamily: "var(--font-mono)", color: "#0f172a", margin: "0.25rem 0" }}>
             {gdpGrowth.toFixed(1)}%
           </div>
-          <div className="flex items-center justify-between gap-1 text-[11px] text-slate-500 mt-1">
+          <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", fontSize: "0.75rem", color: "#64748b" }}>
             <span>Trend:</span>
-            <strong className="text-slate-700">{gdpTrend.trend}</strong>
+            <strong style={{ color: "#16a34a" }}>{gdpTrend.trend}</strong>
           </div>
-          <div className={`mt-2 px-2 py-0.5 rounded text-[10px] font-bold text-center ${gdpTrend.badge}`}>
+          <div
+            style={{
+              marginTop: "0.75rem",
+              padding: "0.3rem 0.6rem",
+              borderRadius: "6px",
+              fontSize: "0.72rem",
+              fontWeight: 700,
+              textAlign: "center",
+              backgroundColor: "#ffffff",
+              border: "1px solid #e2e8f0",
+              color: "#334155",
+            }}
+          >
             {gdpTrend.note}
           </div>
         </div>
       </div>
 
       {/* Aura Research Macro Callout Box */}
-      <div className="p-3.5 rounded-xl bg-blue-50/50 border border-blue-200/60 flex items-start gap-3">
-        <div className="p-2 rounded-lg bg-blue-500/10 text-blue-600 flex-shrink-0 mt-0.5">
-          <Lightbulb size={16} />
+      <div
+        style={{
+          padding: "1rem 1.25rem",
+          borderRadius: "12px",
+          backgroundColor: "#f0f9ff",
+          border: "1px solid #bae6fd",
+          display: "flex",
+          alignItems: "flex-start",
+          gap: "0.75rem",
+        }}
+      >
+        <div style={{ color: "#0284c7", flexShrink: 0, marginTop: "2px" }}>
+          <Lightbulb size={18} />
         </div>
-        <div className="text-xs leading-relaxed text-slate-700">
-          <strong className="text-slate-900 font-bold block mb-0.5">
-            Nhận Định Vĩ Mô Aura Research:
+        <div style={{ fontSize: "0.8rem", lineHeight: 1.6, color: "#334155" }}>
+          <strong style={{ color: "#0369a1", fontWeight: 800, display: "inline" }}>
+            Nhận Định Vĩ Mô Aura Research:{" "}
           </strong>
           <span>"{researchNote}"</span>
         </div>
@@ -158,3 +326,4 @@ export const ProMacroClimatePanel: React.FC<ProMacroClimatePanelProps> = ({
     </div>
   );
 };
+

@@ -252,6 +252,85 @@ export class AdminService {
       totalPages: 1,
     };
   }
+
+  /**
+   * Fetches paginated moderation review queue.
+   */
+  async listModerationQueue(params: {
+    status?: string;
+    targetType?: string;
+    page?: number;
+    limit?: number;
+  } = {}) {
+    const page = Math.max(1, Number(params.page) || 1);
+    const limit = Math.max(1, Math.min(50, Number(params.limit) || 10));
+    const skip = (page - 1) * limit;
+
+    const { items, total } = await this.repo.listModerationQueue({
+      status: params.status,
+      targetType: params.targetType,
+      skip,
+      take: limit,
+    });
+
+    return {
+      data: items,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit) || 1,
+    };
+  }
+
+  /**
+   * Resolves a moderation review item (DISMISS, HIDE, or DELETE).
+   */
+  async resolveModerationItem(
+    actorId: string,
+    itemId: string,
+    action: "DISMISS" | "HIDE" | "DELETE",
+    notes?: string,
+  ) {
+    return this.repo.resolveModerationItem(actorId, itemId, action, notes);
+  }
+
+  /**
+   * Fetches paginated immutable security & administrative audit records.
+   */
+  async listAuditRecords(params: {
+    eventType?: string;
+    actorId?: string;
+    page?: number;
+    limit?: number;
+  } = {}) {
+    const page = Math.max(1, Number(params.page) || 1);
+    const limit = Math.max(1, Math.min(100, Number(params.limit) || 25));
+    const skip = (page - 1) * limit;
+
+    const { records, total } = await this.repo.listAuditRecords({
+      eventType: params.eventType,
+      actorId: params.actorId,
+      skip,
+      take: limit,
+    });
+
+    return {
+      data: records,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit) || 1,
+    };
+  }
+
+  /**
+   * Fetches comprehensive learner detail for admin inspection.
+   */
+  async getLearnerDetails(userId: string) {
+    const data = await this.repo.getLearnerDetails(userId);
+    return { data };
+  }
 }
 
 export const adminService = new AdminService();
+

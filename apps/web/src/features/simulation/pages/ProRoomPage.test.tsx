@@ -119,8 +119,8 @@ describe("ProRoomPage", () => {
       </BrowserRouter>
     );
 
-    // Active session header
-    expect(screen.getByText(/DỮ LIỆU MÔ PHỎNG QUÝ 1/)).toBeDefined();
+    // Active session header (Figma layout: Quarter 1 of 12)
+    expect(screen.getByText(/Quarter 1 of 12/i)).toBeDefined();
 
     // Allocation sliders & donut legend (getAllByText since both slider and donut have asset keys)
     expect(screen.getAllByText(/EQ_GROWTH/).length).toBeGreaterThan(0);
@@ -128,8 +128,8 @@ describe("ProRoomPage", () => {
     expect(screen.getAllByText(/BOND/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/CASH/).length).toBeGreaterThan(0);
 
-    // AI Advisor box
-    expect(screen.getByText("Cố Vấn Đầu Tư Giá Trị (AI Advisor)")).toBeDefined();
+    // AI Advisor box (CrediFin AI Advisor)
+    expect(screen.getByText(/CrediFin AI Advisor/i)).toBeDefined();
   });
 
   it("renders final report state with investment certificate, metrics, and community share button", () => {

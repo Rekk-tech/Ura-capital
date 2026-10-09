@@ -14,6 +14,10 @@ describe("AdminService (FEAT-083: RBAC Self-Protection Guards & Boundaries)", ()
     cancelSimulationSession: ReturnType<typeof vi.fn>;
     getOperationalMetrics: ReturnType<typeof vi.fn>;
     listUsers: ReturnType<typeof vi.fn>;
+    listModerationQueue: ReturnType<typeof vi.fn>;
+    resolveModerationItem: ReturnType<typeof vi.fn>;
+    listAuditRecords: ReturnType<typeof vi.fn>;
+    getLearnerDetails: ReturnType<typeof vi.fn>;
   };
   let adminService: AdminService;
 
@@ -27,6 +31,10 @@ describe("AdminService (FEAT-083: RBAC Self-Protection Guards & Boundaries)", ()
       cancelSimulationSession: vi.fn(),
       getOperationalMetrics: vi.fn(),
       listUsers: vi.fn(),
+      listModerationQueue: vi.fn(),
+      resolveModerationItem: vi.fn(),
+      listAuditRecords: vi.fn(),
+      getLearnerDetails: vi.fn(),
     };
     adminService = new AdminService(mockRepo as unknown as IAdminRepository);
   });
@@ -211,4 +219,97 @@ describe("AdminService (FEAT-083: RBAC Self-Protection Guards & Boundaries)", ()
       expect(res.total).toBe(1);
     });
   });
+
+  describe("listModerationQueue & resolveModerationItem", () => {
+    it("delegates listModerationQueue to repository with correct pagination parameters", async () => {
+      mockRepo.listModerationQueue.mockResolvedValue({
+        items: [
+          {
+            id: "mod-1",
+            targetType: "POST",
+            targetId: "post-1",
+            authorId: "user-1",
+            authorName: "John",
+            snippet: "Test snippet",
+            reason: "Spam",
+            reportCount: 3,
+            status: "PENDING",
+            reportedAt: "2026-10-01T00:00:00Z",
+          },
+        ],
+        total: 1,
+      });
+
+      const res = await adminService.listModerationQueue({ status: "PENDING", page: 1, limit: 10 });
+      expect(res.data.length).toBe(1);
+      expect(res.data[0].id).toBe("mod-1");
+      expect(res.total).toBe(1);
+      expect(mockRepo.listModerationQueue).toHaveBeenCalledWith({
+        status: "PENDING",
+        targetType: undefined,
+        skip: 0,
+        take: 10,
+      });
+    });
+
+    it("delegates resolveModerationItem to repository", async () => {
+      mockRepo.resolveModerationItem.mockResolvedValue({
+        success: true,
+        itemId: "mod-1",
+        status: "RESOLVED",
+      });
+
+      const res = await adminService.resolveModerationItem("admin-123", "mod-1", "HIDE", "Hidden for review");
+      expect(res.success).toBe(true);
+      expect(res.status).toBe("RESOLVED");
+      expect(mockRepo.resolveModerationItem).toHaveBeenCalledWith("admin-123", "mod-1", "HIDE", "Hidden for review");
+    });
+  });
+
+  describe("listAuditRecords", () => {
+    it("delegates listAuditRecords to repository with pagination and filters", async () => {
+      mockRepo.listAuditRecords.mockResolvedValue({
+        records: [
+          {
+            id: "aud-1",
+            eventType: "USER_STATUS_CHANGE",
+            actorId: "admin-123",
+            targetEntity: "USER",
+            status: "SUCCESS",
+            timestamp: "2026-10-01T00:00:00Z",
+          },
+        ],
+        total: 1,
+      });
+
+      const res = await adminService.listAuditRecords({ eventType: "USER_STATUS_CHANGE", page: 1, limit: 25 });
+      expect(res.data.length).toBe(1);
+      expect(res.data[0].eventType).toBe("USER_STATUS_CHANGE");
+      expect(mockRepo.listAuditRecords).toHaveBeenCalledWith({
+        eventType: "USER_STATUS_CHANGE",
+        actorId: undefined,
+        skip: 0,
+        take: 25,
+      });
+    });
+  });
+
+  describe("getLearnerDetails", () => {
+    it("delegates getLearnerDetails to repository", async () => {
+      mockRepo.getLearnerDetails.mockResolvedValue({
+        userId: "usr-456",
+        totalXp: 2100,
+        level: 5,
+        courses: [],
+        map1Survival: { hasSurvived: true, badge: "Survivor", roundsCompleted: 7, highestNav: 150000000 },
+        portfolio: { nav: 110000000, cash: 30000000, unrealizedPnl: 5000000, unrealizedPnlPercent: 5 },
+      });
+
+      const res = await adminService.getLearnerDetails("usr-456");
+      expect(res.data.userId).toBe("usr-456");
+      expect(res.data.level).toBe(5);
+      expect(mockRepo.getLearnerDetails).toHaveBeenCalledWith("usr-456");
+    });
+  });
 });
+

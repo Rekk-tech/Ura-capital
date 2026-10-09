@@ -98,6 +98,73 @@ export class AdminController {
       next(error);
     }
   }
+
+  async listModerationQueue(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { status, targetType, page, limit } = req.query;
+      const result = await this.service.listModerationQueue({
+        status: typeof status === "string" ? status : undefined,
+        targetType: typeof targetType === "string" ? targetType : undefined,
+        page: page ? Number(page) : undefined,
+        limit: limit ? Number(limit) : undefined,
+      });
+      res.status(HTTP_STATUS.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async resolveModerationItem(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const actorId = req.user?.id;
+      if (!actorId) {
+        throw new AppError("Authentication required", ERROR_CODES.UNAUTHENTICATED, HTTP_STATUS.UNAUTHORIZED);
+      }
+      const rawItemId = req.params.itemId;
+      const itemId = Array.isArray(rawItemId) ? rawItemId[0] : rawItemId;
+      const { action, notes } = req.body;
+      if (!itemId || !action) {
+        throw new AppError("itemId and action are required", ERROR_CODES.VALIDATION_ERROR, HTTP_STATUS.BAD_REQUEST);
+      }
+      if (!["DISMISS", "HIDE", "DELETE"].includes(action)) {
+        throw new AppError("action must be DISMISS, HIDE, or DELETE", ERROR_CODES.VALIDATION_ERROR, HTTP_STATUS.BAD_REQUEST);
+      }
+      const result = await this.service.resolveModerationItem(actorId, itemId, action, notes);
+      res.status(HTTP_STATUS.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async listAuditRecords(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { eventType, actorId, page, limit } = req.query;
+      const result = await this.service.listAuditRecords({
+        eventType: typeof eventType === "string" ? eventType : undefined,
+        actorId: typeof actorId === "string" ? actorId : undefined,
+        page: page ? Number(page) : undefined,
+        limit: limit ? Number(limit) : undefined,
+      });
+      res.status(HTTP_STATUS.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getLearnerDetails(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const rawUserId = req.params.userId;
+      const userId = Array.isArray(rawUserId) ? rawUserId[0] : rawUserId;
+      if (!userId) {
+        throw new AppError("userId is required", ERROR_CODES.VALIDATION_ERROR, HTTP_STATUS.BAD_REQUEST);
+      }
+      const result = await this.service.getLearnerDetails(userId);
+      res.status(HTTP_STATUS.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const adminController = new AdminController();
+

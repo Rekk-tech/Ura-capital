@@ -1,7 +1,7 @@
 import React from "react";
 import type { Map2Allocation } from "../../types/map-game.types";
 import { formatCurrency } from "../../../portfolio/utils/portfolioCalculations";
-import { Sliders, RefreshCw, Lock, ArrowRight } from "lucide-react";
+import { RefreshCw, Lock, ArrowRight } from "lucide-react";
 
 interface ProAllocationCockpitProps {
   currentQuarter: number;
@@ -98,28 +98,39 @@ export const ProAllocationCockpit: React.FC<ProAllocationCockpitProps> = ({
   ];
 
   return (
-    <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex flex-col gap-4">
+    <div className="pro-card" style={{ padding: "1.5rem" }}>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "0.5rem",
+          paddingBottom: "0.85rem",
+          borderBottom: "1px solid #f1f5f9",
+        }}
+      >
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="p-1 rounded-md bg-blue-50 text-blue-600 border border-blue-200">
-              <Sliders size={16} />
-            </span>
-            <h3 className="text-base font-bold text-slate-900 tracking-tight">
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
+            <h3 style={{ fontSize: "1.05rem", fontWeight: 800, color: "#0f172a", margin: 0, letterSpacing: "-0.01em" }}>
               Phân Bổ Danh Mục Quý {currentQuarter}
             </h3>
             <span
-              className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider ${
-                isValid
-                  ? "bg-emerald-50 text-emerald-700 border border-emerald-300"
-                  : "bg-rose-50 text-rose-700 border border-rose-300"
-              }`}
+              style={{
+                display: "inline-block",
+                padding: "0.15rem 0.5rem",
+                borderRadius: "9999px",
+                fontSize: "0.68rem",
+                fontWeight: 800,
+                backgroundColor: isValid ? "#ccfbf1" : "#ffe4e6",
+                color: isValid ? "#0f766e" : "#be123c",
+              }}
             >
               {isValid ? "Hợp Lệ: 100%" : `Chưa Đủ: ${total}%`}
             </span>
           </div>
-          <p className="text-xs text-slate-500">
+          <p style={{ margin: 0, fontSize: "0.78rem", color: "#64748b" }}>
             Thiết lập tỷ trọng phân bổ vốn trước khi đóng chu kỳ quý
           </p>
         </div>
@@ -127,71 +138,114 @@ export const ProAllocationCockpit: React.FC<ProAllocationCockpitProps> = ({
         <button
           type="button"
           onClick={handleAutoBalance}
-          className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 hover:underline"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.3rem",
+            background: "none",
+            border: "none",
+            color: "#2563eb",
+            fontSize: "0.75rem",
+            fontWeight: 600,
+            cursor: "pointer",
+          }}
         >
           <RefreshCw size={12} />
           <span>Tự Động Cân Bằng 100%</span>
         </button>
       </div>
 
-      {/* Multi-color Segmented Progress Bar */}
-      <div className="flex flex-col gap-1.5">
-        <div className="w-full h-3 rounded-full bg-slate-100 overflow-hidden flex shadow-inner border border-slate-200/60">
-          <div style={{ width: `${allocation.growth}%`, backgroundColor: "#3b82f6" }} className="transition-all duration-200" title={`Growth: ${allocation.growth}%`} />
-          <div style={{ width: `${allocation.value}%`, backgroundColor: "#06b6d4" }} className="transition-all duration-200" title={`Value: ${allocation.value}%`} />
-          <div style={{ width: `${allocation.bond}%`, backgroundColor: "#10b981" }} className="transition-all duration-200" title={`Bond: ${allocation.bond}%`} />
-          <div style={{ width: `${allocation.cash}%`, backgroundColor: "#f59e0b" }} className="transition-all duration-200" title={`Cash: ${allocation.cash}%`} />
+      {/* Segmented Distribution Progress Bar */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+        <div
+          style={{
+            width: "100%",
+            height: "8px",
+            borderRadius: "9999px",
+            backgroundColor: "#f1f5f9",
+            overflow: "hidden",
+            display: "flex",
+            border: "1px solid #e2e8f0",
+          }}
+        >
+          <div style={{ width: `${allocation.growth}%`, backgroundColor: "#0284c7", transition: "width 0.2s" }} />
+          <div style={{ width: `${allocation.value}%`, backgroundColor: "#8b5cf6", transition: "width 0.2s" }} />
+          <div style={{ width: `${allocation.bond}%`, backgroundColor: "#0d9488", transition: "width 0.2s" }} />
+          <div style={{ width: `${allocation.cash}%`, backgroundColor: "#a5f3fc", transition: "width 0.2s" }} />
         </div>
 
-        {/* Legend */}
-        <div className="flex flex-wrap items-center justify-between text-[11px] font-medium text-slate-600 px-0.5">
-          <div className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: "#3b82f6" }} />
+        {/* Legend with Color Dots */}
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            fontSize: "0.72rem",
+            color: "#64748b",
+            fontWeight: 500,
+            padding: "0 2px",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+            <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#0284c7" }} />
             <span>Growth ({allocation.growth}%)</span>
           </div>
-          <div className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: "#06b6d4" }} />
+          <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+            <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#8b5cf6" }} />
             <span>Value ({allocation.value}%)</span>
           </div>
-          <div className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: "#10b981" }} />
+          <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+            <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#0d9488" }} />
             <span>Bonds ({allocation.bond}%)</span>
           </div>
-          <div className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: "#f59e0b" }} />
+          <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+            <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#a5f3fc" }} />
             <span>Cash ({allocation.cash}%)</span>
           </div>
         </div>
       </div>
 
       {/* 4 Asset Allocation Sliders */}
-      <div className="flex flex-col gap-3">
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", width: "100%", boxSizing: "border-box" }}>
         {assetSpecs.map((item) => (
           <div
             key={item.key}
-            className="p-3.5 rounded-xl border border-slate-200/80 bg-slate-50/50 hover:bg-slate-50 transition-colors flex flex-col gap-2"
+            style={{
+              padding: "0.85rem 1rem",
+              borderRadius: "12px",
+              backgroundColor: "#f8fafc",
+              border: "1px solid #e2e8f0",
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.5rem",
+              boxSizing: "border-box",
+              width: "100%",
+              overflow: "hidden",
+            }}
           >
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <div className="flex items-center gap-2">
-                  <h4 className="text-xs font-bold text-slate-900">{item.name}</h4>
-                  {item.badge && (
-                    <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold border ${item.badgeColor}`}>
-                      {item.badge}
-                    </span>
-                  )}
+            {/* Title and Percent */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "0.5rem" }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", flexWrap: "wrap" }}>
+                  <h4 style={{ margin: 0, fontSize: "0.82rem", fontWeight: 800, color: "#0f172a" }}>
+                    {item.name}
+                  </h4>
                 </div>
-                <p className="text-[11px] text-slate-500 mt-0.5">{item.desc}</p>
+                <p style={{ margin: "2px 0 0", fontSize: "0.72rem", color: "#64748b" }}>
+                  {item.desc}
+                </p>
               </div>
 
-              {/* Percentage & Amount */}
-              <div className="text-right flex-shrink-0">
-                <span className="text-sm font-black font-mono text-slate-900">{item.pct} %</span>
+              <div style={{ textAlign: "right", flexShrink: 0 }}>
+                <span style={{ fontSize: "1.1rem", fontWeight: 900, fontFamily: "var(--font-mono)", color: "#0f172a" }}>
+                  {item.pct}{" "}
+                  <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "#64748b" }}>%</span>
+                </span>
               </div>
             </div>
 
-            {/* Slider */}
-            <div className="flex items-center gap-3">
+            {/* Slider track container */}
+            <div style={{ width: "100%", boxSizing: "border-box", padding: "2px 0" }}>
               <input
                 type="range"
                 min={0}
@@ -199,41 +253,87 @@ export const ProAllocationCockpit: React.FC<ProAllocationCockpitProps> = ({
                 step={5}
                 value={item.pct}
                 onChange={(e) => handleSliderChange(item.key, Number(e.target.value))}
-                className={`w-full h-1.5 rounded-lg bg-slate-200 cursor-pointer ${item.sliderAccent}`}
+                className={`pro-slider-input pro-slider-${item.key}`}
+                style={{
+                  background: `linear-gradient(to right, ${item.color} 0%, ${item.color} ${item.pct}%, #e2e8f0 ${item.pct}%, #e2e8f0 100%)`,
+                }}
+                aria-label={item.name}
               />
             </div>
 
-            <div className="flex items-center justify-between text-[11px] pt-1 border-t border-slate-200/40">
-              <span className="text-slate-400">Số tiền phân bổ:</span>
-              <strong className="font-mono text-slate-800 font-semibold">{formatCurrency(item.amount)}</strong>
+            {/* Amount display */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                fontSize: "0.72rem",
+                color: "#64748b",
+                paddingTop: "0.25rem",
+                borderTop: "1px solid #f1f5f9",
+              }}
+            >
+              <span>Số tiền phân bổ:</span>
+              <strong style={{ color: "#0f172a", fontFamily: "var(--font-mono)", fontWeight: 800 }}>
+                {formatCurrency(item.amount)}
+              </strong>
             </div>
           </div>
         ))}
       </div>
 
       {/* Total Verification Bar */}
-      <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
-        <span className="text-xs font-bold text-slate-600">Tổng tỷ lệ xác lập:</span>
+      <div
+        style={{
+          padding: "0.75rem 1rem",
+          borderRadius: "10px",
+          backgroundColor: "#f8fafc",
+          border: "1px solid #e2e8f0",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "#475569" }}>
+          Tổng tỷ lệ xác lập:
+        </span>
         <strong
-          className={`font-mono text-sm font-black ${
-            isValid ? "text-emerald-600" : "text-rose-600"
-          }`}
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "0.95rem",
+            fontWeight: 900,
+            color: isValid ? "#0f766e" : "#e11d48",
+          }}
         >
           {total}% / 100%
         </strong>
       </div>
 
-      {/* Commit CTA Button */}
-      <div className="flex flex-col gap-2">
+      {/* Primary Confirmation CTA Button */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
         <button
           type="button"
           disabled={!isValid || isCommitting}
           onClick={onCommit}
-          className={`w-full py-3.5 px-4 rounded-xl font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md ${
-            isValid && !isCommitting
-              ? "bg-slate-900 hover:bg-slate-950 text-white cursor-pointer active:scale-[0.99]"
-              : "bg-slate-200 text-slate-400 cursor-not-allowed"
-          }`}
+          style={{
+            width: "100%",
+            padding: "0.95rem 1.25rem",
+            borderRadius: "12px",
+            fontWeight: 900,
+            fontSize: "0.85rem",
+            letterSpacing: "0.04em",
+            textTransform: "uppercase",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "0.5rem",
+            border: "none",
+            backgroundColor: isValid && !isCommitting ? "#0b192c" : "#e2e8f0",
+            color: isValid && !isCommitting ? "#ffffff" : "#94a3b8",
+            cursor: isValid && !isCommitting ? "pointer" : "not-allowed",
+            boxShadow: isValid ? "0 4px 12px rgba(11, 25, 44, 0.2)" : "none",
+            transition: "all 0.2s ease",
+          }}
         >
           {isCommitting ? (
             <span>Đang ghi nhận phân bổ...</span>
@@ -245,11 +345,24 @@ export const ProAllocationCockpit: React.FC<ProAllocationCockpitProps> = ({
           )}
         </button>
 
-        <p className="text-[11px] text-slate-400 text-center leading-relaxed flex items-center justify-center gap-1">
-          <Lock size={12} className="flex-shrink-0" />
-          <span>Quyết định sẽ chốt phân bổ cho 3 tháng tiếp theo. Không thể rút lệnh sau khi xác nhận.</span>
+        <p
+          style={{
+            margin: 0,
+            fontSize: "0.72rem",
+            color: "#94a3b8",
+            textAlign: "center",
+            lineHeight: 1.5,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "0.35rem",
+          }}
+        >
+          <Lock size={12} style={{ flexShrink: 0 }} />
+          <span>Quyết định sẽ chốt phân bổ cho 3 tháng tiếp theo. Không thể rút lệnh sau khi xác nhận chốt quý.</span>
         </p>
       </div>
     </div>
   );
 };
+
