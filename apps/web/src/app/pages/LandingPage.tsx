@@ -17,7 +17,6 @@ import {
   Zap,
 } from "lucide-react";
 import { useAuth } from "../../features/auth/context/AuthContext";
-import { openAiCoach } from "../../features/ai";
 
 
 /**
@@ -315,7 +314,7 @@ export const LandingPage: React.FC = () => {
               Bắt đầu hoàn toàn miễn phí. Nâng cấp khi cần công cụ phân tích danh mục chuyên sâu và mở rộng hạn ngạch giao dịch.
             </p>
             <div className="card-footer-action">
-              <span className="badge badge-amber-subtle">Sắp Ra Mắt</span>
+              <span className="badge badge-success-subtle">Kích Hoạt</span>
               <Link to="/subscription" className="card-action-link">
                 <span>Xem Chi Tiết Gói →</span>
               </Link>
@@ -358,24 +357,18 @@ export const LandingPage: React.FC = () => {
             </p>
             <div className="card-footer-action">
               <span className="badge badge-warning-subtle">Phase 8 Intelligence — Coming Soon</span>
-              <button
-                type="button"
+              <Link
+                to="/ai"
                 className="card-action-link"
                 style={{
-                  background: "none",
-                  border: "none",
-                  padding: 0,
-                  cursor: "pointer",
-                  font: "inherit",
                   display: "inline-flex",
                   alignItems: "center",
                   gap: "4px",
                 }}
-                onClick={() => openAiCoach("GENERAL")}
                 aria-label="Khám phá Cố vấn AI Aura Intelligence"
               >
-                <span>Trò Chuyện Cùng Cố Vấn →</span>
-              </button>
+                <span>Vào AI Studio →</span>
+              </Link>
             </div>
           </div>
         </div>

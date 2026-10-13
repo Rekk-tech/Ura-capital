@@ -1,50 +1,28 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+# Aura Capital Project Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Server Authority & Financial Data Integrity (NON-NEGOTIABLE)
+All financial figures, portfolio NAV, cash balances, transaction orders, simulation cycles, XP rewards, and subscription entitlements are strictly server-authoritative. The client is a presentation and interaction surface; it MUST NEVER compute authoritative monetary balances, alter order fills, or forge subscription entitlements.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Persistence Boundary & Infrastructure Integrity
+PostgreSQL managed via Prisma ORM and transaction runners is the sole authoritative persistence layer. Direct mutable filesystem persistence (`writeFile`, `appendFile`, file-based database engines like `lowdb` or `db.json`) is strictly prohibited in runtime code and continuously enforced by automated boundary test guards.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Model-Based AI Guardrails & Tiered Access Governance
+All LLM and AI Agent interactions must pass through Model-Based Safety Guardrails assessing domain relevance (financial education, investment analysis) and eliminating toxic/adversarial prompt injections before agent processing. Access to real-time AI advisory is strictly limited to authenticated VIP Patron members and System Administrators, protected by token-bucket rate limiting to guarantee infrastructure resilience.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Canonical Route Governance & Honest Presentation
+Every route registered in `ROUTE_REGISTRY` must reflect true system capability. No routes may falsely advertise unimplemented features. Once marked `AVAILABLE`, routes must provide a complete, accessible, keyboard-navigable experience with deterministic loading and error boundaries.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Test-First Rigor & Type Safety Gates
+Every business domain (Academy, Simulation, Portfolio, Community, Subscription, AI Studio, Admin) requires comprehensive unit, integration, and contract tests. Zero TypeScript errors (`tsc --noEmit` exit code 0) and zero persistence guard violations are mandatory preconditions for all merged code.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
-
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
-
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
-
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+## Quality Standards & Technical Stack
+- **Web**: React 18, Vite, TypeScript (strict), TanStack Query, Lucide Icons, Vanilla CSS with design tokens.
+- **API**: Node.js, Express, TypeScript, Prisma ORM, Redis (rate-limiting cache), Zod validation schemas.
+- **Shared**: Canonical schemas, DTOs, and error envelopes shared via `@aura/shared`.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+This constitution supersedes all ad-hoc conventions. Any architectural modifications to persistence, auth/role tiers, or routing invariants require specification under `.specify/specs/` and verification against the persistence boundary test suite.
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
-
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-10-13 | **Status**: ACTIVE

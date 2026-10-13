@@ -53,8 +53,9 @@ describe("Route Registry (FEAT-070 / AC-001)", () => {
 
     const ai = findRouteByPath("/ai");
     expect(ai?.id).toBe("ai");
-    expect(ai?.status).toBe("DEFERRED");
-    expect(ai?.targetPhase).toBe("Phase 8 (Frozen / Post-MVP)");
+    expect(ai?.status).toBe("AVAILABLE");
+    expect(ai?.owningFeature).toBe("FEAT-086");
+    expect(ai?.requiresAuth).toBe(true);
 
     const simulation = findRouteByPath("/simulation");
     expect(simulation?.id).toBe("simulation");

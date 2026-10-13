@@ -348,15 +348,14 @@ export const ROUTE_REGISTRY: Record<RouteKey, RouteMetadata> = {
   ai: {
     id: "ai",
     path: CANONICAL_ROUTES.AI_COACH,
-    title: "Aura Intelligence (AI Coach)",
-    description: "Context-aware financial education assistant (Phase 8).",
-    navLabel: "AI Coach",
-    status: "DEFERRED",
+    title: "Aura Intelligence (AI Studio)",
+    description: "Dedicated financial education & market intelligence workspace with Model-based Guardrails.",
+    navLabel: "AI Studio",
+    status: "AVAILABLE",
     requiresAuth: true,
     isNavVisible: false,
     section: "ai",
-    owningFeature: "FEAT-078",
-    targetPhase: "Phase 8 (Frozen / Post-MVP)",
+    owningFeature: "FEAT-086",
   },
 };
 

@@ -5,9 +5,7 @@ import { AppFooter } from "./AppFooter";
 import { ScrollToTop } from "./ScrollToTop";
 import { RouteErrorBoundary } from "../components/RouteErrorBoundary";
 import { NotFoundPage } from "../components/NotFoundPage";
-import { PlannedRoutePlaceholder } from "../components/PlannedRoutePlaceholder";
 import { LandingPage } from "../pages/LandingPage";
-import { ROUTE_REGISTRY } from "../router/route-registry";
 import { LoginPage } from "../../features/auth/pages/LoginPage";
 import { RegisterPage } from "../../features/auth/pages/RegisterPage";
 import { AccountPage } from "../../features/auth/pages/AccountPage";
@@ -20,7 +18,7 @@ import { CommunityRoutes } from "../router/community-routes";
 import { SubscriptionRoutes } from "../router/subscription-routes";
 import { AdminRoutes } from "../../features/admin/routes/admin-routes";
 import { ProfileSettingsPage } from "../../features/profile/pages/ProfileSettingsPage";
-import { AiCoachWidget } from "../../features/ai";
+import { AiCoachWidget, AiStudioPage } from "../../features/ai";
 
 /**
  * FEAT-070 / FEAT-071 / FEAT-072 / FEAT-073 / FEAT-074 / FEAT-075 / FEAT-076 / FEAT-077: Standard Application Shell
@@ -93,10 +91,14 @@ export const AppShell: React.FC = () => {
             {/* Admin Control Surface UI (FEAT-077) */}
             <Route path="/admin/*" element={<AdminRoutes />} />
 
-            {/* Honest Planned MVP Placeholders */}
+            {/* Dedicated Aura Intelligence AI Studio (FEAT-086) */}
             <Route
               path="/ai"
-              element={<PlannedRoutePlaceholder route={ROUTE_REGISTRY.ai} />}
+              element={
+                <ProtectedRoute>
+                  <AiStudioPage />
+                </ProtectedRoute>
+              }
             />
 
             {/* 404 Fallback for unknown routes */}

@@ -8,3 +8,4 @@ export { openAiCoach, AURA_OPEN_AI_COACH_EVENT } from "./events";
 export type { AiCoachContext } from "./events";
 export { useAiCoach } from "./hooks/useAiCoach";
 export type { CoachMessage } from "./hooks/useAiCoach";
+export { AiStudioPage } from "./pages/AiStudioPage";

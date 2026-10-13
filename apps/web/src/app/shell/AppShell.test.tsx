@@ -156,13 +156,21 @@ describe("AppShell & Route Governance (FEAT-070 / AC-001..AC-008)", () => {
       expect(screen.getByText(/Sign in to view your subscription/i)).toBeDefined();
     });
 
-    it("renders deferred route placeholder for /ai without claiming ready", () => {
+    it("renders live AI studio route for /ai with auth enforcement", () => {
       renderShell("/ai");
+      expect(screen.getByRole("heading", { name: /please sign in/i })).toBeDefined();
+
+      // When authenticated as admin/VIP, renders live studio
+      renderShell("/ai", "valid-token", {
+        id: "u-admin",
+        email: "admin@aura.test",
+        displayName: "Admin Operator",
+        status: "ACTIVE",
+        role: "ADMIN",
+      });
       expect(
-        screen.getByRole("heading", { name: /aura intelligence/i })
+        screen.getByRole("heading", { name: /aura intelligence ai studio/i })
       ).toBeDefined();
-      expect(screen.getByText("Deferred for AI Enhancement")).toBeDefined();
-      expect(screen.getByText("FEAT-078")).toBeDefined();
     });
 
     it("catches render errors in RouteErrorBoundary without exposing stack traces or secrets", () => {

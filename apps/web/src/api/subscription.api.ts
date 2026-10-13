@@ -27,11 +27,6 @@ export interface ISubscriptionApiClient {
     accessToken: string,
     options?: SubscriptionRequestOptions,
   ): Promise<CancelSubscriptionResult>;
-  checkout?(
-    accessToken: string,
-    plan?: string,
-    options?: SubscriptionRequestOptions,
-  ): Promise<unknown>;
 }
 
 const SAFE_ERROR_MESSAGES: Readonly<Record<number, string>> = Object.freeze({
@@ -161,25 +156,6 @@ export class SubscriptionApiClient implements ISubscriptionApiClient {
     } catch {
       throw this.invalidResponseError();
     }
-  }
-
-  async checkout(
-    accessToken: string,
-    plan = "PREMIUM",
-    options?: SubscriptionRequestOptions,
-  ): Promise<unknown> {
-    const response = await fetch(`${this.baseUrl}/checkout`, {
-      method: "POST",
-      headers: {
-        ...this.authHeaders(accessToken),
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ plan }),
-      signal: options?.signal,
-    });
-
-    if (!response.ok) throw this.toSafeError(response);
-    return await this.readJson(response);
   }
 
   private authHeaders(accessToken: string): Record<string, string> {

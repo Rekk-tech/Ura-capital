@@ -82,15 +82,6 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({
   const handleUpgrade = async () => {
     setIsUpgrading(true);
     try {
-      if (accessToken && isSubscriptionCommandUiEnabled(commandEnvironment)) {
-        try {
-          if (subscriptionApi.checkout) {
-            await subscriptionApi.checkout(accessToken, "PREMIUM");
-          }
-        } catch {
-          // Dev / mock fallback
-        }
-      }
       gamificationService.unlockBadge("VIP_PATRON");
       gamificationService.addXp(500);
       setUpgradeBonusClaimed(true);
