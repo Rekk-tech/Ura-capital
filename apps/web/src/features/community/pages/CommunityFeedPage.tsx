@@ -11,6 +11,7 @@ import {
   CommunityEmptyState,
   CommunityErrorCard,
 } from "../components/CommunityStates";
+import { SimulationLeaderboard } from "../../simulation/components/SimulationLeaderboard";
 
 export const CommunityFeedPage: React.FC = () => {
   const { accessToken, isAuthenticated, isLoading: isAuthLoading } = useAuth();
@@ -57,6 +58,14 @@ export const CommunityFeedPage: React.FC = () => {
           Exchange financial analysis, learning takeaways, and investment strategies with peers.
         </p>
       </section>
+
+      {/* Community Trader Leaderboard Spotlight */}
+      <div style={{ marginBottom: "2rem" }}>
+        <SimulationLeaderboard
+          title="Bảng Vinh Danh Nhà Đầu Tư Cộng Đồng"
+          subtitle="Top các nhà đầu tư giả lập có hiệu suất sinh lời và kỷ luật rủi ro cao nhất được cộng đồng Aura Capital vinh danh."
+        />
+      </div>
 
       {/* Post Composer */}
       <PostComposer

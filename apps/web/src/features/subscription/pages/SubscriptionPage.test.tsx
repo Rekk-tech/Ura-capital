@@ -338,4 +338,17 @@ describe("SubscriptionPage", () => {
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
     );
   });
+
+  it("renders upgrade CTA in development and unlocks VIP Patron badge on click", async () => {
+    renderPage({ environment: "development" });
+
+    await waitFor(() => expect(screen.getByText("Your Free plan is active")).toBeDefined());
+    const upgradeBtn = screen.getByTestId("subscription-upgrade-button");
+    expect(upgradeBtn).toBeDefined();
+
+    fireEvent.click(upgradeBtn);
+    await waitFor(() =>
+      expect(screen.getByText(/VIP Patron Badge unlocked/i)).toBeDefined(),
+    );
+  });
 });

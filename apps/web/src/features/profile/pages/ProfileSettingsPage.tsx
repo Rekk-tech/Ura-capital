@@ -15,6 +15,7 @@ import { useProfileQuery, useSessionsQuery } from "../hooks/use-profile";
 import { ProfileDetailsForm } from "../components/ProfileDetailsForm";
 import { ChangePasswordForm } from "../components/ChangePasswordForm";
 import { ActiveSessionsList } from "../components/ActiveSessionsList";
+import { GamificationCockpit } from "../../dashboard/components/GamificationCockpit";
 
 export type ProfileTab = "profile" | "security" | "sessions";
 
@@ -279,6 +280,9 @@ export const ProfileSettingsPage: React.FC = () => {
               accessToken={effectiveToken}
               onProfileUpdated={() => void profileQuery.refetch()}
             />
+            <div style={{ marginTop: "2rem" }}>
+              <GamificationCockpit />
+            </div>
           </div>
         )}
 

@@ -1,6 +1,7 @@
 import React from "react";
 import { ProtectedRoute } from "../../auth/components/ProtectedRoute";
 import { DashboardHeader } from "../components/DashboardHeader";
+import { GamificationCockpit } from "../components/GamificationCockpit";
 import { AcademySummaryWidget } from "../components/AcademySummaryWidget";
 import { SimulationSummaryWidget } from "../components/SimulationSummaryWidget";
 import { CommunitySummaryWidget } from "../components/CommunitySummaryWidget";
@@ -24,6 +25,9 @@ const DashboardView: React.FC = () => {
       <div className="dashboard-layout">
         {/* Header Banner */}
         <DashboardHeader />
+
+        {/* Gamification Cockpit & Trader Level Progression */}
+        <GamificationCockpit />
 
         {/* Cross-Domain Widgets Grid */}
         <div className="dashboard-grid">

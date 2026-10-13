@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { Map1DebriefReport } from "../../types/map-game.types";
-import { Award, AlertOctagon, CheckCircle2, TrendingUp, TrendingDown, ArrowRight, RotateCcw } from "lucide-react";
+import { Award, AlertOctagon, CheckCircle2, TrendingUp, TrendingDown, ArrowRight, RotateCcw, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { gamificationService } from "../../services/gamification.service";
 
 interface FomoDebriefViewProps {
   report: Map1DebriefReport;
@@ -14,9 +15,50 @@ export const FomoDebriefView: React.FC<FomoDebriefViewProps> = ({
 }) => {
   const navigate = useNavigate();
   const isSurvived = report.isSurvived || report.status === "completed_survived";
+  const hasRecordedRef = useRef(false);
+  const [awardInfo, setAwardInfo] = useState<{ xpAwarded: number; badgeUnlocked?: string } | null>(null);
+
+  useEffect(() => {
+    if (!hasRecordedRef.current) {
+      hasRecordedRef.current = true;
+      const res = gamificationService.recordMap1Run({
+        finalNav: report.finalNav,
+        initialNav: 10000000,
+        fomoIndex: report.fomoScore ?? 45,
+      });
+      setAwardInfo(res);
+    }
+  }, [report.finalNav, report.fomoScore]);
 
   return (
     <div className="fomo-debrief-view max-w-4xl mx-auto flex flex-col gap-6 animate-in fade-in duration-300">
+      {/* Gamification Reward Notification */}
+      {awardInfo && (
+        <div className="p-3.5 bg-gradient-to-r from-amber-500/15 via-purple-500/15 to-blue-500/15 border border-amber-500/30 rounded-2xl flex items-center justify-between shadow-sm">
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 rounded-lg bg-amber-500 text-slate-950 font-black">
+              <Sparkles size={16} />
+            </div>
+            <div>
+              <span className="font-bold text-xs text-slate-900 block">
+                +{awardInfo.xpAwarded} XP đã được cộng vào Hồ sơ học viên của bạn!
+              </span>
+              {awardInfo.badgeUnlocked && (
+                <span className="text-[11px] font-semibold text-amber-700">
+                  Mở khóa: {awardInfo.badgeUnlocked}
+                </span>
+              )}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate("/dashboard")}
+            className="text-xs font-bold text-blue-600 hover:text-blue-800 underline underline-offset-2"
+          >
+            Xem Dashboard →
+          </button>
+        </div>
+      )}
       {/* Hero Outcome Banner */}
       <div
         className={`p-6 rounded-2xl border shadow-lg flex flex-col md:flex-row items-center justify-between gap-6 ${

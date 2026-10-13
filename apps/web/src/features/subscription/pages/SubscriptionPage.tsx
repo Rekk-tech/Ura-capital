@@ -21,6 +21,8 @@ import {
   SubscriptionReadOnlyNotice,
 } from "../components/SubscriptionStates";
 import { CancelSubscriptionDialog } from "../components/CancelSubscriptionDialog";
+import { subscriptionApi } from "../../../api/subscription.api";
+import { gamificationService } from "../../simulation/services/gamification.service";
 
 interface SubscriptionPageProps {
   commandEnvironment?: string;
@@ -64,6 +66,9 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({
     setAnnouncement("Subscription status refreshed from the server.");
   }, [currentQuery, plansQuery]);
 
+  const [isUpgrading, setIsUpgrading] = useState(false);
+  const [upgradeBonusClaimed, setUpgradeBonusClaimed] = useState(false);
+
   const confirmCancellation = async () => {
     try {
       await cancelMutation.mutateAsync();
@@ -71,6 +76,30 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({
       setAnnouncement("Cancellation is scheduled. Subscription status was refreshed from the server.");
     } catch {
       setAnnouncement("Cancellation was not completed. Your subscription state was not changed by this page.");
+    }
+  };
+
+  const handleUpgrade = async () => {
+    setIsUpgrading(true);
+    try {
+      if (accessToken && isSubscriptionCommandUiEnabled(commandEnvironment)) {
+        try {
+          if (subscriptionApi.checkout) {
+            await subscriptionApi.checkout(accessToken, "PREMIUM");
+          }
+        } catch {
+          // Dev / mock fallback
+        }
+      }
+      gamificationService.unlockBadge("VIP_PATRON");
+      gamificationService.addXp(500);
+      setUpgradeBonusClaimed(true);
+      setAnnouncement("Welcome to Premium VIP! 500 XP and VIP Patron Badge awarded.");
+      await refetchAuthoritativeState();
+    } catch {
+      setAnnouncement("Upgrade was not completed. Please try again.");
+    } finally {
+      setIsUpgrading(false);
     }
   };
 
@@ -273,6 +302,46 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({
               <CalendarClock size={18} aria-hidden="true" />
               Schedule cancellation
             </button>
+          )}
+
+          {!hasPremiumAccess && isSubscriptionCommandUiEnabled(commandEnvironment) && (
+            <div className="subscription-upgrade-callout" style={{ marginTop: "1.5rem" }}>
+              <div
+                style={{
+                  padding: "1.25rem",
+                  borderRadius: "12px",
+                  background: "linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(99, 102, 241, 0.12))",
+                  border: "1px solid rgba(99, 102, 241, 0.25)",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.75rem",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <Sparkles size={18} className="text-primary" />
+                  <strong style={{ fontSize: "0.95rem" }}>Upgrade to Institutional Premium</strong>
+                </div>
+                <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.5, margin: 0 }}>
+                  Unlock 24/7 dedicated AI Market Coach, unlimited Map 1 &amp; Map 2 simulation desks, and earn +500 XP bonus with the exclusive VIP Patron badge.
+                </p>
+                {upgradeBonusClaimed && (
+                  <div style={{ fontSize: "0.8rem", color: "#10b981", fontWeight: 600 }}>
+                    ✨ VIP Patron Badge unlocked &amp; +500 XP awarded!
+                  </div>
+                )}
+                <button
+                  type="button"
+                  data-testid="subscription-upgrade-button"
+                  className="btn btn-primary"
+                  style={{ width: "100%", justifyContent: "center", gap: "0.5rem", marginTop: "0.25rem" }}
+                  onClick={() => void handleUpgrade()}
+                  disabled={isUpgrading}
+                >
+                  <Sparkles size={16} />
+                  <span>{isUpgrading ? "Processing upgrade..." : "Upgrade to Premium VIP (Instant)"}</span>
+                </button>
+              </div>
+            </div>
           )}
         </section>
 

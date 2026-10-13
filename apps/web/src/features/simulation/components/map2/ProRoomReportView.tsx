@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Map2FinalReport } from "../../types/map-game.types";
 import { formatCurrency } from "../../../portfolio/utils/portfolioCalculations";
+import { gamificationService } from "../../services/gamification.service";
 import {
   Award,
   TrendingUp,
@@ -14,6 +15,7 @@ import {
   CheckCircle2,
   ThumbsUp,
   Target,
+  Sparkles,
 } from "lucide-react";
 
 interface ProRoomReportViewProps {
@@ -26,6 +28,20 @@ export const ProRoomReportView: React.FC<ProRoomReportViewProps> = ({
   onReplay,
 }) => {
   const navigate = useNavigate();
+  const hasRecordedRef = useRef(false);
+  const [awardInfo, setAwardInfo] = useState<{ xpAwarded: number; badgeUnlocked?: string } | null>(null);
+
+  useEffect(() => {
+    if (!hasRecordedRef.current) {
+      hasRecordedRef.current = true;
+      const res = gamificationService.recordMap2Run({
+        finalNav: report.finalNav,
+        initialNav: report.initialCash || 100000000,
+        alpha: report.alpha,
+      });
+      setAwardInfo(res);
+    }
+  }, [report.finalNav, report.initialCash, report.alpha]);
 
   // Average asset weighting across 12 quarters for allocation chips
   const totalRecords = Math.max(1, report.quarterHistory.length);
@@ -70,6 +86,34 @@ export const ProRoomReportView: React.FC<ProRoomReportViewProps> = ({
 
   return (
     <div className="pro-portfolio-report max-w-4xl mx-auto flex flex-col gap-6 animate-in fade-in duration-300 pb-12">
+      {/* Gamification Reward Notification */}
+      {awardInfo && (
+        <div className="p-3.5 bg-gradient-to-r from-amber-500/15 via-purple-500/15 to-blue-500/15 border border-amber-500/30 rounded-2xl flex items-center justify-between shadow-sm">
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 rounded-lg bg-amber-500 text-slate-950 font-black">
+              <Sparkles size={16} />
+            </div>
+            <div>
+              <span className="font-bold text-xs text-slate-900 block">
+                +{awardInfo.xpAwarded} XP đã được cộng vào Hồ sơ học viên của bạn!
+              </span>
+              {awardInfo.badgeUnlocked && (
+                <span className="text-[11px] font-semibold text-amber-700">
+                  Mở khóa: {awardInfo.badgeUnlocked}
+                </span>
+              )}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate("/dashboard")}
+            className="text-xs font-bold text-blue-600 hover:text-blue-800 underline underline-offset-2"
+          >
+            Xem Dashboard →
+          </button>
+        </div>
+      )}
+
       {/* 1. Hero Header Card (Figma Midnight Navy #0A1128) */}
       <div
         className="p-6 md:p-8 rounded-2xl border shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6"

@@ -6,15 +6,13 @@ import { AppContent } from "../../src/app/App";
 import { AuthProvider } from "../../src/features/auth/context/AuthContext";
 
 /**
- * Phase 9 Subscription Learner Journey
+ * FEAT-085 Commercial Subscription Learner Journey
  *
- * In Phase 9, the /subscription route renders a PlannedRoutePlaceholder
- * (owned by FEAT-076). The real SubscriptionPage from Phase 7 is no longer
- * directly mounted in the Phase 9 shell. These tests verify the route
- * renders the appropriate placeholder without dispatching subscription
- * API requests.
+ * Verifies that the /subscription route renders the commercial SubscriptionPage
+ * with plan details for authenticated learners, and presents authentication
+ * requirements for unauthenticated visitors.
  */
-describe("Subscription learner journey (Phase 9)", () => {
+describe("Subscription learner journey (Commercial Production)", () => {
   const originalFetch = globalThis.fetch;
 
   afterEach(() => {
@@ -22,8 +20,61 @@ describe("Subscription learner journey (Phase 9)", () => {
     vi.restoreAllMocks();
   });
 
-  it("renders planned route placeholder at /subscription without dispatching subscription API requests", async () => {
-    globalThis.fetch = vi.fn().mockRejectedValue(new Error("No request expected"));
+  it("renders live subscription center for authenticated learners", async () => {
+    globalThis.fetch = vi.fn().mockImplementation((input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes("/subscriptions/plans")) {
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({
+              data: [
+                {
+                  planKey: "FREE",
+                  name: "Free Plan",
+                  description: "Foundational learning",
+                  entitlements: [],
+                  available: true,
+                },
+                {
+                  planKey: "PREMIUM",
+                  name: "Premium VIP",
+                  description: "Full AI Coach & Simulation",
+                  entitlements: ["PREMIUM_ACCESS"],
+                  available: true,
+                },
+              ],
+            }),
+            { status: 200, headers: { "Content-Type": "application/json" } }
+          )
+        );
+      }
+      if (url.includes("/subscriptions/me")) {
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({
+              data: {
+                plan: "FREE",
+                planKey: "FREE",
+                status: "NONE",
+                entitlements: [],
+                isEntitled: false,
+                currentPeriodStart: null,
+                currentPeriodEnd: null,
+                cancelAtPeriodEnd: false,
+              },
+            }),
+            { status: 200, headers: { "Content-Type": "application/json" } }
+          )
+        );
+      }
+      return Promise.resolve(
+        new Response(JSON.stringify({ data: {} }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        })
+      );
+    });
+
     const queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
     });
@@ -41,40 +92,30 @@ describe("Subscription learner journey (Phase 9)", () => {
       </QueryClientProvider>,
     );
 
-    // Phase 9 renders PlannedRoutePlaceholder for /subscription (FEAT-076 planned)
+    // Live Subscription Page renders
     await waitFor(() =>
-      expect(screen.getByText("Planned for MVP Release")).toBeDefined(),
+      expect(screen.getByTestId("subscription-page")).toBeDefined(),
     );
-    expect(screen.getByText("FEAT-076")).toBeDefined();
-
-    // No subscription API requests should have been dispatched
-    const subscriptionRequests = vi.mocked(globalThis.fetch).mock.calls.filter(([input]) =>
-      String(input).includes("/subscriptions/"),
-    );
-    expect(subscriptionRequests).toHaveLength(0);
+    expect(screen.getByText("Subscription")).toBeDefined();
+    expect(screen.getByText("Your Free plan is active")).toBeDefined();
   });
 
-  it("does not dispatch subscription requests for an unauthenticated route visit", async () => {
-    globalThis.fetch = vi.fn().mockRejectedValue(new Error("No request expected"));
+  it("renders authentication required state for an unauthenticated route visit", async () => {
     const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     render(
       <QueryClientProvider client={queryClient}>
         <MemoryRouter initialEntries={["/subscription"]}>
-          <AuthProvider initialToken={null} initialUser={null}>
+          <AuthProvider initialToken={null} initialUser={null} initialIsLoading={false}>
             <AppContent />
           </AuthProvider>
         </MemoryRouter>
       </QueryClientProvider>,
     );
 
-    // Phase 9 renders PlannedRoutePlaceholder regardless of auth
+    // Renders Authentication Required prompt for visitors
     await waitFor(() =>
-      expect(screen.getByText("Planned for MVP Release")).toBeDefined(),
+      expect(screen.getByTestId("subscription-auth-required")).toBeDefined(),
     );
-
-    const subscriptionRequests = vi.mocked(globalThis.fetch).mock.calls.filter(([input]) =>
-      String(input).includes("/subscriptions/"),
-    );
-    expect(subscriptionRequests).toHaveLength(0);
+    expect(screen.getByText(/Sign in to view your subscription/i)).toBeDefined();
   });
 });

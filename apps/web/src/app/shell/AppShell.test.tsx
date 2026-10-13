@@ -150,12 +150,10 @@ describe("AppShell & Route Governance (FEAT-070 / AC-001..AC-008)", () => {
       expect(screen.getByRole("link", { name: /open simulation/i })).toBeDefined();
     });
 
-    it("renders planned route placeholder for /subscription without claiming ready", () => {
+    it("renders subscription center for /subscription", () => {
       renderShell("/subscription");
-      expect(screen.getByRole("heading", { name: /subscription & tiers/i })).toBeDefined();
-      expect(screen.getByText("Planned for MVP Release")).toBeDefined();
-      expect(screen.getByText("FEAT-076")).toBeDefined();
-      expect(screen.getByRole("link", { name: /return to home/i })).toBeDefined();
+      expect(screen.getByRole("heading", { name: "Subscription" })).toBeDefined();
+      expect(screen.getByText(/Sign in to view your subscription/i)).toBeDefined();
     });
 
     it("renders deferred route placeholder for /ai without claiming ready", () => {

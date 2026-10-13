@@ -230,11 +230,11 @@ export const ROUTE_REGISTRY: Record<RouteKey, RouteMetadata> = {
     title: "Subscription & Tiers",
     description: "Membership tier status, limits, and mock upgrade plans.",
     navLabel: "Subscription",
-    status: "PLANNED",
+    status: "AVAILABLE",
     requiresAuth: false,
     isNavVisible: true,
     section: "account",
-    owningFeature: "FEAT-076",
+    owningFeature: "FEAT-085",
   },
   account: {
     id: "account",

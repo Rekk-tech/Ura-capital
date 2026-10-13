@@ -37,6 +37,7 @@ import {
 } from "../types/simulation-ui.types";
 import { Sparkles, PlusCircle, Compass } from "lucide-react";
 import { MapSelectionView } from "../components/MapSelectionView";
+import { SimulationLeaderboard } from "../components/SimulationLeaderboard";
 
 export interface SimulationDashboardPageProps {
   mode?: "maps" | "cockpit";
@@ -249,6 +250,9 @@ export const SimulationDashboardPage: React.FC<SimulationDashboardPageProps> = (
           activeScenarioName={session?.scenario?.name}
           onEnterCockpit={handleEnterCockpitFromMap}
         />
+        <div style={{ marginTop: "2.5rem" }}>
+          <SimulationLeaderboard />
+        </div>
       </main>
     );
   }

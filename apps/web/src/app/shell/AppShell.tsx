@@ -17,6 +17,7 @@ import { SimulationRoutes } from "../router/simulation-routes";
 import { ProtectedRoute } from "../../features/auth/components/ProtectedRoute";
 import { PortfolioPage } from "../../features/portfolio/pages/PortfolioPage";
 import { CommunityRoutes } from "../router/community-routes";
+import { SubscriptionRoutes } from "../router/subscription-routes";
 import { AdminRoutes } from "../../features/admin/routes/admin-routes";
 import { ProfileSettingsPage } from "../../features/profile/pages/ProfileSettingsPage";
 import { AiCoachWidget } from "../../features/ai";
@@ -63,10 +64,7 @@ export const AppShell: React.FC = () => {
               }
             />
             <Route path="/community/*" element={<CommunityRoutes />} />
-            <Route
-              path="/subscription/*"
-              element={<PlannedRoutePlaceholder route={ROUTE_REGISTRY.subscription} />}
-            />
+            <Route path="/subscription/*" element={<SubscriptionRoutes />} />
 
             {/* Authenticated Account Profile & Auth Entry Surfaces (FEAT-071) */}
             <Route path="/account" element={<AccountPage />} />
