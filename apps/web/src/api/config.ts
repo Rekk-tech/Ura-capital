@@ -17,5 +17,11 @@ export function getApiBaseUrl(): string {
     }
     return raw.replace(/\/+$/, "");
   }
+
+  // Automatic Fallback for Cloudflare Pages (*.pages.dev) edge deployments
+  if (typeof window !== "undefined" && window.location?.hostname?.endsWith(".pages.dev")) {
+    return "https://aura-capital-api.onrender.com";
+  }
+
   return "";
 }

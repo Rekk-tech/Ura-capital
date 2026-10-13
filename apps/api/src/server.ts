@@ -23,10 +23,22 @@ export function createApp(): Express {
   const app = express();
 
   // Core Security & Utilities Middleware
+  const configuredOrigins = env.CORS_ORIGIN.split(",").map((o) => o.trim());
   app.use(helmet());
   app.use(
     cors({
-      origin: env.CORS_ORIGIN,
+      origin: (origin, callback) => {
+        if (
+          !origin ||
+          configuredOrigins.includes(origin) ||
+          configuredOrigins.includes("*") ||
+          /^https:\/\/[a-zA-Z0-9-]+\.pages\.dev$/.test(origin)
+        ) {
+          callback(null, true);
+        } else {
+          callback(new Error(`Origin ${origin} not allowed by CORS policy`));
+        }
+      },
       credentials: true,
     }),
   );
