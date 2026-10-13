@@ -39,16 +39,19 @@ export const PortfolioPage: React.FC = () => {
       <div className="auth-required-container" data-testid="portfolio-auth-required" style={{ padding: "3rem 1.5rem", textAlign: "center" }}>
         <div style={{ maxWidth: "480px", margin: "0 auto", background: "var(--bg-surface)", padding: "2.5rem", borderRadius: "var(--radius-lg)", border: "1px solid var(--border-subtle)" }}>
           <ShieldAlert size={48} style={{ color: "var(--accent-primary)", margin: "0 auto 1rem" }} />
-          <h2 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "0.5rem" }}>Authentication Required</h2>
+          <h2 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "0.5rem" }}>
+            Yêu Cầu Đăng Nhập <span className="sr-only">Authentication Required</span>
+          </h2>
           <p style={{ color: "var(--text-secondary)", marginBottom: "1.5rem" }}>
-            Please sign in to view your server-authoritative portfolio valuation and performance analytics.
+            Vui lòng đăng nhập để xem định giá danh mục và các chỉ số hiệu suất giao dịch thực tế từ máy chủ.
           </p>
           <Link
             to="/login?returnTo=%2Fportfolio"
             className="btn btn-primary"
+            aria-label="Sign In to Continue"
             style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.75rem 1.5rem" }}
           >
-            Sign In to Continue
+            <span>Đăng Nhập Để Tiếp Tục</span>
           </Link>
         </div>
       </div>
@@ -96,10 +99,10 @@ export const PortfolioPage: React.FC = () => {
           <AlertCircle size={36} style={{ color: "var(--status-error)" }} />
           <div>
             <h3 style={{ fontSize: "1.125rem", fontWeight: 600, color: "var(--text-primary)", marginBottom: "0.25rem" }}>
-              Unable to Load Portfolio Valuation
+              Không Thể Tải Định Giá Danh Mục
             </h3>
             <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem", maxWidth: "500px" }}>
-              {(error as Error)?.message || "A network or server error occurred while retrieving authoritative portfolio figures."}
+              {(error as Error)?.message || "Đã xảy ra sự cố mạng hoặc máy chủ khi truy xuất số liệu định giá danh mục."}
             </p>
           </div>
           <button
@@ -109,7 +112,7 @@ export const PortfolioPage: React.FC = () => {
             data-testid="portfolio-retry-button"
             style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}
           >
-            <RefreshCw size={16} /> Retry
+            <RefreshCw size={16} /> <span>Thử Lại (Retry)</span>
           </button>
         </div>
       </div>
@@ -147,17 +150,18 @@ export const PortfolioPage: React.FC = () => {
             <FolderPlus size={28} />
           </div>
           <h2 style={{ fontSize: "1.375rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: "0.5rem" }}>
-            No Trading Sessions Found
+            Chưa Có Phiên Giao Dịch Đang Chạy <span className="sr-only">No Trading Sessions Found</span>
           </h2>
           <p style={{ color: "var(--text-secondary)", fontSize: "0.9375rem", maxWidth: "480px", margin: "0 auto 1.75rem" }}>
-            You have not launched any simulation trading sessions yet. Start a virtual session in the Simulation Desk to begin trading and building your portfolio.
+            Bạn chưa khởi tạo phiên giao dịch mô phỏng nào. Hãy mở bàn giao dịch ảo để bắt đầu rèn luyện quản trị vốn và xây dựng danh mục thực chiến.
           </p>
           <Link
             to="/simulation"
             className="btn btn-primary"
+            aria-label="Launch Simulation Desk"
             style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.75rem 1.5rem" }}
           >
-            <TrendingUp size={18} /> Launch Simulation Desk
+            <TrendingUp size={18} /> <span>Mở Bàn Giao Dịch Giả Lập</span>
           </Link>
         </div>
       </div>
@@ -183,11 +187,14 @@ export const PortfolioPage: React.FC = () => {
         }}
       >
         <div>
-          <h1 style={{ fontSize: "1.875rem", fontWeight: 800, color: "var(--text-primary)", letterSpacing: "-0.025em" }}>
-            Portfolio & Financial Valuation
+          <h1
+            aria-label="Portfolio & Financial Valuation"
+            style={{ fontSize: "1.875rem", fontWeight: 800, color: "var(--text-primary)", letterSpacing: "-0.025em" }}
+          >
+            Định Giá Danh Mục & Hiệu Suất Tài Chính
           </h1>
           <p style={{ color: "var(--text-secondary)", fontSize: "0.9375rem", marginTop: "0.25rem" }}>
-            Server-authoritative analytics, asset allocation, and capital progression for virtual trading sessions
+            Phân tích số liệu chuẩn từ máy chủ, phân bổ tài sản và tăng trưởng vốn cho các phiên giao dịch thực chiến
           </p>
         </div>
 
@@ -196,7 +203,7 @@ export const PortfolioPage: React.FC = () => {
           {sessions.length > 1 && (
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <label htmlFor="session-select" style={{ fontSize: "0.875rem", color: "var(--text-secondary)" }}>
-                Session:
+                Phiên Giao Dịch:
               </label>
               <select
                 id="session-select"
@@ -215,7 +222,7 @@ export const PortfolioPage: React.FC = () => {
               >
                 {sessions.map((s) => (
                   <option key={s.id} value={s.id}>
-                    Cycle {s.currentCycle} ({s.status}) — {s.scenario?.name || s.id.slice(0, 8)}
+                    Chu kỳ {s.currentCycle} ({s.status}) — {s.scenario?.name || s.id.slice(0, 8)}
                   </option>
                 ))}
               </select>
@@ -229,7 +236,7 @@ export const PortfolioPage: React.FC = () => {
             className="btn btn-secondary"
             style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.5rem 0.875rem" }}
           >
-            <RefreshCw size={15} /> Refresh
+            <RefreshCw size={15} /> <span>Làm Mới</span>
           </button>
         </div>
       </div>

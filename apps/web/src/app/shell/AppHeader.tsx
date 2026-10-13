@@ -33,6 +33,7 @@ const NAV_ICONS: Record<string, React.ReactNode> = {
   "/portfolio": <PieChart size={16} aria-hidden="true" />,
   "/community": <Users size={16} aria-hidden="true" />,
   "/subscription": <BadgeDollarSign size={16} aria-hidden="true" />,
+  "/ai": <Cpu size={16} aria-hidden="true" />,
 };
 
 const VI_NAV_LABELS: Record<string, string> = {
@@ -42,6 +43,9 @@ const VI_NAV_LABELS: Record<string, string> = {
   "/simulation": "Đấu Trường Giả Lập",
   "/portfolio": "Danh Mục",
   "/community": "Cộng Đồng",
+  "/ai": "AI Studio",
+  "/subscription": "Hội Viên",
+  "/admin": "Quản Trị",
 };
 
 /**
@@ -299,23 +303,23 @@ export const AppHeader: React.FC = () => {
                   <div className="dropdown-divider" />
                   <Link to="/dashboard" className="dropdown-item" role="menuitem" onClick={() => setIsUserMenuOpen(false)}>
                     <LayoutDashboard size={15} />
-                    <span>Dashboard</span>
+                    <span>Tổng Quan (Dashboard)</span>
                   </Link>
                   <Link to="/portfolio" className="dropdown-item" role="menuitem" onClick={() => setIsUserMenuOpen(false)}>
                     <PieChart size={15} />
-                    <span>Portfolio</span>
+                    <span>Danh Mục (Portfolio)</span>
                   </Link>
                   <Link to="/subscription" className="dropdown-item" role="menuitem" onClick={() => setIsUserMenuOpen(false)}>
                     <Sparkles size={15} />
-                    <span>Membership Plans</span>
+                    <span>Gói Hội Viên (Membership)</span>
                   </Link>
                   <Link to="/profile" className="dropdown-item" role="menuitem" onClick={() => setIsUserMenuOpen(false)}>
                     <Settings size={15} />
-                    <span>Profile & Settings</span>
+                    <span>Cài Đặt Hồ Sơ</span>
                   </Link>
                   <Link to="/account" className="dropdown-item" role="menuitem" onClick={() => setIsUserMenuOpen(false)}>
                     <User size={15} />
-                    <span>Account Profile</span>
+                    <span>Tài Khoản Cá Nhân</span>
                   </Link>
                   <div className="dropdown-divider" />
                   <button
@@ -325,7 +329,7 @@ export const AppHeader: React.FC = () => {
                     role="menuitem"
                   >
                     <LogOut size={15} />
-                    <span>Sign Out</span>
+                    <span>Đăng Xuất</span>
                   </button>
                 </div>
               )}
@@ -333,13 +337,13 @@ export const AppHeader: React.FC = () => {
           ) : (
             /* Unauthenticated Visitor CTAs */
             <div className="unauth-btn-group">
-              <Link to="/login" className="btn btn-ghost btn-sm auth-signin-btn">
+              <Link to="/login" className="btn btn-ghost btn-sm auth-signin-btn" aria-label="Sign In">
                 <LogIn size={15} aria-hidden="true" />
-                <span>Sign In</span>
+                <span>Đăng Nhập</span>
               </Link>
-              <Link to="/register" className="btn btn-gradient btn-sm auth-signup-btn">
+              <Link to="/register" className="btn btn-gradient btn-sm auth-signup-btn" aria-label="Get Started Free">
                 <Sparkles size={14} aria-hidden="true" />
-                <span>Get Started Free</span>
+                <span>Bắt Đầu Miễn Phí</span>
               </Link>
             </div>
           )}
@@ -403,7 +407,7 @@ export const AppHeader: React.FC = () => {
                     </Link>
                   )}
                   <Link to="/dashboard" className="btn btn-primary btn-sm mobile-auth-btn">
-                    Dashboard
+                    Tổng Quan (Dashboard)
                   </Link>
                   <Link
                     to="/profile"
@@ -412,23 +416,23 @@ export const AppHeader: React.FC = () => {
                     style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
                   >
                     <Settings size={15} />
-                    <span>Profile & Settings</span>
+                    <span>Cài Đặt Hồ Sơ</span>
                   </Link>
                   <button
                     type="button"
                     className="btn btn-outline btn-sm mobile-auth-btn"
                     onClick={handleLogout}
                   >
-                    Sign Out
+                    Đăng Xuất
                   </button>
                 </>
               ) : (
                 <>
-                  <Link to="/login" className="btn btn-secondary btn-sm mobile-auth-btn">
-                    Sign In
+                  <Link to="/login" className="btn btn-secondary btn-sm mobile-auth-btn" aria-label="Sign In">
+                    Đăng Nhập
                   </Link>
-                  <Link to="/register" className="btn btn-gradient btn-sm mobile-auth-btn">
-                    Get Started Free
+                  <Link to="/register" className="btn btn-gradient btn-sm mobile-auth-btn" aria-label="Get Started Free">
+                    Bắt Đầu Miễn Phí
                   </Link>
                 </>
               )}

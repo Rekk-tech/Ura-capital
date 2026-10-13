@@ -101,17 +101,16 @@ describe("FEAT-080: Phase 9 Product Integration & Browser E2E Gate", () => {
       }
     });
 
-    it("verifies Phase 8 AI remains strictly DEFERRED under FEAT-078 without product leakage", () => {
+    it("verifies AI Studio route is promoted under FEAT-086", () => {
       const aiRoute = ROUTE_REGISTRY.ai;
-      expect(aiRoute.status).toBe("DEFERRED");
-      expect(aiRoute.targetPhase).toContain("Phase 8");
-      expect(aiRoute.owningFeature).toBe("FEAT-078");
+      expect(aiRoute.status).toBe("AVAILABLE");
+      expect(aiRoute.owningFeature).toBe("FEAT-086");
     });
 
-    it("verifies Subscription route remains PLANNED under FEAT-076 for Phase 9 MVP", () => {
+    it("verifies Subscription route is promoted under FEAT-085", () => {
       const subRoute = ROUTE_REGISTRY.subscription;
-      expect(subRoute.status).toBe("PLANNED");
-      expect(subRoute.owningFeature).toBe("FEAT-076");
+      expect(subRoute.status).toBe("AVAILABLE");
+      expect(subRoute.owningFeature).toBe("FEAT-085");
     });
 
     it("verifies FEAT-077 Admin and FEAT-079 Learning Path are promoted to AVAILABLE", () => {
@@ -564,12 +563,11 @@ describe("FEAT-080: Phase 9 Product Integration & Browser E2E Gate", () => {
       });
     });
 
-    describe("G. Subscription Planned Placeholder Journey", () => {
-      it("renders PlannedRoutePlaceholder at /subscription without dispatching billing calls", async () => {
+    describe("G. Subscription Commercial Journey", () => {
+      it("renders SubscriptionPage at /subscription with authoritative plan definitions", async () => {
         renderApp("/subscription");
 
-        expect(screen.getByText("Planned for MVP Release")).toBeDefined();
-        expect(screen.getByText("FEAT-076")).toBeDefined();
+        expect(await screen.findByRole("heading", { level: 1, name: /^Subscription$/i })).toBeDefined();
       });
     });
 
@@ -730,18 +728,10 @@ describe("FEAT-080: Phase 9 Product Integration & Browser E2E Gate", () => {
       expect(output).toContain("Learn investing cleanly");
     });
 
-    it("enforces Phase 8 AI Isolation: /ai renders planned placeholder with zero API calls", () => {
-      const fetchSpy = vi.spyOn(globalThis, "fetch");
-
+    it("enforces AI Studio Security Boundaries: /ai requires authentication", () => {
       renderApp("/ai");
 
-      expect(screen.getByText("Deferred for AI Enhancement")).toBeDefined();
-      expect(screen.getByText("FEAT-078")).toBeDefined();
-
-      const aiCalls = fetchSpy.mock.calls.filter(
-        ([url]) => String(url).includes("/ai") || String(url).includes("gemini"),
-      );
-      expect(aiCalls).toHaveLength(0);
+      expect(screen.getByRole("heading", { level: 1, name: /please sign in/i })).toBeDefined();
     });
 
     it("renders simulated trading risk disclosure prominently on trading surfaces", async () => {

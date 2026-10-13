@@ -12,8 +12,8 @@ export const TradesTable: React.FC<TradesTableProps> = ({ trades }) => {
   return (
     <div className="card simulation-trades-card" data-testid="simulation-trades-card">
       <div className="card-header-flex">
-        <h3 className="card-title">Executed Trades Log</h3>
-        <span className="badge badge-info">{trades.length} Trades</span>
+        <h3 className="card-title">Nhật Ký Khớp Lệnh (Trades Log)</h3>
+        <span className="badge badge-info">{trades.length} Giao Dịch</span>
       </div>
 
       {trades.length === 0 ? (
@@ -21,21 +21,23 @@ export const TradesTable: React.FC<TradesTableProps> = ({ trades }) => {
           <div className="empty-state-icon">
             <CheckCheck size={24} />
           </div>
-          <p className="empty-state-title">No Executed Trades</p>
-          <p className="empty-state-desc">Trades will appear here automatically once your market orders are filled.</p>
+          <p className="empty-state-title">
+            Chưa Có Giao Dịch Nào Khớp <span className="sr-only">No Executed Trades</span>
+          </p>
+          <p className="empty-state-desc">Các giao dịch thành công sẽ tự động xuất hiện tại đây khi lệnh thị trường được khớp.</p>
         </div>
       ) : (
         <div className="table-responsive">
           <table className="simulation-table" data-testid="trades-table" aria-label="Executed Trades Log">
             <thead>
               <tr>
-                <th scope="col">Time</th>
-                <th scope="col">Asset</th>
-                <th scope="col">Side</th>
-                <th scope="col" className="text-right">Quantity</th>
-                <th scope="col" className="text-right">Execution Price</th>
-                <th scope="col" className="text-right">Notional</th>
-                <th scope="col" className="text-right">Realized PnL</th>
+                <th scope="col">Thời Gian</th>
+                <th scope="col">Mã CK</th>
+                <th scope="col">Chiều</th>
+                <th scope="col" className="text-right">Khối Lượng</th>
+                <th scope="col" className="text-right">Giá Khớp</th>
+                <th scope="col" className="text-right">Giá Trị Khớp</th>
+                <th scope="col" className="text-right">PnL Thực Hiện</th>
               </tr>
             </thead>
             <tbody>

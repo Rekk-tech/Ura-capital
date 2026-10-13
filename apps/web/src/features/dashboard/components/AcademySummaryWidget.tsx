@@ -50,9 +50,11 @@ export const AcademySummaryWidget: React.FC = () => {
   return (
     <DashboardWidgetWrapper
       title="Academy Learning"
+      displayTitle="Học Viện & Khóa Học"
       icon={<BookOpen size={20} className="text-accent" />}
       domainUrl="/academy"
       domainLabel="View Academy"
+      displayLabel="Vào Học Viện"
       isLoading={isLoading}
       isError={isError}
       errorMessage="Unable to load Academy progress. Please check your connection."
@@ -66,7 +68,7 @@ export const AcademySummaryWidget: React.FC = () => {
             <Award size={22} className="text-warning" />
           </div>
           <div className="metric-details">
-            <span className="metric-label">Total Experience Points</span>
+            <span className="metric-label">Tổng Điểm Kinh Nghiệm</span>
             <span className="metric-value font-mono" data-testid="learner-xp-value">
               {totalXp.toLocaleString()} XP
             </span>
@@ -76,14 +78,14 @@ export const AcademySummaryWidget: React.FC = () => {
         {/* Featured Courses List */}
         <div className="widget-section">
           <div className="widget-section-header">
-            <span className="widget-section-title">Available Curricula</span>
-            <span className="badge badge-info">{courses.length} Courses</span>
+            <span className="widget-section-title">Khóa Học Khả Dụng</span>
+            <span className="badge badge-info">{courses.length} Khóa Học</span>
           </div>
 
           {courses.length === 0 ? (
             <div className="widget-empty-state">
               <Layers size={24} className="text-muted" aria-hidden="true" />
-              <p className="text-muted">No courses currently available.</p>
+              <p className="text-muted">Hiện chưa có khóa học nào khả dụng.</p>
             </div>
           ) : (
             <ul className="widget-list" role="list">
@@ -92,7 +94,7 @@ export const AcademySummaryWidget: React.FC = () => {
                   <div className="item-info">
                     <span className="item-title">{course.title}</span>
                     <span className="item-meta text-muted">
-                      {course.level} • {course.lessonCount} {course.lessonCount === 1 ? "lesson" : "lessons"}
+                      {course.level} • {course.lessonCount} {course.lessonCount === 1 ? "bài học" : "bài học"}
                     </span>
                   </div>
                   <Link
@@ -100,7 +102,7 @@ export const AcademySummaryWidget: React.FC = () => {
                     className="btn btn-outline btn-xs"
                     aria-label={`Start course: ${course.title}`}
                   >
-                    Resume Course
+                    <span>Học Tiếp</span>
                   </Link>
                 </li>
               ))}

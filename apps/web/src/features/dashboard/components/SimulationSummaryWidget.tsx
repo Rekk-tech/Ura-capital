@@ -58,12 +58,14 @@ export const SimulationSummaryWidget: React.FC = () => {
   return (
     <DashboardWidgetWrapper
       title="Simulation Portfolio"
+      displayTitle="Danh Mục Đấu Trường"
       icon={<TrendingUp size={20} className="text-accent" />}
       domainUrl="/simulation"
       domainLabel="Open Desk"
+      displayLabel="Vào Đấu Trường"
       badge={
         activeSession ? (
-          <span className="badge badge-success">{activeSession.status}</span>
+          <span className="badge badge-success">{activeSession.status === "ACTIVE" ? "ĐANG MỞ" : activeSession.status}</span>
         ) : undefined
       }
       isLoading={isLoading}
@@ -76,46 +78,54 @@ export const SimulationSummaryWidget: React.FC = () => {
         {!activeSession ? (
           <div className="widget-empty-state">
             <Activity size={28} className="text-muted" aria-hidden="true" />
-            <p className="empty-title font-bold">No Active Simulation</p>
-            <p className="text-muted">
-              You do not have an active simulated trading desk session.
-              Practice institutional strategies with virtual cash.
+            <p className="empty-title font-bold">
+              Chưa Có Phiên Giả Lập Đang Mở
+              <span className="sr-only">No Active Simulation</span>
             </p>
-            <Link to="/simulation" className="btn btn-primary btn-sm" style={{ marginTop: "0.75rem" }}>
-              Launch Simulation Desk
+            <p className="text-muted">
+              Bạn chưa có phiên giao dịch ảo nào đang hoạt động. You do not have an active simulated trading desk session.
+              Rèn luyện phản xạ và quản trị vốn an toàn với số dư 100.000.000 VND ảo.
+            </p>
+            <Link
+              to="/simulation"
+              className="btn btn-primary btn-sm"
+              style={{ marginTop: "0.75rem" }}
+              aria-label="Launch Simulation Desk"
+            >
+              <span>Mở Bàn Giao Dịch</span>
             </Link>
           </div>
         ) : (
           <>
             {/* Session Scenario Info */}
             <div className="simulation-scenario-banner">
-              <span className="scenario-label text-muted">Scenario:</span>
+              <span className="scenario-label text-muted">Kịch bản:</span>
               <span className="scenario-name font-bold">
                 {activeSession.scenario?.name || "Standard Market Session"}
               </span>
               <span className="cycle-badge font-mono text-muted">
-                Cycle {activeSession.currentCycle}
+                Chu kỳ {activeSession.currentCycle}
               </span>
             </div>
 
             {/* Metrics Grid */}
             <div className="portfolio-metrics-grid">
               <div className="portfolio-metric-box">
-                <span className="metric-box-label">Portfolio Equity</span>
+                <span className="metric-box-label">Tổng Tài Sản (Equity)</span>
                 <span className="metric-box-value font-mono" data-testid="portfolio-equity-value">
                   {valuation ? formatCurrency(valuation.totalEquity) : "0 VND"}
                 </span>
               </div>
 
               <div className="portfolio-metric-box">
-                <span className="metric-box-label">Cash Balance</span>
+                <span className="metric-box-label">Số Dư Tiền Mặt (Cash)</span>
                 <span className="metric-box-value font-mono">
                   {valuation ? formatCurrency(valuation.cashBalance) : "0 VND"}
                 </span>
               </div>
 
               <div className="portfolio-metric-box">
-                <span className="metric-box-label">Unrealized PnL</span>
+                <span className="metric-box-label">Lãi/Lỗ Tạm Tính (PnL)</span>
                 <span
                   className={`metric-box-value font-mono ${isPnlPositive ? "text-success" : "text-error"}`}
                   data-testid="portfolio-pnl-value"
@@ -128,7 +138,7 @@ export const SimulationSummaryWidget: React.FC = () => {
             {/* Regulatory Simulation Disclosure */}
             <div className="simulation-disclaimer-note" role="note">
               <AlertTriangle size={14} className="text-warning flex-shrink-0" aria-hidden="true" />
-              <span>Simulated execution only • Virtual funds • No real capital at risk</span>
+              <span>Simulated execution only • Virtual funds • No real capital at risk (Giao dịch mô phỏng • Vốn ảo phi rủi ro)</span>
             </div>
           </>
         )}

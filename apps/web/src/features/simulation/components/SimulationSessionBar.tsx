@@ -84,15 +84,15 @@ export const SimulationSessionBar: React.FC<SimulationSessionBarProps> = ({
 
         <div className="session-meta-items">
           <div className="session-meta-item">
-            <span className="meta-label">Current Cycle</span>
+            <span className="meta-label">Chu Kỳ Hiện Tại</span>
             <span className="meta-value" data-testid="session-cycle-value">Cycle {session.currentCycle}</span>
           </div>
           <div className="session-meta-item">
-            <span className="meta-label">Starting Cash</span>
+            <span className="meta-label">Vốn Khởi Điểm</span>
             <span className="meta-value" data-testid="session-starting-cash">{formatCurrency(session.startingCash)}</span>
           </div>
           <div className="session-meta-item">
-            <span className="meta-label">Session ID</span>
+            <span className="meta-label">Mã Phiên</span>
             <span className="meta-value-mono" title={session.id}>
               {session.id.slice(0, 8)}...{session.id.slice(-4)}
             </span>
@@ -132,7 +132,7 @@ export const SimulationSessionBar: React.FC<SimulationSessionBarProps> = ({
             data-testid="start-session-button"
           >
             <Play size={16} style={{ marginRight: "6px" }} />
-            {isStarting ? "Starting..." : "Start Session"}
+            {isStarting ? "Đang Bắt Đầu..." : "Bắt Đầu Phiên • Start Session"}
           </button>
         )}
 
@@ -143,10 +143,10 @@ export const SimulationSessionBar: React.FC<SimulationSessionBarProps> = ({
             onClick={onCompleteSession}
             disabled={isCompleting}
             data-testid="complete-session-button"
-            title="Complete this simulation session"
+            title="Hoàn tất phiên giao dịch này"
           >
             <CheckCircle2 size={15} style={{ marginRight: "6px" }} />
-            {isCompleting ? "Completing..." : "Complete"}
+            {isCompleting ? "Đang Hoàn Tất..." : "Hoàn Tất • Complete"}
           </button>
         )}
 
@@ -157,10 +157,10 @@ export const SimulationSessionBar: React.FC<SimulationSessionBarProps> = ({
             onClick={onCancelSession}
             disabled={isCancelling}
             data-testid="cancel-session-button"
-            title="Cancel this simulation session"
+            title="Hủy phiên giao dịch này"
           >
             <XCircle size={15} style={{ marginRight: "6px" }} />
-            {isCancelling ? "Cancelling..." : "Cancel"}
+            {isCancelling ? "Đang Hủy..." : "Hủy • Cancel"}
           </button>
         )}
 
@@ -171,10 +171,10 @@ export const SimulationSessionBar: React.FC<SimulationSessionBarProps> = ({
             onClick={onResetSession}
             disabled={isResetting}
             data-testid="reset-session-button"
-            title="Reset cash and positions to beginning of Cycle 1"
+            title="Đặt lại tiền mặt và vị thế ban đầu của Chu kỳ 1"
           >
             <RotateCcw size={15} style={{ marginRight: "6px" }} />
-            {isResetting ? "Resetting..." : "Reset"}
+            {isResetting ? "Đang Đặt Lại..." : "Đặt Lại • Reset"}
           </button>
         )}
 
@@ -185,10 +185,10 @@ export const SimulationSessionBar: React.FC<SimulationSessionBarProps> = ({
             onClick={onCreateSession}
             disabled={isCreating}
             data-testid="new-session-button"
-            title="Create a new simulation session"
+            title="Tạo phiên giả lập mới"
           >
             <PlusCircle size={15} style={{ marginRight: "6px" }} />
-            New
+            Tạo Mới • New
           </button>
         )}
 
@@ -198,10 +198,10 @@ export const SimulationSessionBar: React.FC<SimulationSessionBarProps> = ({
             className="button button-outline"
             onClick={onBackToMaps}
             data-testid="session-back-to-maps-button"
-            title="Back to Simulation Maps Lobby"
+            title="Quay lại sảnh bản đồ"
           >
             <Compass size={15} style={{ marginRight: "6px" }} />
-            Maps
+            Sảnh Bản Đồ
           </button>
         )}
       </div>

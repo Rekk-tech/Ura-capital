@@ -183,7 +183,7 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
   return (
     <div className="card market-order-ticket" data-testid="market-order-ticket">
       <div className="card-header-flex">
-        <h3 className="card-title">Order Ticket</h3>
+        <h3 className="card-title">Phiếu Đặt Lệnh (Order Ticket)</h3>
         <span className="badge badge-info font-mono" data-testid="ticket-type-badge">
           {orderType} ORDER
         </span>
@@ -193,7 +193,7 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
       {cashBalance && (
         <div className="ticket-cash-display" data-testid="ticket-cash-balance" style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "0.75rem" }}>
           <Wallet size={14} className="text-accent" aria-hidden="true" />
-          <span>Available Purchasing Power:</span>
+          <span>Sức Mua Khả Dụng (Available Cash):</span>
           <strong className="font-mono text-primary">${cashBalance}</strong>
         </div>
       )}
@@ -201,7 +201,7 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
       {!isActiveSession && (
         <div className="ticket-inactive-notice" data-testid="ticket-inactive-banner">
           <HelpCircle size={15} style={{ marginRight: "6px" }} />
-          <span>Trading disabled: Session status is <strong>{sessionStatus}</strong>. Start the session to enable order placement.</span>
+          <span>Bàn giao dịch đang khóa: Trạng thái phiên là <strong>{sessionStatus}</strong>. Hãy bắt đầu phiên để đặt lệnh.</span>
         </div>
       )}
 
@@ -216,11 +216,11 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
         <div className="ticket-alert ticket-alert-success" role="status" data-testid="order-success-banner">
           <CheckCircle size={16} className="alert-icon" />
           <div>
-            <strong>Order {successOrder.status}!</strong>
+            <strong>Khớp Lệnh Thành Công • Order {successOrder.status}!</strong>
             <p style={{ margin: "2px 0 0", fontSize: "0.85rem" }}>
               {successOrder.side} {successOrder.executedQuantity ?? successOrder.quantity} {successOrder.assetSymbol} @ ${successOrder.executionPrice ?? "Market"}
               {successOrder.realizedPnl && successOrder.realizedPnl !== "0.0000" && (
-                <span> • Realized PnL: ${successOrder.realizedPnl}</span>
+                <span> • PnL Thực Hiện: ${successOrder.realizedPnl}</span>
               )}
             </p>
           </div>
@@ -230,7 +230,7 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
       <form onSubmit={handleSubmit} className="order-form" data-testid="order-form">
         {/* Order Side Toggle (BUY / SELL) */}
         <div className="form-group">
-          <label className="form-label" id="side-label">Order Action</label>
+          <label className="form-label" id="side-label">Chiều Lệnh (Order Action)</label>
           <div className="order-side-toggle" role="radiogroup" aria-labelledby="side-label">
             <button
               type="button"
@@ -240,10 +240,10 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
               data-testid="side-buy-button"
               aria-checked={side === "BUY"}
               role="radio"
-              title="BUY: Execute purchase of equities using available virtual cash balance"
+              title="BUY: Mua cổ phiếu bằng tiền mặt ảo khả dụng"
             >
               <TrendingUp size={16} aria-hidden="true" />
-              <span>BUY</span>
+              <span>MUA (BUY)</span>
             </button>
             <button
               type="button"
@@ -253,17 +253,17 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
               data-testid="side-sell-button"
               aria-checked={side === "SELL"}
               role="radio"
-              title="SELL: Execute sale of held positions to realize profit or loss into virtual cash"
+              title="SELL: Bán vị thế đang nắm giữ để chốt lời hoặc cắt lỗ vào tiền mặt ảo"
             >
               <TrendingDown size={16} aria-hidden="true" />
-              <span>SELL</span>
+              <span>BÁN (SELL)</span>
             </button>
           </div>
         </div>
 
         {/* Order Type Toggle (MARKET / LIMIT) */}
         <div className="form-group">
-          <label className="form-label" id="type-label">Order Type</label>
+          <label className="form-label" id="type-label">Loại Lệnh (Order Type)</label>
           <div className="order-side-toggle" role="radiogroup" aria-labelledby="type-label" style={{ gridTemplateColumns: "1fr 1fr" }}>
             <button
               type="button"
@@ -273,9 +273,9 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
               data-testid="type-market-button"
               aria-checked={orderType === "MARKET"}
               role="radio"
-              title="MARKET Order: Fills immediately at the authoritative price snapshot of the current cycle"
+              title="MARKET Order: Khớp tức thì theo giá thị trường chu kỳ hiện tại"
             >
-              MARKET
+              Lệnh Thị Trường (MARKET)
             </button>
             <button
               type="button"
@@ -285,16 +285,16 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
               data-testid="type-limit-button"
               aria-checked={orderType === "LIMIT"}
               role="radio"
-              title="LIMIT Order: Rests on book and executes only when the market price meets or improves upon your limit"
+              title="LIMIT Order: Chờ khớp khi giá thị trường chạm hoặc tốt hơn mức giới hạn"
             >
-              LIMIT
+              Lệnh Giới Hạn (LIMIT)
             </button>
           </div>
         </div>
 
         {/* Asset Selector */}
         <div className="form-group">
-          <label htmlFor="asset-select" className="form-label">Asset to Trade</label>
+          <label htmlFor="asset-select" className="form-label">Mã Cổ Phiếu Giao Dịch (Asset to Trade)</label>
           <select
             id="asset-select"
             className="input-select"
@@ -303,7 +303,7 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
             disabled={!isActiveSession || isSubmitting || assets.length === 0}
             data-testid="asset-select"
             aria-label="Select Asset to Trade"
-            title="Choose which equity symbol to buy or sell from current simulation universe"
+            title="Chọn mã chứng khoán cần giao dịch trong vũ trụ mô phỏng"
           >
             {assets.map((a) => (
               <option key={a.id} value={a.symbol}>
@@ -315,16 +315,16 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
 
         {/* Current Snapshot Price Display */}
         <div className="ticker-price-preview" data-testid="ticket-price-preview" title="Authoritative pricing reference derived from the current discrete cycle">
-          <span className="price-preview-label">Authoritative Snapshot Price</span>
+          <span className="price-preview-label">Giá Khớp Tham Chiếu (Snapshot Price)</span>
           <span className="price-preview-value font-mono">
-            {currentPrice ? `$${currentPrice}` : "Awaiting Market Snapshot"}
+            {currentPrice ? `$${currentPrice}` : "Đang chờ giá thị trường..."}
           </span>
         </div>
 
         {/* Limit Price Input when LIMIT is chosen */}
         {orderType === "LIMIT" && (
           <div className="form-group" data-testid="limit-price-group">
-            <label htmlFor="limit-price-input" className="form-label">Limit Price ($)</label>
+            <label htmlFor="limit-price-input" className="form-label">Mức Giá Giới Hạn ($)</label>
             <input
               id="limit-price-input"
               type="number"
@@ -336,8 +336,8 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
               disabled={!isActiveSession || isSubmitting}
               data-testid="limit-price-input"
               aria-label="Limit Price in USD"
-              placeholder={currentPrice ?? "Enter limit price"}
-              title="Enter your desired execution price limit in USD"
+              placeholder={currentPrice ?? "Nhập giá giới hạn"}
+              title="Nhập mức giá giới hạn mong muốn"
             />
           </div>
         )}
@@ -345,8 +345,8 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
         {/* Quantity Input */}
         <div className="form-group">
           <div className="label-with-hint">
-            <label htmlFor="quantity-input" className="form-label">Quantity (Shares)</label>
-            <span className="input-hint">Whole units only</span>
+            <label htmlFor="quantity-input" className="form-label">Khối Lượng Cổ Phiếu (Quantity)</label>
+            <span className="input-hint">Đơn vị lô nguyên</span>
           </div>
           <input
             id="quantity-input"
@@ -359,13 +359,13 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
             disabled={!isActiveSession || isSubmitting}
             data-testid="quantity-input"
             aria-label="Order Quantity in whole shares"
-            title="Enter the number of whole shares to trade (minimum: 1)"
+            title="Nhập số lượng cổ phiếu cần đặt lệnh (tối thiểu: 1)"
             required
           />
           {/* Quick Position Sizing Buttons */}
           {isActiveSession && effectivePrice > 0 && (
             <div className="quick-qty-buttons" style={{ display: "flex", gap: "6px", marginTop: "8px", alignItems: "center" }}>
-              <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600 }}>Quick Size:</span>
+              <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600 }}>Tỷ trọng nhanh:</span>
               {[
                 { label: "25%", pct: 0.25 },
                 { label: "50%", pct: 0.50 },
@@ -385,7 +385,7 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
                       setErrorMsg(null);
                     }}
                     disabled={isSubmitting}
-                    title={`Calculate position size for ${label} of available capital (${targetQty} shares)`}
+                    title={`Tính toán khối lượng cho ${label} vốn khả dụng (${targetQty} cổ phiếu)`}
                   >
                     {label}
                   </button>
@@ -400,21 +400,21 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
           <div
             className={`estimated-notional-box ${isExceedingCash ? "estimated-notional-warning" : ""}`}
             data-testid="estimated-notional"
-            title="Estimated total value based on price × quantity"
+            title="Giá trị ước tính căn cứ trên đơn giá × khối lượng"
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span className="notional-label">Estimated Notional</span>
+              <span className="notional-label">Giá Trị Lệnh Dự Kiến (Estimated Notional)</span>
               <span className="notional-value font-mono" data-testid="estimated-notional-value">
                 ${estimatedNotional}
               </span>
             </div>
             {isExceedingCash && (
               <span className="notional-warning-text" data-testid="cash-exceeded-warning" style={{ color: "var(--status-error)", fontSize: "0.8rem", display: "block", marginTop: "4px" }}>
-                Exceeds available cash balance (${cashBalance}).
+                Vượt quá số dư tiền mặt khả dụng (${cashBalance}).
               </span>
             )}
             <span className="notional-disclaimer">
-              Informational display only. Final execution occurs at authoritative server price.
+              Chỉ hiển thị ước tính tham khảo. Khớp lệnh thực tế diễn ra theo giá máy chủ chuẩn.
             </span>
           </div>
         )}
@@ -425,10 +425,10 @@ export const MarketOrderTicket: React.FC<MarketOrderTicketProps> = ({
           className={`button order-submit-btn ${side === "BUY" ? "button-success" : "button-error"}`}
           disabled={!isActiveSession || isSubmitting || quantity <= 0 || isExceedingCash}
           data-testid="submit-order-button"
-          title={`Click to commit and transmit this ${side} ${orderType} order to the simulation exchange`}
+          title={`Bấm để gửi lệnh ${side} ${orderType} vào sàn giao dịch mô phỏng`}
         >
           <Send size={16} style={{ marginRight: "8px" }} aria-hidden="true" />
-          {isSubmitting ? "Submitting Order..." : `Place ${side} ${orderType} Order`}
+          {isSubmitting ? "Đang Gửi Lệnh..." : `Đặt Lệnh ${side === "BUY" ? "MUA" : "BÁN"} (${orderType}) • Place ${side} ${orderType} Order`}
         </button>
       </form>
     </div>

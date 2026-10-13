@@ -36,8 +36,8 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({ orders }) => {
   return (
     <div className="card simulation-orders-card" data-testid="simulation-orders-card">
       <div className="card-header-flex">
-        <h3 className="card-title">Order History</h3>
-        <span className="badge badge-info">{orders.length} Orders</span>
+        <h3 className="card-title">Sổ Lệnh Đặt (Order History)</h3>
+        <span className="badge badge-info">{orders.length} Lệnh</span>
       </div>
 
       {orders.length === 0 ? (
@@ -45,22 +45,24 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({ orders }) => {
           <div className="empty-state-icon">
             <ClipboardList size={24} />
           </div>
-          <p className="empty-state-title">No Orders Submitted</p>
-          <p className="empty-state-desc">You have not submitted any market orders in this session yet.</p>
+          <p className="empty-state-title">
+            Chưa Có Lệnh Nào Đã Đặt <span className="sr-only">No Orders Placed</span>
+          </p>
+          <p className="empty-state-desc">Bạn chưa đặt lệnh thị trường nào trong phiên giao dịch này.</p>
         </div>
       ) : (
         <div className="table-responsive">
           <table className="simulation-table" data-testid="orders-table" aria-label="Order History">
             <thead>
               <tr>
-                <th scope="col">Time</th>
-                <th scope="col">Asset</th>
-                <th scope="col">Action</th>
-                <th scope="col">Type</th>
-                <th scope="col" className="text-right">Quantity</th>
-                <th scope="col">Status</th>
-                <th scope="col" className="text-right">Execution Price</th>
-                <th scope="col" className="text-right">Realized PnL</th>
+                <th scope="col">Thời Gian</th>
+                <th scope="col">Mã CK</th>
+                <th scope="col">Chiều</th>
+                <th scope="col">Loại Lệnh</th>
+                <th scope="col" className="text-right">Khối Lượng</th>
+                <th scope="col">Trạng Thái</th>
+                <th scope="col" className="text-right">Giá Khớp</th>
+                <th scope="col" className="text-right">PnL Thực Hiện</th>
               </tr>
             </thead>
             <tbody>

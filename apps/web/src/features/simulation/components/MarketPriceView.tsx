@@ -33,9 +33,9 @@ export const MarketPriceView: React.FC<MarketPriceViewProps> = ({
       <div className="card-header-flex" style={{ flexWrap: "wrap", gap: "0.75rem" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
           <Activity size={18} className="text-accent" aria-hidden="true" />
-          <h3 className="card-title" style={{ margin: 0 }}>Market Quotes & Snapshot Prices</h3>
+          <h3 className="card-title" style={{ margin: 0 }}>Bảng Giá & Khớp Lệnh Tham Chiếu</h3>
           <span className="badge badge-info font-mono" data-testid="market-cycle-badge">
-            Cycle {currentCycle}
+            Chu kỳ {currentCycle} • Cycle {currentCycle}
           </span>
         </div>
 
@@ -45,7 +45,7 @@ export const MarketPriceView: React.FC<MarketPriceViewProps> = ({
           <input
             type="text"
             className="input-text"
-            placeholder="Search symbol or name..."
+            placeholder="Tìm mã hoặc tên chứng khoán..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{ paddingLeft: "30px", fontSize: "0.85rem", height: "34px" }}
@@ -60,25 +60,25 @@ export const MarketPriceView: React.FC<MarketPriceViewProps> = ({
           <div className="empty-state-icon">
             <Coins size={24} />
           </div>
-          <p className="empty-state-title">No Assets Available</p>
-          <p className="empty-state-desc">The asset universe is currently unpopulated for this simulation scenario.</p>
+          <p className="empty-state-title">Chưa Có Mã Chứng Khoán Khả Dụng</p>
+          <p className="empty-state-desc">Vũ trụ tài sản chưa được cấu hình cho kịch bản giao dịch này.</p>
         </div>
       ) : filteredAssets.length === 0 ? (
         <div className="empty-state-wrap" data-testid="market-no-match-state">
-          <p className="empty-state-title">No matching assets found</p>
-          <p className="empty-state-desc">No asset symbol or name matches &quot;{searchTerm}&quot;.</p>
+          <p className="empty-state-title">Không tìm thấy mã phù hợp</p>
+          <p className="empty-state-desc">Không có cổ phiếu nào khớp với từ khoá &quot;{searchTerm}&quot;.</p>
         </div>
       ) : (
         <div className="table-responsive">
           <table className="simulation-table" data-testid="market-prices-table" aria-label="Market Asset Prices">
             <thead>
               <tr>
-                <th scope="col">Symbol</th>
-                <th scope="col">Asset Name</th>
-                <th scope="col">Type</th>
-                <th scope="col" className="text-right">Snapshot Price</th>
-                <th scope="col" className="text-right">Cycle</th>
-                {onSelectAsset && <th scope="col" className="text-center">Action</th>}
+                <th scope="col">Mã CK</th>
+                <th scope="col">Tên Doanh Nghiệp</th>
+                <th scope="col">Phân Loại</th>
+                <th scope="col" className="text-right">Giá Khớp Tham Chiếu</th>
+                <th scope="col" className="text-right">Chu Kỳ</th>
+                {onSelectAsset && <th scope="col" className="text-center">Thao Tác</th>}
               </tr>
             </thead>
             <tbody>

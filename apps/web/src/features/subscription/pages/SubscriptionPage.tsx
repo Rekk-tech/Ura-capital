@@ -21,7 +21,6 @@ import {
   SubscriptionReadOnlyNotice,
 } from "../components/SubscriptionStates";
 import { CancelSubscriptionDialog } from "../components/CancelSubscriptionDialog";
-import { subscriptionApi } from "../../../api/subscription.api";
 import { gamificationService } from "../../simulation/services/gamification.service";
 
 interface SubscriptionPageProps {

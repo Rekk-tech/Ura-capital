@@ -11,6 +11,7 @@ import { FomoTutorialModal } from "../components/map1/FomoTutorialModal";
 import { FomoDebriefView } from "../components/map1/FomoDebriefView";
 import { Play, ArrowLeft, RefreshCw, AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
+import { FOMO_SCENARIOS } from "../data/simulation-scenarios-store";
 
 export const FomoArenaPage: React.FC = () => {
   const { accessToken } = useAuth();
@@ -33,6 +34,7 @@ export const FomoArenaPage: React.FC = () => {
   const [showTutorial, setShowTutorial] = useState(!tutorialCompleted);
   const [activeTrapQuizClosedForRound, setActiveTrapQuizClosedForRound] = useState<number | null>(null);
   const [liveTickPrice, setLiveTickPrice] = useState<number | null>(null);
+  const [selectedScenarioKey, setSelectedScenarioKey] = useState<string>("vix_pump");
 
   // Trigger tutorial on initial view if not completed
   useEffect(() => {
@@ -110,18 +112,84 @@ export const FomoArenaPage: React.FC = () => {
         />
       )}
 
-      {/* 4. Thẻ Đấu Trường FOMO Arena (Empty State before starting game) */}
+      {/* 4. Thẻ Đấu Trường FOMO Arena (Empty State before starting game with Scenario Selector) */}
       {!isLoading && !debrief && !sessionId && (
-        <div className="w-full bg-white rounded-2xl border border-slate-200 p-6 md:p-8 shadow-sm flex flex-col gap-4">
+        <div className="w-full bg-white rounded-2xl border border-slate-200 p-6 md:p-8 shadow-sm flex flex-col gap-6">
           <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="badge badge-primary text-xs font-bold uppercase tracking-wider">Mô Phỏng Thực Chiến 7 Vòng</span>
+              <span className="text-xs text-slate-500">• 100% Thị Trường Thật</span>
+            </div>
             <h2 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight whitespace-nowrap">
               Đấu Trường Tâm Lý — FOMO Arena
             </h2>
-            <p className="text-slate-600 max-w-3xl leading-relaxed text-base mt-2">
+            <p className="text-slate-600 max-w-3xl leading-relaxed text-sm md:text-base mt-1">
               Trải nghiệm cảm xúc mua đỉnh bán đáy trong 7 Vòng sinh tử đầy biến động. Học cách giữ vững kỷ luật, né bẫy Bull-trap và bảo toàn vốn sống sót.
             </p>
           </div>
-          <div className="flex items-center gap-3 mt-3">
+
+          {/* Scenario Selection Grid */}
+          <div className="flex flex-col gap-3">
+            <label className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              Chọn Kịch Bản Thị Trường Mô Phỏng:
+            </label>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {Object.values(FOMO_SCENARIOS).map((scen) => {
+                const isSelected = selectedScenarioKey === scen.key;
+                return (
+                  <div
+                    key={scen.key}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setSelectedScenarioKey(scen.key)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setSelectedScenarioKey(scen.key);
+                      }
+                    }}
+                    className={`p-4 rounded-xl border text-left cursor-pointer transition-all duration-200 flex flex-col justify-between gap-3 ${
+                      isSelected
+                        ? "border-blue-600 bg-blue-50/50 shadow-sm ring-2 ring-blue-500/20"
+                        : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50"
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-1.5">
+                        <span className="font-mono text-xs font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded">
+                          {scen.ticker}
+                        </span>
+                        <span
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                            scen.difficulty === "Khốc Liệt"
+                              ? "bg-rose-100 text-rose-700"
+                              : scen.difficulty === "Nâng Cao"
+                              ? "bg-teal-100 text-teal-700"
+                              : "bg-amber-100 text-amber-700"
+                          }`}
+                        >
+                          {scen.difficulty}
+                        </span>
+                      </div>
+                      <h4 className="font-bold text-slate-900 text-sm">{scen.name}</h4>
+                      <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                        {scen.description}
+                      </p>
+                    </div>
+
+                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+                      <span>{scen.expectedVolatility}</span>
+                      <span className={`font-semibold ${isSelected ? "text-blue-600 font-bold" : "text-slate-400"}`}>
+                        {isSelected ? "✓ Đang chọn" : "Chọn kịch bản"}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 pt-2">
             <button
               type="button"
               onClick={startNewGame}

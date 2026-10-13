@@ -30,10 +30,12 @@ export const CommunitySummaryWidget: React.FC = () => {
   return (
     <DashboardWidgetWrapper
       title="Community Discussions"
+      displayTitle="Thảo Luận Cộng Đồng"
       icon={<MessageSquare size={20} className="text-accent" />}
       domainUrl="/community"
       domainLabel="Join Forum"
-      badge={<span className="badge badge-info">{posts.length} Recent</span>}
+      displayLabel="Vào Diễn Đàn"
+      badge={<span className="badge badge-info">{posts.length} Mới nhất</span>}
       isLoading={postsQuery.isLoading}
       isError={postsQuery.isError}
       errorMessage="Unable to load community discussions. Please try again."
@@ -44,12 +46,20 @@ export const CommunitySummaryWidget: React.FC = () => {
         {posts.length === 0 ? (
           <div className="widget-empty-state">
             <MessageSquare size={26} className="text-muted" aria-hidden="true" />
-            <p className="empty-title font-bold">No Recent Discussions</p>
-            <p className="text-muted">
-              Be the first to share an investment hypothesis or ask a question.
+            <p className="empty-title font-bold">
+              Chưa Có Thảo Luận Gần Đây
+              <span className="sr-only">No Recent Discussions</span>
             </p>
-            <Link to="/community" className="btn btn-outline btn-sm" style={{ marginTop: "0.75rem" }}>
-              Start Discussion
+            <p className="text-muted">
+              Hãy là người đầu tiên chia sẻ góc nhìn đầu tư hoặc đặt câu hỏi thảo luận.
+            </p>
+            <Link
+              to="/community"
+              className="btn btn-outline btn-sm"
+              style={{ marginTop: "0.75rem" }}
+              aria-label="Start Discussion"
+            >
+              <span>Đăng Bài Thảo Luận</span>
             </Link>
           </div>
         ) : (

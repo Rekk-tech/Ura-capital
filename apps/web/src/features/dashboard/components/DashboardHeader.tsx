@@ -43,7 +43,7 @@ export const DashboardHeader: React.FC = () => {
             </span>
           </div>
           <p className="dashboard-subtitle text-muted">
-            {user?.email} • Institutional learning desk and paper portfolio overview
+            {user?.email} • Trạm học tập tài chính &amp; Tổng quan danh mục giả lập
           </p>
         </div>
       </div>
@@ -57,10 +57,10 @@ export const DashboardHeader: React.FC = () => {
           aria-label="Refresh all dashboard data"
         >
           <RefreshCw size={14} className={isRefreshing ? "spin-animation" : ""} aria-hidden="true" />
-          <span>{isRefreshing ? "Refreshing..." : "Refresh Overview"}</span>
+          <span>{isRefreshing ? "Đang đồng bộ..." : "Làm Mới Tổng Quan"}</span>
         </button>
         <Link to="/account" className="btn btn-secondary btn-sm" aria-label="Go to Account Settings">
-          Account Details
+          Tài Khoản Cá Nhân
         </Link>
       </div>
 
@@ -68,9 +68,7 @@ export const DashboardHeader: React.FC = () => {
       <div className="dashboard-authority-notice" role="note">
         <ShieldAlert size={14} className="text-info flex-shrink-0" aria-hidden="true" />
         <span>
-          <strong>Server Authority Notice:</strong> All XP, simulation balances, community counts, and
-          tier entitlements shown on this dashboard are server-authoritative facts. Client displays do not
-          confer authority or alter durable state.
+          <strong>Server Authority Notice:</strong> All XP, simulation balances, community counts, and tier entitlements shown on this dashboard are server-authoritative facts. Client displays do not confer authority or alter durable state. (Số liệu chứng thực an toàn từ máy chủ).
         </span>
       </div>
     </section>

@@ -14,6 +14,7 @@ import { ProQuizDialog } from "../components/map2/ProQuizDialog";
 import { ProRoomReportView } from "../components/map2/ProRoomReportView";
 import { BrainCircuit, Play, ArrowLeft, RefreshCw, AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
+import { PRO_MACRO_REGIMES } from "../data/simulation-scenarios-store";
 
 export const ProRoomPage: React.FC = () => {
   const { accessToken } = useAuth();
@@ -33,6 +34,7 @@ export const ProRoomPage: React.FC = () => {
 
   const [showMacroExplainer, setShowMacroExplainer] = useState(false);
   const [activeQuizClosedForQuarter, setActiveQuizClosedForQuarter] = useState<number | null>(null);
+  const [selectedRegimeKey, setSelectedRegimeKey] = useState<string>("cycle_standard");
 
   // Draft allocation state synchronized with session allocation
   const [draftAllocation, setDraftAllocation] = useState<Map2Allocation>({
@@ -48,21 +50,9 @@ export const ProRoomPage: React.FC = () => {
     }
   }, [session?.currentAllocation, session?.currentQuarter]);
 
-  // Static macro stage definitions corresponding to 12 quarters
-  const quartersConfig = [
-    { quarter: 1, stage: "BÙNG NỔ", stageKey: "BOOM", stageDescription: "Initial Capital Deployment & Base Macro Positioning", rate: 5.0, inflation: 2.5, gdp: 7.5 },
-    { quarter: 2, stage: "BÙNG NỔ", stageKey: "BOOM", stageDescription: "Initial Capital Deployment & Base Macro Positioning", rate: 5.0, inflation: 2.5, gdp: 7.5 },
-    { quarter: 3, stage: "BÙNG NỔ", stageKey: "BOOM", stageDescription: "Initial Capital Deployment & Base Macro Positioning", rate: 5.0, inflation: 2.5, gdp: 7.5 },
-    { quarter: 4, stage: "ĐÌNH LẠM", stageKey: "STAGFLATION", stageDescription: "Macroeconomic Peak & Systemic Liquidity Squeeze", rate: 8.5, inflation: 6.0, gdp: 4.5 },
-    { quarter: 5, stage: "ĐÌNH LẠM", stageKey: "STAGFLATION", stageDescription: "Macroeconomic Peak & Systemic Liquidity Squeeze", rate: 8.5, inflation: 6.0, gdp: 4.5 },
-    { quarter: 6, stage: "ĐÌNH LẠM", stageKey: "STAGFLATION", stageDescription: "Macroeconomic Peak & Systemic Liquidity Squeeze", rate: 8.5, inflation: 6.0, gdp: 4.5 },
-    { quarter: 7, stage: "SUY THOÁI", stageKey: "RECESSION", stageDescription: "Market Capitulation & Deep Value Accumulation", rate: 7.0, inflation: 4.0, gdp: 3.0 },
-    { quarter: 8, stage: "SUY THOÁI", stageKey: "RECESSION", stageDescription: "Market Capitulation & Deep Value Accumulation", rate: 7.0, inflation: 4.0, gdp: 3.0 },
-    { quarter: 9, stage: "SUY THOÁI", stageKey: "RECESSION", stageDescription: "Market Capitulation & Deep Value Accumulation", rate: 7.0, inflation: 4.0, gdp: 3.0 },
-    { quarter: 10, stage: "HỒI PHỤC", stageKey: "RECOVERY", stageDescription: "Monetary Easing & Asset Expansion Rebound", rate: 6.0, inflation: 3.0, gdp: 6.0 },
-    { quarter: 11, stage: "HỒI PHỤC", stageKey: "RECOVERY", stageDescription: "Monetary Easing & Asset Expansion Rebound", rate: 6.0, inflation: 3.0, gdp: 6.0 },
-    { quarter: 12, stage: "HỒI PHỤC", stageKey: "RECOVERY", stageDescription: "Monetary Easing & Asset Expansion Rebound", rate: 6.0, inflation: 3.0, gdp: 6.0 },
-  ];
+  // Macro regime quarters definition
+  const selectedRegime = PRO_MACRO_REGIMES[selectedRegimeKey] || PRO_MACRO_REGIMES["cycle_standard"]!;
+  const quartersConfig = selectedRegime.quarters;
 
   const currentQ = session?.currentQuarter ?? 1;
   const currentQConfig = quartersConfig[Math.min(11, currentQ - 1)] ?? quartersConfig[0]!;
@@ -184,22 +174,76 @@ export const ProRoomPage: React.FC = () => {
 
       {/* 4. Empty State (No session active) */}
       {!isLoading && !report && !sessionId && (
-        <div className="max-w-2xl mx-auto my-12 p-8 rounded-2xl bg-white border border-slate-200 shadow-md text-center flex flex-col items-center gap-4">
+        <div className="max-w-3xl mx-auto my-8 p-6 md:p-8 rounded-2xl bg-white border border-slate-200 shadow-md text-center flex flex-col items-center gap-6">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-lg">
             <BrainCircuit size={32} />
           </div>
           <div>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <span className="badge badge-primary text-xs font-bold uppercase tracking-wider">Đầu Tư Định Chế 12 Quý</span>
+              <span className="text-xs text-slate-500">• Benjamin Graham &amp; Warren Buffett AI</span>
+            </div>
             <h2 className="text-2xl font-black text-slate-900 tracking-tight">
               Phòng Quản Trị Danh Mục — Pro Room
             </h2>
-            <p className="text-xs text-slate-500 max-w-md mx-auto mt-2 leading-relaxed">
+            <p className="text-xs text-slate-500 max-w-lg mx-auto mt-2 leading-relaxed">
               Quản trị số vốn định chế <strong>100.000.000 VND</strong> qua 12 quý kinh tế (Bùng nổ, Đình lạm, Suy thoái, Hồi phục). Nhận cố vấn trực tiếp từ AI Advisor theo triết lý Benjamin Graham &amp; Warren Buffett.
             </p>
           </div>
+
+          {/* Macro Regime Selection */}
+          <div className="w-full flex flex-col gap-2.5 text-left">
+            <label className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              Chọn Kịch Bản Vĩ Mô 12 Quý:
+            </label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {Object.values(PRO_MACRO_REGIMES).map((regime) => {
+                const isSelected = selectedRegimeKey === regime.key;
+                return (
+                  <div
+                    key={regime.key}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setSelectedRegimeKey(regime.key)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setSelectedRegimeKey(regime.key);
+                      }
+                    }}
+                    className={`p-4 rounded-xl border text-left cursor-pointer transition-all duration-200 flex flex-col justify-between gap-3 ${
+                      isSelected
+                        ? "border-blue-600 bg-blue-50/50 shadow-sm ring-2 ring-blue-500/20"
+                        : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50"
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-1.5">
+                        <span className="font-bold text-xs text-slate-900">{regime.name}</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                          {regime.badge}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 leading-relaxed line-clamp-2">
+                        {regime.description}
+                      </p>
+                    </div>
+                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400 font-mono">
+                      <span>Lãi suất gốc: {regime.baselineRate}%</span>
+                      <span className={`font-semibold ${isSelected ? "text-blue-600 font-bold" : "text-slate-400"}`}>
+                        {isSelected ? "✓ Đang chọn" : "Chọn kịch bản"}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           <button
             type="button"
             onClick={startNewGame}
-            className="btn btn-primary py-3 px-6 rounded-xl font-bold text-sm bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 shadow-md active:scale-95 mt-2"
+            className="btn btn-primary py-3 px-6 rounded-xl font-bold text-sm bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 shadow-md active:scale-95 mt-1"
           >
             <Play size={16} />
             <span>Khai Mạc Chu Kỳ 12 Quý</span>

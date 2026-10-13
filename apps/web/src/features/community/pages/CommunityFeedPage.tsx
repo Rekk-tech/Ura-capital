@@ -34,11 +34,11 @@ export const CommunityFeedPage: React.FC = () => {
     return (
       <main className="community-page-container">
         <section className="community-hero" style={{ marginBottom: "1.5rem" }}>
-          <h1 className="hero-title" style={{ fontSize: "1.75rem", marginBottom: "0.5rem" }}>
-            Community Discussions
+          <h1 className="hero-title" aria-label="Community Discussions" style={{ fontSize: "1.75rem", marginBottom: "0.5rem" }}>
+            Diễn Đàn Thảo Luận Cộng Đồng
           </h1>
           <p className="hero-subtitle" style={{ color: "var(--text-secondary)", fontSize: "0.95rem" }}>
-            Exchange financial analysis, learning takeaways, and investment strategies with peers.
+            Trao đổi phân tích tài chính, bài học kinh nghiệm và chiến lược đầu tư cùng cộng đồng học viên Aura Capital.
           </p>
         </section>
         <CommunityAuthRequiredCard />
@@ -51,11 +51,11 @@ export const CommunityFeedPage: React.FC = () => {
   return (
     <main className="community-page-container" data-testid="community-feed-page">
       <section className="community-hero" style={{ marginBottom: "1.5rem" }}>
-        <h1 className="hero-title" style={{ fontSize: "1.75rem", marginBottom: "0.5rem" }}>
-          Community Discussions
+        <h1 className="hero-title" aria-label="Community Discussions" style={{ fontSize: "1.75rem", marginBottom: "0.5rem" }}>
+          Diễn Đàn Thảo Luận Cộng Đồng
         </h1>
         <p className="hero-subtitle" style={{ color: "var(--text-secondary)", fontSize: "0.95rem" }}>
-          Exchange financial analysis, learning takeaways, and investment strategies with peers.
+          Trao đổi phân tích tài chính, bài học kinh nghiệm và chiến lược đầu tư cùng cộng đồng học viên Aura Capital.
         </p>
       </section>
 
@@ -85,7 +85,7 @@ export const CommunityFeedPage: React.FC = () => {
         }}
       >
         <span style={{ fontSize: "0.875rem", color: "var(--text-muted)", marginRight: "0.25rem" }}>
-          Sort by:
+          Sắp xếp theo (Sort by):
         </span>
         <button
           type="button"
@@ -95,7 +95,7 @@ export const CommunityFeedPage: React.FC = () => {
           aria-pressed={sortBy === "LATEST"}
           style={{ padding: "0.4rem 0.85rem", fontSize: "0.85rem" }}
         >
-          Latest
+          Mới Nhất • Latest
         </button>
         <button
           type="button"
@@ -105,7 +105,7 @@ export const CommunityFeedPage: React.FC = () => {
           aria-pressed={sortBy === "POPULAR"}
           style={{ padding: "0.4rem 0.85rem", fontSize: "0.85rem" }}
         >
-          Popular
+          Sôi Nổi • Popular
         </button>
       </div>
 

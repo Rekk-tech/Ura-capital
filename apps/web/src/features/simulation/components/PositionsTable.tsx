@@ -16,8 +16,8 @@ export const PositionsTable: React.FC<PositionsTableProps> = ({
   return (
     <div className="card simulation-positions-card" data-testid="simulation-positions-card">
       <div className="card-header-flex">
-        <h3 className="card-title">Open Asset Positions</h3>
-        <span className="badge badge-info">{positions.length} Positions</span>
+        <h3 className="card-title">Vị Thế Đang Nắm Giữ (Open Positions)</h3>
+        <span className="badge badge-info">{positions.length} Mã</span>
       </div>
 
       {positions.length === 0 ? (
@@ -25,9 +25,11 @@ export const PositionsTable: React.FC<PositionsTableProps> = ({
           <div className="empty-state-icon">
             <Package size={24} />
           </div>
-          <p className="empty-state-title">No Open Positions</p>
+          <p className="empty-state-title">
+            Chưa Có Vị Thế Nắm Giữ <span className="sr-only">No Open Positions</span>
+          </p>
           <p className="empty-state-desc">
-            Your portfolio currently holds 100% cash. Use the order ticket below to place market BUY orders.
+            Danh mục của bạn hiện nắm giữ 100% tiền mặt. Sử dụng phiếu đặt lệnh bên dưới để thực hiện lệnh MUA tích luỹ.
           </p>
         </div>
       ) : (
@@ -35,13 +37,13 @@ export const PositionsTable: React.FC<PositionsTableProps> = ({
           <table className="simulation-table" data-testid="positions-table" aria-label="Open Positions">
             <thead>
               <tr>
-                <th scope="col">Asset</th>
-                <th scope="col" className="text-right">Quantity</th>
-                <th scope="col" className="text-right">Average Cost</th>
-                <th scope="col" className="text-right">Current Price</th>
-                <th scope="col" className="text-right">Market Value</th>
-                <th scope="col" className="text-right">Unrealized PnL</th>
-                {onSelectAsset && <th scope="col" className="text-center">Action</th>}
+                <th scope="col">Mã Chứng Khoán</th>
+                <th scope="col" className="text-right">Khối Lượng</th>
+                <th scope="col" className="text-right">Giá Vốn TB</th>
+                <th scope="col" className="text-right">Giá Hiện Tại</th>
+                <th scope="col" className="text-right">Giá Trị Thị Trường</th>
+                <th scope="col" className="text-right">Lãi/Lỗ Dự Kiến</th>
+                {onSelectAsset && <th scope="col" className="text-center">Thao Tác</th>}
               </tr>
             </thead>
             <tbody>

@@ -40,9 +40,8 @@ const DashboardView: React.FC = () => {
         {/* Educational & Regulatory Bottom Disclosure */}
         <footer className="dashboard-footer-disclosure" role="contentinfo">
           <p className="text-muted">
-            <strong>Platform Disclosure:</strong> Aura Capital educational learning modules, simulation trading desks,
-            community forums, and subscription plans operate under institutional simulation standards. No real money or live
-            brokerage execution is conducted on this platform.
+            <strong>Platform Disclosure:</strong> <span>(Công Bố Nền Tảng) Các mô-đun học tập, bàn giao dịch giả lập,
+            diễn đàn cộng đồng và gói hội viên Aura Capital vận hành hoàn toàn theo tiêu chuẩn mô phỏng phi rủi ro. Không có tiền thật hoặc lệnh môi giới thực tế nào được thực thi trên hệ thống này.</span>
           </p>
         </footer>
       </div>

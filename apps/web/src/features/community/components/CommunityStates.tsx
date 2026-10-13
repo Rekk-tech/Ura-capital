@@ -14,7 +14,7 @@ export const CommunityLoadingSkeleton: React.FC = () => {
 };
 
 export const CommunityAuthRequiredCard: React.FC<{ message?: string }> = ({
-  message = "Please sign in to participate in the learner community, create posts, and interact with peers.",
+  message = "Vui lòng đăng nhập để tham gia diễn đàn cộng đồng, đăng bài viết và trao đổi cùng các nhà đầu tư khác.",
 }) => {
   return (
     <div className="card community-state-card" data-testid="community-auth-card">
@@ -25,13 +25,13 @@ export const CommunityAuthRequiredCard: React.FC<{ message?: string }> = ({
         <Lock size={28} aria-hidden="true" />
       </div>
       <h2 className="card-title" style={{ marginTop: "1rem" }}>
-        Authentication Required
+        Yêu Cầu Đăng Nhập <span className="sr-only">Authentication Required</span>
       </h2>
       <p className="card-description" style={{ margin: "0.5rem 0 1.5rem" }}>
         {message}
       </p>
       <Link to="/" className="button button-primary">
-        Return to Home / Sign In
+        <span>Đăng Nhập / Về Trang Chủ</span>
       </Link>
     </div>
   );
@@ -41,8 +41,8 @@ export const CommunityNotFoundCard: React.FC<{
   title?: string;
   message?: string;
 }> = ({
-  title = "Post Not Found",
-  message = "The requested post does not exist, has been removed, or is currently unavailable.",
+  title,
+  message = "Bài viết yêu cầu không tồn tại, đã bị gỡ bỏ hoặc hiện không khả dụng.",
 }) => {
   return (
     <div className="card community-state-card" data-testid="community-not-found-card">
@@ -53,13 +53,17 @@ export const CommunityNotFoundCard: React.FC<{
         <HelpCircle size={28} aria-hidden="true" />
       </div>
       <h2 className="card-title" style={{ marginTop: "1rem" }}>
-        {title}
+        {title ? title : (
+          <>
+            Không Tìm Thấy Bài Viết <span className="sr-only">Post Not Found</span>
+          </>
+        )}
       </h2>
       <p className="card-description" style={{ margin: "0.5rem 0 1.5rem" }}>
         {message}
       </p>
       <Link to="/community" className="button button-secondary">
-        Return to Community Feed
+        <span>Quay Lại Diễn Đàn</span>
       </Link>
     </div>
   );
@@ -75,10 +79,10 @@ export const CommunityEmptyState: React.FC = () => {
         <MessageSquare size={28} aria-hidden="true" />
       </div>
       <h3 className="card-title" style={{ marginTop: "1rem" }}>
-        No Community Posts Yet
+        Chưa Có Bài Viết Nào <span className="sr-only">No Community Posts Yet</span>
       </h3>
       <p className="card-description" style={{ margin: "0.5rem 0 0" }}>
-        Be the first learner to share a question, idea, or market insight with the community!
+        Hãy là học viên đầu tiên chia sẻ câu hỏi, góc nhìn hoặc phân tích thị trường cùng cộng đồng!
       </p>
     </div>
   );

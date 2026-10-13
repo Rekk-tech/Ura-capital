@@ -40,9 +40,11 @@ export const SubscriptionSummaryWidget: React.FC = () => {
   return (
     <DashboardWidgetWrapper
       title="Membership Plan"
+      displayTitle="Gói Hội Viên"
       icon={<ShieldCheck size={20} className="text-accent" />}
       domainUrl="/subscription"
       domainLabel="Manage Plan"
+      displayLabel="Quản Lý Gói"
       badge={
         sub ? (
           <span className={`badge ${isPremium ? "badge-success" : "badge-info"}`}>
@@ -61,7 +63,7 @@ export const SubscriptionSummaryWidget: React.FC = () => {
         <div className="subscription-tier-highlight">
           <div className="tier-header-row">
             <div>
-              <span className="tier-label text-muted">Active Tier</span>
+              <span className="tier-label text-muted">Hạng Thành Viên</span>
               <h3 className="tier-name font-bold" data-testid="subscription-plan-value">
                 {isPremium ? "Institutional Premium" : "Free Explorer"}
               </h3>
@@ -79,15 +81,15 @@ export const SubscriptionSummaryWidget: React.FC = () => {
           <div className="tier-entitlements-list">
             <div className="entitlement-item">
               <CheckCircle2 size={14} className="text-success flex-shrink-0" aria-hidden="true" />
-              <span>{isPremium ? "Unlimited Multi-Asset Simulation Desks" : "Basic Academy Lesson Access"}</span>
+              <span>{isPremium ? "Không giới hạn bàn giao dịch mô phỏng đa tài sản" : "Truy cập hệ thống bài học cơ bản"}</span>
             </div>
             <div className="entitlement-item">
               <CheckCircle2 size={14} className="text-success flex-shrink-0" aria-hidden="true" />
-              <span>{isPremium ? "Institutional Analytics & Fast Refresh" : "Paper Trading Simulation (Standard)"}</span>
+              <span>{isPremium ? "Định giá chuyên sâu tổ chức & Trợ lý AI Studio" : "Đấu trường giao dịch mô phỏng tiêu chuẩn"}</span>
             </div>
             {periodEndFormatted && (
               <div className="entitlement-item text-muted" style={{ fontSize: "0.85rem", marginTop: "0.25rem" }}>
-                <span>Renews / Expires: {periodEndFormatted}</span>
+                <span>Thời hạn hiệu lực: {periodEndFormatted}</span>
               </div>
             )}
           </div>
@@ -99,7 +101,7 @@ export const SubscriptionSummaryWidget: React.FC = () => {
             to="/subscription"
             className={`btn btn-block ${isPremium ? "btn-outline" : "btn-primary"} btn-sm`}
           >
-            {isPremium ? "Review Membership Entitlements" : "Upgrade to Premium"}
+            <span>{isPremium ? "Xem Chi Tiết Quyền Lợi" : "Nâng Cấp Hội Viên VIP"}</span>
           </Link>
         </div>
       </div>
