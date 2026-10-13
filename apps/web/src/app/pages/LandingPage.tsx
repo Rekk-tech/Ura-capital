@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import {
   ShieldCheck,
@@ -17,7 +17,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useAuth } from "../../features/auth/context/AuthContext";
-import { AiCoachModal } from "../../features/ai";
+import { openAiCoach } from "../../features/ai";
 
 
 /**
@@ -29,7 +29,6 @@ import { AiCoachModal } from "../../features/ai";
  */
 export const LandingPage: React.FC = () => {
   const { isAuthenticated } = useAuth();
-  const [isAiCoachOpen, setIsAiCoachOpen] = useState(false);
 
   return (
     <main id="main-content" className="landing-container">
@@ -372,7 +371,7 @@ export const LandingPage: React.FC = () => {
                   alignItems: "center",
                   gap: "4px",
                 }}
-                onClick={() => setIsAiCoachOpen(true)}
+                onClick={() => openAiCoach("GENERAL")}
                 aria-label="Khám phá Cố vấn AI Aura Intelligence"
               >
                 <span>Trò Chuyện Cùng Cố Vấn →</span>
@@ -676,13 +675,6 @@ export const LandingPage: React.FC = () => {
           </div>
         </div>
       </section>
-
-      {/* Aura Intelligence AI Coach Modal */}
-      <AiCoachModal
-        isOpen={isAiCoachOpen}
-        onClose={() => setIsAiCoachOpen(false)}
-        initialContext="GENERAL"
-      />
     </main>
   );
 };

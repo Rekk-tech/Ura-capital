@@ -1,4 +1,10 @@
 export { AiCoachModal } from "./components/AiCoachModal";
 export type { AiCoachModalProps } from "./components/AiCoachModal";
+export { AiCoachFab } from "./components/AiCoachFab";
+export type { AiCoachFabProps } from "./components/AiCoachFab";
+export { AiCoachWidget } from "./components/AiCoachWidget";
+export type { AiCoachWidgetProps } from "./components/AiCoachWidget";
+export { openAiCoach, AURA_OPEN_AI_COACH_EVENT } from "./events";
+export type { AiCoachContext } from "./events";
 export { useAiCoach } from "./hooks/useAiCoach";
 export type { CoachMessage } from "./hooks/useAiCoach";

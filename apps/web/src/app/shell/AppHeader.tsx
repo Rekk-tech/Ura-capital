@@ -22,7 +22,7 @@ import {
 import { APP_NAME } from "@aura/shared";
 import { useAuth } from "../../features/auth/context/AuthContext";
 import { getPrimaryNavRoutes, isRouteActive } from "../router/route-registry";
-import { AiCoachModal } from "../../features/ai";
+import { openAiCoach } from "../../features/ai";
 
 
 const NAV_ICONS: Record<string, React.ReactNode> = {
@@ -54,7 +54,6 @@ export const AppHeader: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [isAiCoachOpen, setIsAiCoachOpen] = useState(false);
   const [currentLang, setCurrentLang] = useState<"VI" | "EN">(() => {
     try {
       return (localStorage.getItem("aura_app_lang") as "VI" | "EN") || "VI";
@@ -187,7 +186,7 @@ export const AppHeader: React.FC = () => {
           {/* Aura Intelligence AI Coach Trigger */}
           <button
             type="button"
-            onClick={() => setIsAiCoachOpen(true)}
+            onClick={() => openAiCoach("GENERAL")}
             className="ai-coach-pill-btn"
             title="Mở Cố vấn Aura Intelligence"
             aria-label="Mở Cố vấn Aura Intelligence"
@@ -446,13 +445,6 @@ export const AppHeader: React.FC = () => {
           aria-hidden="true"
         />
       )}
-
-      {/* Global Aura Intelligence AI Learning Coach Modal */}
-      <AiCoachModal
-        isOpen={isAiCoachOpen}
-        onClose={() => setIsAiCoachOpen(false)}
-        initialContext="GENERAL"
-      />
     </header>
   );
 };

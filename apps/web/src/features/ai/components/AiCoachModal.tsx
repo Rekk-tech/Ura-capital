@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import {
   Cpu,
   X,
@@ -8,6 +9,9 @@ import {
   ShieldAlert,
   Bot,
   User,
+  Maximize2,
+  Minimize2,
+  Minus,
 } from "lucide-react";
 import { useAiCoach } from "../hooks/useAiCoach";
 
@@ -31,21 +35,25 @@ export const AiCoachModal: React.FC<AiCoachModalProps> = ({
   } = useAiCoach(initialContext);
 
   const [inputValue, setInputValue] = useState("");
+  const [isExpanded, setIsExpanded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Focus trap & Escape key
+  // Focus trap & Escape key navigation
   useEffect(() => {
     if (!isOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        onClose();
+        if (isExpanded) {
+          setIsExpanded(false);
+        } else {
+          onClose();
+        }
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    // Autofocus input after animation
     const timer = setTimeout(() => {
       inputRef.current?.focus();
     }, 150);
@@ -54,7 +62,7 @@ export const AiCoachModal: React.FC<AiCoachModalProps> = ({
       window.removeEventListener("keydown", handleKeyDown);
       clearTimeout(timer);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, isExpanded, onClose]);
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -63,7 +71,7 @@ export const AiCoachModal: React.FC<AiCoachModalProps> = ({
     }
   }, [messages, isLoading, isOpen]);
 
-  if (!isOpen) return null;
+  if (!isOpen || typeof document === "undefined") return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,27 +87,33 @@ export const AiCoachModal: React.FC<AiCoachModalProps> = ({
     ask(suggestionText);
   };
 
-  return (
+  const dialogContent = (
     <div
-      className="ai-coach-backdrop"
+      className={
+        isExpanded
+          ? "ai-coach-backdrop-expanded"
+          : "ai-coach-docked-container"
+      }
       onClick={(e) => {
-        if (e.target === e.currentTarget) {
-          onClose();
+        if (isExpanded && e.target === e.currentTarget) {
+          setIsExpanded(false);
         }
       }}
-      role="presentation"
+      role={isExpanded ? "presentation" : undefined}
     >
       <div
-        className="ai-coach-dialog"
+        className={`ai-coach-dialog ${
+          isExpanded ? "ai-coach-dialog-expanded" : "ai-coach-dialog-docked"
+        }`}
         role="dialog"
-        aria-modal="true"
+        aria-modal={isExpanded ? "true" : "false"}
         aria-labelledby="ai-coach-title"
       >
         {/* Header */}
         <div className="ai-coach-header">
           <div className="ai-coach-brand">
             <div className="ai-coach-avatar">
-              <Cpu size={24} aria-hidden="true" />
+              <Cpu size={22} aria-hidden="true" />
               <span className="ai-coach-online-dot" title="Trực tuyến" />
             </div>
             <div className="ai-coach-title-area">
@@ -121,16 +135,38 @@ export const AiCoachModal: React.FC<AiCoachModalProps> = ({
               title="Khởi tạo lại cuộc trò chuyện"
               aria-label="Khởi tạo lại cuộc trò chuyện"
             >
-              <RotateCcw size={16} />
+              <RotateCcw size={15} />
+            </button>
+            <button
+              type="button"
+              className="ai-coach-icon-btn"
+              onClick={() => setIsExpanded(!isExpanded)}
+              title={
+                isExpanded
+                  ? "Thu nhỏ về góc màn hình (Docked Mode)"
+                  : "Mở rộng toàn màn hình (Study Mode)"
+              }
+              aria-label="Phóng to hoặc thu nhỏ cửa sổ cố vấn"
+            >
+              {isExpanded ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
             </button>
             <button
               type="button"
               className="ai-coach-icon-btn"
               onClick={onClose}
+              title="Thu nhỏ xuống thanh tác vụ"
+              aria-label="Thu gọn cửa sổ cố vấn"
+            >
+              <Minus size={15} />
+            </button>
+            <button
+              type="button"
+              className="ai-coach-icon-btn ai-coach-close-btn"
+              onClick={onClose}
               title="Đóng cửa sổ cố vấn"
               aria-label="Đóng cửa sổ cố vấn"
             >
-              <X size={18} />
+              <X size={16} />
             </button>
           </div>
         </div>
@@ -146,8 +182,8 @@ export const AiCoachModal: React.FC<AiCoachModalProps> = ({
             >
               <div
                 style={{
-                  width: 32,
-                  height: 32,
+                  width: 30,
+                  height: 30,
                   borderRadius: 10,
                   display: "flex",
                   alignItems: "center",
@@ -158,7 +194,7 @@ export const AiCoachModal: React.FC<AiCoachModalProps> = ({
                   color: msg.role === "user" ? "#ffffff" : "#6366f1",
                 }}
               >
-                {msg.role === "user" ? <User size={16} /> : <Bot size={16} />}
+                {msg.role === "user" ? <User size={15} /> : <Bot size={15} />}
               </div>
 
               <div className="ai-message-bubble">
@@ -176,8 +212,8 @@ export const AiCoachModal: React.FC<AiCoachModalProps> = ({
             <div className="ai-message ai-message-coach">
               <div
                 style={{
-                  width: 32,
-                  height: 32,
+                  width: 30,
+                  height: 30,
                   borderRadius: 10,
                   display: "flex",
                   alignItems: "center",
@@ -187,7 +223,7 @@ export const AiCoachModal: React.FC<AiCoachModalProps> = ({
                   color: "#6366f1",
                 }}
               >
-                <Bot size={16} />
+                <Bot size={15} />
               </div>
               <div className="ai-typing-indicator" aria-label="Đang phân tích">
                 <span className="ai-typing-dot" />
@@ -256,4 +292,6 @@ export const AiCoachModal: React.FC<AiCoachModalProps> = ({
       </div>
     </div>
   );
+
+  return createPortal(dialogContent, document.body);
 };

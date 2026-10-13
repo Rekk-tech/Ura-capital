@@ -6438,51 +6438,188 @@ a {
 }
 
 /* ==========================================================================
-   AURA INTELLIGENCE (AI LEARNING COACH) MODAL & WIDGET
+   AURA INTELLIGENCE (AI LEARNING COACH) CO-PILOT WIDGET & MODAL
    ========================================================================== */
-.ai-coach-backdrop {
+.ai-coach-backdrop,
+.ai-coach-backdrop-expanded {
   position: fixed;
   inset: 0;
-  background-color: rgba(11, 27, 58, 0.65);
+  background-color: rgba(11, 27, 58, 0.55);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  padding: 1rem;
+  padding: 1.25rem;
   animation: aiCoachFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.ai-coach-docked-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  animation: aiCoachSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 .ai-coach-dialog {
-  width: 100%;
-  max-width: 680px;
-  height: 85vh;
-  max-height: 720px;
+  pointer-events: auto;
   background-color: #ffffff;
   border-radius: 20px;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 25px 50px -12px rgba(11, 27, 58, 0.25);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   position: relative;
-  animation: aiCoachSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes aiCoachFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.ai-coach-dialog-docked {
+  width: 420px;
+  max-width: calc(100vw - 32px);
+  height: min(620px, calc(100vh - 48px));
+  box-shadow: 0 20px 45px -10px rgba(11, 27, 58, 0.22), 0 0 1px rgba(11, 27, 58, 0.15);
+  border: 1px solid rgba(226, 232, 240, 0.9);
 }
 
-@keyframes aiCoachSlideUp {
+.ai-coach-dialog-expanded {
+  width: 100%;
+  max-width: 760px;
+  height: min(780px, 86vh);
+  box-shadow: 0 25px 60px -12px rgba(11, 27, 58, 0.35);
+  animation: aiCoachExpand 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes aiCoachExpand {
   from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.98);
+    opacity: 0.7;
+    transform: scale(0.96);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: scale(1);
+  }
+}
+
+/* Floating Action Button (FAB) */
+.ai-coach-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9990;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 1.15rem 0.55rem 0.55rem;
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 45%, #4f46e5 100%);
+  border: 1px solid rgba(196, 181, 253, 0.35);
+  border-radius: 9999px;
+  box-shadow: 0 10px 25px -5px rgba(49, 46, 129, 0.4), 0 0 15px rgba(124, 58, 237, 0.25);
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  user-select: none;
+  animation: aiCoachSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ai-coach-fab:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 14px 30px -5px rgba(49, 46, 129, 0.5), 0 0 20px rgba(139, 92, 246, 0.35);
+  border-color: rgba(221, 214, 254, 0.6);
+}
+
+.ai-coach-fab:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.ai-coach-fab-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+}
+
+.ai-coach-fab-online-dot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  background-color: #10b981;
+  border: 2px solid #1e1b4b;
+  border-radius: 50%;
+}
+
+.ai-coach-fab-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.ai-coach-fab-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.ai-coach-fab-sparkle {
+  color: #fde047;
+  animation: aiSparkleRotate 3s infinite linear;
+}
+
+@keyframes aiSparkleRotate {
+  0% { transform: rotate(0deg) scale(0.9); }
+  50% { transform: rotate(180deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(0.9); }
+}
+
+.ai-coach-fab-status {
+  font-size: 0.7rem;
+  color: #c7d2fe;
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+@media (max-width: 640px) {
+  .ai-coach-docked-container {
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+  }
+
+  .ai-coach-dialog-docked,
+  .ai-coach-dialog-expanded {
+    width: 100%;
+    max-width: 100%;
+    height: 85vh;
+    max-height: 85vh;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: none;
+  }
+
+  .ai-coach-fab {
+    bottom: 16px;
+    right: 16px;
+    padding: 0.5rem 0.85rem;
   }
 }
 

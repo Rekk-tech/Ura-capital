@@ -19,6 +19,7 @@ import { PortfolioPage } from "../../features/portfolio/pages/PortfolioPage";
 import { CommunityRoutes } from "../router/community-routes";
 import { AdminRoutes } from "../../features/admin/routes/admin-routes";
 import { ProfileSettingsPage } from "../../features/profile/pages/ProfileSettingsPage";
+import { AiCoachWidget } from "../../features/ai";
 
 /**
  * FEAT-070 / FEAT-071 / FEAT-072 / FEAT-073 / FEAT-074 / FEAT-075 / FEAT-076 / FEAT-077: Standard Application Shell
@@ -108,6 +109,9 @@ export const AppShell: React.FC = () => {
 
       {/* Global Application Footer */}
       <AppFooter />
+
+      {/* Global Aura Intelligence AI Learning Coach (Docked Co-Pilot + Floating FAB) */}
+      <AiCoachWidget />
     </div>
   );
 };
