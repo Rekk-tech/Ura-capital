@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ShieldCheck,
@@ -17,6 +17,8 @@ import {
   Zap,
 } from "lucide-react";
 import { useAuth } from "../../features/auth/context/AuthContext";
+import { AiCoachModal } from "../../features/ai";
+
 
 /**
  * Modern Corporate Landing Page (Vietnamese - English Financial Hybrid)
@@ -27,6 +29,7 @@ import { useAuth } from "../../features/auth/context/AuthContext";
  */
 export const LandingPage: React.FC = () => {
   const { isAuthenticated } = useAuth();
+  const [isAiCoachOpen, setIsAiCoachOpen] = useState(false);
 
   return (
     <main id="main-content" className="landing-container">
@@ -341,7 +344,7 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* 7. Aura Intelligence */}
-          <div className="card card-aura card-deferred">
+          <div className="card card-aura">
             <div className="card-header">
               <div className="card-icon-wrap bg-purple-subtle">
                 <Cpu size={22} className="text-purple" aria-hidden="true" />
@@ -355,8 +358,25 @@ export const LandingPage: React.FC = () => {
               Cố vấn AI đồng hành thông minh, giải thích biến động thị trường theo thời gian thực và định hình kỷ luật giao dịch an toàn.
             </p>
             <div className="card-footer-action">
-              <span className="badge badge-neutral">Phase 8 Intelligence — Coming Soon</span>
-              <span className="text-muted" style={{ fontSize: "0.85rem" }}>Đang Phát Triển</span>
+              <span className="badge badge-success-subtle">Sẵn Sàng</span>
+              <button
+                type="button"
+                className="card-action-link"
+                style={{
+                  background: "none",
+                  border: "none",
+                  padding: 0,
+                  cursor: "pointer",
+                  font: "inherit",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "4px",
+                }}
+                onClick={() => setIsAiCoachOpen(true)}
+                aria-label="Khám phá Cố vấn AI Aura Intelligence"
+              >
+                <span>Trò Chuyện Cùng Cố Vấn →</span>
+              </button>
             </div>
           </div>
         </div>
@@ -656,6 +676,14 @@ export const LandingPage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Aura Intelligence AI Coach Modal */}
+      <AiCoachModal
+        isOpen={isAiCoachOpen}
+        onClose={() => setIsAiCoachOpen(false)}
+        initialContext="GENERAL"
+      />
     </main>
   );
 };
+

@@ -127,9 +127,13 @@ describe("FEAT-058 AI Gateway Security, Secrecy & Scope Boundaries", () => {
         }
       }
 
-      // Must have zero AI assistant endpoints
-      const aiRoutes = routes.filter((r) => r.includes("/ai") || r.includes("/assistant"));
-      expect(aiRoutes).toEqual([]);
+      // Must have zero unapproved AI assistant endpoints (only approved Phase 9 authenticated coach endpoints)
+      const unapprovedAiRoutes = routes.filter(
+        (r) =>
+          (r.includes("/ai") || r.includes("/assistant")) &&
+          !["/api/ai/coach", "/ai/coach", "/api/ai/chat", "/ai/chat"].includes(r),
+      );
+      expect(unapprovedAiRoutes).toEqual([]);
     });
 
     it("confirms ZERO AI database models or migrations exist in Prisma schema", () => {

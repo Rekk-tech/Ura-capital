@@ -17,10 +17,13 @@ import {
   Sparkles,
   ShieldCheck,
   Settings,
+  Cpu,
 } from "lucide-react";
 import { APP_NAME } from "@aura/shared";
 import { useAuth } from "../../features/auth/context/AuthContext";
 import { getPrimaryNavRoutes, isRouteActive } from "../router/route-registry";
+import { AiCoachModal } from "../../features/ai";
+
 
 const NAV_ICONS: Record<string, React.ReactNode> = {
   "/": <HomeIcon size={16} aria-hidden="true" />,
@@ -51,6 +54,7 @@ export const AppHeader: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isAiCoachOpen, setIsAiCoachOpen] = useState(false);
   const [currentLang, setCurrentLang] = useState<"VI" | "EN">(() => {
     try {
       return (localStorage.getItem("aura_app_lang") as "VI" | "EN") || "VI";
@@ -180,6 +184,31 @@ export const AppHeader: React.FC = () => {
 
         {/* Header Right Actions */}
         <div className="header-actions">
+          {/* Aura Intelligence AI Coach Trigger */}
+          <button
+            type="button"
+            onClick={() => setIsAiCoachOpen(true)}
+            className="ai-coach-pill-btn"
+            title="Mở Cố vấn Aura Intelligence"
+            aria-label="Mở Cố vấn Aura Intelligence"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              padding: "0.3rem 0.75rem",
+              borderRadius: "9999px",
+              fontSize: "0.75rem",
+              fontWeight: 700,
+              background: "linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(99, 102, 241, 0.1))",
+              color: "#7c3aed",
+              border: "1px solid rgba(139, 92, 246, 0.3)",
+              cursor: "pointer",
+            }}
+          >
+            <Cpu size={14} aria-hidden="true" />
+            <span>Trợ Lý AI</span>
+          </button>
+
           {/* Upgrade / Admin Action Pill */}
           {isAdmin ? (
             <Link
@@ -417,6 +446,14 @@ export const AppHeader: React.FC = () => {
           aria-hidden="true"
         />
       )}
+
+      {/* Global Aura Intelligence AI Learning Coach Modal */}
+      <AiCoachModal
+        isOpen={isAiCoachOpen}
+        onClose={() => setIsAiCoachOpen(false)}
+        initialContext="GENERAL"
+      />
     </header>
   );
 };
+
