@@ -78,3 +78,9 @@ tmp/
 *.sw?
 .DS_Store
 Thumbs.db
+
+# Test reports & temp scratch
+playwright-report/
+test-results/
+accoun_admin.txt
+

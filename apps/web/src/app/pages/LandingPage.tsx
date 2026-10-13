@@ -357,7 +357,7 @@ export const LandingPage: React.FC = () => {
               Cố vấn AI đồng hành thông minh, giải thích biến động thị trường theo thời gian thực và định hình kỷ luật giao dịch an toàn.
             </p>
             <div className="card-footer-action">
-              <span className="badge badge-success-subtle">Sẵn Sàng</span>
+              <span className="badge badge-warning-subtle">Phase 8 Intelligence — Coming Soon</span>
               <button
                 type="button"
                 className="card-action-link"

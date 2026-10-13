@@ -35,11 +35,13 @@ export const AiCoachWidget: React.FC<AiCoachWidgetProps> = ({
       {showFab && !isOpen && (
         <AiCoachFab onClick={() => setIsOpen(true)} />
       )}
-      <AiCoachModal
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        initialContext={activeContext}
-      />
+      {isOpen && (
+        <AiCoachModal
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          initialContext={activeContext}
+        />
+      )}
     </>
   );
 };

@@ -15,11 +15,15 @@ export function useSubscriptionPlansQuery(accessToken?: string) {
     enabled: Boolean(accessToken),
   });
 }
-export function useCurrentSubscriptionQuery(accessToken?: string, sessionKey?: string) {
+export function useCurrentSubscriptionQuery(
+  accessToken?: string,
+  sessionKey?: string,
+  enabled = true
+) {
   return useQuery({
     queryKey: subscriptionQueryKeys.current(sessionKey),
     queryFn: ({ signal }) => subscriptionApi.getCurrent(accessToken!, { signal }),
-    enabled: Boolean(accessToken && sessionKey),
+    enabled: Boolean(accessToken && sessionKey && enabled),
   });
 }
 

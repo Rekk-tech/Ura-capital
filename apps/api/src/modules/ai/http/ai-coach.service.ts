@@ -1,5 +1,6 @@
 import { logger } from "../../../infrastructure/logging/logger.js";
 import { classifyIntentDeterministic } from "../intent/index.js";
+import { aiGuardrailService, AIGuardrailService } from "./ai-guardrail.service.js";
 
 export interface AICoachRequest {
   query: string;
@@ -96,37 +97,33 @@ const KNOWLEDGE_BASE: KnowledgePattern[] = [
 ];
 
 export class AICoachService {
+  constructor(
+    private readonly guardrailService: AIGuardrailService = aiGuardrailService,
+  ) {}
+
   /**
    * Process learner query and generate educational coaching response
    */
   async consult(request: AICoachRequest): Promise<AICoachResponse> {
     const trimmedQuery = request.query?.trim() || "";
 
-    // 1. Adversarial / Prompt Injection Filtering
-    const adversarialPatterns = [
-      /ignore previous instructions/i,
-      /system prompt/i,
-      /reveal key/i,
-      /bypass safety/i,
-      /hack/i,
-      /jailbreak/i,
-    ];
-    for (const pattern of adversarialPatterns) {
-      if (pattern.test(trimmedQuery)) {
-        return {
-          answer:
-            "Hệ thống an toàn của Aura Intelligence ghi nhận yêu cầu không phù hợp với mục tiêu giáo dục đầu tư tài chính. Cố vấn chỉ hỗ trợ giải đáp kiến thức tài chính, quản trị rủi ro và mô phỏng chiến lược.",
-          intent: "UNSUPPORTED_OR_REFUSED",
-          confidence: 1.0,
-          suggestions: [
-            "Giải thích chỉ số P/E & P/B trong đầu tư",
-            "Chiến lược phòng ngừa bẫy FOMO ở Map 1",
-            "Phân bổ danh mục 60/40 theo Benjamin Graham",
-          ],
-          disclaimer: MANDATORY_DISCLAIMER,
-          source: "deterministic_engine",
-        };
-      }
+    // 1. Model-Based & Adversarial Guardrails Evaluation
+    const guardrailResult = await this.guardrailService.evaluate(trimmedQuery);
+    if (!guardrailResult.isAllowed) {
+      return {
+        answer:
+          guardrailResult.educationalRefusal ||
+          "Hệ thống an toàn của Aura Intelligence ghi nhận yêu cầu không phù hợp với mục tiêu giáo dục đầu tư tài chính.",
+        intent: "UNSUPPORTED_OR_REFUSED",
+        confidence: 1.0,
+        suggestions: [
+          "Giải thích chỉ số P/E & P/B trong đầu tư chứng khoán",
+          "Chiến lược phòng ngừa bẫy FOMO ở Đấu trường Map 1",
+          "Phân bổ danh mục 60/40 theo Benjamin Graham ở Pro Room",
+        ],
+        disclaimer: MANDATORY_DISCLAIMER,
+        source: "deterministic_engine",
+      };
     }
 
     // 2. Classify intent via deterministic intent classifier

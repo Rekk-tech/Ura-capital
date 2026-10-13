@@ -81,6 +81,16 @@ export interface AIResolvedContextEnvelope {
   readonly estimatedTokens: number;
 }
 
+/**
+ * Model-based & deterministic Guardrail evaluation outcome.
+ */
+export interface AIGuardrailResult {
+  readonly isAllowed: boolean;
+  readonly reason: "VALID" | "OFF_TOPIC" | "UNSAFE" | "PROMPT_INJECTION";
+  readonly explanation: string;
+  readonly educationalRefusal?: string;
+}
+
 export type {
   AIIntent,
   AIRequestContextMode,
