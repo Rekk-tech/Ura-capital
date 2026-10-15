@@ -78,7 +78,7 @@ describe("AiCoachModal (Unit Tests)", () => {
     expect(screen.getByText("Aura Intelligence")).toBeDefined();
     expect(screen.getByText("ADMIN VIP")).toBeDefined();
     expect(screen.getByText(/Tôi là Aura Intelligence/i)).toBeDefined();
-    expect(screen.getByText("Giải thích chỉ số P/E & P/B trong đầu tư chứng khoán")).toBeDefined();
+    expect(screen.getByText("📊 Chỉ số P/E & P/B")).toBeDefined();
     expect(screen.getByText(/Mọi tư vấn chỉ mang tính chất giáo dục mô phỏng/i)).toBeDefined();
   });
 
@@ -92,33 +92,12 @@ describe("AiCoachModal (Unit Tests)", () => {
     expect(handleClose).toHaveBeenCalledTimes(1);
   });
 
-  it("toggles between docked mode and expanded study mode when clicking maximize button", () => {
+  it("renders refresh button and triggers conversation reset", () => {
     renderWithRouter(<AiCoachModal isOpen={true} onClose={vi.fn()} />);
 
-    const toggleBtn = screen.getByLabelText("Phóng to hoặc thu nhỏ cửa sổ cố vấn");
-    expect(toggleBtn).toBeDefined();
-
-    // Initial state is docked mode
-    const dialog = screen.getByRole("dialog");
-    expect(dialog.className).toContain("ai-coach-dialog-docked");
-
-    // Click to maximize
-    fireEvent.click(toggleBtn);
-    expect(dialog.className).toContain("ai-coach-dialog-expanded");
-
-    // Click again to shrink back to docked mode
-    fireEvent.click(toggleBtn);
-    expect(dialog.className).toContain("ai-coach-dialog-docked");
-  });
-
-  it("calls onClose when minimize button is clicked", () => {
-    const handleClose = vi.fn();
-    renderWithRouter(<AiCoachModal isOpen={true} onClose={handleClose} />);
-
-    const minBtn = screen.getByLabelText("Thu gọn cửa sổ cố vấn");
-    fireEvent.click(minBtn);
-
-    expect(handleClose).toHaveBeenCalledTimes(1);
+    const refreshBtn = screen.getByLabelText("Khởi tạo lại cuộc trò chuyện");
+    expect(refreshBtn).toBeDefined();
+    fireEvent.click(refreshBtn);
   });
 
   it("sends query when clicking suggestion chip and displays coach response for entitled users", async () => {
@@ -133,7 +112,7 @@ describe("AiCoachModal (Unit Tests)", () => {
 
     renderWithRouter(<AiCoachModal isOpen={true} onClose={vi.fn()} />);
 
-    const chip = screen.getByText("Giải thích chỉ số P/E & P/B trong đầu tư chứng khoán");
+    const chip = screen.getByText("📊 Chỉ số P/E & P/B");
     fireEvent.click(chip);
 
     await waitFor(() => {

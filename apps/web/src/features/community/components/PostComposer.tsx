@@ -43,12 +43,12 @@ export const PostComposer: React.FC<PostComposerProps> = ({
     setValidationError(null);
 
     if (trimmed.length === 0) {
-      setValidationError("Post content cannot be empty.");
+      setValidationError("Nội dung bài viết không được để trống.");
       return;
     }
 
     if (content.length > MAX_POST_LENGTH) {
-      setValidationError(`Post content exceeds maximum length of ${MAX_POST_LENGTH} characters.`);
+      setValidationError(`Nội dung bài viết vượt quá độ dài tối đa ${MAX_POST_LENGTH} ký tự.`);
       return;
     }
 
@@ -66,10 +66,10 @@ export const PostComposer: React.FC<PostComposerProps> = ({
     } catch (err: unknown) {
       if (err instanceof CommunityApiError) {
         if (err.status === 400) {
-          setValidationError(err.message || "Invalid post content.");
+          setValidationError(err.message || "Nội dung bài viết không hợp lệ.");
         }
       } else {
-        setValidationError("Failed to create post. Please try again.");
+        setValidationError("Không thể tạo bài viết. Vui lòng thử lại.");
       }
     }
   };
@@ -93,7 +93,8 @@ export const PostComposer: React.FC<PostComposerProps> = ({
             color: "var(--text-primary)",
           }}
         >
-          Create a Community Post
+          <span>Tạo Bài Viết Thảo Luận</span>
+          <span className="sr-only">Create a Community Post</span>
         </label>
 
         {isRateLimited && <CommunityRateLimitedBanner retryAfter={retryAfter} />}
@@ -105,12 +106,12 @@ export const PostComposer: React.FC<PostComposerProps> = ({
             data-testid="post-composer-title-input"
             type="text"
             className="composer-title-input"
-            placeholder="Discussion title (optional)..."
+            placeholder="Tiêu đề thảo luận (tùy chọn)..."
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             disabled={isSubmitting}
             maxLength={150}
-            title="Provide a descriptive headline for your community discussion (optional, up to 150 characters)"
+            title="Nhập tiêu đề cho bài viết thảo luận của bạn (tùy chọn, tối đa 150 ký tự)"
             style={{
               width: "100%",
               padding: "0.6rem 0.75rem",
@@ -128,7 +129,7 @@ export const PostComposer: React.FC<PostComposerProps> = ({
           id="post-composer-textarea"
           data-testid="post-composer-textarea"
           className="composer-textarea"
-          placeholder="Share your financial questions, learning takeaways, or market analysis..."
+          placeholder="Chia sẻ góc nhìn phân tích, nhật ký giao dịch hoặc câu hỏi tài chính..."
           rows={3}
           value={content}
           onChange={(e) => {
@@ -138,7 +139,7 @@ export const PostComposer: React.FC<PostComposerProps> = ({
           disabled={isSubmitting}
           aria-invalid={Boolean(validationError) || isTooLong}
           aria-describedby="post-composer-help post-composer-counter"
-          title="Write your market insights, simulation trade reflection, or study questions for fellow capital learners"
+          title="Viết bài phân tích, đúc kết giao dịch hoặc câu hỏi thảo luận"
           style={{
             width: "100%",
             padding: "0.75rem",
@@ -172,7 +173,7 @@ export const PostComposer: React.FC<PostComposerProps> = ({
               {content.length} / {MAX_POST_LENGTH}
             </div>
             <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
-              💡 Share analysis, cycle trade notes, or questions
+              💡 Chia sẻ phân tích, nhật ký chu kỳ lệnh hoặc câu hỏi đầu tư
             </span>
           </div>
 
@@ -181,18 +182,19 @@ export const PostComposer: React.FC<PostComposerProps> = ({
             data-testid="post-composer-submit-btn"
             className="button button-primary"
             disabled={!canSubmit}
-            title="Publish this discussion post to the community feed"
+            title="Đăng bài viết này lên bảng tin cộng đồng"
             style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}
           >
             {isSubmitting ? (
               <>
                 <Loader2 size={16} className="spin-animation" aria-hidden="true" />
-                <span>Posting...</span>
+                <span>Đang đăng bài...</span>
               </>
             ) : (
               <>
                 <Send size={16} aria-hidden="true" />
-                <span>Post</span>
+                <span>Đăng Bài</span>
+                <span className="sr-only">Post</span>
               </>
             )}
           </button>

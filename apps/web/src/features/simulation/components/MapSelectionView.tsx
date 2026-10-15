@@ -35,7 +35,9 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
       {hasActiveSession && (
         <div className="active-session-banner card-aura">
           <div className="active-session-info">
-            <span className="badge badge-success-subtle">PHIÊN ĐANG MỞ • <span className="sr-only">SESSION IN PROGRESS</span></span>
+            <span className="badge badge-success-subtle">
+              PHIÊN ĐANG MỞ • <span className="sr-only">SESSION IN PROGRESS</span>
+            </span>
             <h4>{activeScenarioName || "Phiên Giao Dịch Đang Hoạt Động"}</h4>
             <p>Chu kỳ {activeSessionCycle ?? 1} · Khớp lệnh thị trường đang chạy</p>
           </div>
@@ -56,6 +58,7 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
         </span>
         <h2 className="section-title">
           CHỌN BẢN ĐỒ <span className="text-gradient">THỰC CHIẾN</span>
+          <span className="sr-only">SELECT YOUR SIMULATION MAP</span>
         </h2>
         <p className="map-picker-subtitle">
           Lựa chọn đấu trường để rèn giũa phản xạ tài chính thực tế—từ áp lực tâm lý biến động nghẹt thở đến chiến lược phân bổ danh mục vĩ mô 12 quý.
@@ -79,7 +82,7 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
               <Flame size={32} className="text-orange" />
             </div>
             <h3 className="map-title-lg">MAP 1 — FOMO ARENA</h3>
-            <p className="map-tagline-lg">Tôi Luyện Tâm Lý & Đối Đầu Biến Động Ngắn Hạn</p>
+            <p className="map-tagline-lg">Tôi Luyện Tâm Lý &amp; Đối Đầu Biến Động Ngắn Hạn</p>
           </div>
 
           <div className="map-specs-box">
@@ -87,13 +90,19 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
               <span className="spec-icon-label">
                 <Clock size={15} className="text-muted" /> Cơ Chế:
               </span>
-              <strong>Real-time · 7 rounds × 45s</strong>
+              <strong>
+                Thời gian thực · 7 vòng × 45 giây
+                <span className="sr-only">Real-time · 7 rounds × 45s</span>
+              </strong>
             </div>
             <div className="spec-row">
               <span className="spec-icon-label">
                 <Coins size={15} className="text-muted" /> Vốn Khởi Điểm:
               </span>
-              <strong>10.000.000 VND virtual cash</strong>
+              <strong>
+                10.000.000 ₫ tiền ảo
+                <span className="sr-only">10.000.000 VND virtual cash</span>
+              </strong>
             </div>
             <div className="spec-row">
               <span className="spec-icon-label">
@@ -124,7 +133,7 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
               className="btn btn-ghost btn-sm"
               onClick={() => setBriefingMap("map1-fomo")}
             >
-              <span>Xem Luật Chơi & Nhiệm Vụ Map 1</span>
+              <span>Xem Luật Chơi &amp; Nhiệm Vụ Map 1</span>
             </button>
           </div>
         </div>
@@ -137,7 +146,9 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
               <span>MAP 2</span>
             </div>
             <span className="badge badge-amber-subtle">
-              <Lock size={13} /> Khóa cho đến khi vượt qua Map 1 <span className="sr-only">Locked until Map 1 is survived</span>
+              <Lock size={13} />
+              <span>Khóa cho đến khi vượt qua Map 1</span>
+              <span className="sr-only">Locked until Map 1 is survived</span>
             </span>
           </div>
 
@@ -146,7 +157,7 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
               <BrainCircuit size={32} className="text-teal" />
             </div>
             <h3 className="map-title-lg">MAP 2 — PRO ROOM</h3>
-            <p className="map-tagline-lg">Đầu Tư Giá Trị Kỷ Luật & Phân Bổ Danh Mục Chiến Lược</p>
+            <p className="map-tagline-lg">Đầu Tư Giá Trị Kỷ Luật &amp; Phân Bổ Danh Mục Chiến Lược</p>
           </div>
 
           <div className="map-specs-box">
@@ -154,13 +165,19 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
               <span className="spec-icon-label">
                 <Clock size={15} className="text-muted" /> Cơ Chế:
               </span>
-              <strong>Turn-based · 12 quarters</strong>
+              <strong>
+                Theo lượt · 12 quý vĩ mô
+                <span className="sr-only">Turn-based · 12 quarters</span>
+              </strong>
             </div>
             <div className="spec-row">
               <span className="spec-icon-label">
                 <Coins size={15} className="text-muted" /> Vốn Khởi Điểm:
               </span>
-              <strong>100.000.000 VND virtual cash</strong>
+              <strong>
+                100.000.000 ₫ tiền ảo
+                <span className="sr-only">100.000.000 VND virtual cash</span>
+              </strong>
             </div>
             <div className="spec-row">
               <span className="spec-icon-label">
@@ -172,7 +189,10 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
               <span className="spec-icon-label">
                 <Sparkles size={15} className="text-muted" /> Cố Vấn:
               </span>
-              <strong>Graham & Buffett AI Advisor</strong>
+              <strong>
+                Cố vấn AI Graham &amp; Buffett
+                <span className="sr-only">Graham &amp; Buffett AI Advisor</span>
+              </strong>
             </div>
           </div>
 
@@ -191,7 +211,7 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
               className="btn btn-ghost btn-sm"
               onClick={() => setBriefingMap("map2-pro")}
             >
-              <span>Xem Giáo Trình & Chiến Lược Map 2</span>
+              <span>Xem Giáo Trình &amp; Chiến Lược Map 2</span>
             </button>
           </div>
         </div>
@@ -203,10 +223,10 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
           <div className="stepper-node active">
             <div className="node-circle">1</div>
             <span className="node-title">Map 1: FOMO Arena</span>
-            <span className="node-desc">Survive the emotional storm</span>
+            <span className="node-desc">Vượt qua bão tâm lý ngắn hạn</span>
           </div>
           <div className="stepper-arrow">
-            <span className="key-pill">🔑 Access Key</span>
+            <span className="key-pill">🔑 Chìa Khóa Mở Khóa</span>
             <div className="arrow-line" />
           </div>
           <div className="stepper-node locked">
@@ -214,7 +234,7 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
               <Lock size={14} />
             </div>
             <span className="node-title">Map 2: Pro Room</span>
-            <span className="node-desc">Multi-quarter value allocation</span>
+            <span className="node-desc">Chiến lược phân bổ danh mục đa quý</span>
           </div>
         </div>
       </div>
@@ -226,10 +246,12 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
             <div className="modal-header">
               <div className="modal-title-row">
                 <span className="map-chip">
-                  {briefingMap === "map1-fomo" ? "MAP 1 BRIEFING" : "MAP 2 BRIEFING"}
+                  {briefingMap === "map1-fomo" ? "HƯỚNG DẪN MAP 1" : "HƯỚNG DẪN MAP 2"}
                 </span>
                 <h3>
-                  {briefingMap === "map1-fomo" ? "FOMO Arena: Mission Briefing" : "Pro Room: Strategic Briefing"}
+                  {briefingMap === "map1-fomo"
+                    ? "FOMO Arena: Nhiệm Vụ Thực Chiến"
+                    : "Pro Room: Chiến Lược Phân Bổ"}
                 </h3>
               </div>
               <button
@@ -246,26 +268,26 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
               {briefingMap === "map1-fomo" ? (
                 <>
                   <p className="briefing-lead">
-                    You have been allocated <strong>10.000.000 VND</strong> in virtual capital.
-                    Your objective is to survive 7 consecutive rounds (45 seconds each) without blowing up your account.
+                    Bạn được cấp <strong>10.000.000 ₫</strong> vốn ảo.
+                    Mục tiêu là sống sót qua 7 vòng giao dịch liên tiếp (mỗi vòng 45 giây) mà không bị cháy tài khoản.
                   </p>
                   <div className="briefing-rules">
                     <div className="rule-item">
                       <CheckCircle2 size={16} className="text-success" />
                       <div>
-                        <strong>Beware Herd Traps:</strong> Breaking rumors and volatile pumps are engineered to test stop-loss discipline.
+                        <strong>Cảnh Giác Bẫy Đám Đông:</strong> Tin đồn bất ngờ và các đợt bơm giá sốc được thiết kế để thử thách kỷ luật cắt lỗ.
                       </div>
                     </div>
                     <div className="rule-item">
                       <CheckCircle2 size={16} className="text-success" />
                       <div>
-                        <strong>Execution Limits:</strong> Market and Limit orders match deterministically against order book liquidity.
+                        <strong>Cơ Chế Khớp Lệnh:</strong> Lệnh Thị trường (Market) và Giới hạn (Limit) khớp chính xác theo thanh khoản sổ lệnh.
                       </div>
                     </div>
                     <div className="rule-item">
                       <CheckCircle2 size={16} className="text-success" />
                       <div>
-                        <strong>Scoring Metric:</strong> You will be graded on your <em>FOMO Resistance Score</em> and <em>Net PnL</em>.
+                        <strong>Tiêu Chí Đánh Giá:</strong> Bạn sẽ được xếp hạng dựa trên <em>Điểm Kháng FOMO</em> và <em>Hiệu suất PnL</em>.
                       </div>
                     </div>
                   </div>
@@ -273,25 +295,25 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
               ) : (
                 <>
                   <p className="briefing-lead">
-                    You have been allocated <strong>100.000.000 VND</strong> in institutional virtual capital across 12 economic quarters.
+                    Bạn được cấp <strong>100.000.000 ₫</strong> vốn giả lập của quỹ đầu tư tổ chức trải dài qua 12 quý kinh tế vĩ mô.
                   </p>
                   <div className="briefing-rules">
                     <div className="rule-item">
                       <CheckCircle2 size={16} className="text-success" />
                       <div>
-                        <strong>Multi-Asset Allocation:</strong> Balance capital across Growth Equities, Value Equities, Fixed Income, and Cash.
+                        <strong>Phân Bổ Đa Tài Sản:</strong> Cân bằng danh mục giữa Cổ phiếu tăng trưởng, Cổ phiếu giá trị, Trái phiếu và Tiền mặt.
                       </div>
                     </div>
                     <div className="rule-item">
                       <CheckCircle2 size={16} className="text-success" />
                       <div>
-                        <strong>Macro Sensitivity:</strong> Navigate inflation spikes, central bank interest rate hikes, and economic recessions.
+                        <strong>Độ Nhạy Vĩ Mô:</strong> Ứng phó trước cú sốc lạm phát, đợt tăng lãi suất ngân hàng trung ương và chu kỳ suy thoái.
                       </div>
                     </div>
                     <div className="rule-item">
                       <Lock size={16} className="text-amber" />
                       <div>
-                        <strong>Prerequisite:</strong> Complete Map 1 to earn the accreditation key for Pro Room activation.
+                        <strong>Điều Kiện Mở Khóa:</strong> Hoàn thành sống sót tại Map 1 để nhận chứng chỉ kích hoạt Pro Room.
                       </div>
                     </div>
                   </div>
@@ -305,7 +327,7 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
                 className="btn btn-outline btn-md"
                 onClick={() => setBriefingMap(null)}
               >
-                Close
+                Đóng
               </button>
               {briefingMap === "map1-fomo" ? (
                 <button
@@ -316,7 +338,7 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
                     navigate("/simulation/map-1");
                   }}
                 >
-                  <span>Enter FOMO Arena →</span>
+                  <span>Vào Đấu Trường FOMO Arena →</span>
                 </button>
               ) : (
                 <button
@@ -327,7 +349,7 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
                     navigate("/simulation/map-2");
                   }}
                 >
-                  <span>Enter Pro Room →</span>
+                  <span>Vào Bàn Chiến Lược Pro Room →</span>
                 </button>
               )}
             </div>

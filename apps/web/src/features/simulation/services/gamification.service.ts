@@ -177,9 +177,9 @@ class GamificationService {
       // fallback on error
     }
 
-    const levelInfo = calculateLevelFromXp(50);
+    const levelInfo = calculateLevelFromXp(200);
     return {
-      xp: 50,
+      xp: 200,
       ...levelInfo,
       badges: ALL_BADGES,
       history: [],
@@ -198,6 +198,20 @@ class GamificationService {
 
   public getState(): GamificationState {
     return { ...this.state };
+  }
+
+  public syncXp(authoritativeXp: number): GamificationState {
+    const targetXp = Math.max(this.state.xp, authoritativeXp);
+    if (targetXp !== this.state.xp) {
+      const levelInfo = calculateLevelFromXp(targetXp);
+      this.state = {
+        ...this.state,
+        xp: targetXp,
+        ...levelInfo,
+      };
+      this.saveState();
+    }
+    return this.getState();
   }
 
   public addXp(amount: number): GamificationState {

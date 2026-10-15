@@ -403,8 +403,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ initialT
                 {/* Metric 1: Total Users */}
                 <div className="card" style={{ padding: "1.5rem" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
-                    <span className="text-muted text-sm" style={{ fontWeight: 500 }}>
-                      Người Dùng Hoạt Động (Total Users)
+                    <span className="text-muted text-sm font-semibold" style={{ fontWeight: 600 }}>
+                      Người Dùng Hoạt Động<span className="sr-only"> (Total Users)</span>
                     </span>
                     <Users size={18} style={{ color: "var(--accent-primary, #3b82f6)" }} aria-hidden="true" />
                   </div>
@@ -412,15 +412,16 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ initialT
                     {metricsResponse?.data?.totalUsers ?? 0}
                   </div>
                   <div className="text-muted text-sm" style={{ marginTop: "0.25rem" }}>
-                    {metricsResponse?.data?.activeUsers24h ?? 0} active in last 24h
+                    <span>{metricsResponse?.data?.activeUsers24h ?? 0} hoạt động trong 24h qua</span>
+                    <span className="sr-only">{metricsResponse?.data?.activeUsers24h ?? 0} active in last 24h</span>
                   </div>
                 </div>
 
                 {/* Metric 2: Active Simulation Sessions */}
                 <div className="card" style={{ padding: "1.5rem" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
-                    <span className="text-muted text-sm" style={{ fontWeight: 500 }}>
-                      Phiên Giả Lập Đang Chạy (Simulations)
+                    <span className="text-muted text-sm font-semibold" style={{ fontWeight: 600 }}>
+                      Phiên Giả Lập Đang Chạy<span className="sr-only"> (Simulations)</span>
                     </span>
                     <Activity size={18} style={{ color: "var(--level-beginner, #10b981)" }} aria-hidden="true" />
                   </div>
@@ -428,15 +429,15 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ initialT
                     {metricsResponse?.data?.activeSimulationSessions ?? 0}
                   </div>
                   <div className="text-muted text-sm" style={{ marginTop: "0.25rem" }}>
-                    Server-authoritative portfolio cycles
+                    Chu kỳ khớp lệnh máy chủ xác thực
                   </div>
                 </div>
 
                 {/* Metric 3: Flagged Content */}
                 <div className="card" style={{ padding: "1.5rem" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
-                    <span className="text-muted text-sm" style={{ fontWeight: 500 }}>
-                      Báo Cáo Chờ Xử Lý (Flagged Content)
+                    <span className="text-muted text-sm font-semibold" style={{ fontWeight: 600 }}>
+                      Báo Cáo Chờ Xử Lý<span className="sr-only"> (Flagged Content)</span>
                     </span>
                     <Shield size={18} style={{ color: "var(--status-warning, #f59e0b)" }} aria-hidden="true" />
                   </div>
@@ -451,8 +452,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ initialT
                 {/* Metric 4: System Health */}
                 <div className="card" style={{ padding: "1.5rem" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
-                    <span className="text-muted text-sm" style={{ fontWeight: 500 }}>
-                      Trạng Thái Hệ Thống (System Health)
+                    <span className="text-muted text-sm font-semibold" style={{ fontWeight: 600 }}>
+                      Trạng Thái Hệ Thống<span className="sr-only"> (System Health)</span>
                     </span>
                     <Database size={18} style={{ color: "var(--accent-cyan, #06b6d4)" }} aria-hidden="true" />
                   </div>
@@ -463,7 +464,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ initialT
                     </span>
                   </div>
                   <div className="text-muted text-sm" style={{ marginTop: "0.5rem" }}>
-                    Database: {metricsResponse?.data?.databaseStatus || "CONNECTED"}
+                    <span>Cơ sở dữ liệu: {metricsResponse?.data?.databaseStatus || "CONNECTED"}</span>
+                    <span className="sr-only">Database: {metricsResponse?.data?.databaseStatus || "CONNECTED"}</span>
                   </div>
                 </div>
               </div>

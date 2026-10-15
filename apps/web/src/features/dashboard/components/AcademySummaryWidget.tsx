@@ -5,6 +5,8 @@ import { BookOpen, Award, Layers } from "lucide-react";
 import { useAuth } from "../../auth/context/AuthContext";
 import { academyApi } from "../../../api/academy.api";
 import { DashboardWidgetWrapper } from "./DashboardWidgetWrapper";
+import { useGamification } from "../../simulation/hooks/useGamification";
+import { gamificationService } from "../../simulation/services/gamification.service";
 
 /**
  * FEAT-072: Academy Learning Progress Widget (FR-001, FR-003, FR-004, AC-001..AC-008)
@@ -16,6 +18,7 @@ import { DashboardWidgetWrapper } from "./DashboardWidgetWrapper";
  */
 export const AcademySummaryWidget: React.FC = () => {
   const { accessToken } = useAuth();
+  const { state: gamificationState } = useGamification();
 
   const xpQuery = useQuery({
     queryKey: ["dashboard", "academy", "xp"],
@@ -44,7 +47,15 @@ export const AcademySummaryWidget: React.FC = () => {
     if (coursesQuery.isError) void coursesQuery.refetch();
   };
 
-  const totalXp = xpQuery.data?.data?.totalXp ?? 0;
+  const serverXp = xpQuery.data?.data?.totalXp ?? 0;
+  const effectiveTotalXp = Math.max(serverXp, gamificationState.xp);
+
+  React.useEffect(() => {
+    if (serverXp > gamificationState.xp) {
+      gamificationService.syncXp(serverXp);
+    }
+  }, [serverXp, gamificationState.xp]);
+
   const courses = coursesQuery.data?.data ?? [];
 
   return (
@@ -70,7 +81,7 @@ export const AcademySummaryWidget: React.FC = () => {
           <div className="metric-details">
             <span className="metric-label">Tổng Điểm Kinh Nghiệm</span>
             <span className="metric-value font-mono" data-testid="learner-xp-value">
-              {totalXp.toLocaleString()} XP
+              {effectiveTotalXp.toLocaleString()} XP
             </span>
           </div>
         </div>

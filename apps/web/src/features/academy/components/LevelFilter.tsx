@@ -6,11 +6,11 @@ interface LevelFilterProps {
   onSelectLevel: (level?: CourseLevel) => void;
 }
 
-const LEVELS: Array<{ label: string; value?: CourseLevel }> = [
-  { label: "All Levels", value: undefined },
-  { label: "Beginner", value: "BEGINNER" },
-  { label: "Intermediate", value: "INTERMEDIATE" },
-  { label: "Advanced", value: "ADVANCED" },
+const LEVELS: Array<{ label: string; viLabel: string; value?: CourseLevel }> = [
+  { label: "All Levels", viLabel: "Tất Cả Cấp Độ", value: undefined },
+  { label: "Beginner", viLabel: "Cơ Bản", value: "BEGINNER" },
+  { label: "Intermediate", viLabel: "Trung Cấp", value: "INTERMEDIATE" },
+  { label: "Advanced", viLabel: "Nâng Cao", value: "ADVANCED" },
 ];
 
 export const LevelFilter: React.FC<LevelFilterProps> = ({ selectedLevel, onSelectLevel }) => {
@@ -25,9 +25,10 @@ export const LevelFilter: React.FC<LevelFilterProps> = ({ selectedLevel, onSelec
               type="button"
               className={`filter-pill ${isActive ? "active" : ""}`}
               aria-pressed={isActive}
+              aria-label={item.label}
               onClick={() => onSelectLevel(item.value)}
             >
-              {item.label}
+              {item.viLabel}
             </button>
           );
         })}

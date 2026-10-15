@@ -37,9 +37,12 @@ export const CourseCatalogPage: React.FC = () => {
   return (
     <div className="academy-catalog-page">
       <header className="catalog-header">
-        <h1 className="catalog-title">Aura Academy Courses</h1>
+        <h1 className="catalog-title">
+          Hệ Thống Khóa Học Aura Academy
+          <span className="sr-only">Aura Academy Courses</span>
+        </h1>
         <p className="catalog-subtitle">
-          Master financial markets, investment principles, and risk management through structured, progressive learning.
+          Làm chủ thị trường tài chính, triết lý đầu tư giá trị và kiểm soát rủi ro thông qua lộ trình học tập bài bản 3 giai đoạn.
         </p>
       </header>
 
@@ -47,26 +50,26 @@ export const CourseCatalogPage: React.FC = () => {
       <section className="academy-curriculum-overview" aria-label="Aura Academy 3-Stage Curriculum Roadmap" style={{ marginBottom: "2rem" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1rem" }}>
           <div className="card-aura" style={{ padding: "1.25rem", borderLeft: "4px solid var(--aura-blue-500)" }}>
-            <span className="badge badge-brand" style={{ marginBottom: "0.5rem", display: "inline-block" }}>STAGE 1 · STATIONS 1–3</span>
-            <h3 style={{ fontSize: "1.05rem", fontWeight: 700, margin: "0 0 0.4rem" }}>Awareness & Foundations</h3>
+            <span className="badge badge-brand" style={{ marginBottom: "0.5rem", display: "inline-block" }}>GIAI ĐOẠN 1 · TRẠM 1–3</span>
+            <h3 style={{ fontSize: "1.05rem", fontWeight: 700, margin: "0 0 0.4rem" }}>Nhận Thức &amp; Nền Tảng Cơ Bản</h3>
             <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", margin: 0, lineHeight: 1.5 }}>
-              Core financial literacy, personal cash flow budgeting, risk profiling, and inflation dynamics.
+              Kiến thức tài chính cốt lõi, quản lý dòng tiền cá nhân, xác định khẩu vị rủi ro và tác động của lạm phát.
             </p>
           </div>
 
           <div className="card-aura" style={{ padding: "1.25rem", borderLeft: "4px solid var(--aura-teal-500)" }}>
-            <span className="badge badge-teal" style={{ marginBottom: "0.5rem", display: "inline-block" }}>STAGE 2 · STATIONS 4–6</span>
-            <h3 style={{ fontSize: "1.05rem", fontWeight: 700, margin: "0 0 0.4rem" }}>Skills & Real Simulation</h3>
+            <span className="badge badge-teal" style={{ marginBottom: "0.5rem", display: "inline-block" }}>GIAI ĐOẠN 2 · TRẠM 4–6</span>
+            <h3 style={{ fontSize: "1.05rem", fontWeight: 700, margin: "0 0 0.4rem" }}>Kỹ Năng &amp; Thực Chiến Giả Lập</h3>
             <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", margin: 0, lineHeight: 1.5 }}>
-              Equity valuation, technical indicators, order execution mechanics, and volatility management in FOMO Arena.
+              Định giá cổ phiếu, phân tích kỹ thuật, cơ chế khớp lệnh và làm chủ tâm lý trước biến động ở FOMO Arena.
             </p>
           </div>
 
           <div className="card-aura" style={{ padding: "1.25rem", borderLeft: "4px solid var(--aura-green-500)" }}>
-            <span className="badge badge-success-subtle" style={{ marginBottom: "0.5rem", display: "inline-block" }}>STAGE 3 · STATIONS 7–9</span>
-            <h3 style={{ fontSize: "1.05rem", fontWeight: 700, margin: "0 0 0.4rem" }}>Strategy & Mastery</h3>
+            <span className="badge badge-success-subtle" style={{ marginBottom: "0.5rem", display: "inline-block" }}>GIAI ĐOẠN 3 · TRẠM 7–9</span>
+            <h3 style={{ fontSize: "1.05rem", fontWeight: 700, margin: "0 0 0.4rem" }}>Chiến Lược &amp; Bậc Thầy Phân Bổ</h3>
             <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", margin: 0, lineHeight: 1.5 }}>
-              Macroeconomic cycles, multi-asset portfolio hedging, risk-adjusted returns, and autonomous execution.
+              Chu kỳ kinh tế vĩ mô, phòng hộ danh mục đa tài sản, tối ưu hóa tỷ suất sinh lời điều chỉnh rủi ro.
             </p>
           </div>
         </div>
@@ -103,7 +106,7 @@ export const CourseCatalogPage: React.FC = () => {
               border: 0,
             }}
           >
-            Search courses
+            Tìm kiếm khóa học
           </label>
           <Search
             size={16}
@@ -118,7 +121,7 @@ export const CourseCatalogPage: React.FC = () => {
           <input
             id="course-search-input"
             type="search"
-            placeholder="Search courses..."
+            placeholder="Tìm kiếm khóa học..."
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);

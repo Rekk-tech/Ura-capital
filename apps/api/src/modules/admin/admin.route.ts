@@ -33,10 +33,14 @@ const handleRoleUpdate = (req: Request, res: Response, next: NextFunction) => ad
 adminRouter.patch("/admin/users/:userId/role", authenticate, requireAdmin({ auditDenied: true }), handleRoleUpdate);
 adminRouter.patch("/api/admin/users/:userId/role", authenticate, requireAdmin({ auditDenied: true }), handleRoleUpdate);
 
-// POST /admin/simulation/:sessionId/reset & /api/admin/simulation/:sessionId/reset
+// POST /admin/simulation/:sessionId/reset & /api/admin/simulation/:sessionId/reset (and plural / v1 aliases)
 const handleSessionReset = (req: Request, res: Response, next: NextFunction) => adminController.resetSimulationSession(req, res, next);
 adminRouter.post("/admin/simulation/:sessionId/reset", authenticate, requireAdmin({ auditDenied: true }), handleSessionReset);
 adminRouter.post("/api/admin/simulation/:sessionId/reset", authenticate, requireAdmin({ auditDenied: true }), handleSessionReset);
+adminRouter.post("/admin/simulations/:sessionId/reset", authenticate, requireAdmin({ auditDenied: true }), handleSessionReset);
+adminRouter.post("/api/admin/simulations/:sessionId/reset", authenticate, requireAdmin({ auditDenied: true }), handleSessionReset);
+adminRouter.post("/api/v1/admin/simulations/:sessionId/reset", authenticate, requireAdmin({ auditDenied: true }), handleSessionReset);
+adminRouter.post("/api/v1/admin/simulation/:sessionId/reset", authenticate, requireAdmin({ auditDenied: true }), handleSessionReset);
 
 // GET /admin/users/:userId/learner-details & /api/admin/users/:userId/learner-details
 const handleGetLearnerDetails = (req: Request, res: Response, next: NextFunction) => adminController.getLearnerDetails(req, res, next);

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { APP_NAME } from "@aura/shared";
-import { ShieldCheck, BookOpen, TrendingUp, Users, HelpCircle, Lock } from "lucide-react";
+import { ShieldCheck, BookOpen, TrendingUp, Users, HelpCircle, Lock, PieChart } from "lucide-react";
 
 /**
  * Modern Corporate Navy Application Footer
@@ -18,68 +18,97 @@ export const AppFooter: React.FC = () => {
             <span className="footer-brand text-gradient-navy">{APP_NAME}</span>
           </div>
           <p className="footer-disclaimer">
-            Aura Capital is an educational investment simulation platform.
-            All market activities, asset positions, and trading outcomes are simulated
-            and do not constitute actual financial advice or live brokerage execution.
-            Educational & simulation purposes only. No real capital is at risk.
+            Aura Capital là nền tảng mô phỏng và đào tạo đầu tư tài chính.
+            Mọi hoạt động thị trường, danh mục vị thế và kết quả giao dịch đều là giả lập
+            và không cấu thành lời khuyên đầu tư tài chính thực tế.
+            Toàn bộ môi trường vận hành an toàn không rủi ro vốn thật.
+            <span className="sr-only">
+              Educational &amp; simulation purposes only. No real capital is at risk.
+            </span>
           </p>
           <div className="footer-security-pill">
             <ShieldCheck size={14} aria-hidden="true" />
-            <span>Server-Authoritative Sandbox · 100% Virtual Capital</span>
+            <span>Môi trường giả lập máy chủ xác thực · 100% Vốn ảo</span>
           </div>
         </div>
 
         {/* Column 2: Platform Links */}
         <nav className="footer-nav" aria-label="Footer Navigation">
           <div className="footer-nav-col">
-            <span className="footer-nav-title">Platform</span>
+            <span className="footer-nav-title">Nền Tảng</span>
             <Link to="/academy" className="footer-link">
               <BookOpen size={14} aria-hidden="true" />
-              <span>Academy Courses</span>
+              <span>Khóa Học Academy</span>
+              <span className="sr-only">Academy Courses</span>
             </Link>
             <Link to="/simulation" className="footer-link">
               <TrendingUp size={14} aria-hidden="true" />
-              <span>Trading Simulation</span>
+              <span>Đấu Trường Giả Lập</span>
+              <span className="sr-only">Trading Simulation</span>
             </Link>
             <Link to="/community" className="footer-link">
               <Users size={14} aria-hidden="true" />
-              <span>Community Discussions</span>
+              <span>Diễn Đàn Cộng Đồng</span>
+              <span className="sr-only">Community Discussions</span>
             </Link>
             <Link to="/portfolio" className="footer-link">
-              <span>Portfolio Analytics</span>
+              <PieChart size={14} aria-hidden="true" />
+              <span>Phân Tích Danh Mục</span>
+              <span className="sr-only">Portfolio Analytics</span>
             </Link>
           </div>
 
           {/* Column 3: Account & Membership */}
           <div className="footer-nav-col">
-            <span className="footer-nav-title">Account</span>
-            <Link to="/subscription" className="footer-link">Subscription Plans</Link>
-            <Link to="/login" className="footer-link">Sign In</Link>
-            <Link to="/register" className="footer-link">Create Account</Link>
-            <Link to="/dashboard" className="footer-link">Learner Dashboard</Link>
+            <span className="footer-nav-title">Tài Khoản</span>
+            <Link to="/subscription" className="footer-link">
+              <span>Gói Hội Viên</span>
+              <span className="sr-only">Subscription Plans</span>
+            </Link>
+            <Link to="/login" className="footer-link">
+              <span>Đăng Nhập</span>
+              <span className="sr-only">Sign In</span>
+            </Link>
+            <Link to="/register" className="footer-link">
+              <span>Đăng Ký Tài Khoản</span>
+              <span className="sr-only">Create Account</span>
+            </Link>
+            <Link to="/dashboard" className="footer-link">
+              <span>Bảng Điều Khiển</span>
+              <span className="sr-only">Learner Dashboard</span>
+            </Link>
           </div>
 
           {/* Column 4: Support & Legal */}
           <div className="footer-nav-col">
-            <span className="footer-nav-title">Legal & Support</span>
-            <Link to="/terms" className="footer-link">Terms of Service</Link>
-            <Link to="/privacy" className="footer-link">Privacy Policy</Link>
-            <Link to="/disclaimer" className="footer-link">Risk Disclaimer</Link>
+            <span className="footer-nav-title">Pháp Lý &amp; Hỗ Trợ</span>
+            <Link to="/terms" className="footer-link">
+              <span>Điều Khoản Dịch Vụ</span>
+              <span className="sr-only">Terms of Service</span>
+            </Link>
+            <Link to="/privacy" className="footer-link">
+              <span>Chính Sách Quyền Riêng Tư</span>
+              <span className="sr-only">Privacy Policy</span>
+            </Link>
+            <Link to="/disclaimer" className="footer-link">
+              <span>Tuyên Bố Miễn Trừ Rủi Ro</span>
+              <span className="sr-only">Risk Disclaimer</span>
+            </Link>
             <Link to="/faq" className="footer-link">
               <HelpCircle size={14} aria-hidden="true" />
-              <span>FAQ</span>
+              <span>Câu Hỏi Thường Gặp (FAQ)</span>
             </Link>
           </div>
         </nav>
       </div>
 
       <div className="footer-bottom">
-        <p>© 2026 {APP_NAME}. Production MVP — All rights reserved.</p>
+        <p>© 2026 {APP_NAME}. Bản quyền được bảo lưu.</p>
         <div className="footer-bottom-badges">
-          <span className="badge badge-subtle">Build v0.9.0-mvp</span>
+          <span className="badge badge-subtle">Phiên bản v0.9.0-mvp</span>
           <span className="badge badge-success-subtle">
             <Lock size={12} aria-hidden="true" />
-            <span>Argon2id Protected</span>
+            <span>Bảo Mật Argon2id</span>
           </span>
         </div>
       </div>

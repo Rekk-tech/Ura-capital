@@ -59,102 +59,109 @@ export const CommunityFeedPage: React.FC = () => {
         </p>
       </section>
 
-      {/* Community Trader Leaderboard Spotlight */}
-      <div style={{ marginBottom: "2rem" }}>
-        <SimulationLeaderboard
-          title="Bảng Vinh Danh Nhà Đầu Tư Cộng Đồng"
-          subtitle="Top các nhà đầu tư giả lập có hiệu suất sinh lời và kỷ luật rủi ro cao nhất được cộng đồng Aura Capital vinh danh."
-        />
-      </div>
+      {/* 2-Column Responsive Layout: 70% Main Feed & 30% Top 5 Leaderboard Sidebar */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Main Feed Column (70% / 8 cols) */}
+        <div className="lg:col-span-8 flex flex-col gap-6">
+          {/* Post Composer */}
+          <PostComposer
+            accessToken={accessToken}
+            initialTitle={prefillState?.prefillTitle}
+            initialContent={prefillState?.prefillContent}
+          />
 
-      {/* Post Composer */}
-      <PostComposer
-        accessToken={accessToken}
-        initialTitle={prefillState?.prefillTitle}
-        initialContent={prefillState?.prefillContent}
-      />
+          {/* Sorting Tabs */}
+          <div
+            className="community-sort-controls"
+            style={{
+              display: "flex",
+              gap: "0.5rem",
+              alignItems: "center",
+            }}
+          >
+            <span style={{ fontSize: "0.875rem", color: "var(--text-muted)", marginRight: "0.25rem" }}>
+              Sắp xếp theo:
+            </span>
+            <button
+              type="button"
+              data-testid="feed-sort-latest-btn"
+              className={`button ${sortBy === "LATEST" ? "button-primary" : "button-ghost"}`}
+              onClick={() => setSortBy("LATEST")}
+              aria-pressed={sortBy === "LATEST"}
+              style={{ padding: "0.4rem 0.85rem", fontSize: "0.85rem" }}
+            >
+              Mới Nhất <span className="sr-only">• Latest</span>
+            </button>
+            <button
+              type="button"
+              data-testid="feed-sort-popular-btn"
+              className={`button ${sortBy === "POPULAR" ? "button-primary" : "button-ghost"}`}
+              onClick={() => setSortBy("POPULAR")}
+              aria-pressed={sortBy === "POPULAR"}
+              style={{ padding: "0.4rem 0.85rem", fontSize: "0.85rem" }}
+            >
+              Sôi Nổi <span className="sr-only">• Popular</span>
+            </button>
+          </div>
 
-      {/* Sorting Tabs */}
-      <div
-        className="community-sort-controls"
-        style={{
-          display: "flex",
-          gap: "0.5rem",
-          marginBottom: "1rem",
-          alignItems: "center",
-        }}
-      >
-        <span style={{ fontSize: "0.875rem", color: "var(--text-muted)", marginRight: "0.25rem" }}>
-          Sắp xếp theo (Sort by):
-        </span>
-        <button
-          type="button"
-          data-testid="feed-sort-latest-btn"
-          className={`button ${sortBy === "LATEST" ? "button-primary" : "button-ghost"}`}
-          onClick={() => setSortBy("LATEST")}
-          aria-pressed={sortBy === "LATEST"}
-          style={{ padding: "0.4rem 0.85rem", fontSize: "0.85rem" }}
-        >
-          Mới Nhất • Latest
-        </button>
-        <button
-          type="button"
-          data-testid="feed-sort-popular-btn"
-          className={`button ${sortBy === "POPULAR" ? "button-primary" : "button-ghost"}`}
-          onClick={() => setSortBy("POPULAR")}
-          aria-pressed={sortBy === "POPULAR"}
-          style={{ padding: "0.4rem 0.85rem", fontSize: "0.85rem" }}
-        >
-          Sôi Nổi • Popular
-        </button>
-      </div>
+          {/* Feed content states */}
+          {feedQuery.isLoading ? (
+            <CommunityLoadingSkeleton />
+          ) : feedQuery.isError ? (
+            <CommunityErrorCard
+              message="Không thể tải luồng thảo luận. Vui lòng thử lại."
+              onRetry={() => feedQuery.refetch()}
+            />
+          ) : posts.length === 0 ? (
+            <CommunityEmptyState />
+          ) : (
+            <section className="community-feed-list" aria-label="Community Posts">
+              {posts.map((post) => (
+                <PostCard key={post.id} post={post} accessToken={accessToken} />
+              ))}
 
-      {/* Feed content states */}
-      {feedQuery.isLoading ? (
-        <CommunityLoadingSkeleton />
-      ) : feedQuery.isError ? (
-        <CommunityErrorCard
-          message="Failed to load community feed. Please try again."
-          onRetry={() => feedQuery.refetch()}
-        />
-      ) : posts.length === 0 ? (
-        <CommunityEmptyState />
-      ) : (
-        <section className="community-feed-list" aria-label="Community Posts">
-          {posts.map((post) => (
-            <PostCard key={post.id} post={post} accessToken={accessToken} />
-          ))}
-
-          {/* Explicit Load More pagination */}
-          {feedQuery.hasNextPage && (
-            <div style={{ textAlign: "center", margin: "1.5rem 0" }}>
-              <button
-                type="button"
-                data-testid="feed-load-more-btn"
-                className="button button-secondary"
-                onClick={() => feedQuery.fetchNextPage()}
-                disabled={feedQuery.isFetchingNextPage}
-                style={{
-                  padding: "0.6rem 1.5rem",
-                  fontSize: "0.95rem",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                }}
-              >
-                {feedQuery.isFetchingNextPage ? (
-                  <>
-                    <Loader2 size={16} className="spin-animation" aria-hidden="true" />
-                    <span>Loading more posts...</span>
-                  </>
-                ) : (
-                  <span>Load More Posts</span>
-                )}
-              </button>
-            </div>
+              {/* Explicit Load More pagination */}
+              {feedQuery.hasNextPage && (
+                <div style={{ textAlign: "center", margin: "1.5rem 0" }}>
+                  <button
+                    type="button"
+                    data-testid="feed-load-more-btn"
+                    className="button button-secondary"
+                    onClick={() => feedQuery.fetchNextPage()}
+                    disabled={feedQuery.isFetchingNextPage}
+                    style={{
+                      padding: "0.6rem 1.5rem",
+                      fontSize: "0.95rem",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                    }}
+                  >
+                    {feedQuery.isFetchingNextPage ? (
+                      <>
+                        <Loader2 size={16} className="spin-animation" aria-hidden="true" />
+                        <span>Đang tải thêm bài viết...</span>
+                      </>
+                    ) : (
+                      <span>Tải thêm bài viết</span>
+                    )}
+                  </button>
+                </div>
+              )}
+            </section>
           )}
-        </section>
-      )}
+        </div>
+
+        {/* Sidebar Column (30% / 4 cols) - Compact Top 5 Leaderboard */}
+        <aside className="lg:col-span-4 flex flex-col gap-6">
+          <SimulationLeaderboard
+            variant="sidebar"
+            limit={5}
+            title="Top 5 Nhà Đầu Tư"
+            subtitle="Hiệu suất sinh lời cao nhất"
+          />
+        </aside>
+      </div>
     </main>
   );
 };

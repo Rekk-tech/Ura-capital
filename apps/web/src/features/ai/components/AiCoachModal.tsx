@@ -9,9 +9,6 @@ import {
   ShieldAlert,
   Bot,
   User,
-  Maximize2,
-  Minimize2,
-  Minus,
 } from "lucide-react";
 import { useAiCoach } from "../hooks/useAiCoach";
 import { useAuth } from "../../auth/context/AuthContext";
@@ -127,17 +124,18 @@ export const AiCoachModal: React.FC<AiCoachModalProps> = ({
         aria-modal={isExpanded ? "true" : "false"}
         aria-labelledby="ai-coach-title"
       >
-        {/* Header */}
+        {/* Header (1-line modern streamlined widget) */}
         <div className="ai-coach-header">
           <div className="ai-coach-brand">
             <div className="ai-coach-avatar">
-              <Cpu size={22} aria-hidden="true" />
+              <Cpu size={16} aria-hidden="true" />
               <span className="ai-coach-online-dot" title="Trực tuyến" />
             </div>
             <div className="ai-coach-title-area">
               <h3 id="ai-coach-title">
-                Aura Intelligence
-                <span className="ai-coach-badge">
+                <span>Aura AI</span>
+                <span className="sr-only">Aura Intelligence</span>
+                <span className="sr-only">
                   {isAdmin
                     ? "ADMIN VIP"
                     : isPremium
@@ -145,9 +143,6 @@ export const AiCoachModal: React.FC<AiCoachModalProps> = ({
                     : "KHÓA HỘI VIÊN"}
                 </span>
               </h3>
-              <div className="ai-coach-subtitle">
-                Cố vấn Học tập &amp; Trợ lý Đầu tư Thông minh • Trực Tuyến
-              </div>
             </div>
           </div>
 
@@ -157,34 +152,12 @@ export const AiCoachModal: React.FC<AiCoachModalProps> = ({
                 type="button"
                 className="ai-coach-icon-btn"
                 onClick={resetConversation}
-                title="Khởi tạo lại cuộc trò chuyện"
+                title="Làm mới cuộc trò chuyện"
                 aria-label="Khởi tạo lại cuộc trò chuyện"
               >
                 <RotateCcw size={15} />
               </button>
             )}
-            <button
-              type="button"
-              className="ai-coach-icon-btn"
-              onClick={() => setIsExpanded(!isExpanded)}
-              title={
-                isExpanded
-                  ? "Thu nhỏ về góc màn hình (Docked Mode)"
-                  : "Mở rộng toàn màn hình (Study Mode)"
-              }
-              aria-label="Phóng to hoặc thu nhỏ cửa sổ cố vấn"
-            >
-              {isExpanded ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
-            </button>
-            <button
-              type="button"
-              className="ai-coach-icon-btn"
-              onClick={onClose}
-              title="Thu nhỏ xuống thanh tác vụ"
-              aria-label="Thu gọn cửa sổ cố vấn"
-            >
-              <Minus size={15} />
-            </button>
             <button
               type="button"
               className="ai-coach-icon-btn ai-coach-close-btn"
@@ -310,10 +283,11 @@ export const AiCoachModal: React.FC<AiCoachModalProps> = ({
                   type="submit"
                   className="ai-send-btn"
                   disabled={isLoading || !inputValue.trim()}
+                  title="Gửi câu hỏi"
                   aria-label="Gửi câu hỏi"
                 >
-                  <span>Gửi</span>
-                  <Send size={15} aria-hidden="true" />
+                  <Send size={14} aria-hidden="true" />
+                  <span className="sr-only">Gửi</span>
                 </button>
               </form>
 

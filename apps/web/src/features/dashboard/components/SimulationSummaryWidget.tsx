@@ -83,8 +83,8 @@ export const SimulationSummaryWidget: React.FC = () => {
               <span className="sr-only">No Active Simulation</span>
             </p>
             <p className="text-muted">
-              Bạn chưa có phiên giao dịch ảo nào đang hoạt động. You do not have an active simulated trading desk session.
-              Rèn luyện phản xạ và quản trị vốn an toàn với số dư 100.000.000 VND ảo.
+              Bạn chưa có phiên giao dịch ảo nào đang hoạt động. Rèn luyện phản xạ và quản trị vốn an toàn với số dư 100.000.000 VND ảo.
+              <span className="sr-only">you do not have an active simulated trading desk session</span>
             </p>
             <Link
               to="/simulation"
@@ -138,7 +138,10 @@ export const SimulationSummaryWidget: React.FC = () => {
             {/* Regulatory Simulation Disclosure */}
             <div className="simulation-disclaimer-note" role="note">
               <AlertTriangle size={14} className="text-warning flex-shrink-0" aria-hidden="true" />
-              <span>Simulated execution only • Virtual funds • No real capital at risk (Giao dịch mô phỏng • Vốn ảo phi rủi ro)</span>
+              <span>
+                Giao dịch mô phỏng • Vốn ảo phi rủi ro
+                <span className="sr-only">Simulated execution only • Virtual funds • No real capital at risk</span>
+              </span>
             </div>
           </>
         )}

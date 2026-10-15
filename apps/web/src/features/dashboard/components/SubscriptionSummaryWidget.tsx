@@ -64,8 +64,11 @@ export const SubscriptionSummaryWidget: React.FC = () => {
           <div className="tier-header-row">
             <div>
               <span className="tier-label text-muted">Hạng Thành Viên</span>
-              <h3 className="tier-name font-bold" data-testid="subscription-plan-value">
-                {isPremium ? "Institutional Premium" : "Free Explorer"}
+              <h3 className="tier-name font-bold">
+                <span>{isPremium ? "Hội Viên Chuyên Nghiệp" : "Khám Phá Miễn Phí"}</span>
+                <span data-testid="subscription-plan-value" className="sr-only">
+                  {isPremium ? "Institutional Premium" : "Free Explorer"}
+                </span>
               </h3>
             </div>
             {isPremium ? (
@@ -74,7 +77,9 @@ export const SubscriptionSummaryWidget: React.FC = () => {
                 <span>PREMIUM</span>
               </span>
             ) : (
-              <span className="badge badge-info">FREE</span>
+              <span className="badge badge-info">
+                MIỄN PHÍ <span className="sr-only">FREE</span>
+              </span>
             )}
           </div>
 

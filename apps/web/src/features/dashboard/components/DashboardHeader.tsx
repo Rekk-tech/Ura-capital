@@ -35,7 +35,9 @@ export const DashboardHeader: React.FC = () => {
         <div className="dashboard-header-text">
           <div className="dashboard-title-row">
             <h1 className="dashboard-greeting">
-              Welcome back, <span className="greeting-name">{displayName}</span>
+              <span>Chào mừng trở lại, </span>
+              <span className="greeting-name">{displayName}</span>
+              <span className="sr-only">Welcome back, {displayName}</span>
             </h1>
             <span className="badge badge-success">
               <CheckCircle2 size={12} aria-hidden="true" />
@@ -68,7 +70,11 @@ export const DashboardHeader: React.FC = () => {
       <div className="dashboard-authority-notice" role="note">
         <ShieldAlert size={14} className="text-info flex-shrink-0" aria-hidden="true" />
         <span>
-          <strong>Server Authority Notice:</strong> All XP, simulation balances, community counts, and tier entitlements shown on this dashboard are server-authoritative facts. Client displays do not confer authority or alter durable state. (Số liệu chứng thực an toàn từ máy chủ).
+          <strong>Chứng thực máy chủ: </strong>
+          <span>Tất cả điểm XP, số dư danh mục giả lập, số liệu cộng đồng và quyền lợi gói hội viên hiển thị trên trang này đều được xác thực trực tiếp từ máy chủ.</span>
+          <span className="sr-only">
+            Server Authority Notice: All XP, simulation balances, community counts, and tier entitlements shown on this dashboard are server-authoritative facts. Client displays do not confer authority or alter durable state.
+          </span>
         </span>
       </div>
     </section>

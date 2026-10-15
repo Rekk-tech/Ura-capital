@@ -15,15 +15,12 @@ const INITIAL_GREETING: CoachMessage = {
   id: "greeting",
   role: "coach",
   content:
-    "Xin chào! Tôi là Aura Intelligence — Cố vấn Học tập & Trợ lý Đầu tư Thông minh của bạn tại Aura Capital.\n\n" +
-    "Tôi có thể hỗ trợ bạn giải thích các chỉ số tài chính (P/E, P/B, ROE), phân tích biến động vĩ mô (Lãi suất, Lạm phát, VN30), hoặc tư vấn kỷ luật kiểm soát tâm lý tránh bẫy FOMO.\n\n" +
-    "Hãy chọn một chủ đề gợi ý bên dưới hoặc đặt câu hỏi bất kỳ!",
+    "Xin chào! Tôi là Aura Intelligence — Cố vấn học tập & trợ lý đầu tư của bạn tại Aura Capital. Hãy chọn một chủ đề bên dưới hoặc đặt câu hỏi bất kỳ để bắt đầu!",
   timestamp: new Date(),
   suggestions: [
-    "Giải thích chỉ số P/E & P/B trong đầu tư chứng khoán",
-    "Làm thế nào để tránh bẫy FOMO ở Đấu trường Map 1?",
-    "Chiến lược phân bổ tài sản Graham 60/40 ở Map 2",
-    "Tác động của Lãi suất và Lạm phát tới chỉ số VN30",
+    "📊 Chỉ số P/E & P/B",
+    "📈 Lãi suất & Vĩ mô",
+    "🛡️ Kiểm soát FOMO",
   ],
 };
 
