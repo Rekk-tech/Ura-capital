@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import "../src/infrastructure/config/env.js";
 import { passwordHashingService } from "../src/modules/auth/password-hashing.service.js";
 
 /**
