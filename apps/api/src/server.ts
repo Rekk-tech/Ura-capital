@@ -14,6 +14,7 @@ import { simulationRouter } from "./modules/simulation/simulation.routes.js";
 import { communityRouter } from "./modules/community/community.routes.js";
 import { subscriptionRouter } from "./modules/subscription/subscription.routes.js";
 import { aiRouter } from "./modules/ai/http/ai.routes.js";
+import { brokerRouter } from "./modules/broker/broker.routes.js";
 import { AppError } from "./shared/errors/error-envelope.js";
 import { ERROR_CODES, HTTP_STATUS } from "@aura/shared";
 
@@ -56,6 +57,7 @@ export function createApp(): Express {
   app.use(communityRouter);
   app.use(subscriptionRouter);
   app.use(aiRouter);
+  app.use(brokerRouter);
 
   // 404 Fallback
   app.use((req, _res, next) => {

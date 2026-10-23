@@ -67,6 +67,8 @@ export const CANONICAL_ROUTES = {
   ADMIN_MODERATION: "/admin/moderation",
   ADMIN_AUDIT: "/admin/audit",
   AI_COACH: "/ai",
+  BROKER_HUB: "/broker-hub",
+  BROKER_ROOM: "/broker-hub/rooms/:roomId",
 } as const;
 
 export type RouteKey =
@@ -91,7 +93,9 @@ export type RouteKey =
   | "adminUsers"
   | "adminModeration"
   | "adminAudit"
-  | "ai";
+  | "ai"
+  | "brokerHub"
+  | "brokerRoom";
 
 export const ROUTE_REGISTRY: Record<RouteKey, RouteMetadata> = {
   home: {
@@ -357,6 +361,29 @@ export const ROUTE_REGISTRY: Record<RouteKey, RouteMetadata> = {
     section: "ai",
     owningFeature: "FEAT-086",
   },
+  brokerHub: {
+    id: "brokerHub",
+    path: CANONICAL_ROUTES.BROKER_HUB,
+    title: "Aura Broker Hub — Phòng Đầu Tư Xác Thực",
+    description: "Sàn giao lưu và phòng sinh hoạt đầu tư của các Broker chuyên nghiệp được UBCKNN cấp phép.",
+    navLabel: "Broker Hub",
+    status: "AVAILABLE",
+    requiresAuth: false,
+    isNavVisible: true,
+    section: "community",
+    owningFeature: "FEAT-088",
+  },
+  brokerRoom: {
+    id: "brokerRoom",
+    path: CANONICAL_ROUTES.BROKER_ROOM,
+    title: "Phòng Đầu Tư Độc Quyền",
+    description: "Không gian học tập chiến lược, bài giảng và bài tập thực chiến của Broker.",
+    status: "AVAILABLE",
+    requiresAuth: false,
+    isNavVisible: false,
+    section: "community",
+    owningFeature: "FEAT-088",
+  },
 };
 
 /** Canonical list of all routes */
@@ -369,6 +396,7 @@ export function getPrimaryNavRoutes(): RouteMetadata[] {
     ROUTE_REGISTRY.dashboard,
     ROUTE_REGISTRY.academy,
     ROUTE_REGISTRY.simulation,
+    ROUTE_REGISTRY.brokerHub,
     ROUTE_REGISTRY.portfolio,
     ROUTE_REGISTRY.community,
     ROUTE_REGISTRY.subscription,

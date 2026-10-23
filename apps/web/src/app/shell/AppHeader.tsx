@@ -18,6 +18,7 @@ import {
   ShieldCheck,
   Settings,
   Cpu,
+  Award,
 } from "lucide-react";
 import { APP_NAME } from "@aura/shared";
 import { useAuth } from "../../features/auth/context/AuthContext";
@@ -29,6 +30,7 @@ const NAV_ICONS: Record<string, React.ReactNode> = {
   "/dashboard": <LayoutDashboard size={16} aria-hidden="true" />,
   "/academy": <BookOpen size={16} aria-hidden="true" />,
   "/simulation": <TrendingUp size={16} aria-hidden="true" />,
+  "/broker-hub": <Award size={16} aria-hidden="true" />,
   "/portfolio": <PieChart size={16} aria-hidden="true" />,
   "/community": <Users size={16} aria-hidden="true" />,
   "/subscription": <BadgeDollarSign size={16} aria-hidden="true" />,
@@ -40,6 +42,7 @@ const VI_NAV_LABELS: Record<string, string> = {
   "/dashboard": "Tổng Quan",
   "/academy": "Khóa Học",
   "/simulation": "Đấu Trường Giả Lập",
+  "/broker-hub": "Broker Hub",
   "/portfolio": "Danh Mục",
   "/community": "Cộng Đồng",
   "/ai": "AI Studio",

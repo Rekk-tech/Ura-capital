@@ -20,8 +20,9 @@ import { useAdminMetrics, useResetSimulationSession } from "../hooks/use-admin";
 import { AdminUserTable } from "../components/AdminUserTable";
 import { AdminModerationQueue } from "../components/AdminModerationQueue";
 import { AdminAuditLogTable } from "../components/AdminAuditLogTable";
+import { AdminBrokerVerificationTable } from "../components/AdminBrokerVerificationTable";
 
-export type AdminTab = "overview" | "users" | "moderation" | "audit";
+export type AdminTab = "overview" | "users" | "moderation" | "audit" | "brokers";
 
 interface AdminDashboardPageProps {
   initialTab?: AdminTab;
@@ -37,6 +38,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ initialT
     if (location.pathname.startsWith("/admin/users")) return "users";
     if (location.pathname.startsWith("/admin/moderation")) return "moderation";
     if (location.pathname.startsWith("/admin/audit")) return "audit";
+    if (location.pathname.startsWith("/admin/brokers")) return "brokers";
     if (location.pathname === "/admin" || location.pathname === "/admin/") return "overview";
     return initialTab || "overview";
   };
@@ -58,6 +60,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ initialT
     else if (tab === "users") navigate("/admin/users");
     else if (tab === "moderation") navigate("/admin/moderation");
     else if (tab === "audit") navigate("/admin/audit");
+    else if (tab === "brokers") navigate("/admin/brokers");
   };
 
   // Metrics query for Overview
@@ -288,6 +291,34 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ initialT
         >
           <Clock size={16} aria-hidden="true" />
           <span>Nhật Ký Kiểm Toán (Audit Logs)</span>
+        </button>
+
+        <button
+          type="button"
+          role="tab"
+          id="tab-brokers"
+          aria-selected={currentTab === "brokers"}
+          aria-controls="panel-brokers"
+          data-testid="admin-tab-brokers"
+          onClick={() => handleSelectTab("brokers")}
+          className={`tab-btn ${currentTab === "brokers" ? "active" : ""}`}
+          style={{
+            padding: "0.75rem 1.25rem",
+            background: "none",
+            border: "none",
+            borderBottom: currentTab === "brokers" ? "2px solid var(--accent-primary, #3b82f6)" : "2px solid transparent",
+            color: currentTab === "brokers" ? "var(--text-primary)" : "var(--text-secondary)",
+            fontWeight: currentTab === "brokers" ? 600 : 400,
+            cursor: "pointer",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            fontSize: "0.95rem",
+            whiteSpace: "nowrap",
+          }}
+        >
+          <Shield size={16} aria-hidden="true" />
+          <span>Thẩm Định Broker (Brokers & Tuân Thủ)</span>
         </button>
       </nav>
 
@@ -896,6 +927,13 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ initialT
       {currentTab === "audit" && (
         <section id="panel-audit" role="tabpanel" aria-labelledby="tab-audit">
           <AdminAuditLogTable />
+        </section>
+      )}
+
+      {/* 5. Broker Partner Verification & Compliance Panel */}
+      {currentTab === "brokers" && (
+        <section id="panel-brokers" role="tabpanel" aria-labelledby="tab-brokers">
+          <AdminBrokerVerificationTable />
         </section>
       )}
     </main>

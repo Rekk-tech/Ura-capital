@@ -20,6 +20,7 @@ export const AdminRoutes: React.FC = () => {
         <Route path="users" element={<AdminDashboardPage initialTab="users" />} />
         <Route path="moderation" element={<AdminDashboardPage initialTab="moderation" />} />
         <Route path="audit" element={<AdminDashboardPage initialTab="audit" />} />
+        <Route path="brokers" element={<AdminDashboardPage initialTab="brokers" />} />
         <Route path="*" element={<Navigate to="/admin" replace />} />
       </Routes>
     </AdminRouteGuard>

@@ -19,6 +19,8 @@ import { SubscriptionRoutes } from "../router/subscription-routes";
 import { AdminRoutes } from "../../features/admin/routes/admin-routes";
 import { ProfileSettingsPage } from "../../features/profile/pages/ProfileSettingsPage";
 import { AiCoachWidget, AiStudioPage } from "../../features/ai";
+import { BrokerHubPage } from "../../features/broker/pages/BrokerHubPage";
+import { BrokerRoomDetailPage } from "../../features/broker/pages/BrokerRoomDetailPage";
 
 /**
  * FEAT-070 / FEAT-071 / FEAT-072 / FEAT-073 / FEAT-074 / FEAT-075 / FEAT-076 / FEAT-077: Standard Application Shell
@@ -63,6 +65,8 @@ export const AppShell: React.FC = () => {
             />
             <Route path="/community/*" element={<CommunityRoutes />} />
             <Route path="/subscription/*" element={<SubscriptionRoutes />} />
+            <Route path="/broker-hub" element={<BrokerHubPage />} />
+            <Route path="/broker-hub/rooms/:roomId" element={<BrokerRoomDetailPage />} />
 
             {/* Authenticated Account Profile & Auth Entry Surfaces (FEAT-071) */}
             <Route path="/account" element={<AccountPage />} />
