@@ -122,63 +122,74 @@ export const SimulationLeaderboard: React.FC<SimulationLeaderboardProps> = ({
     );
   };
 
+  const getSidebarRankClass = (rank: number) => {
+    switch (rank) {
+      case 1:
+        return "rank-1";
+      case 2:
+        return "rank-2";
+      case 3:
+        return "rank-3";
+      case 4:
+        return "rank-4";
+      default:
+        return "rank-default";
+    }
+  };
+
   // Variant 2: Compact Sidebar Widget (for Community page 30% column)
   if (variant === "sidebar") {
     return (
-      <div className="simulation-leaderboard-sidebar">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
+      <div className="sidebar-leaderboard-card">
+        {/* Header */}
+        <div className="sidebar-leaderboard-header">
           <div>
-            <h4 className="text-sm font-bold text-slate-900 tracking-tight">
+            <h4 className="sidebar-leaderboard-title">
               {title || "Top 5 Nhà Đầu Tư"}
             </h4>
-            <p className="text-[11px] text-slate-500 mt-0.5">
+            <p className="sidebar-leaderboard-sub">
               {subtitle || "Hiệu suất sinh lời cao nhất"}
             </p>
           </div>
-          <Trophy size={16} className="text-amber-500 flex-shrink-0" />
+          <div className="sidebar-trophy-wrap">
+            <Trophy size={16} />
+          </div>
         </div>
 
-        <div className="flex flex-col divide-y divide-slate-100">
+        {/* List of traders */}
+        <div className="sidebar-leaderboard-list">
           {entries.map((entry) => {
             const avatar = getAvatarInfo(entry.rank, entry.avatar);
+            const isRankPositive = entry.returnPct >= 0;
             return (
               <div
                 key={entry.rank}
-                className={`py-2.5 flex items-center justify-between gap-2.5 transition-colors ${
-                  entry.isCurrentUser ? "bg-blue-50/50 -mx-2 px-2 rounded-lg" : ""
-                }`}
+                className={`sidebar-trader-row ${entry.isCurrentUser ? "is-current-user" : ""}`}
               >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-5 text-center flex-shrink-0">
-                    {getRankBadge(entry.rank)}
+                <div className="sidebar-trader-left">
+                  <div className={`sidebar-rank-num ${getSidebarRankClass(entry.rank)}`}>
+                    {entry.rank}
                   </div>
-                  <div className={`arena-trader-avatar ${avatar.cls}`}>
+                  <div className={`sidebar-avatar-circle ${avatar.cls}`}>
                     {avatar.label}
                   </div>
-                  <div className="min-w-0">
-                    <span className="text-xs font-bold text-slate-900 block" style={{ textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>
-                      {entry.displayName}
+                  <div className="sidebar-name-col">
+                    <span className="sidebar-name-main">
+                      <span>{entry.displayName}</span>
+                      {entry.isCurrentUser && <span className="sidebar-you-tag">(Bạn)</span>}
                     </span>
-                    <span className="text-[10px] text-slate-400 font-mono block" style={{ textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>
+                    <span className="sidebar-handle-main">
                       {entry.handle}
                     </span>
                   </div>
                 </div>
 
-                <div className="text-right flex-shrink-0">
-                  <span
-                    className={`text-xs font-mono font-bold flex items-center justify-end gap-0.5 ${
-                      entry.returnPct >= 0 ? "text-emerald-600" : "text-rose-600"
-                    }`}
-                  >
-                    {entry.returnPct >= 0 ? (
-                      <TrendingUp size={12} />
-                    ) : (
-                      <TrendingDown size={12} />
-                    )}
-                    <span>{entry.returnPct >= 0 ? `+${entry.returnPct}%` : `${entry.returnPct}%`}</span>
+                <div className="sidebar-trader-right">
+                  <span className={`sidebar-roi-text ${isRankPositive ? "" : "roi-negative"}`}>
+                    {isRankPositive ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                    <span>{isRankPositive ? `+${entry.returnPct}%` : `${entry.returnPct}%`}</span>
                   </span>
-                  <span className="text-[10px] text-slate-400 font-mono block">
+                  <span className="sidebar-xp-count">
                     {entry.xp.toLocaleString()} XP
                   </span>
                 </div>
@@ -187,10 +198,11 @@ export const SimulationLeaderboard: React.FC<SimulationLeaderboardProps> = ({
           })}
         </div>
 
-        <div className="border-t border-slate-100 pt-3 mt-2 text-center">
+        {/* Footer Link */}
+        <div className="sidebar-leaderboard-footer">
           <Link
             to="/simulation"
-            className="text-xs font-bold text-indigo-600 hover:text-indigo-800 inline-flex items-center gap-1 transition-colors"
+            className="sidebar-view-more-link"
           >
             <span>Vào Đấu Trường Giả Lập</span>
             <ArrowRight size={13} />

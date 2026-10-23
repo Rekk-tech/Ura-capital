@@ -14,6 +14,10 @@ import {
   Coins,
   Award,
   Zap,
+  Clock,
+  Target,
+  Calendar,
+  ArrowRight,
 } from "lucide-react";
 import { useAuth } from "../../features/auth/context/AuthContext";
 
@@ -353,8 +357,11 @@ export const LandingPage: React.FC = () => {
       <section className="section-navy-band" aria-labelledby="maps-showcase-heading">
         <div className="navy-band-inner">
           <div className="section-header-center text-white">
-            <span className="section-tag-navy">TIÊU ĐIỂM ĐẤU TRƯỜNG • SIMULATION SPOTLIGHT</span>
-            <h2 id="maps-showcase-heading" className="section-title text-white">
+            <span className="section-tag-navy">
+              <Zap size={13} />
+              <span>TIÊU ĐIỂM ĐẤU TRƯỜNG • SIMULATION SPOTLIGHT</span>
+            </span>
+            <h2 id="maps-showcase-heading" className="section-title-navy">
               TRẢI NGHIỆM ĐẦU TƯ <span className="text-gradient-navy">QUA 2 BẢN ĐỒ THỰC CHIẾN</span>
             </h2>
             <p className="section-subtitle-navy">
@@ -364,48 +371,75 @@ export const LandingPage: React.FC = () => {
 
           <div className="maps-showcase-grid">
             {/* Map 1 Card */}
-            <div className="map-showcase-card map1-card">
+            <div className="map-showcase-card">
               <div className="map-card-badge-row">
                 <span className="map-chip map1-chip">
-                  <Flame size={14} /> MAP 1 • FOMO ARENA
+                  <Flame size={14} />
+                  <span>MAP 1 • FOMO ARENA</span>
                 </span>
-                <span className="badge badge-success-subtle">SẴN SÀNG</span>
+                <span className="map-status-pill ready">
+                  <span className="map-status-dot" />
+                  <span>SẴN SÀNG</span>
+                </span>
               </div>
               <h3 className="map-card-title">FOMO ARENA</h3>
               <p className="map-card-tagline">Đấu Trường Tâm Lý &amp; Lướt Sóng Ngắn Hạn</p>
 
               <div className="map-specs-list">
                 <div className="map-spec-item">
-                  <span className="spec-label">⏱ Cơ Chế:</span>
+                  <div className="spec-label-wrap">
+                    <div className="spec-icon-box orange">
+                      <Clock size={12} />
+                    </div>
+                    <span>Cơ Chế</span>
+                  </div>
                   <span className="spec-val">Thời gian thực · 7 vòng × 45s</span>
                 </div>
                 <div className="map-spec-item">
-                  <span className="spec-label">💰 Vốn Ảo:</span>
-                  <span className="spec-val">10.000.000 VND tiền vốn thực hành</span>
+                  <div className="spec-label-wrap">
+                    <div className="spec-icon-box amber">
+                      <Coins size={12} />
+                    </div>
+                    <span>Vốn Ảo</span>
+                  </div>
+                  <span className="spec-val">10.000.000 VND thực hành</span>
                 </div>
                 <div className="map-spec-item">
-                  <span className="spec-label">🎯 Mục Tiêu:</span>
-                  <span className="spec-val">Vượt bẫy tâm lý, đạt lợi nhuận +5% đến +10%</span>
+                  <div className="spec-label-wrap">
+                    <div className="spec-icon-box rose">
+                      <Target size={12} />
+                    </div>
+                    <span>Mục Tiêu</span>
+                  </div>
+                  <span className="spec-val">Vượt bẫy tâm lý, ROI +5% đến +10%</span>
                 </div>
                 <div className="map-spec-item">
-                  <span className="spec-label">🏆 Phần Thưởng:</span>
-                  <span className="spec-val">Huy hiệu &quot;Kẻ Sinh Tồn&quot; + Mở khóa Bản Đồ 2</span>
+                  <div className="spec-label-wrap">
+                    <div className="spec-icon-box blue">
+                      <Award size={12} />
+                    </div>
+                    <span>Phần Thưởng</span>
+                  </div>
+                  <span className="spec-val">Huy hiệu &amp; Mở khóa Bản Đồ 2</span>
                 </div>
               </div>
 
-              <Link to="/simulation" className="btn btn-primary btn-md map-cta-btn">
-                <span>Vào Map 1 (FOMO Arena) →</span>
+              <Link to="/simulation" className="map-cta-btn">
+                <span>Vào Map 1 (FOMO Arena)</span>
+                <ArrowRight size={14} />
               </Link>
             </div>
 
             {/* Map 2 Card */}
-            <div className="map-showcase-card map2-card">
+            <div className="map-showcase-card">
               <div className="map-card-badge-row">
                 <span className="map-chip map2-chip">
-                  <BrainCircuit size={14} /> MAP 2 • PRO ROOM
+                  <BrainCircuit size={14} />
+                  <span>MAP 2 • PRO ROOM</span>
                 </span>
-                <span className="badge badge-amber-subtle">
-                  <Lock size={12} /> YÊU CẦU MỞ KHÓA
+                <span className="map-status-pill locked">
+                  <Lock size={11} />
+                  <span>YÊU CẦU MỞ KHÓA</span>
                 </span>
               </div>
               <h3 className="map-card-title">PRO ROOM</h3>
@@ -413,33 +447,54 @@ export const LandingPage: React.FC = () => {
 
               <div className="map-specs-list">
                 <div className="map-spec-item">
-                  <span className="spec-label">📅 Cơ Chế:</span>
+                  <div className="spec-label-wrap">
+                    <div className="spec-icon-box blue">
+                      <Calendar size={12} />
+                    </div>
+                    <span>Cơ Chế</span>
+                  </div>
                   <span className="spec-val">Theo lượt (Turn-based) · 12 quý kinh tế</span>
                 </div>
                 <div className="map-spec-item">
-                  <span className="spec-label">💰 Vốn Ảo:</span>
+                  <div className="spec-label-wrap">
+                    <div className="spec-icon-box amber">
+                      <Coins size={12} />
+                    </div>
+                    <span>Vốn Ảo</span>
+                  </div>
                   <span className="spec-val">100.000.000 VND vốn định chế</span>
                 </div>
                 <div className="map-spec-item">
-                  <span className="spec-label">🎯 Mục Tiêu:</span>
-                  <span className="spec-val">Lợi nhuận bền vững (Alpha), Giảm sụt giảm &lt; 15%</span>
+                  <div className="spec-label-wrap">
+                    <div className="spec-icon-box emerald">
+                      <Target size={12} />
+                    </div>
+                    <span>Mục Tiêu</span>
+                  </div>
+                  <span className="spec-val">Lợi nhuận Alpha, sụt giảm &lt; 15%</span>
                 </div>
                 <div className="map-spec-item">
-                  <span className="spec-label">🤖 Cố Vấn AI:</span>
+                  <div className="spec-label-wrap">
+                    <div className="spec-icon-box purple">
+                      <Sparkles size={12} />
+                    </div>
+                    <span>Cố Vấn AI</span>
+                  </div>
                   <span className="spec-val">Phân tích Graham &amp; Buffett Advisor</span>
                 </div>
               </div>
 
               <div className="map-locked-box">
-                <Lock size={14} className="text-amber" />
+                <Lock size={13} style={{ color: "#94A3B8" }} />
                 <span>Hoàn thành Map 1 để mở khóa Phòng Pro Room</span>
               </div>
             </div>
           </div>
 
           <div className="navy-band-action">
-            <Link to="/simulation" className="btn btn-gradient btn-lg">
-              <span>Đến Sàn Giả Lập &amp; Chọn Bản Đồ →</span>
+            <Link to="/simulation" className="btn-spotlight-action">
+              <span>Đến Sàn Giả Lập &amp; Chọn Bản Đồ</span>
+              <ArrowRight size={15} />
             </Link>
           </div>
         </div>
