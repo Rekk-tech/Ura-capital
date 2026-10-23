@@ -73,200 +73,250 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
       )}
 
       {/* Main Header */}
-      <div className="map-picker-header">
-        <span className="section-tag">
-          ĐẤU TRƯỜNG GIẢ LẬP <span className="sr-only">SIMULATION ARENA</span>
-        </span>
-        <h2 className="section-title">
-          CHỌN BẢN ĐỒ <span className="text-gradient">THỰC CHIẾN</span>
-          <span className="sr-only">SELECT YOUR SIMULATION MAP</span>
-        </h2>
-        <p className="map-picker-subtitle">
-          Lựa chọn đấu trường để rèn giũa phản xạ tài chính thực tế—từ áp lực tâm lý biến động nghẹt thở đến chiến lược phân bổ danh mục vĩ mô 12 quý.
+      <div className="arena-hero-section">
+        <div className="arena-season-tag">
+          <span className="season-dot" />
+          <span>HỆ THỐNG ĐẤU TRƯỜNG MÙA GIẢI Q2/2026</span>
+          <span className="sr-only">SIMULATION ARENA</span>
+          <span className="sr-only">CHỌN BẢN ĐỒ THỰC CHIẾN</span>
+        </div>
+        <h1 className="arena-hero-title">
+          Đấu Trường Giả Lập <span className="text-blue">Thực Chiến</span>
+        </h1>
+        <p className="arena-hero-subtitle">
+          Rèn giũa phản xạ tài chính thực tế và thử thách kỷ luật danh mục. Lựa chọn đấu trường giữa áp lực sóng tâm lý ngắn hạn hoặc chiến lược phân bổ vĩ mô 12 quý.
         </p>
       </div>
 
+      {/* Quick Stats Dashboard Strip */}
+      <div className="arena-metrics-grid">
+        <div className="arena-metric-card">
+          <span className="arena-metric-label">VỐN KHẢ DỤNG</span>
+          <span className="arena-metric-val">10.000.000 đ</span>
+        </div>
+        <div className="arena-metric-card">
+          <span className="arena-metric-label">CHUỖI THẮNG</span>
+          <span className="arena-metric-val text-emerald-600">3 Ván Liên Tiếp</span>
+        </div>
+        <div className="arena-metric-card">
+          <span className="arena-metric-label">DRAWDOWN KỶ LUẬT</span>
+          <span className="arena-metric-val">
+            4,2% <span className="arena-metric-sub text-emerald-600 font-medium">(An toàn)</span>
+          </span>
+        </div>
+        <div className="arena-metric-card">
+          <span className="arena-metric-label">HẠNG HIỆN TẠI</span>
+          <span className="arena-metric-val text-blue-600">#4 Toàn Sàn</span>
+        </div>
+      </div>
+
+      {/* Tier / Fighter Promotion Roadmap */}
+      <div className="arena-tier-roadmap">
+        <div className="tier-header-row">
+          <div className="tier-header-left">
+            <span className="tier-pulse-dot" />
+            <span className="tier-header-title">Tiến trình Thăng Hạng Đấu Sĩ</span>
+          </div>
+          <span className="tier-header-right">Hoàn thành Map 1 để mở khóa Map 2</span>
+        </div>
+        <div className="tier-track-container">
+          <div className="tier-step tier-step-active">
+            <div className="tier-circle tier-circle-active">1</div>
+            <div className="tier-step-info">
+              <span className="tier-step-name">Map 1: FOMO Arena</span>
+              <span className="tier-step-status text-emerald-600">Đang sẵn sàng • Cấp độ 1</span>
+            </div>
+          </div>
+
+          <div className="tier-connector">
+            <div className="tier-line tier-line-filled" />
+            <div className="tier-key-badge">
+              <span>🔑 Chìa Khóa Mở Khóa: Đạt ROI &gt; 5%</span>
+            </div>
+            <div className="tier-line tier-line-empty" />
+          </div>
+
+          <div className="tier-step tier-step-locked">
+            <div className="tier-circle tier-circle-locked">
+              <Lock size={15} />
+            </div>
+            <div className="tier-step-info">
+              <span className="tier-step-name text-slate-500">Map 2: Macro Pro Room</span>
+              <span className="tier-step-status text-slate-400">Yêu cầu hoàn thành Map 1</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Dual Map Grid */}
-      <div className="maps-selection-grid">
+      <div className="arena-dual-grid">
         {/* MAP 1: FOMO ARENA */}
-        <div className="map-picker-card map1-picker">
-          <div className="map-picker-top">
-            <div className="map-chip map1-chip">
-              <Flame size={15} />
-              <span>MAP 1</span>
+        <div className="arena-map-card arena-card-fomo">
+          <div className="arena-card-top-row">
+            <div className="arena-chip-tag arena-chip-amber">
+              <Flame size={14} className="text-amber-600" />
+              <span>MAP 1 • TẬP TRUNG TÂM LÝ</span>
             </div>
-            <span className="badge badge-success-subtle">SẴN SÀNG</span>
+            <div className="arena-status-badge arena-status-green">
+              <span className="badge-dot-green" />
+              <span>SẴN SÀNG VÀO LỆNH</span>
+            </div>
           </div>
 
-          <div className="map-card-hero">
-            <div className="map-icon-halo map1-halo">
-              <Flame size={32} className="text-orange" />
-            </div>
-            <h3 className="map-title-lg">MAP 1 — FOMO ARENA</h3>
-            <p className="map-tagline-lg">Tôi Luyện Tâm Lý &amp; Đối Đầu Biến Động Ngắn Hạn</p>
-          </div>
+          <h2 className="arena-card-title">
+            FOMO Arena — Sóng Biến Động Ngắn Hạn
+            <span className="sr-only">MAP 1 — FOMO ARENA</span>
+          </h2>
+          <p className="arena-card-desc">
+            Đối mặt với các bẫy tin tức bất ngờ, bẫy Bull Trap/Bear Trap và áp lực bảng điện nhấp nháy liên tục trong từng giây.
+          </p>
 
-          <div className="map-specs-box">
-            <div className="spec-row">
-              <span className="spec-icon-label">
-                <Clock size={15} className="text-muted" /> Cơ Chế:
+          <div className="arena-specs-table">
+            <div className="arena-spec-row">
+              <span className="arena-spec-label">
+                <Clock size={14} className="text-slate-400" /> Cơ chế thi đấu:
               </span>
-              <strong>
-                Thời gian thực · 7 vòng × 45 giây
+              <strong className="arena-spec-value">
+                Thời gian thực • 7 vòng × 45 giây
                 <span className="sr-only">Real-time · 7 rounds × 45s</span>
               </strong>
             </div>
-            <div className="spec-row">
-              <span className="spec-icon-label">
-                <Coins size={15} className="text-muted" /> Vốn Khởi Điểm:
+            <div className="arena-spec-row">
+              <span className="arena-spec-label">
+                <Coins size={14} className="text-slate-400" /> Vốn khởi điểm:
               </span>
-              <strong>
-                10.000.000 ₫ tiền ảo
+              <strong className="arena-spec-value">
+                10.000.000 đ (Tiền ảo)
                 <span className="sr-only">10.000.000 VND virtual cash</span>
               </strong>
             </div>
-            <div className="spec-row">
-              <span className="spec-icon-label">
-                <Target size={15} className="text-muted" /> Mục Tiêu:
+            <div className="arena-spec-row">
+              <span className="arena-spec-label">
+                <Target size={14} className="text-slate-400" /> Mục tiêu bắt buộc:
               </span>
-              <strong>Sống sót qua các bẫy, lợi nhuận +5–10%</strong>
+              <strong className="arena-spec-value text-emerald-600">
+                Sống sót + ROI +5% đến +10%
+              </strong>
             </div>
-            <div className="spec-row">
-              <span className="spec-icon-label">
-                <Award size={15} className="text-muted" /> Cột Mốc:
+            <div className="arena-spec-row">
+              <span className="arena-spec-label">
+                <Award size={14} className="text-slate-400" /> Phần thưởng vượt ải:
               </span>
-              <strong>Huy hiệu Sinh Tồn + Chìa khóa mở Map 2</strong>
+              <strong className="arena-spec-value text-amber-600">
+                Huy hiệu Sinh Tồn + Chìa khóa Map 2
+              </strong>
             </div>
           </div>
 
-          <div className="map-picker-actions">
+          <div className="arena-card-actions">
             <button
               type="button"
-              className={`btn ${hasActiveSession ? "btn-secondary" : "btn-primary"} btn-md btn-block`}
+              className="btn btn-primary btn-block btn-lg arena-cta-btn"
               onClick={() => navigate("/simulation/map-1")}
               data-testid="enter-fomo-arena-button"
             >
-              <span>Vào Đấu Trường Map 1 (FOMO Arena) →</span>
+              <span>Tham Gia Đấu Trường (FOMO Arena) →</span>
               <span className="sr-only">Start Map 1 (FOMO Arena)</span>
             </button>
             <button
               type="button"
-              className="btn btn-ghost btn-sm"
+              className="btn btn-ghost btn-sm arena-sub-btn"
               onClick={() => setBriefingMap("map1-fomo")}
             >
-              <span>Xem Luật Chơi &amp; Nhiệm Vụ Map 1</span>
+              <span>Xem Luật Chơi &amp; Bài Học Tâm Lý Thực Hành ›</span>
             </button>
           </div>
         </div>
 
         {/* MAP 2: PRO ROOM */}
-        <div className="map-picker-card map2-picker">
-          <div className="map-picker-top">
-            <div className="map-chip map2-chip">
-              <BrainCircuit size={15} />
-              <span>MAP 2</span>
+        <div className="arena-map-card arena-card-pro">
+          <div className="arena-card-top-row">
+            <div className="arena-chip-tag arena-chip-teal">
+              <BrainCircuit size={14} className="text-teal-600" />
+              <span>MAP 2 • PHÂN BỔ DANH MỤC VĨ MÔ</span>
             </div>
-            <span className="badge badge-amber-subtle">
-              <Lock size={13} />
-              <span>Khóa cho đến khi vượt qua Map 1</span>
+            <div className="arena-status-badge arena-status-gray">
+              <Lock size={12} className="text-slate-500" />
+              <span>YÊU CẦU ĐẠT CHỈ SỐ</span>
               <span className="sr-only">Locked until Map 1 is survived</span>
-            </span>
-          </div>
-
-          <div className="map-card-hero">
-            <div className="map-icon-halo map2-halo">
-              <BrainCircuit size={32} className="text-teal" />
             </div>
-            <h3 className="map-title-lg">MAP 2 — PRO ROOM</h3>
-            <p className="map-tagline-lg">Đầu Tư Giá Trị Kỷ Luật &amp; Phân Bổ Danh Mục Chiến Lược</p>
           </div>
 
-          <div className="map-specs-box">
-            <div className="spec-row">
-              <span className="spec-icon-label">
-                <Clock size={15} className="text-muted" /> Cơ Chế:
+          <h2 className="arena-card-title">
+            Macro Pro Room — Chiến Lược Danh Mục
+            <span className="sr-only">MAP 2 — PRO ROOM</span>
+          </h2>
+          <p className="arena-card-desc">
+            Kiểm chứng năng lực phân bổ tài sản qua 12 quý vĩ mô: Lãi suất biến động, chu kỳ suy thoái &amp; bùng nổ hàng hóa toàn cầu.
+          </p>
+
+          <div className="arena-specs-table">
+            <div className="arena-spec-row">
+              <span className="arena-spec-label">
+                <Clock size={14} className="text-slate-400" /> Cơ chế thi đấu:
               </span>
-              <strong>
-                Theo lượt · 12 quý vĩ mô
+              <strong className="arena-spec-value">
+                Mô phỏng chu kỳ • 12 Quý vĩ mô
                 <span className="sr-only">Turn-based · 12 quarters</span>
               </strong>
             </div>
-            <div className="spec-row">
-              <span className="spec-icon-label">
-                <Coins size={15} className="text-muted" /> Vốn Khởi Điểm:
+            <div className="arena-spec-row">
+              <span className="arena-spec-label">
+                <Coins size={14} className="text-slate-400" /> Quy mô danh mục:
               </span>
-              <strong>
-                100.000.000 ₫ tiền ảo
+              <strong className="arena-spec-value">
+                100.000.000 đ (Tiền ảo)
                 <span className="sr-only">100.000.000 VND virtual cash</span>
               </strong>
             </div>
-            <div className="spec-row">
-              <span className="spec-icon-label">
-                <Target size={15} className="text-muted" /> Mục Tiêu:
+            <div className="arena-spec-row">
+              <span className="arena-spec-label">
+                <Target size={14} className="text-slate-400" /> Chỉ số định lượng:
               </span>
-              <strong>Tạo Alpha bền vững, sụt giảm Drawdown &lt; 15%</strong>
+              <strong className="arena-spec-value">
+                Tạo Alpha bền vững, Max DD &lt; 15%
+              </strong>
             </div>
-            <div className="spec-row">
-              <span className="spec-icon-label">
-                <Sparkles size={15} className="text-muted" /> Cố Vấn:
+            <div className="arena-spec-row">
+              <span className="arena-spec-label">
+                <Sparkles size={14} className="text-slate-400" /> Cố vấn đồng hành:
               </span>
-              <strong>
-                Cố vấn AI Graham &amp; Buffett
+              <strong className="arena-spec-value text-blue-600">
+                Aura AI Macro Advisor
                 <span className="sr-only">Graham &amp; Buffett AI Advisor</span>
               </strong>
             </div>
           </div>
 
-          <div className="map-picker-actions">
+          <div className="arena-card-actions">
             <button
               type="button"
-              className="btn btn-secondary btn-md btn-block"
+              className="btn btn-dark btn-block btn-lg arena-cta-btn arena-dark-btn"
               onClick={handleEnterMap2}
               data-testid="enter-pro-room-button"
             >
-              <span>Vào Bàn Chiến Lược Map 2 (Pro Room) →</span>
+              <Lock size={16} style={{ display: "inline", verticalAlign: "middle", marginRight: "6px" }} />
+              <span>Vào Bàn Chiến Lược Map 2 (Pro Room)</span>
               <span className="sr-only">Start Map 2 (Pro Room)</span>
             </button>
-            <div className="quota-indicator" style={{ marginTop: "0.5rem", fontSize: "0.75rem", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.4rem" }}>
+            <div className="quota-indicator">
               {isPremium ? (
-                <span className="text-emerald-600 font-bold flex items-center gap-1">
+                <span className="text-emerald-600 font-bold flex items-center justify-center gap-1 text-xs mt-1.5">
                   <Crown size={13} className="text-amber-500" /> Không giới hạn phiên (Premium VIP)
                 </span>
               ) : (
-                <span className={quota.remaining > 0 ? "text-slate-500" : "text-rose-600 font-bold"}>
+                <span className="text-slate-400 text-xs text-center block mt-1.5 font-medium">
                   Hạn mức Standard: {quota.runsUsed}/3 phiên tháng này{quota.remaining === 0 ? " (Đã hết lượt)" : ""}
                 </span>
               )}
             </div>
             <button
               type="button"
-              className="btn btn-ghost btn-sm"
+              className="btn btn-ghost btn-sm arena-sub-btn"
               onClick={() => setBriefingMap("map2-pro")}
             >
-              <span>Xem Giáo Trình &amp; Chiến Lược Map 2</span>
+              <span>Xem Giáo Trình &amp; Chiến Lược Map 2 ›</span>
             </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Stepper Roadmap Footer */}
-      <div className="simulation-stepper-card">
-        <div className="stepper-track">
-          <div className="stepper-node active">
-            <div className="node-circle">1</div>
-            <span className="node-title">Map 1: FOMO Arena</span>
-            <span className="node-desc">Vượt qua bão tâm lý ngắn hạn</span>
-          </div>
-          <div className="stepper-arrow">
-            <span className="key-pill">🔑 Chìa Khóa Mở Khóa</span>
-            <div className="arrow-line" />
-          </div>
-          <div className="stepper-node locked">
-            <div className="node-circle">
-              <Lock size={14} />
-            </div>
-            <span className="node-title">Map 2: Pro Room</span>
-            <span className="node-desc">Chiến lược phân bổ danh mục đa quý</span>
           </div>
         </div>
       </div>

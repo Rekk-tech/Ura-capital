@@ -236,14 +236,6 @@ export const SimulationDashboardPage: React.FC<SimulationDashboardPageProps> = (
     return (
       <main className="simulation-page" data-testid="simulation-page">
         <SimulationDisclosureBanner />
-        <div className="simulation-page-header" style={{ marginBottom: "2rem" }}>
-          <div>
-            <h1 className="page-title">Simulation Trading Arenas</h1>
-            <p className="page-subtitle">
-              Select your simulated financial arena: High-intensity FOMO Arena or Systematic Pro Room.
-            </p>
-          </div>
-        </div>
         <MapSelectionView
           hasActiveSession={Boolean(session && session.status === "ACTIVE")}
           activeSessionCycle={session?.currentCycle}
