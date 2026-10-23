@@ -69,6 +69,7 @@ export const BrokerRoomDetailPage: React.FC = () => {
     return new Intl.NumberFormat("vi-VN").format(amount) + " ₫";
   };
 
+  const brokerDisplayName = (room.brokerName || "Chuyên Gia").replace(/^V+u\s+/i, "Vũ ");
   const lectures = room.resources.filter((r) => r.category === "LECTURE" || r.category === "VALUATION_MODEL");
   const briefs = room.resources.filter((r) => r.category === "MARKET_BRIEF");
   const simExercises = room.resources.filter((r) => r.category === "SIMULATION_EXERCISE");
@@ -104,14 +105,14 @@ export const BrokerRoomDetailPage: React.FC = () => {
             <div className="room-author-strip">
               <div className="author-avatar">
                 {room.brokerAvatarUrl ? (
-                  <img src={room.brokerAvatarUrl} alt={room.brokerName} />
+                  <img src={room.brokerAvatarUrl} alt={brokerDisplayName} />
                 ) : (
-                  room.brokerName.slice(0, 2).toUpperCase()
+                  brokerDisplayName.slice(0, 2).toUpperCase()
                 )}
               </div>
               <div className="author-info">
                 <div className="author-name-row">
-                  <span className="author-name">{room.brokerName}</span>
+                  <span className="author-name">{brokerDisplayName}</span>
                   <span className="author-badge">
                     <Award size={12} /> {room.brokerBadge}
                   </span>

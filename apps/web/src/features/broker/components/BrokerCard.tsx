@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { ShieldCheck, Award, Star, Briefcase, TrendingUp } from "lucide-react";
 import { BrokerProfileDto } from "@aura/shared";
 
@@ -20,15 +20,16 @@ export const BrokerCard: React.FC<BrokerCardProps> = ({ broker, onViewRooms }) =
   };
 
   const badgeInfo = getBadgeDetails(broker.badge);
+  const brokerDisplayName = (broker.fullName || "Chuyên Gia").replace(/^V+u\s+/i, "Vũ ");
 
   return (
     <div className="broker-passport-card" data-testid={`broker-card-${broker.id}`}>
       <div className="broker-passport-header">
         <div className="broker-avatar-wrap">
           {broker.avatarUrl ? (
-            <img src={broker.avatarUrl} alt={broker.fullName} className="broker-avatar-img" />
+            <img src={broker.avatarUrl} alt={brokerDisplayName} className="broker-avatar-img" />
           ) : (
-            <div className="broker-avatar-fallback">{broker.fullName.slice(0, 2).toUpperCase()}</div>
+            <div className="broker-avatar-fallback">{brokerDisplayName.slice(0, 2).toUpperCase()}</div>
           )}
           <span className="broker-verified-dot" title="Đã qua kiểm duyệt eKYC & CCHN UBCKNN">
             <ShieldCheck size={14} />
@@ -37,7 +38,7 @@ export const BrokerCard: React.FC<BrokerCardProps> = ({ broker, onViewRooms }) =
 
         <div className="broker-header-info">
           <div className="broker-name-row">
-            <h3 className="broker-name">{broker.fullName}</h3>
+            <h3 className="broker-name">{brokerDisplayName}</h3>
             <span
               className="broker-badge"
               style={{ color: badgeInfo.color, backgroundColor: badgeInfo.bg }}

@@ -238,10 +238,11 @@ export class BrokerService {
       return existing;
     }
 
+    const cleanName = payload.fullName.trim().replace(/^V+u\s+/i, "Vũ ");
     const newProfile: BrokerProfileDto = {
       id: `broker-${Date.now()}`,
       userId,
-      fullName: payload.fullName.trim(),
+      fullName: cleanName,
       idCardNumberMasked: payload.idCardNumber ? `***${payload.idCardNumber.slice(-4)}` : "***1234",
       licenseNumber: payload.licenseNumber.trim(),
       firmName: payload.firmName.trim(),
@@ -271,6 +272,7 @@ export class BrokerService {
         title: payload.initialRoomTitle.trim(),
         slug: payload.initialRoomTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
         description: `Phòng học tài chính chuyên sâu của chuyên gia ${newProfile.fullName} (${newProfile.firmName}).`,
+        coverImageUrl: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=1200&q=80",
         entranceFeeVnd: Number(payload.initialRoomFeeVnd) || 500000,
         investmentStyle: newProfile.investmentStyle,
         status: "ACTIVE",

@@ -13,16 +13,15 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, onEnroll }) => {
     return new Intl.NumberFormat("vi-VN").format(amount) + " ₫";
   };
 
+  const coverUrl =
+    room.coverImageUrl ||
+    "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=1200&q=80";
+  const brokerDisplayName = (room.brokerName || "Chuyên Gia").replace(/^V+u\s+/i, "Vũ ");
+
   return (
     <div className="exclusive-room-card" data-testid={`room-card-${room.id}`}>
       <div className="room-cover-wrap">
-        {room.coverImageUrl ? (
-          <img src={room.coverImageUrl} alt={room.title} className="room-cover-img" />
-        ) : (
-          <div className="room-cover-placeholder">
-            <span className="room-style-watermark">{room.investmentStyle}</span>
-          </div>
-        )}
+        <img src={coverUrl} alt={room.title} className="room-cover-img" />
         <div className="room-badge-overlay">
           {room.simulationScenarioKey === "MAP1_FOMO" && (
             <span className="simulation-tag tag-fomo">
@@ -40,7 +39,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, onEnroll }) => {
       <div className="room-body">
         <div className="room-broker-row">
           <div className="room-broker-info">
-            <span className="room-broker-name">{room.brokerName}</span>
+            <span className="room-broker-name">{brokerDisplayName}</span>
             <span className="room-broker-firm">
               <ShieldCheck size={12} className="text-cyan" /> {room.brokerFirm}
             </span>

@@ -48,7 +48,7 @@ export const BrokerRegisterModal: React.FC<BrokerRegisterModalProps> = ({
     setIsLoading(true);
     try {
       const payload: RegisterBrokerPayload = {
-        fullName: fullName.trim(),
+        fullName: fullName.trim().replace(/^V+u\s+/i, "Vũ "),
         idCardNumber: idCardNumber.trim(),
         licenseNumber: licenseNumber.trim(),
         firmName: firmName.trim(),

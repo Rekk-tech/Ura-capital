@@ -82,7 +82,7 @@ export const RoomEnrollmentModal: React.FC<RoomEnrollmentModalProps> = ({
               <h3 className="summary-room-title">{room.title}</h3>
               <div className="summary-broker-info">
                 <Award size={14} className="text-cyan" />
-                <span>Chuyên gia: <strong>{room.brokerName}</strong> ({room.brokerFirm})</span>
+                <span>Chuyên gia: <strong>{(room.brokerName || "Chuyên Gia").replace(/^V+u\s+/i, "Vũ ")}</strong> ({room.brokerFirm})</span>
               </div>
             </div>
 
