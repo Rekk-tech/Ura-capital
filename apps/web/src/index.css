@@ -718,37 +718,23 @@ a {
   min-width: 0;
 }
 
-.subscription-page-header {
-  max-width: 720px;
-}
-
-.subscription-page-header h1 {
-  margin: 0.2rem 0 0.45rem;
-  font-size: 1.9rem;
-  line-height: 1.2;
-  letter-spacing: 0;
-}
-
-.subscription-page-header > p:last-child,
-.subscription-state-copy,
-.subscription-plan-description {
-  color: var(--text-secondary);
-  line-height: 1.65;
+.subscription-page-header,
+.subscription-layout {
+  display: none !important;
 }
 
 .subscription-eyebrow {
-  color: var(--accent-cyan);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0;
+  color: var(--accent-cyan, #06b6d4);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
-.subscription-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
-  gap: 1.25rem;
-  align-items: start;
+.subscription-page {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 4rem;
 }
 
 .subscription-status-card,
