@@ -15,6 +15,20 @@ export interface TraderBadge {
   unlockedAt?: string;
 }
 
+export interface ScoreBreakdownItem {
+  label: string;
+  points: number;
+  maxPoints?: number;
+  description: string;
+  type: "positive" | "negative" | "neutral";
+}
+
+export interface SimulationScoreDetail {
+  compositeScore: number;
+  grade: "S" | "A" | "B" | "C" | "D";
+  breakdown: ScoreBreakdownItem[];
+}
+
 export interface SimulationRunRecord {
   id: string;
   map: "MAP1" | "MAP2";
@@ -25,6 +39,11 @@ export interface SimulationRunRecord {
   returnPct: number;
   scoreMetric: string; // e.g. "FOMO Index: 38/100" or "Alpha: +4.2%"
   xpEarned: number;
+  quizScore?: number;
+  maxDrawdown?: number;
+  compositeScore?: number;
+  grade?: "S" | "A" | "B" | "C" | "D";
+  scoreBreakdown?: ScoreBreakdownItem[];
 }
 
 export interface LeaderboardEntry {
@@ -250,10 +269,74 @@ class GamificationService {
     finalNav: number;
     initialNav: number;
     fomoIndex: number;
-  }): { xpAwarded: number; badgeUnlocked?: string } {
+    quizScore?: number;
+    maxDrawdown?: number;
+  }): {
+    xpAwarded: number;
+    badgeUnlocked?: string;
+    compositeScore: number;
+    grade: "S" | "A" | "B" | "C" | "D";
+    breakdown: ScoreBreakdownItem[];
+  } {
     const returnPct = Number(
       (((result.finalNav - result.initialNav) / result.initialNav) * 100).toFixed(2),
     );
+
+    // Composite scoring calculation:
+    // S_ROI: up to 40 pts
+    const roiPoints = Math.min(40, Math.max(0, returnPct * 2));
+    // S_FOMO: up to 40 pts (lower FOMO index = higher score)
+    const fomoPoints = Math.max(0, 40 - result.fomoIndex * 0.4);
+    // S_Quiz: up to 20 pts
+    const quizPoints = result.quizScore !== undefined ? Math.min(20, Math.max(0, result.quizScore)) : 15;
+    // Penalty Drawdown: max drawdown > 15% deducts points
+    const dd = result.maxDrawdown ?? 0;
+    const ddPenalty = dd > 15 ? Math.min(20, (dd - 15) * 1.5) : 0;
+
+    const compositeScore = Math.max(
+      0,
+      Math.min(100, Math.round(roiPoints + fomoPoints + quizPoints - ddPenalty)),
+    );
+
+    const grade: "S" | "A" | "B" | "C" | "D" =
+      compositeScore >= 85 ? "S" :
+      compositeScore >= 70 ? "A" :
+      compositeScore >= 55 ? "B" :
+      compositeScore >= 40 ? "C" : "D";
+
+    const breakdown: ScoreBreakdownItem[] = [
+      {
+        label: "Hiệu Suất Lợi Nhuận (ROI)",
+        points: Math.round(roiPoints),
+        maxPoints: 40,
+        description: `Tăng trưởng NAV ${returnPct >= 0 ? "+" : ""}${returnPct}%`,
+        type: roiPoints > 0 ? "positive" : "neutral",
+      },
+      {
+        label: "Kỷ Luật Tâm Lý (FOMO)",
+        points: Math.round(fomoPoints),
+        maxPoints: 40,
+        description: `Chỉ số kiểm soát bẫy tâm lý: ${result.fomoIndex}/100`,
+        type: result.fomoIndex <= 50 ? "positive" : "neutral",
+      },
+      {
+        label: "Kiến Thức Thực Chiến (Quiz)",
+        points: Math.round(quizPoints),
+        maxPoints: 20,
+        description: `Điểm trả lời câu hỏi trắc nghiệm giữa vòng`,
+        type: "positive",
+      },
+    ];
+
+    if (ddPenalty > 0) {
+      breakdown.push({
+        label: "Phạt Sụt Giảm Danh Mục (Drawdown)",
+        points: -Math.round(ddPenalty),
+        maxPoints: 0,
+        description: `Sụt giảm tài khoản sâu nhất đạt ${dd.toFixed(1)}% (ngưỡng an toàn ≤ 15%)`,
+        type: "negative",
+      });
+    }
 
     // Award XP: base 100 XP + bonus for profitability
     let xpAwarded = 100;
@@ -270,6 +353,11 @@ class GamificationService {
       returnPct,
       scoreMetric: `Chỉ số FOMO: ${result.fomoIndex}/100`,
       xpEarned: xpAwarded,
+      quizScore: result.quizScore,
+      maxDrawdown: result.maxDrawdown,
+      compositeScore,
+      grade,
+      scoreBreakdown: breakdown,
     };
 
     let badgeUnlocked: string | undefined;
@@ -285,17 +373,80 @@ class GamificationService {
     }
 
     this.addXp(xpAwarded);
-    return { xpAwarded, badgeUnlocked };
+    return { xpAwarded, badgeUnlocked, compositeScore, grade, breakdown };
   }
 
   public recordMap2Run(result: {
     finalNav: number;
     initialNav: number;
     alpha: number;
-  }): { xpAwarded: number; badgeUnlocked?: string } {
+    sharpeRatio?: number;
+    maxDrawdown?: number;
+    quizScore?: number;
+  }): {
+    xpAwarded: number;
+    badgeUnlocked?: string;
+    compositeScore: number;
+    grade: "S" | "A" | "B" | "C" | "D";
+    breakdown: ScoreBreakdownItem[];
+  } {
     const returnPct = Number(
       (((result.finalNav - result.initialNav) / result.initialNav) * 100).toFixed(2),
     );
+
+    // Composite scoring calculation:
+    // S_Alpha: up to 40 pts
+    const alphaPoints = Math.min(40, Math.max(0, 20 + result.alpha * 4));
+    // S_Sharpe: up to 25 pts
+    const sharpe = result.sharpeRatio ?? 1.2;
+    const sharpePoints = Math.min(25, Math.max(0, sharpe * 12.5));
+    // S_DD: up to 20 pts
+    const dd = result.maxDrawdown ?? 8;
+    const ddPoints = Math.max(0, 20 - dd * 0.8);
+    // S_Quiz: up to 15 pts
+    const quizPoints = result.quizScore !== undefined ? Math.min(15, Math.max(0, result.quizScore)) : 12;
+
+    const compositeScore = Math.max(
+      0,
+      Math.min(100, Math.round(alphaPoints + sharpePoints + ddPoints + quizPoints)),
+    );
+
+    const grade: "S" | "A" | "B" | "C" | "D" =
+      compositeScore >= 85 ? "S" :
+      compositeScore >= 70 ? "A" :
+      compositeScore >= 55 ? "B" :
+      compositeScore >= 40 ? "C" : "D";
+
+    const breakdown: ScoreBreakdownItem[] = [
+      {
+        label: "Tạo Alpha Vượt Trội (vs VN30)",
+        points: Math.round(alphaPoints),
+        maxPoints: 40,
+        description: `Hiệu suất thặng dư Alpha đạt ${result.alpha >= 0 ? "+" : ""}${result.alpha.toFixed(1)}%`,
+        type: result.alpha >= 0 ? "positive" : "neutral",
+      },
+      {
+        label: "Tỷ Lệ Sharpe Đo Lường Rủi Ro",
+        points: Math.round(sharpePoints),
+        maxPoints: 25,
+        description: `Chỉ số Sharpe đạt ${sharpe.toFixed(2)} (Chuẩn tổ chức ≥ 1.0)`,
+        type: sharpe >= 1.0 ? "positive" : "neutral",
+      },
+      {
+        label: "Kiểm Soát Drawdown Đa Quý",
+        points: Math.round(ddPoints),
+        maxPoints: 20,
+        description: `Mức sụt giảm tối đa 12 quý giữ ở mức ${dd.toFixed(1)}%`,
+        type: dd <= 15 ? "positive" : "neutral",
+      },
+      {
+        label: "Trắc Nghiệm Định Giá & Phân Bổ",
+        points: Math.round(quizPoints),
+        maxPoints: 15,
+        description: `Độ chuẩn xác trong quyết định phân bổ vĩ mô`,
+        type: "positive",
+      },
+    ];
 
     let xpAwarded = 150;
     if (result.alpha > 0) xpAwarded += 50;
@@ -311,6 +462,11 @@ class GamificationService {
       returnPct,
       scoreMetric: `Alpha vs VN30: ${result.alpha >= 0 ? "+" : ""}${result.alpha.toFixed(1)}%`,
       xpEarned: xpAwarded,
+      quizScore: result.quizScore,
+      maxDrawdown: result.maxDrawdown,
+      compositeScore,
+      grade,
+      scoreBreakdown: breakdown,
     };
 
     let badgeUnlocked: string | undefined;
@@ -325,7 +481,46 @@ class GamificationService {
     }
 
     this.addXp(xpAwarded);
-    return { xpAwarded, badgeUnlocked };
+    return { xpAwarded, badgeUnlocked, compositeScore, grade, breakdown };
+  }
+
+  public getMonthlyMap2RunsCount(): number {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    return this.state.history.filter((record) => {
+      if (record.map !== "MAP2") return false;
+      const recordDate = new Date(record.completedAt);
+      return (
+        recordDate.getMonth() === currentMonth &&
+        recordDate.getFullYear() === currentYear
+      );
+    }).length;
+  }
+
+  public canPlayMap2(planKey: string = "FREE"): {
+    allowed: boolean;
+    runsUsed: number;
+    limit: number;
+    remaining: number;
+  } {
+    const runsUsed = this.getMonthlyMap2RunsCount();
+    if (planKey === "PREMIUM") {
+      return {
+        allowed: true,
+        runsUsed,
+        limit: Infinity,
+        remaining: Infinity,
+      };
+    }
+    const limit = 3;
+    const remaining = Math.max(0, limit - runsUsed);
+    return {
+      allowed: runsUsed < limit,
+      runsUsed,
+      limit,
+      remaining,
+    };
   }
 
   public getLeaderboard(currentUserName = "Bạn"): LeaderboardEntry[] {

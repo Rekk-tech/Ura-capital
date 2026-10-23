@@ -101,6 +101,58 @@ describe("GamificationService Unit Tests", () => {
     expect(state.history[0]?.map).toBe("MAP2");
   });
 
+  it("calculates composite score and breakdown for Map 1 with quizScore and maxDrawdown", () => {
+    const res = gamificationService.recordMap1Run({
+      finalNav: 110000000,
+      initialNav: 100000000,
+      fomoIndex: 20,
+      quizScore: 20,
+      maxDrawdown: 18, // exceeds 15% threshold -> penalty applied
+    });
+
+    expect(res.compositeScore).toBeGreaterThan(0);
+    expect(["S", "A", "B", "C", "D"]).toContain(res.grade);
+    expect(res.breakdown.length).toBeGreaterThanOrEqual(3);
+    const ddItem = res.breakdown.find((b) => b.type === "negative");
+    expect(ddItem).toBeDefined();
+    expect(ddItem?.label).toContain("Drawdown");
+  });
+
+  it("calculates composite score and breakdown for Map 2 with Sharpe ratio and quiz", () => {
+    const res = gamificationService.recordMap2Run({
+      finalNav: 120000000,
+      initialNav: 100000000,
+      alpha: 3.5,
+      sharpeRatio: 1.8,
+      maxDrawdown: 9,
+      quizScore: 15,
+    });
+
+    expect(res.compositeScore).toBeGreaterThanOrEqual(70);
+    expect(["S", "A"]).toContain(res.grade);
+    expect(res.breakdown).toHaveLength(4);
+  });
+
+  it("enforces monthly quota for Map 2 sessions on Standard plan", () => {
+    expect(gamificationService.canPlayMap2("FREE").allowed).toBe(true);
+    expect(gamificationService.canPlayMap2("FREE").limit).toBe(3);
+
+    // Simulate 3 Map 2 runs
+    gamificationService.recordMap2Run({ finalNav: 105000000, initialNav: 100000000, alpha: 1 });
+    gamificationService.recordMap2Run({ finalNav: 106000000, initialNav: 100000000, alpha: 1.5 });
+    gamificationService.recordMap2Run({ finalNav: 107000000, initialNav: 100000000, alpha: 2 });
+
+    const quota = gamificationService.canPlayMap2("FREE");
+    expect(quota.runsUsed).toBe(3);
+    expect(quota.remaining).toBe(0);
+    expect(quota.allowed).toBe(false);
+
+    // Premium users bypass quota
+    const premiumQuota = gamificationService.canPlayMap2("PREMIUM");
+    expect(premiumQuota.allowed).toBe(true);
+    expect(premiumQuota.limit).toBe(Infinity);
+  });
+
   it("generates leaderboard with currentUser injected and ranked", () => {
     const leaderboard = gamificationService.getLeaderboard("Học Viên Long");
     expect(leaderboard.length).toBeGreaterThanOrEqual(4);

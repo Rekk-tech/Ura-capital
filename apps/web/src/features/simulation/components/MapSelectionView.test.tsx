@@ -51,4 +51,38 @@ describe("MapSelectionView", () => {
     fireEvent.click(proBtn);
     expect(mockNavigate).toHaveBeenCalledWith("/simulation/map-2");
   });
+
+  it("displays upgrade modal when Standard account reaches monthly quota (3 runs)", async () => {
+    // Mock canPlayMap2 returning exhausted quota
+    const { gamificationService } = await import("../services/gamification.service");
+    vi.spyOn(gamificationService, "canPlayMap2").mockReturnValue({
+      allowed: false,
+      runsUsed: 3,
+      limit: 3,
+      remaining: 0,
+    });
+
+    render(
+      <BrowserRouter>
+        <MapSelectionView
+          onEnterCockpit={vi.fn()}
+          hasActiveSession={false}
+          isPremium={false}
+        />
+      </BrowserRouter>
+    );
+
+    const proBtn = screen.getByTestId("enter-pro-room-button");
+    fireEvent.click(proBtn);
+
+    // Assert upgrade modal is shown
+    expect(screen.getByTestId("map2-upgrade-modal")).toBeDefined();
+    expect(screen.getByText("Nâng Cấp Để Mở Khóa Map 2")).toBeDefined();
+    expect(screen.getByText(/3 lượt trải nghiệm Map 2/i)).toBeDefined();
+
+    // Clicking upgrade navigates to /subscription
+    const upgradeCta = screen.getByRole("button", { name: /Nâng Cấp Lên Premium VIP/i });
+    fireEvent.click(upgradeCta);
+    expect(mockNavigate).toHaveBeenCalledWith("/subscription");
+  });
 });

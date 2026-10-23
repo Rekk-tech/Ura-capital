@@ -351,4 +351,36 @@ describe("SubscriptionPage", () => {
       expect(screen.getByText(/VIP Patron Badge unlocked/i)).toBeDefined(),
     );
   });
+
+  it("toggles billing cycle between annual and monthly and updates displayed price", async () => {
+    renderPage();
+
+    await waitFor(() => expect(screen.getByText("1.490.000 ₫")).toBeDefined());
+    expect(screen.getByText("/ năm")).toBeDefined();
+
+    const monthlyToggle = screen.getByRole("button", { name: "Theo Tháng" });
+    fireEvent.click(monthlyToggle);
+
+    await waitFor(() => expect(screen.getByText("199.000 ₫")).toBeDefined());
+    expect(screen.getByText("/ tháng")).toBeDefined();
+
+    const yearlyToggle = screen.getByRole("button", { name: /Theo Năm/ });
+    fireEvent.click(yearlyToggle);
+
+    await waitFor(() => expect(screen.getByText("1.490.000 ₫")).toBeDefined());
+  });
+
+  it("renders the 8-row feature comparison matrix table", async () => {
+    renderPage();
+
+    await waitFor(() => expect(screen.getByText("Chi Tiết Đặc Quyền Giữa 2 Gói")).toBeDefined());
+    expect(screen.getByText("Vốn Khởi Điểm Thực Chiến")).toBeDefined();
+    expect(screen.getAllByText("Đấu Trường FOMO (Map 1)").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Đấu Trường Pro Room (Map 2)").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText("Trợ Lý AI Aura Intelligence")).toBeDefined();
+    expect(screen.getByText("Phân Tích Lệnh & Tâm Lý AI")).toBeDefined();
+    expect(screen.getByText("Khóa Học Aura Academy")).toBeDefined();
+    expect(screen.getByText("Đặc Quyền Bảng Xếp Hạng")).toBeDefined();
+    expect(screen.getByText("Quà Tặng Điểm Thưởng XP")).toBeDefined();
+  });
 });

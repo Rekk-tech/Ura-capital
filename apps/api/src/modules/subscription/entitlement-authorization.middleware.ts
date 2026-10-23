@@ -185,3 +185,74 @@ export function requireEntitlement(
     next();
   };
 }
+
+export interface RequireMap2QuotaOptions {
+  resolver: IEntitlementResolver;
+  getMonthlyRunCount?: (userId: string) => number | Promise<number>;
+  maxStandardRunsPerMonth?: number;
+  observer?: IEntitlementDecisionObserver;
+}
+
+/**
+ * Authorizes Map 2 simulation session access:
+ * - Premium subscribers: Unlimited access.
+ * - Standard (Free) accounts: Limited to 3 sessions per month.
+ */
+export function requireMap2QuotaAuthorization(options: RequireMap2QuotaOptions) {
+  const maxRuns = options.maxStandardRunsPerMonth ?? 3;
+
+  return async (
+    req: EntitlementAuthorizedRequest,
+    _res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    if (!req.user) {
+      next(
+        new AppError(
+          "Authentication required",
+          ERROR_CODES.UNAUTHENTICATED,
+          HTTP_STATUS.UNAUTHORIZED,
+        ),
+      );
+      return;
+    }
+
+    let context: EntitlementContext;
+    try {
+      context = await options.resolver.resolveUserEntitlement(req.user.id);
+    } catch {
+      next(resolutionError());
+      return;
+    }
+
+    // If entitled to PREMIUM_ACCESS, allow unlimited runs
+    if (context.entitlements.includes("PREMIUM_ACCESS")) {
+      req.entitlement = Object.freeze({
+        userId: req.user.id,
+        entitlementKey: "PREMIUM_ACCESS",
+        evaluatedAt: context.evaluatedAt.toISOString(),
+      });
+      next();
+      return;
+    }
+
+    // For Standard / Free users, check monthly quota limit (3 runs / month)
+    const currentRuns = options.getMonthlyRunCount
+      ? await options.getMonthlyRunCount(req.user.id)
+      : 0;
+
+    if (currentRuns >= maxRuns) {
+      next(
+        new AppError(
+          `Hạn mức Map 2 của gói Standard là ${maxRuns} lần/tháng. Vui lòng nâng cấp lên gói Premium để không giới hạn.`,
+          ERROR_CODES.ENTITLEMENT_REQUIRED,
+          HTTP_STATUS.FORBIDDEN,
+        ),
+      );
+      return;
+    }
+
+    next();
+  };
+}
+

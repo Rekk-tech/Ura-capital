@@ -15,6 +15,9 @@ export interface PlanCatalogItem {
   readonly name: string;
   readonly description: string;
   readonly entitlements: readonly EntitlementKey[];
+  readonly priceMonthly?: number;
+  readonly priceYearly?: number;
+  readonly currency?: string;
 }
 
 export interface PublicPlanInfo {
@@ -22,6 +25,9 @@ export interface PublicPlanInfo {
   readonly name: string;
   readonly description: string;
   readonly entitlements: readonly EntitlementKey[];
+  readonly priceMonthly?: number;
+  readonly priceYearly?: number;
+  readonly currency?: string;
 }
 
 export interface InternalProviderPriceMapping {

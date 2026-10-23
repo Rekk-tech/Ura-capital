@@ -3,6 +3,7 @@ import {
   CalendarClock,
   Check,
   CircleDollarSign,
+  Crown,
   RefreshCw,
   ShieldCheck,
   Sparkles,
@@ -48,6 +49,7 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({
   const { accessToken, user, isAuthenticated, isLoading: authLoading } = useAuth();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [announcement, setAnnouncement] = useState("");
+  const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("yearly");
 
   const plansQuery = useSubscriptionPlansQuery(accessToken ?? undefined);
   const currentQuery = useCurrentSubscriptionQuery(accessToken ?? undefined, user?.id);
@@ -293,46 +295,6 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({
               Schedule cancellation
             </button>
           )}
-
-          {!hasPremiumAccess && isSubscriptionCommandUiEnabled(commandEnvironment) && (
-            <div className="subscription-upgrade-callout" style={{ marginTop: "1.5rem" }}>
-              <div
-                style={{
-                  padding: "1.25rem",
-                  borderRadius: "12px",
-                  background: "linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(99, 102, 241, 0.12))",
-                  border: "1px solid rgba(99, 102, 241, 0.25)",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "0.75rem",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                  <Sparkles size={18} className="text-primary" />
-                  <strong style={{ fontSize: "0.95rem" }}>Upgrade to Institutional Premium</strong>
-                </div>
-                <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.5, margin: 0 }}>
-                  Unlock 24/7 dedicated AI Market Coach, unlimited Map 1 &amp; Map 2 simulation desks, and earn +500 XP bonus with the exclusive VIP Patron badge.
-                </p>
-                {upgradeBonusClaimed && (
-                  <div style={{ fontSize: "0.8rem", color: "#10b981", fontWeight: 600 }}>
-                    ✨ VIP Patron Badge unlocked &amp; +500 XP awarded!
-                  </div>
-                )}
-                <button
-                  type="button"
-                  data-testid="subscription-upgrade-button"
-                  className="btn btn-primary"
-                  style={{ width: "100%", justifyContent: "center", gap: "0.5rem", marginTop: "0.25rem" }}
-                  onClick={() => void handleUpgrade()}
-                  disabled={isUpgrading}
-                >
-                  <Sparkles size={16} />
-                  <span>{isUpgrading ? "Processing upgrade..." : "Upgrade to Premium VIP (Instant)"}</span>
-                </button>
-              </div>
-            </div>
-          )}
         </section>
 
         <section className="subscription-benefits" aria-labelledby="subscription-benefits-title">
@@ -366,6 +328,266 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({
           {!isSubscriptionCommandUiEnabled(commandEnvironment) && <SubscriptionReadOnlyNotice />}
         </section>
       </div>
+
+      {/* ================================================================ */}
+      {/* ZONE 2: Bảng Giá 2 Gói (Standard: 0₫ & Premium VIP: 199k/1.49M)   */}
+      {/* ================================================================ */}
+      <section className="subscription-pricing-section" aria-labelledby="pricing-plans-title">
+        <div className="subscription-billing-toggle-container">
+          <p className="subscription-eyebrow">Bảng Giá Hội Viên</p>
+          <h2 id="pricing-plans-title" style={{ margin: "0.2rem 0 0.5rem", fontSize: "1.6rem", fontWeight: 800 }}>
+            Lựa Chọn Gói Phù Hợp Với Bạn
+          </h2>
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", margin: 0, textAlign: "center" }}>
+            Trải nghiệm trọn vẹn sức mạnh trí tuệ nhân tạo và đấu trường mô phỏng tài chính chuẩn tổ chức.
+          </p>
+
+          <div className="subscription-billing-toggle" style={{ marginTop: "1rem" }}>
+            <button
+              type="button"
+              className={`billing-toggle-btn ${billingCycle === "yearly" ? "active" : ""}`}
+              onClick={() => setBillingCycle("yearly")}
+            >
+              <span>Theo Năm</span>
+              <span className="billing-savings-badge">Tiết kiệm 38% 🔥</span>
+            </button>
+            <button
+              type="button"
+              className={`billing-toggle-btn ${billingCycle === "monthly" ? "active" : ""}`}
+              onClick={() => setBillingCycle("monthly")}
+            >
+              <span>Theo Tháng</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="subscription-pricing-grid">
+          {/* Card 1: Gói Tiêu Chuẩn (Standard) */}
+          <div className="pricing-card">
+            <div>
+              <div className="pricing-card-header">
+                <h3 className="pricing-plan-name">Gói Tiêu Chuẩn</h3>
+                <p className="pricing-plan-tagline">
+                  Bắt đầu hành trình đầu tư thực chiến không rủi ro tài chính
+                </p>
+              </div>
+
+              <div className="pricing-amount-block">
+                <span className="pricing-number">0 ₫</span>
+                <span className="pricing-unit">/ Trọn đời</span>
+              </div>
+              <p className="pricing-equivalent-note" style={{ color: "var(--text-secondary)" }}>
+                Miễn phí vĩnh viễn cho mọi học viên
+              </p>
+
+              <ul className="pricing-features-list">
+                <li>
+                  <Check size={17} className="text-emerald-500" />
+                  <span><strong>100.000.000 ₫</strong> tiền ảo thực chiến cố định</span>
+                </li>
+                <li>
+                  <Check size={17} className="text-emerald-500" />
+                  <span><strong>Không giới hạn</strong> Đấu Trường FOMO (Map 1)</span>
+                </li>
+                <li>
+                  <Check size={17} className="text-emerald-500" />
+                  <span><strong>3 phiên / tháng</strong> Đấu Trường Pro Room (Map 2)</span>
+                </li>
+                <li>
+                  <Check size={17} className="text-emerald-500" />
+                  <span><strong>10 câu hỏi / ngày</strong> với Trợ lý AI Aura Coach</span>
+                </li>
+                <li>
+                  <Check size={17} className="text-emerald-500" />
+                  <span>Mở khóa <strong>Chặng 1 &amp; 2</strong> Aura Academy (Cổ phiếu)</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="pricing-card-actions">
+              <button
+                type="button"
+                disabled
+                className="btn btn-outline"
+                style={{ width: "100%", justifyContent: "center" }}
+              >
+                {isFree ? "Gói Đang Sử Dụng" : "Gói Mặc Định"}
+              </button>
+            </div>
+          </div>
+
+          {/* Card 2: Gói Cao Cấp (Premium VIP) */}
+          <div className="pricing-card pricing-card-featured">
+            <div className="pricing-card-badge">
+              <Sparkles size={14} />
+              <span>KHUYÊN DÙNG • TIẾT KIỆM 38% 🔥</span>
+            </div>
+
+            <div>
+              <div className="pricing-card-header" style={{ marginTop: "0.25rem" }}>
+                <h3 className="pricing-plan-name" style={{ color: "var(--accent-primary, #4f46e5)" }}>
+                  Gói Cao Cấp VIP
+                </h3>
+                <p className="pricing-plan-tagline">
+                  Toàn quyền tiếp cận công cụ phân tích tổ chức &amp; AI Market Coach 24/7
+                </p>
+              </div>
+
+              <div className="pricing-amount-block">
+                <span className="pricing-number">
+                  {billingCycle === "yearly" ? "1.490.000 ₫" : "199.000 ₫"}
+                </span>
+                <span className="pricing-unit">
+                  {billingCycle === "yearly" ? "/ năm" : "/ tháng"}
+                </span>
+              </div>
+              <p className="pricing-equivalent-note">
+                {billingCycle === "yearly"
+                  ? "Tương đương ~124.000 ₫ / tháng (Tiết kiệm 38%)"
+                  : "Thanh toán linh hoạt theo từng tháng"}
+              </p>
+
+              <div className="pricing-bonus-highlight">
+                <Crown size={16} />
+                <span>Tặng ngay +500 XP &amp; Huy hiệu VIP Patron</span>
+              </div>
+
+              {upgradeBonusClaimed && (
+                <div style={{ fontSize: "0.85rem", color: "#10b981", fontWeight: 700, marginBottom: "1rem" }}>
+                  ✨ VIP Patron Badge unlocked &amp; +500 XP awarded!
+                </div>
+              )}
+
+              <ul className="pricing-features-list">
+                <li>
+                  <Check size={17} className="text-emerald-500" />
+                  <span><strong>Tùy biến vốn danh mục</strong> lên tới 1.000.000.000 ₫</span>
+                </li>
+                <li>
+                  <Check size={17} className="text-emerald-500" />
+                  <span><strong>Không giới hạn</strong> Đấu Trường FOMO &amp; Map 2 Pro Room</span>
+                </li>
+                <li>
+                  <Check size={17} className="text-emerald-500" />
+                  <span><strong>Không giới hạn 24/7</strong> Aura AI Studio (Gemini 1.5 Pro)</span>
+                </li>
+                <li>
+                  <Check size={17} className="text-emerald-500" />
+                  <span>Bóc tách chi tiết tâm lý lệnh &amp; bẫy cảm xúc từng chu kỳ</span>
+                </li>
+                <li>
+                  <Check size={17} className="text-emerald-500" />
+                  <span><strong>Mở khóa 100%</strong> Academy (Chặng 3 phái sinh &amp; định giá)</span>
+                </li>
+                <li>
+                  <Check size={17} className="text-emerald-500" />
+                  <span>Xuất báo cáo phân tích hiệu suất chuyên sâu</span>
+                </li>
+                <li>
+                  <Check size={17} className="text-emerald-500" />
+                  <span>Huy hiệu <strong>VIP Patron vàng</strong> nổi bật trên Bảng Xếp Hạng</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="pricing-card-actions">
+              <button
+                type="button"
+                data-testid="subscription-upgrade-button"
+                className="btn btn-primary"
+                style={{
+                  width: "100%",
+                  justifyContent: "center",
+                  gap: "0.5rem",
+                  padding: "0.75rem",
+                  fontSize: "0.95rem",
+                  fontWeight: 700,
+                }}
+                onClick={() => void handleUpgrade()}
+                disabled={isUpgrading || hasPremiumAccess}
+              >
+                <Sparkles size={18} />
+                <span>
+                  {hasPremiumAccess
+                    ? "Gói Đang Sử Dụng (Premium VIP)"
+                    : isUpgrading
+                      ? "Processing upgrade..."
+                      : "Nâng Cấp Gói Premium VIP"}
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================================ */}
+      {/* ZONE 3: Bảng So Sánh Quyền Lợi Chi Tiết (8 Chỉ Mục Matrix)        */}
+      {/* ================================================================ */}
+      <section className="subscription-comparison-section" aria-labelledby="comparison-matrix-title">
+        <div>
+          <p className="subscription-eyebrow">So Sánh Quyền Lợi</p>
+          <h2 id="comparison-matrix-title" style={{ margin: "0.2rem 0 0.5rem", fontSize: "1.4rem", fontWeight: 800 }}>
+            Chi Tiết Đặc Quyền Giữa 2 Gói
+          </h2>
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.88rem", margin: 0 }}>
+            Minh bạch mọi giới hạn và quyền lợi nâng cao để bạn tự tin ra quyết định đầu tư.
+          </p>
+        </div>
+
+        <div className="comparison-table-wrapper">
+          <table className="comparison-table">
+            <thead>
+              <tr>
+                <th scope="col" style={{ width: "34%" }}>Tính Năng &amp; Đặc Quyền</th>
+                <th scope="col" style={{ width: "33%" }}>Gói Tiêu Chuẩn (Standard)</th>
+                <th scope="col" style={{ width: "33%", color: "#6366f1" }}>Gói Cao Cấp (Premium VIP)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="col-feature">Vốn Khởi Điểm Thực Chiến</td>
+                <td className="col-standard">100.000.000 ₫ (Cố định)</td>
+                <td className="col-premium">Tùy biến lên tới 1.000.000.000 ₫</td>
+              </tr>
+              <tr>
+                <td className="col-feature">Đấu Trường FOMO (Map 1)</td>
+                <td className="col-standard">Không giới hạn lượt chơi</td>
+                <td className="col-premium">Không giới hạn lượt chơi</td>
+              </tr>
+              <tr>
+                <td className="col-feature">Đấu Trường Pro Room (Map 2)</td>
+                <td className="col-standard">Tối đa 3 phiên / tháng</td>
+                <td className="col-premium">Không giới hạn 12 quý vĩ mô</td>
+              </tr>
+              <tr>
+                <td className="col-feature">Trợ Lý AI Aura Intelligence</td>
+                <td className="col-standard">10 truy vấn / ngày (Cơ bản)</td>
+                <td className="col-premium">Không giới hạn 24/7 (AI Studio chuyên sâu)</td>
+              </tr>
+              <tr>
+                <td className="col-feature">Phân Tích Lệnh &amp; Tâm Lý AI</td>
+                <td className="col-standard">Đánh giá tổng quan sau trận</td>
+                <td className="col-premium">Bóc tách chi tiết từng chu kỳ lệnh</td>
+              </tr>
+              <tr>
+                <td className="col-feature">Khóa Học Aura Academy</td>
+                <td className="col-standard">Chặng 1 &amp; 2 (Nền tảng &amp; Cổ phiếu)</td>
+                <td className="col-premium">Mở khóa 100% Khóa học &amp; Phái sinh / Hedging</td>
+              </tr>
+              <tr>
+                <td className="col-feature">Đặc Quyền Bảng Xếp Hạng</td>
+                <td className="col-standard">Hiển thị xếp hạng tiêu chuẩn</td>
+                <td className="col-premium">Huy hiệu VIP Patron vàng nổi bật</td>
+              </tr>
+              <tr>
+                <td className="col-feature">Quà Tặng Điểm Thưởng XP</td>
+                <td className="col-standard">200 XP mặc định ban đầu</td>
+                <td className="col-premium">Tặng ngay +500 XP khi nâng cấp</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
       {mutationError && (
         <div

@@ -1098,6 +1098,369 @@ a {
   to { transform: rotate(360deg); }
 }
 
+/* ============================================================================
+   FEAT-085: Commercial Pricing, Feature Comparison Matrix & Score Breakdown
+   ============================================================================ */
+
+.subscription-pricing-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.subscription-billing-toggle-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+}
+
+.subscription-billing-toggle {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
+  gap: 0.25rem;
+}
+
+.billing-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.billing-toggle-btn.active {
+  background: var(--accent-primary, #3b82f6);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
+}
+
+.billing-savings-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  border-radius: 9999px;
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.billing-toggle-btn.active .billing-savings-badge {
+  background: #fff;
+  color: #d97706;
+  border-color: #fff;
+}
+
+.subscription-pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.pricing-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.75rem;
+  border-radius: 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pricing-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.2);
+}
+
+.pricing-card-featured {
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.08) 0%, rgba(99, 102, 241, 0.04) 100%), var(--bg-surface);
+  border: 2px solid #6366f1;
+  box-shadow: 0 8px 30px rgba(99, 102, 241, 0.18);
+}
+
+.pricing-card-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.85rem;
+  background: linear-gradient(135deg, #4f46e5, #06b6d4);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 9999px;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+  white-space: nowrap;
+}
+
+.pricing-card-header {
+  margin-bottom: 1.25rem;
+}
+
+.pricing-plan-name {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin: 0 0 0.35rem 0;
+  color: var(--text-primary);
+}
+
+.pricing-plan-tagline {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.pricing-amount-block {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  margin: 1.25rem 0 0.5rem 0;
+}
+
+.pricing-number {
+  font-size: 2.25rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--text-primary);
+  font-feature-settings: "tnum";
+}
+
+.pricing-unit {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.pricing-equivalent-note {
+  font-size: 0.78rem;
+  color: #10b981;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+}
+
+.pricing-bonus-highlight {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px dashed rgba(245, 158, 11, 0.4);
+  color: #f59e0b;
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+}
+
+.pricing-features-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.pricing-features-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  line-height: 1.45;
+}
+
+.pricing-features-list li svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.pricing-card-actions {
+  margin-top: auto;
+}
+
+/* Feature Comparison Table */
+.subscription-comparison-section {
+  margin-top: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.comparison-table-wrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.88rem;
+}
+
+.comparison-table th,
+.comparison-table td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.comparison-table th {
+  background: var(--bg-card);
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.comparison-table tr:last-child td {
+  border-bottom: none;
+}
+
+.comparison-table td.col-feature {
+  font-weight: 600;
+  color: var(--text-primary);
+  width: 34%;
+}
+
+.comparison-table td.col-standard {
+  color: var(--text-secondary);
+  width: 33%;
+}
+
+.comparison-table td.col-premium {
+  color: var(--text-primary);
+  font-weight: 600;
+  width: 33%;
+  background: rgba(99, 102, 241, 0.04);
+}
+
+.comparison-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.comparison-table tr:hover td.col-premium {
+  background: rgba(99, 102, 241, 0.08);
+}
+
+/* Score Breakdown Component */
+.score-breakdown-card {
+  padding: 1.5rem;
+  border-radius: 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.score-breakdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.score-grade-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 9999px;
+  font-weight: 800;
+  font-size: 0.88rem;
+}
+
+.score-grade-s {
+  background: linear-gradient(135deg, #f59e0b, #ec4899);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+}
+
+.score-grade-a {
+  background: linear-gradient(135deg, #10b981, #06b6d4);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+}
+
+.score-grade-b {
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  color: #fff;
+}
+
+.score-grade-c,
+.score-grade-d {
+  background: rgba(148, 163, 184, 0.2);
+  color: var(--text-primary);
+}
+
+.score-breakdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.score-breakdown-table th,
+.score-breakdown-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  text-align: left;
+}
+
+.score-breakdown-table th {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.score-breakdown-table tr:last-child td {
+  border-bottom: none;
+}
+
+.point-positive {
+  color: #10b981;
+  font-weight: 700;
+}
+
+.point-negative {
+  color: #ef4444;
+  font-weight: 700;
+}
+
+.point-neutral {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
 @keyframes subscription-pulse {
   0%, 100% { opacity: 0.45; }
   50% { opacity: 1; }

@@ -2,7 +2,7 @@
 
 **Feature Code**: `FEAT-085`  
 **Created**: 2026-10-13  
-**Status**: COMPLETED  
+**Status**: IN_PROGRESS (Option A Commercial Pricing Activation)  
 
 ---
 
@@ -34,3 +34,10 @@
   - [x] T5.2: Run full unit & integration tests (`npm run test`).
   - [x] T5.3: Run full workspace typecheck (`npm run typecheck`) and web build (`npm run build:web`).
   - [x] T5.4: Visual verification & state synchronization across all surfaces.
+
+- [x] **Task 6 (Option A): Commercial Pricing Plans & Feature Comparison Matrix**
+  - [x] T6.1: Add `billingCycle` toggle state and pricing model (`199.000 ₫/tháng` & `1.490.000 ₫/năm`) to `SubscriptionPage.tsx`.
+  - [x] T6.2: Build interactive 2-column pricing cards (Standard 0đ vs Premium VIP featured card).
+  - [x] T6.3: Build 8-row responsive Feature Comparison Table comparing quotas, AI access, and map limits.
+  - [x] T6.4: Add FinTech styling in `index.css` for pricing cards, toggle switch, and comparison matrix.
+  - [x] T6.5: Verify `SubscriptionPage.test.tsx`, `npm run typecheck`, and `npm run build:web`.

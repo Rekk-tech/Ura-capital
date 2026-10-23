@@ -7,7 +7,10 @@ import type { NextFunction, Response } from "express";
 import { ERROR_CODES, HTTP_STATUS } from "@aura/shared";
 
 import { AppError } from "../../src/shared/errors/error-envelope.js";
-import { requireEntitlement } from "../../src/modules/subscription/entitlement-authorization.middleware.js";
+import {
+  requireEntitlement,
+  requireMap2QuotaAuthorization,
+} from "../../src/modules/subscription/entitlement-authorization.middleware.js";
 import type {
   EntitlementAuthorizedRequest,
   IEntitlementDecisionObserver,
@@ -224,6 +227,61 @@ describe("FEAT-054 premium entitlement authorization middleware", () => {
       requestId: "request-entitlement-001",
     });
     expect((next.mock.calls[0]?.[0] as AppError).code).toBe(ERROR_CODES.ENTITLEMENT_REQUIRED);
+  });
+
+  describe("requireMap2QuotaAuthorization", () => {
+    it("allows Premium users unlimited Map 2 sessions regardless of monthly run count", async () => {
+      const req = request();
+      const res = {} as Response;
+      const next = vi.fn() as unknown as NextFunction;
+      const entitlementResolver = resolver(context({ planKey: "PREMIUM", isEntitled: true }));
+
+      const middleware = requireMap2QuotaAuthorization({
+        resolver: entitlementResolver,
+        getMonthlyRunCount: vi.fn().mockResolvedValue(10), // already 10 runs
+      });
+
+      await middleware(req, res, next);
+      expect(next).toHaveBeenCalledWith();
+      expect(req.entitlement?.entitlementKey).toBe("PREMIUM_ACCESS");
+    });
+
+    it("allows Standard users to enter Map 2 if they have not reached the 3 sessions/month limit", async () => {
+      const req = request();
+      const res = {} as Response;
+      const next = vi.fn() as unknown as NextFunction;
+      const freeContext = context({ planKey: "FREE", isEntitled: false, entitlements: [] });
+      const entitlementResolver = resolver(freeContext);
+
+      const middleware = requireMap2QuotaAuthorization({
+        resolver: entitlementResolver,
+        getMonthlyRunCount: vi.fn().mockResolvedValue(2), // 2 runs used (< 3)
+      });
+
+      await middleware(req, res, next);
+      expect(next).toHaveBeenCalledWith();
+    });
+
+    it("blocks Standard users with 403 when they reach the 3 sessions/month limit", async () => {
+      const req = request();
+      const res = {} as Response;
+      const next = vi.fn() as unknown as NextFunction;
+      const freeContext = context({ planKey: "FREE", isEntitled: false, entitlements: [] });
+      const entitlementResolver = resolver(freeContext);
+
+      const middleware = requireMap2QuotaAuthorization({
+        resolver: entitlementResolver,
+        getMonthlyRunCount: vi.fn().mockResolvedValue(3), // 3 runs used (>= 3 limit)
+      });
+
+      await middleware(req, res, next);
+      expect(next).toHaveBeenCalledWith(
+        expect.objectContaining({
+          code: ERROR_CODES.ENTITLEMENT_REQUIRED,
+          statusCode: HTTP_STATUS.FORBIDDEN,
+        }),
+      );
+    });
   });
 
   it("contains no production-domain or public route integration", () => {

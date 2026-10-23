@@ -19,12 +19,18 @@ export const SERVER_PLAN_CATALOG: Readonly<Record<SubscriptionPlan, PlanCatalogI
     name: "Free Plan",
     description: "Standard access to foundational platform capabilities.",
     entitlements: Object.freeze([]) as readonly EntitlementKey[],
+    priceMonthly: 0,
+    priceYearly: 0,
+    currency: "VND",
   }),
   PREMIUM: Object.freeze({
     planKey: "PREMIUM",
     name: "Premium Plan",
     description: "Full access to advanced platform capabilities and features.",
     entitlements: Object.freeze(["PREMIUM_ACCESS"]) as readonly EntitlementKey[],
+    priceMonthly: 199000,
+    priceYearly: 1490000,
+    currency: "VND",
   }),
 });
 
@@ -113,6 +119,9 @@ export function getPublicPlans(): PublicPlanInfo[] {
       name: item.name,
       description: item.description,
       entitlements: item.entitlements,
+      priceMonthly: item.priceMonthly,
+      priceYearly: item.priceYearly,
+      currency: item.currency,
     };
   });
 }

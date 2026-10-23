@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Map2FinalReport } from "../../types/map-game.types";
 import { formatCurrency } from "../../../portfolio/utils/portfolioCalculations";
-import { gamificationService } from "../../services/gamification.service";
+import { gamificationService, type ScoreBreakdownItem } from "../../services/gamification.service";
 import {
   Award,
   TrendingUp,
@@ -29,19 +29,30 @@ export const ProRoomReportView: React.FC<ProRoomReportViewProps> = ({
 }) => {
   const navigate = useNavigate();
   const hasRecordedRef = useRef(false);
-  const [awardInfo, setAwardInfo] = useState<{ xpAwarded: number; badgeUnlocked?: string } | null>(null);
+  const [awardInfo, setAwardInfo] = useState<{
+    xpAwarded: number;
+    badgeUnlocked?: string;
+    compositeScore?: number;
+    grade?: "S" | "A" | "B" | "C" | "D";
+    breakdown?: ScoreBreakdownItem[];
+  } | null>(null);
 
   useEffect(() => {
     if (!hasRecordedRef.current) {
       hasRecordedRef.current = true;
+      const correctQuizzes = report.quarterHistory ? report.quarterHistory.filter((q) => q.quizResult?.isCorrect).length : 0;
+      const quizScore = Math.min(15, Math.max(8, correctQuizzes * 5));
       const res = gamificationService.recordMap2Run({
         finalNav: report.finalNav,
         initialNav: report.initialCash || 100000000,
         alpha: report.alpha,
+        sharpeRatio: report.sharpeRatio,
+        maxDrawdown: report.maxDrawdown,
+        quizScore,
       });
       setAwardInfo(res);
     }
-  }, [report.finalNav, report.initialCash, report.alpha]);
+  }, [report.finalNav, report.initialCash, report.alpha, report.sharpeRatio, report.maxDrawdown, report.quarterHistory]);
 
   // Average asset weighting across 12 quarters for allocation chips
   const totalRecords = Math.max(1, report.quarterHistory.length);
@@ -241,6 +252,82 @@ export const ProRoomReportView: React.FC<ProRoomReportViewProps> = ({
           </span>
         </div>
       </div>
+
+      {/* Component-Level Score Breakdown Table */}
+      {awardInfo && awardInfo.breakdown && (
+        <div className="card-aura p-5 rounded-2xl border border-slate-200 bg-white shadow-xs flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                CHUẨN HÓA ĐIỂM SỐ PRO ROOM
+              </span>
+              <h3 className="text-base font-bold text-slate-900 tracking-tight">
+                Bảng Chi Tiết Điểm Thành Phần &amp; Xếp Hạng Vĩ Mô
+              </h3>
+            </div>
+            <div className="flex items-center gap-2.5">
+              <span className="text-xs text-slate-500 font-medium">Điểm Tổng Hợp:</span>
+              <span className="text-2xl font-black font-mono text-teal-600">
+                {awardInfo.compositeScore ?? 0}
+                <span className="text-xs text-slate-400 font-normal">/100</span>
+              </span>
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${
+                  awardInfo.grade === "S"
+                    ? "bg-amber-500 text-slate-950 shadow-sm"
+                    : awardInfo.grade === "A"
+                      ? "bg-teal-500 text-white shadow-sm"
+                      : awardInfo.grade === "B"
+                        ? "bg-blue-600 text-white shadow-sm"
+                        : "bg-slate-200 text-slate-800"
+                }`}
+              >
+                HẠNG {awardInfo.grade}
+              </span>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-left text-xs">
+              <thead>
+                <tr className="border-b border-slate-100 text-slate-400 font-semibold uppercase text-[10px]">
+                  <th className="py-2 px-3">Thành Phần Đánh Giá</th>
+                  <th className="py-2 px-3">Mô Tả Tiêu Chí</th>
+                  <th className="py-2 px-3 text-right">Điểm Đạt Được</th>
+                  <th className="py-2 px-3 text-right">Trọng Số Tối Đa</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {awardInfo.breakdown.map((item, idx) => (
+                  <tr key={idx} className="hover:bg-slate-50/50">
+                    <td className="py-2.5 px-3 font-semibold text-slate-800">{item.label}</td>
+                    <td className="py-2.5 px-3 text-slate-500">{item.description}</td>
+                    <td className="py-2.5 px-3 text-right font-mono font-bold">
+                      <span
+                        className={
+                          item.type === "negative"
+                            ? "text-rose-600"
+                            : item.type === "positive"
+                              ? "text-teal-600"
+                              : "text-slate-700"
+                        }
+                      >
+                        {item.points > 0 ? `+${item.points}` : item.points}
+                      </span>
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-mono text-slate-400">
+                      {item.maxPoints !== undefined && item.maxPoints > 0 ? `${item.maxPoints} đ` : "-"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-[11px] text-slate-400 italic">
+            * Công thức chuẩn hóa: Score = S_Alpha (40đ) + S_Sharpe (25đ) + S_Drawdown (20đ) + S_Quiz (15đ).
+          </p>
+        </div>
+      )}
 
       {/* 3. 12-Quarter Performance & Macro Cycles Trajectory Chart (Figma Style) */}
       <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-xs flex flex-col gap-4">

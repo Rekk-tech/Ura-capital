@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import type { Map1DebriefReport } from "../../types/map-game.types";
 import { Award, AlertOctagon, CheckCircle2, TrendingUp, TrendingDown, ArrowRight, RotateCcw, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { gamificationService } from "../../services/gamification.service";
+import { gamificationService, type ScoreBreakdownItem } from "../../services/gamification.service";
 
 interface FomoDebriefViewProps {
   report: Map1DebriefReport;
@@ -16,19 +16,41 @@ export const FomoDebriefView: React.FC<FomoDebriefViewProps> = ({
   const navigate = useNavigate();
   const isSurvived = report.isSurvived || report.status === "completed_survived";
   const hasRecordedRef = useRef(false);
-  const [awardInfo, setAwardInfo] = useState<{ xpAwarded: number; badgeUnlocked?: string } | null>(null);
+  const [awardInfo, setAwardInfo] = useState<{
+    xpAwarded: number;
+    badgeUnlocked?: string;
+    compositeScore?: number;
+    grade?: "S" | "A" | "B" | "C" | "D";
+    breakdown?: ScoreBreakdownItem[];
+  } | null>(null);
 
   useEffect(() => {
     if (!hasRecordedRef.current) {
       hasRecordedRef.current = true;
+
+      // Calculate max drawdown from navHistory if available
+      let calculatedMaxDrawdown = 0;
+      if (report.navHistory && report.navHistory.length > 0) {
+        let peak = report.navHistory[0]?.nav ?? (report.initialCash || 10000000);
+        for (const pt of report.navHistory) {
+          if (pt.nav > peak) peak = pt.nav;
+          const dd = peak > 0 ? ((peak - pt.nav) / peak) * 100 : 0;
+          if (dd > calculatedMaxDrawdown) calculatedMaxDrawdown = dd;
+        }
+      }
+
+      const quizScore = report.disciplineScore ? Math.round(report.disciplineScore / 5) : 15;
+
       const res = gamificationService.recordMap1Run({
         finalNav: report.finalNav,
-        initialNav: 10000000,
+        initialNav: report.initialCash || 10000000,
         fomoIndex: report.fomoScore ?? 45,
+        quizScore,
+        maxDrawdown: calculatedMaxDrawdown,
       });
       setAwardInfo(res);
     }
-  }, [report.finalNav, report.fomoScore]);
+  }, [report.finalNav, report.fomoScore, report.initialCash, report.disciplineScore, report.navHistory]);
 
   return (
     <div className="fomo-debrief-view max-w-4xl mx-auto flex flex-col gap-6 animate-in fade-in duration-300">
@@ -243,6 +265,82 @@ export const FomoDebriefView: React.FC<FomoDebriefViewProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Component-Level Gamification Score Breakdown Table */}
+      {awardInfo && awardInfo.breakdown && (
+        <div className="card-aura p-5 rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                CHUẨN HÓA ĐIỂM SỐ GAMIFICATION
+              </span>
+              <h3 className="text-base font-bold text-slate-900 tracking-tight">
+                Bảng Chi Tiết Điểm Thành Phần &amp; Xếp Hạng
+              </h3>
+            </div>
+            <div className="flex items-center gap-2.5">
+              <span className="text-xs text-slate-500 font-medium">Điểm Tổng Hợp:</span>
+              <span className="text-2xl font-black font-mono text-blue-600">
+                {awardInfo.compositeScore ?? 0}
+                <span className="text-xs text-slate-400 font-normal">/100</span>
+              </span>
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${
+                  awardInfo.grade === "S"
+                    ? "bg-amber-500 text-slate-950 shadow-sm"
+                    : awardInfo.grade === "A"
+                      ? "bg-emerald-500 text-white shadow-sm"
+                      : awardInfo.grade === "B"
+                        ? "bg-blue-600 text-white shadow-sm"
+                        : "bg-slate-200 text-slate-800"
+                }`}
+              >
+                HẠNG {awardInfo.grade}
+              </span>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-left text-xs">
+              <thead>
+                <tr className="border-b border-slate-100 text-slate-400 font-semibold uppercase text-[10px]">
+                  <th className="py-2 px-3">Hạng Mục Tính Điểm</th>
+                  <th className="py-2 px-3">Mô Tả Tiêu Chí</th>
+                  <th className="py-2 px-3 text-right">Điểm Đạt Được</th>
+                  <th className="py-2 px-3 text-right">Tối Đa</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {awardInfo.breakdown.map((item, idx) => (
+                  <tr key={idx} className="hover:bg-slate-50/50">
+                    <td className="py-2.5 px-3 font-semibold text-slate-800">{item.label}</td>
+                    <td className="py-2.5 px-3 text-slate-500">{item.description}</td>
+                    <td className="py-2.5 px-3 text-right font-mono font-bold">
+                      <span
+                        className={
+                          item.type === "negative"
+                            ? "text-rose-600"
+                            : item.type === "positive"
+                              ? "text-emerald-600"
+                              : "text-slate-700"
+                        }
+                      >
+                        {item.points > 0 ? `+${item.points}` : item.points}
+                      </span>
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-mono text-slate-400">
+                      {item.maxPoints !== undefined && item.maxPoints > 0 ? `${item.maxPoints} đ` : "-"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-[11px] text-slate-400 italic">
+            * Công thức chuẩn hóa: Score = S_ROI (40đ) + S_FOMO (40đ) + S_Quiz (20đ) - Penalty_Drawdown (nếu MDD &gt; 15%).
+          </p>
+        </div>
+      )}
 
       {/* Top 3 Real Mistakes Breakdown */}
       <div className="card-aura p-5 rounded-xl border border-slate-200 bg-white shadow-sm">

@@ -11,13 +11,17 @@ import {
   Award,
   X,
   Sparkles,
+  Crown,
 } from "lucide-react";
+import { gamificationService } from "../services/gamification.service";
 
 interface MapSelectionViewProps {
   onEnterCockpit: (mapId: "map1-fomo" | "map2-pro") => void;
   hasActiveSession: boolean;
   activeSessionCycle?: number;
   activeScenarioName?: string;
+  userPlan?: "FREE" | "PREMIUM";
+  isPremium?: boolean;
 }
 
 export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
@@ -25,9 +29,26 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
   hasActiveSession,
   activeSessionCycle,
   activeScenarioName,
+  userPlan,
+  isPremium: propIsPremium,
 }) => {
   const navigate = useNavigate();
   const [briefingMap, setBriefingMap] = useState<"map1-fomo" | "map2-pro" | null>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
+  const isVipBadge = gamificationService
+    .getState()
+    .badges.some((b) => b.id === "VIP_PATRON" && b.isUnlocked);
+  const isPremium = propIsPremium ?? (userPlan === "PREMIUM" || isVipBadge);
+  const quota = gamificationService.canPlayMap2(isPremium ? "PREMIUM" : "FREE");
+
+  const handleEnterMap2 = () => {
+    if (!isPremium && !quota.allowed) {
+      setShowUpgradeModal(true);
+      return;
+    }
+    navigate("/simulation/map-2");
+  };
 
   return (
     <div className="map-selection-view">
@@ -200,12 +221,23 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
             <button
               type="button"
               className="btn btn-secondary btn-md btn-block"
-              onClick={() => navigate("/simulation/map-2")}
+              onClick={handleEnterMap2}
               data-testid="enter-pro-room-button"
             >
               <span>Vào Bàn Chiến Lược Map 2 (Pro Room) →</span>
               <span className="sr-only">Start Map 2 (Pro Room)</span>
             </button>
+            <div className="quota-indicator" style={{ marginTop: "0.5rem", fontSize: "0.75rem", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.4rem" }}>
+              {isPremium ? (
+                <span className="text-emerald-600 font-bold flex items-center gap-1">
+                  <Crown size={13} className="text-amber-500" /> Không giới hạn phiên (Premium VIP)
+                </span>
+              ) : (
+                <span className={quota.remaining > 0 ? "text-slate-500" : "text-rose-600 font-bold"}>
+                  Hạn mức Standard: {quota.runsUsed}/3 phiên tháng này{quota.remaining === 0 ? " (Đã hết lượt)" : ""}
+                </span>
+              )}
+            </div>
             <button
               type="button"
               className="btn btn-ghost btn-sm"
@@ -346,12 +378,100 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
                   className="btn btn-primary btn-md"
                   onClick={() => {
                     setBriefingMap(null);
-                    navigate("/simulation/map-2");
+                    handleEnterMap2();
                   }}
                 >
                   <span>Vào Bàn Chiến Lược Pro Room →</span>
                 </button>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Map 2 Quota Upgrade Modal for Standard Users */}
+      {showUpgradeModal && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true" data-testid="map2-upgrade-modal">
+          <div className="modal-card" style={{ maxWidth: "520px" }}>
+            <div className="modal-header">
+              <div className="modal-title-row" style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                <div style={{ padding: "0.5rem", borderRadius: "10px", background: "rgba(245, 158, 11, 0.15)", color: "#f59e0b" }}>
+                  <Crown size={24} />
+                </div>
+                <div>
+                  <span className="badge badge-warning-subtle text-[11px]" style={{ display: "inline-block", marginBottom: "0.25rem" }}>
+                    CHẠM HẠN MỨC GÓI TIÊU CHUẨN (3/3 LƯỢT)
+                  </span>
+                  <h3 className="modal-title text-lg font-bold" style={{ margin: 0 }}>Nâng Cấp Để Mở Khóa Map 2</h3>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="modal-close-btn"
+                onClick={() => setShowUpgradeModal(false)}
+                aria-label="Đóng"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="modal-body" style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              <p className="text-sm text-slate-600 leading-relaxed" style={{ margin: 0 }}>
+                Bạn đã sử dụng hết <strong>3 lượt trải nghiệm Map 2 (Pro Room)</strong> trong tháng này.
+                Tài khoản Gói Tiêu Chuẩn (Standard) bị giới hạn tối đa 3 phiên phân bổ vĩ mô mỗi tháng.
+              </p>
+
+              <div
+                style={{
+                  padding: "1rem",
+                  borderRadius: "12px",
+                  background: "linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(6, 182, 212, 0.08))",
+                  border: "1px solid rgba(99, 102, 241, 0.25)",
+                }}
+              >
+                <strong className="text-xs font-bold text-slate-900 block mb-2 uppercase tracking-wide">
+                  Đặc quyền khi nâng cấp lên Premium VIP (199.000 ₫/tháng):
+                </strong>
+                <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.5rem", fontSize: "0.82rem" }}>
+                  <li style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <CheckCircle2 size={15} className="text-emerald-500" />
+                    <span><strong>Không giới hạn</strong> lượt chơi Map 1 &amp; Map 2 suốt năm</span>
+                  </li>
+                  <li style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <CheckCircle2 size={15} className="text-emerald-500" />
+                    <span>Cố vấn AI Market Coach 24/7 trực tiếp trong từng vòng lệnh</span>
+                  </li>
+                  <li style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <CheckCircle2 size={15} className="text-emerald-500" />
+                    <span>Mở khóa 100% Khóa học Academy (Chặng 3 phái sinh &amp; hedging)</span>
+                  </li>
+                  <li style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <CheckCircle2 size={15} className="text-emerald-500" />
+                    <span><strong>Tặng ngay +500 XP</strong> &amp; Huy hiệu độc quyền VIP Patron</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="modal-footer" style={{ display: "flex", gap: "0.75rem", justifyContent: "flex-end" }}>
+              <button
+                type="button"
+                className="btn btn-outline btn-md"
+                onClick={() => setShowUpgradeModal(false)}
+              >
+                Để Sau
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary btn-md flex items-center gap-2"
+                onClick={() => {
+                  setShowUpgradeModal(false);
+                  navigate("/subscription");
+                }}
+              >
+                <Sparkles size={16} />
+                <span>Nâng Cấp Lên Premium VIP →</span>
+              </button>
             </div>
           </div>
         </div>
