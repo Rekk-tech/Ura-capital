@@ -52,6 +52,31 @@ export const SimulationLeaderboard: React.FC<SimulationLeaderboardProps> = ({
     }
   };
 
+  const renderDisplayName = (
+    entry: { displayName: string; isCurrentUser?: boolean },
+    textClass = "text-xs"
+  ) => {
+    if (entry.isCurrentUser) {
+      const rawName = entry.displayName.replace(/\s*\([Bb]ạn\)\s*/g, "").trim();
+      return (
+        <span className={`${textClass} font-bold text-slate-900 truncate inline-flex items-center gap-1`}>
+          <span className="truncate">{rawName}</span>
+          <span
+            className="font-extrabold flex-shrink-0"
+            style={{ color: "var(--aura-blue-600, #1D6FF2)" }}
+          >
+            (Bạn)
+          </span>
+        </span>
+      );
+    }
+    return (
+      <span className={`${textClass} font-bold text-slate-900 truncate`}>
+        {entry.displayName}
+      </span>
+    );
+  };
+
   // Variant 2: Compact Sidebar Widget (Top 5 for Community page 30% column)
   if (variant === "sidebar") {
     return (
@@ -88,14 +113,7 @@ export const SimulationLeaderboard: React.FC<SimulationLeaderboardProps> = ({
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-1">
-                    <span className="text-xs font-bold text-slate-900 truncate">
-                      {entry.displayName}
-                    </span>
-                    {entry.isCurrentUser && (
-                      <span className="text-[9px] font-black uppercase bg-blue-600 text-white px-1 py-0.2 rounded">
-                        BẠN
-                      </span>
-                    )}
+                    {renderDisplayName(entry, "text-xs")}
                   </div>
                   <span className="text-[10px] text-slate-400 font-mono block truncate">
                     {entry.handle}
@@ -191,14 +209,7 @@ export const SimulationLeaderboard: React.FC<SimulationLeaderboardProps> = ({
                     </div>
                     <div>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-slate-900 font-bold">
-                          {entry.displayName}
-                        </span>
-                        {entry.isCurrentUser && (
-                          <span className="text-[10px] font-black uppercase bg-blue-600 text-white px-1.5 py-0.2 rounded">
-                            BẠN
-                          </span>
-                        )}
+                        {renderDisplayName(entry, "text-sm")}
                       </div>
                       <span className="text-xs text-slate-400 font-mono block">
                         {entry.handle}

@@ -23,7 +23,6 @@ import {
   StreamCategoryId,
 } from "../components/CommunityStreamNav";
 import { MarketTickerWidget } from "../components/MarketTickerWidget";
-import { VoiceRoomWidget } from "../components/VoiceRoomWidget";
 import { CrediFinAdvisorCard } from "../components/CrediFinAdvisorCard";
 import { TrendingTickersWidget } from "../components/TrendingTickersWidget";
 import { ProVipWorkshopCard } from "../components/ProVipWorkshopCard";
@@ -171,9 +170,6 @@ export const CommunityFeedPage: React.FC = () => {
 
             {/* Live Market Mini-Widget */}
             <MarketTickerWidget />
-
-            {/* Live Audio Room */}
-            <VoiceRoomWidget />
           </aside>
 
           {/* ======================================================== */}
