@@ -265,14 +265,10 @@ a {
 .brand-icon {
   width: 36px;
   height: 36px;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-cyan));
-  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-weight: 700;
-  font-size: 1.1rem;
+  flex-shrink: 0;
 }
 
 .brand-title {

@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { APP_NAME } from "@aura/shared";
 import { ShieldCheck, BookOpen, TrendingUp, Users, HelpCircle, Lock, PieChart } from "lucide-react";
+import { AuraLogo } from "../components/AuraLogo";
 
 /**
  * Modern Corporate Navy Application Footer
@@ -14,7 +15,7 @@ export const AppFooter: React.FC = () => {
         {/* Column 1: Brand & Regulatory Disclaimers */}
         <div className="footer-brand-section">
           <div className="footer-brand-header">
-            <div className="brand-icon" aria-hidden="true">A</div>
+            <AuraLogo size={36} />
             <span className="footer-brand text-gradient-navy">{APP_NAME}</span>
           </div>
           <p className="footer-disclaimer">
@@ -28,7 +29,7 @@ export const AppFooter: React.FC = () => {
           </p>
           <div className="footer-security-pill">
             <ShieldCheck size={14} aria-hidden="true" />
-            <span>Môi trường giả lập máy chủ xác thực · 100% Vốn ảo</span>
+            <span>Môi trường giả lập chuẩn tổ chức · Bảo mật máy chủ đa tầng</span>
           </div>
         </div>
 
@@ -105,7 +106,7 @@ export const AppFooter: React.FC = () => {
       <div className="footer-bottom">
         <p>© 2026 {APP_NAME}. Bản quyền được bảo lưu.</p>
         <div className="footer-bottom-badges">
-          <span className="badge badge-subtle">Phiên bản v0.9.0-mvp</span>
+          <span className="badge badge-subtle">Phiên bản v1.0.0 · Production</span>
           <span className="badge badge-success-subtle">
             <Lock size={12} aria-hidden="true" />
             <span>Bảo Mật Argon2id</span>

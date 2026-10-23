@@ -16,7 +16,7 @@ interface Props {
 export const PlannedRoutePlaceholder: React.FC<Props> = ({ route }) => {
   const isDeferred = route.status === "DEFERRED";
   const badgeClass = isDeferred ? "badge badge-neutral" : "badge badge-info";
-  const statusLabel = isDeferred ? "Deferred for AI Enhancement" : "Planned for MVP Release";
+  const statusLabel = isDeferred ? "Deferred for AI Enhancement" : "Lộ Trình Phát Triển (Roadmap)";
 
   return (
     <main className="placeholder-container" id="main-content">

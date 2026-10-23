@@ -23,6 +23,7 @@ import {
 import { APP_NAME } from "@aura/shared";
 import { useAuth } from "../../features/auth/context/AuthContext";
 import { getPrimaryNavRoutes, isRouteActive } from "../router/route-registry";
+import { AuraLogo } from "../components/AuraLogo";
 
 
 const NAV_ICONS: Record<string, React.ReactNode> = {
@@ -155,7 +156,7 @@ export const AppHeader: React.FC = () => {
         {/* Brand Logo */}
         <div className="brand">
           <Link to={isAdmin ? "/admin" : "/"} className="brand-link" aria-label={isAdmin ? "Aura Capital Admin Console" : `${APP_NAME} Home`}>
-            <div className="brand-icon" aria-hidden="true">A</div>
+            <AuraLogo size={36} />
             <div>
               {isHome ? (
                 <h1 className="brand-title">{APP_NAME}</h1>
