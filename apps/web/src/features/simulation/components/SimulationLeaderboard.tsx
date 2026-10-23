@@ -156,10 +156,10 @@ export const SimulationLeaderboard: React.FC<SimulationLeaderboardProps> = ({
                     {avatar.label}
                   </div>
                   <div className="min-w-0">
-                    <span className="text-xs font-bold text-slate-900 truncate block">
+                    <span className="text-xs font-bold text-slate-900 block" style={{ textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>
                       {entry.displayName}
                     </span>
-                    <span className="text-[10px] text-slate-400 font-mono block truncate">
+                    <span className="text-[10px] text-slate-400 font-mono block" style={{ textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>
                       {entry.handle}
                     </span>
                   </div>

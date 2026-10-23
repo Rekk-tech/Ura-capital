@@ -101,7 +101,7 @@ export const CommunitySummaryWidget: React.FC = () => {
       domainLabel="Join Forum"
       displayLabel="Vào Diễn Đàn"
       badge={
-        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+        <span className="overview-header-pill">
           {posts.length > 0 ? posts.length : 3} Mới Nhất
         </span>
       }
@@ -113,67 +113,67 @@ export const CommunitySummaryWidget: React.FC = () => {
     >
       <div className="widget-body">
         {postsQuery.isSuccess && posts.length === 0 ? (
-          <div className="widget-empty-state p-6 text-center flex flex-col items-center justify-center">
-            <MessageSquare size={26} className="text-slate-400 mb-2" aria-hidden="true" />
-            <p className="empty-title font-bold text-slate-800">
+          <div className="widget-empty-state" style={{ padding: "24px", textAlign: "center" }}>
+            <MessageSquare size={26} style={{ color: "#94A3B8", marginBottom: "8px" }} aria-hidden="true" />
+            <p className="empty-title" style={{ fontWeight: 700, color: "#1E293B" }}>
               Chưa Có Thảo Luận Gần Đây
               <span className="sr-only">No Recent Discussions</span>
             </p>
-            <p className="text-slate-500 text-xs max-w-sm mt-1">
+            <p style={{ color: "#64748B", fontSize: "0.775rem", maxWidth: "380px", margin: "6px auto 0" }}>
               Hãy là người đầu tiên chia sẻ góc nhìn đầu tư hoặc đặt câu hỏi thảo luận.
             </p>
             <Link
               to="/community"
-              className="mt-3 px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold transition-colors inline-block"
+              className="btn-overview-action"
+              style={{ marginTop: "12px", display: "inline-flex" }}
               aria-label="Start Discussion"
             >
               <span>Đăng Bài Thảo Luận</span>
             </Link>
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
+          <div className="overview-posts-list">
             {(displayPosts.length > 0 ? displayPosts : defaultMockPosts).map((post) => (
               <div
                 key={post.id}
-                className="p-3.5 rounded-xl border border-slate-100 hover:border-slate-200 bg-white hover:bg-slate-50/50 transition-all flex flex-col gap-2 shadow-2xs"
+                className="overview-post-item"
               >
                 {/* Header: Author & Date */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
+                <div className="overview-post-head">
+                  <div className="post-author-box">
                     <div
-                      className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center text-white ${
-                        post.isAdmin ? "bg-slate-900" : "bg-blue-600"
-                      }`}
+                      className="post-author-avatar"
+                      style={{ background: post.isAdmin ? "#0F172A" : "#1D6FF2" }}
                     >
                       {post.authorInitials}
                     </div>
-                    <span className="text-xs font-bold text-slate-900">
+                    <span className="post-author-name">
                       {post.authorName}
                     </span>
                     {post.isAdmin && (
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800">
+                      <span className="post-admin-badge">
                         Admin
                       </span>
                     )}
                   </div>
-                  <span className="text-[11px] text-slate-400 font-mono">
+                  <span className="post-date-str">
                     {post.dateFormatted}
                   </span>
                 </div>
 
                 {/* Content Snippet */}
-                <p className="text-xs text-slate-600 leading-relaxed line-clamp-2 m-0">
+                <p className="post-snippet-text">
                   {post.content}
                 </p>
 
                 {/* Engagement Stats */}
-                <div className="flex items-center gap-4 text-[11px] text-slate-400 pt-1">
-                  <span className="inline-flex items-center gap-1 hover:text-rose-500 transition-colors">
-                    <Heart size={12} />
+                <div className="post-stats-row">
+                  <span className="post-stat-item">
+                    <Heart size={13} style={{ color: "#EF4444" }} aria-hidden="true" />
                     <span>{post.likeCount} Thích</span>
                   </span>
-                  <span className="inline-flex items-center gap-1 hover:text-blue-500 transition-colors">
-                    <MessageCircle size={12} />
+                  <span className="post-stat-item">
+                    <MessageCircle size={13} style={{ color: "#64748B" }} aria-hidden="true" />
                     <span>{post.commentCount} Bình luận</span>
                   </span>
                 </div>

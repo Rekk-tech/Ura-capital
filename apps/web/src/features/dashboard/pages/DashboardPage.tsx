@@ -19,38 +19,36 @@ import { UpcomingEventWidget } from "../components/UpcomingEventWidget";
  */
 const DashboardView: React.FC = () => {
   return (
-    <main className="dashboard-page-container min-h-screen py-6 px-4 md:px-8 max-w-7xl mx-auto" id="main-content">
-      <div className="dashboard-layout flex flex-col gap-6">
-        {/* Profile Hero & Gamification Progression Banner */}
-        <DashboardHeader />
+    <main className="overview-dashboard-container" id="main-content">
+      {/* Profile Hero & Gamification Progression Banner */}
+      <DashboardHeader />
 
-        {/* 2-Column Responsive Dashboard Content */}
-        <div className="dashboard-content-columns grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left Column (Approx 60-65%): Simulation, Academy, Community */}
-          <div className="lg:col-span-7 xl:col-span-8 flex flex-col gap-6">
-            <SimulationSummaryWidget />
-            <AcademySummaryWidget />
-            <CommunitySummaryWidget />
-          </div>
-
-          {/* Right Column (Approx 35-40%): AI Copilot, Upcoming Event, Subscription */}
-          <div className="lg:col-span-5 xl:col-span-4 flex flex-col gap-6">
-            <AIAssistantWidget />
-            <UpcomingEventWidget />
-            <SubscriptionSummaryWidget />
-          </div>
+      {/* 2-Column Responsive Dashboard Content */}
+      <div className="overview-dashboard-grid">
+        {/* Left Column (Main): Simulation, Academy, Community */}
+        <div className="overview-col-main">
+          <SimulationSummaryWidget />
+          <AcademySummaryWidget />
+          <CommunitySummaryWidget />
         </div>
 
-        {/* Educational & Regulatory Bottom Disclosure */}
-        <footer className="dashboard-footer-disclosure pt-4 pb-8" role="contentinfo">
-          <p className="text-xs text-slate-400 text-center leading-relaxed max-w-4xl mx-auto">
-            <strong>Platform Disclosure:</strong>{" "}
-            <span>
-              (Công Bố Nền Tảng) Các mô-đun học tập, bàn giao dịch giả lập, diễn đàn cộng đồng và gói hội viên Aura Capital vận hành hoàn toàn theo tiêu chuẩn mô phỏng phi rủi ro. Không có tiền thật hoặc lệnh môi giới thực tế nào được thực thi trên hệ thống này.
-            </span>
-          </p>
-        </footer>
+        {/* Right Column (Side): AI Copilot, Upcoming Event, Subscription */}
+        <div className="overview-col-side">
+          <AIAssistantWidget />
+          <UpcomingEventWidget />
+          <SubscriptionSummaryWidget />
+        </div>
       </div>
+
+      {/* Educational & Regulatory Bottom Disclosure */}
+      <footer className="overview-platform-disclosure" role="contentinfo">
+        <p>
+          <strong>Platform Disclosure:</strong>{" "}
+          <span>
+            (Công Bố Nền Tảng) Các mô-đun học tập, bàn giao dịch giả lập, diễn đàn cộng đồng và gói hội viên Aura Capital vận hành hoàn toàn theo tiêu chuẩn mô phỏng phi rủi ro. Không có tiền thật hoặc lệnh môi giới thực tế nào được thực thi trên hệ thống này.
+          </span>
+        </p>
+      </footer>
     </main>
   );
 };

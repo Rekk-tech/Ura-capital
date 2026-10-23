@@ -45,29 +45,29 @@ export const DashboardWidgetWrapper: React.FC<Props> = ({
   testId,
 }) => {
   return (
-    <section className="dashboard-widget card" aria-labelledby={`widget-title-${title.replace(/\s+/g, "-").toLowerCase()}`} data-testid={testId}>
-      <header className="widget-header">
-        <div className="widget-title-wrap">
-          <span className="widget-icon" aria-hidden="true">
+    <section className="overview-card dashboard-widget" aria-labelledby={`widget-title-${title.replace(/\s+/g, "-").toLowerCase()}`} data-testid={testId}>
+      <header className="overview-card-header widget-header">
+        <div className="overview-card-header-left widget-title-wrap">
+          <span className="overview-card-icon-wrap widget-icon" aria-hidden="true">
             {icon}
           </span>
           <div>
-            <div className="flex items-center gap-2">
-              <h2 id={`widget-title-${title.replace(/\s+/g, "-").toLowerCase()}`} className="widget-title">
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <h2 id={`widget-title-${title.replace(/\s+/g, "-").toLowerCase()}`} className="overview-card-title widget-title">
                 {displayTitle || title}
               </h2>
               {badge && <div className="widget-badge">{badge}</div>}
             </div>
-            {subtitle && <p className="widget-subtitle text-xs text-slate-500 mt-0.5">{subtitle}</p>}
+            {subtitle && <p className="overview-card-sub widget-subtitle">{subtitle}</p>}
           </div>
         </div>
-        <Link to={domainUrl} className="widget-domain-link" aria-label={`Go to ${domainLabel}`}>
+        <Link to={domainUrl} className="overview-header-link widget-domain-link" aria-label={`Go to ${domainLabel}`}>
           <span>{displayLabel || domainLabel}</span>
           <ArrowRight size={14} aria-hidden="true" />
         </Link>
       </header>
 
-      <div className="widget-content">
+      <div className="widget-content" style={{ marginTop: "16px" }}>
         {isError ? (
           <div className="widget-error" role="alert">
             <div className="widget-error-message">

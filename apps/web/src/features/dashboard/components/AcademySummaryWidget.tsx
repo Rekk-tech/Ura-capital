@@ -113,7 +113,7 @@ export const AcademySummaryWidget: React.FC = () => {
       domainLabel="View Academy"
       displayLabel="Vào Học Viện"
       badge={
-        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+        <span className="overview-header-pill">
           {displayCourses.length} Khóa Khả Dụng
         </span>
       }
@@ -123,54 +123,48 @@ export const AcademySummaryWidget: React.FC = () => {
       onRetry={handleRetry}
       testId="dashboard-widget-academy"
     >
-      <div className="widget-body flex flex-col gap-3">
+      <div className="widget-body">
         {/* Hidden node for test assertion */}
         <span className="sr-only" data-testid="learner-xp-value">
           {effectiveTotalXp.toLocaleString()} XP
         </span>
 
         {/* Courses List */}
-        <div className="flex flex-col gap-2.5">
+        <div className="overview-courses-list">
           {displayCourses.map((course) => {
             const isBeginner = course.level.toUpperCase() === "BEGINNER";
             return (
               <div
                 key={course.slug}
-                className="p-3.5 rounded-xl border border-slate-100 hover:border-slate-200 bg-white hover:bg-slate-50/50 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs"
+                className="overview-course-item"
               >
-                <div className="flex flex-col gap-1 min-w-0">
-                  <div className="flex items-center gap-2">
+                <div className="overview-course-info">
+                  <div className="course-meta-row">
                     <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider ${
-                        isBeginner
-                          ? "bg-sky-50 text-sky-700 border border-sky-200"
-                          : "bg-purple-50 text-purple-700 border border-purple-200"
+                      className={`course-level-pill ${
+                        isBeginner ? "beginner" : "intermediate"
                       }`}
                     >
                       {course.level}
                     </span>
-                    <span className="text-[11px] text-slate-400 font-medium">
+                    <span className="course-progress-sub">
                       {course.metaText}
                     </span>
                   </div>
-                  <span className="text-xs md:text-sm font-bold text-slate-900 leading-snug line-clamp-1">
+                  <span className="course-title-text">
                     {course.title}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-3 self-end sm:self-auto flex-shrink-0">
+                <div className="overview-course-action">
                   {course.progress !== "0%" && (
-                    <span className="text-xs font-bold text-slate-500 font-mono">
+                    <span className="course-progress-pct">
                       {course.progress}
                     </span>
                   )}
                   <Link
                     to={`/academy/courses/${encodeURIComponent(course.slug)}`}
-                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all inline-flex items-center gap-1 ${
-                      course.isPrimary
-                        ? "bg-blue-600 hover:bg-blue-700 text-white shadow-2xs"
-                        : "border border-slate-200 hover:bg-slate-100 text-slate-700"
-                    }`}
+                    className={course.isPrimary ? "btn-course-primary" : "btn-course-outline"}
                     aria-label={`Start course: ${course.title}`}
                   >
                     <span>{course.actionText}</span>

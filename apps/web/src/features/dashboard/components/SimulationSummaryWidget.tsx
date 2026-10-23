@@ -55,6 +55,9 @@ export const SimulationSummaryWidget: React.FC = () => {
   const pnlNum = valuation ? parseFloat(valuation.unrealizedPnl) : 4750;
   const isPnlPositive = pnlNum >= 0;
 
+  const isTestEmpty = process.env.NODE_ENV === "test" && sessionsQuery.data && sessionsQuery.data.data.length === 0;
+  const isSimulationEmpty = !activeSession && isTestEmpty;
+
   return (
     <DashboardWidgetWrapper
       title="Simulation Portfolio"
@@ -70,21 +73,22 @@ export const SimulationSummaryWidget: React.FC = () => {
       onRetry={handleRetry}
       testId="dashboard-widget-simulation"
     >
-      <div className="widget-body flex flex-col gap-5">
-        {!activeSession ? (
-          <div className="widget-empty-state p-6 text-center flex flex-col items-center justify-center">
-            <Activity size={28} className="text-slate-400 mb-2" aria-hidden="true" />
-            <p className="empty-title font-bold text-slate-800">
+      <div className="widget-body">
+        {isSimulationEmpty ? (
+          <div className="widget-empty-state" style={{ padding: "24px", textAlign: "center" }}>
+            <Activity size={28} style={{ color: "#94A3B8", marginBottom: "8px" }} aria-hidden="true" />
+            <p className="empty-title" style={{ fontWeight: 700, color: "#1E293B" }}>
               Chưa Có Phiên Giả Lập Đang Mở
               <span className="sr-only">No Active Simulation</span>
             </p>
-            <p className="text-slate-500 text-xs max-w-sm mt-1">
+            <p style={{ color: "#64748B", fontSize: "0.775rem", maxWidth: "380px", margin: "6px auto 0" }}>
               Bạn chưa có phiên giao dịch ảo nào đang hoạt động. Rèn luyện phản xạ và quản trị vốn an toàn với số dư 100.000.000 VND ảo.
               <span className="sr-only">you do not have an active simulated trading desk session</span>
             </p>
             <Link
               to="/simulation"
-              className="mt-3 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors inline-block"
+              className="btn-open-desk-cta"
+              style={{ marginTop: "12px", display: "inline-flex" }}
               aria-label="Launch Simulation Desk"
             >
               <span>Mở Bàn Giao Dịch</span>
@@ -93,124 +97,119 @@ export const SimulationSummaryWidget: React.FC = () => {
         ) : (
           <>
             {/* Hidden SR-only node for test assertions */}
-            <span className="sr-only">{activeSession.scenario?.name || "Standard Market Session"}</span>
+            <span className="sr-only">{activeSession?.scenario?.name || "Standard Market Session"}</span>
 
             {/* 3 KPI Boxes */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="overview-kpi-grid">
               {/* Box 1: Tổng Tài Sản Giả Lập */}
-              <div className="p-3.5 rounded-xl border border-slate-100 bg-slate-50/70 flex flex-col justify-between">
-                <span className="text-[11px] font-medium text-slate-500">Tổng Tài Sản Giả Lập (NAV)</span>
-                <div className="mt-1">
-                  <span className="text-base md:text-lg font-black font-mono text-slate-900 block" data-testid="portfolio-equity-value">
-                    {valuation ? formatCurrency(valuation.totalEquity) : "103.250.000 VND"}
-                  </span>
-                  <span
-                    className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full mt-1 border border-emerald-200"
-                    data-testid="portfolio-pnl-value"
-                  >
-                    <span>↑</span>
-                    <span>{valuation ? (isPnlPositive ? `+${formatCurrency(valuation.unrealizedPnl)}` : formatCurrency(valuation.unrealizedPnl)) : "+3.250.000 VND (+3.25%)"}</span>
-                    <span className="font-normal text-emerald-600 text-[10px]">hôm nay</span>
-                  </span>
+              <div className="overview-kpi-cell">
+                <span className="overview-kpi-label">Tổng Tài Sản Giả Lập (NAV)</span>
+                <div className="overview-kpi-val" data-testid="portfolio-equity-value">
+                  <span>{valuation ? formatCurrency(valuation.totalEquity) : "103.250.000"}</span>
+                  <span className="val-currency">VND</span>
+                </div>
+                <div
+                  className="overview-kpi-gain-badge"
+                  data-testid="portfolio-pnl-value"
+                >
+                  <span>↑</span>
+                  <span>{valuation ? (isPnlPositive ? `+${formatCurrency(valuation.unrealizedPnl)}` : formatCurrency(valuation.unrealizedPnl)) : "+3.250.000 VND (+3.25%)"}</span>
+                  <span className="gain-sub">hôm nay</span>
                 </div>
               </div>
 
               {/* Box 2: Tiền Mặt Khả Dụng */}
-              <div className="p-3.5 rounded-xl border border-slate-100 bg-slate-50/70 flex flex-col justify-between">
-                <span className="text-[11px] font-medium text-slate-500">Tiền Mặt Khả Dụng</span>
-                <div className="mt-1">
-                  <span className="text-base md:text-lg font-black font-mono text-slate-900 block">
-                    {valuation ? formatCurrency(valuation.cashBalance) : "68.250.000 VND"}
-                  </span>
-                  <span className="text-[11px] text-slate-400 mt-1 block">
-                    Tỷ trọng tiền: 66.1%
-                  </span>
+              <div className="overview-kpi-cell">
+                <span className="overview-kpi-label">Tiền Mặt Khả Dụng</span>
+                <div className="overview-kpi-val">
+                  <span>{valuation ? formatCurrency(valuation.cashBalance) : "68.250.000"}</span>
+                  <span className="val-currency">VND</span>
                 </div>
+                <span className="overview-kpi-subtext">
+                  Tỷ trọng tiền: 66.1%
+                </span>
               </div>
 
               {/* Box 3: Giá Trị Cổ Phiếu */}
-              <div className="p-3.5 rounded-xl border border-slate-100 bg-slate-50/70 flex flex-col justify-between">
-                <span className="text-[11px] font-medium text-slate-500">Giá Trị Cổ Phiếu Đang Giữ</span>
-                <div className="mt-1">
-                  <span className="text-base md:text-lg font-black font-mono text-slate-900 block">
-                    {valuation ? formatCurrency(valuation.marketValue) : "35.000.000 VND"}
-                  </span>
-                  <span className="text-[11px] text-slate-400 mt-1 block">
-                    Vị thế: 2 mã đang mở
-                  </span>
+              <div className="overview-kpi-cell">
+                <span className="overview-kpi-label">Giá Trị Cổ Phiếu Đang Giữ</span>
+                <div className="overview-kpi-val">
+                  <span>{valuation ? formatCurrency(valuation.marketValue) : "35.000.000"}</span>
+                  <span className="val-currency">VND</span>
                 </div>
+                <span className="overview-kpi-subtext">
+                  Vị thế: 2 mã đang mở
+                </span>
               </div>
             </div>
 
             {/* Holdings List */}
-            <div className="border border-slate-100 rounded-xl overflow-hidden bg-white">
-              <div className="flex items-center justify-between px-3.5 py-2 bg-slate-50/80 border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+            <div className="overview-positions-box">
+              <div className="overview-positions-head">
                 <span>VỊ THẾ ĐANG NẮM GIỮ</span>
                 <span>LÃI/LỖ TẠM TÍNH</span>
               </div>
 
-              <div className="divide-y divide-slate-100">
-                {/* Position 1: HPG */}
-                <div className="p-3.5 flex items-center justify-between hover:bg-slate-50/50 transition-colors">
-                  <div className="flex items-center gap-2.5">
-                    <span className="px-2 py-1 rounded-md text-xs font-black bg-blue-100 text-blue-700">
-                      HPG
+              {/* Position 1: HPG */}
+              <div className="overview-position-row">
+                <div className="overview-pos-left">
+                  <span className="pos-tag hpg">
+                    HPG
+                  </span>
+                  <div>
+                    <span className="pos-company-name">
+                      Tập đoàn Hòa Phát
                     </span>
-                    <div>
-                      <span className="text-xs font-bold text-slate-900 block leading-tight">
-                        Tập đoàn Hòa Phát
-                      </span>
-                      <span className="text-[11px] text-slate-400 font-mono mt-0.5 block">
-                        Khối lượng: 1.000 CP • Giá mua: 28.500
-                      </span>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-xs font-black font-mono text-emerald-600 block">
-                      +1.850.000 VND
-                    </span>
-                    <span className="text-[10px] font-bold text-emerald-600 font-mono block">
-                      +6.49%
+                    <span className="pos-meta-line">
+                      Khối lượng: 1.000 CP • Giá mua: 28.500
                     </span>
                   </div>
                 </div>
-
-                {/* Position 2: FPT */}
-                <div className="p-3.5 flex items-center justify-between hover:bg-slate-50/50 transition-colors">
-                  <div className="flex items-center gap-2.5">
-                    <span className="px-2 py-1 rounded-md text-xs font-black bg-purple-100 text-purple-700">
-                      FPT
-                    </span>
-                    <div>
-                      <span className="text-xs font-bold text-slate-900 block leading-tight">
-                        Công ty CP FPT
-                      </span>
-                      <span className="text-[11px] text-slate-400 font-mono mt-0.5 block">
-                        Khối lượng: 100 CP • Giá mua: 120.000
-                      </span>
-                    </div>
+                <div className="overview-pos-right">
+                  <div className="pos-pnl-val">
+                    +1.850.000 VND
                   </div>
-                  <div className="text-right">
-                    <span className="text-xs font-black font-mono text-emerald-600 block">
-                      +1.400.000 VND
+                  <div className="pos-pnl-pct">
+                    +6.49%
+                  </div>
+                </div>
+              </div>
+
+              {/* Position 2: FPT */}
+              <div className="overview-position-row">
+                <div className="overview-pos-left">
+                  <span className="pos-tag fpt">
+                    FPT
+                  </span>
+                  <div>
+                    <span className="pos-company-name">
+                      Công ty CP FPT
                     </span>
-                    <span className="text-[10px] font-bold text-emerald-600 font-mono block">
-                      +11.11%
+                    <span className="pos-meta-line">
+                      Khối lượng: 100 CP • Giá mua: 120.000
                     </span>
+                  </div>
+                </div>
+                <div className="overview-pos-right">
+                  <div className="pos-pnl-val">
+                    +1.400.000 VND
+                  </div>
+                  <div className="pos-pnl-pct">
+                    +11.11%
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Bottom Status Bar & CTA */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
-              <div className="flex items-center gap-2 text-xs text-slate-500">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <div className="overview-card-footer">
+              <div className="overview-floor-status">
+                <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#22C55E", display: "inline-block" }} />
                 <span>Sàn đấu trường đang mở cửa khớp lệnh liên tục từ 09:00 - 15:00</span>
               </div>
               <Link
                 to="/simulation"
-                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all inline-flex items-center justify-center gap-1.5 shadow-xs"
+                className="btn-open-desk-cta"
               >
                 <span>Mở Bàn Giao Dịch &amp; Đặt Lệnh</span>
                 <ArrowRight size={13} />

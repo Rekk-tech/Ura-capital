@@ -53,13 +53,13 @@ export const SubscriptionSummaryWidget: React.FC = () => {
       onRetry={() => void subQuery.refetch()}
       testId="dashboard-widget-subscription"
     >
-      <div className="widget-body flex flex-col justify-between">
+      <div className="widget-body">
         {/* Tier Overview Card */}
-        <div className="p-4 rounded-xl border border-slate-100 bg-slate-50/70 flex flex-col gap-3">
-          <div className="flex items-center justify-between">
+        <div className="sub-membership-box">
+          <div className="sub-tier-row">
             <div>
-              <span className="text-[11px] font-medium text-slate-400 block">Hạng Thành Viên</span>
-              <h3 className="text-sm font-bold text-slate-900 m-0">
+              <span className="sub-tier-label">Hạng Thành Viên</span>
+              <h3 className="sub-tier-name">
                 <span>{isPremium ? "Hội Viên Chuyên Nghiệp" : "Khám Phá Miễn Phí"}</span>
                 <span data-testid="subscription-plan-value" className="sr-only">
                   {isPremium ? "Institutional Premium" : "Free Explorer"}
@@ -67,43 +67,43 @@ export const SubscriptionSummaryWidget: React.FC = () => {
               </h3>
             </div>
             {isPremium ? (
-              <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+              <span className="sub-tier-badge premium">
                 <Sparkles size={11} aria-hidden="true" />
                 <span>PREMIUM</span>
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">
+              <span className="sub-tier-badge">
                 <span>MIỄN PHÍ</span>
                 <span className="sr-only">FREE</span>
               </span>
             )}
           </div>
 
-          <div className="space-y-2 pt-1 border-t border-slate-200/60 text-xs">
-            <div className="flex items-center gap-2 text-slate-700">
-              <CheckCircle2 size={13} className="text-emerald-500 flex-shrink-0" aria-hidden="true" />
+          <div className="sub-entitlements-list">
+            <div className="sub-entitlement-item checked">
+              <CheckCircle2 size={13} style={{ color: "#10B981", flexShrink: 0 }} aria-hidden="true" />
               <span>Truy cập hệ thống bài học cơ bản</span>
             </div>
-            <div className="flex items-center gap-2 text-slate-700">
-              <CheckCircle2 size={13} className="text-emerald-500 flex-shrink-0" aria-hidden="true" />
+            <div className="sub-entitlement-item checked">
+              <CheckCircle2 size={13} style={{ color: "#10B981", flexShrink: 0 }} aria-hidden="true" />
               <span>Đấu trường giao dịch mô phỏng tiêu chuẩn</span>
             </div>
-            <div className="flex items-center gap-2 text-slate-400">
+            <div className={`sub-entitlement-item ${isPremium ? "checked" : "unchecked"}`}>
               {isPremium ? (
                 <>
-                  <CheckCircle2 size={13} className="text-emerald-500 flex-shrink-0" aria-hidden="true" />
-                  <span className="text-slate-700">Định giá chuyên sâu tổ chức &amp; Trợ lý AI Studio</span>
+                  <CheckCircle2 size={13} style={{ color: "#10B981", flexShrink: 0 }} aria-hidden="true" />
+                  <span>Định giá chuyên sâu tổ chức &amp; Trợ lý AI Studio</span>
                 </>
               ) : (
                 <>
-                  <X size={13} className="text-slate-400 flex-shrink-0" aria-hidden="true" />
+                  <X size={13} style={{ color: "#94A3B8", flexShrink: 0 }} aria-hidden="true" />
                   <span>Chưa kích hoạt tính năng Cố vấn AI VIP</span>
                 </>
               )}
             </div>
 
             {periodEndFormatted && (
-              <div className="text-[11px] text-slate-400 pt-1 font-mono">
+              <div style={{ fontSize: "0.725rem", color: "#94A3B8", marginTop: 4, fontFamily: "var(--font-mono, monospace)" }}>
                 Thời hạn hiệu lực: {periodEndFormatted}
               </div>
             )}
@@ -111,18 +111,12 @@ export const SubscriptionSummaryWidget: React.FC = () => {
         </div>
 
         {/* Upgrade / Management Action CTA */}
-        <div className="mt-4">
-          <Link
-            to="/subscription"
-            className={`w-full py-2.5 rounded-xl text-xs font-bold transition-all block text-center shadow-xs ${
-              isPremium
-                ? "border border-slate-200 hover:bg-slate-100 text-slate-700"
-                : "bg-blue-600 hover:bg-blue-700 text-white"
-            }`}
-          >
-            <span>{isPremium ? "Xem Chi Tiết Quyền Lợi" : "Nâng Cấp Hội Viên VIP"}</span>
-          </Link>
-        </div>
+        <Link
+          to="/subscription"
+          className="btn-sub-upgrade"
+        >
+          <span>{isPremium ? "Xem Chi Tiết Quyền Lợi" : "Nâng Cấp Hội Viên VIP"}</span>
+        </Link>
       </div>
     </DashboardWidgetWrapper>
   );
