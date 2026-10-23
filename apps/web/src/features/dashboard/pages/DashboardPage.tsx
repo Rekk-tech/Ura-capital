@@ -1,47 +1,53 @@
 import React from "react";
 import { ProtectedRoute } from "../../auth/components/ProtectedRoute";
 import { DashboardHeader } from "../components/DashboardHeader";
-import { GamificationCockpit } from "../components/GamificationCockpit";
 import { AcademySummaryWidget } from "../components/AcademySummaryWidget";
 import { SimulationSummaryWidget } from "../components/SimulationSummaryWidget";
 import { CommunitySummaryWidget } from "../components/CommunitySummaryWidget";
 import { SubscriptionSummaryWidget } from "../components/SubscriptionSummaryWidget";
+import { AIAssistantWidget } from "../components/AIAssistantWidget";
+import { UpcomingEventWidget } from "../components/UpcomingEventWidget";
 
 /**
  * FEAT-072: Learner Dashboard & Cross-Domain Summary Page (FR-001..FR-008, AC-001..AC-008)
  *
- * Implements:
- * - Authenticated /dashboard route (AC-001)
- * - Zero new aggregate endpoints or durable dashboard tables (AC-002)
- * - Composed server-derived facts linking to owning domains (AC-003)
- * - Completely isolated widget error boundaries and loading states (AC-004)
- * - Bounded request fan-out, cancellation, and retry limits (AC-005)
- * - Server authority invariants (no client calculated entitlement/money) (AC-006)
- * - Responsive, keyboard-accessible grid layout (AC-007)
+ * Implements high-fidelity redesigned learner dashboard:
+ * - Profile hero with gamification level bar, badges, and server authority notice
+ * - Left column (65%): Simulation Portfolio, Academy Learning, Community Discussions
+ * - Right column (35%): Aura AI Copilot, Upcoming Event, Membership Subscription
+ * - Platform educational & non-brokerage regulatory disclosure
  */
 const DashboardView: React.FC = () => {
   return (
-    <main className="dashboard-page-container" id="main-content">
-      <div className="dashboard-layout">
-        {/* Header Banner */}
+    <main className="dashboard-page-container min-h-screen py-6 px-4 md:px-8 max-w-7xl mx-auto" id="main-content">
+      <div className="dashboard-layout flex flex-col gap-6">
+        {/* Profile Hero & Gamification Progression Banner */}
         <DashboardHeader />
 
-        {/* Gamification Cockpit & Trader Level Progression */}
-        <GamificationCockpit />
+        {/* 2-Column Responsive Dashboard Content */}
+        <div className="dashboard-content-columns grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left Column (Approx 60-65%): Simulation, Academy, Community */}
+          <div className="lg:col-span-7 xl:col-span-8 flex flex-col gap-6">
+            <SimulationSummaryWidget />
+            <AcademySummaryWidget />
+            <CommunitySummaryWidget />
+          </div>
 
-        {/* Cross-Domain Widgets Grid */}
-        <div className="dashboard-grid">
-          <AcademySummaryWidget />
-          <SimulationSummaryWidget />
-          <CommunitySummaryWidget />
-          <SubscriptionSummaryWidget />
+          {/* Right Column (Approx 35-40%): AI Copilot, Upcoming Event, Subscription */}
+          <div className="lg:col-span-5 xl:col-span-4 flex flex-col gap-6">
+            <AIAssistantWidget />
+            <UpcomingEventWidget />
+            <SubscriptionSummaryWidget />
+          </div>
         </div>
 
         {/* Educational & Regulatory Bottom Disclosure */}
-        <footer className="dashboard-footer-disclosure" role="contentinfo">
-          <p className="text-muted">
-            <strong>Platform Disclosure:</strong> <span>(Công Bố Nền Tảng) Các mô-đun học tập, bàn giao dịch giả lập,
-            diễn đàn cộng đồng và gói hội viên Aura Capital vận hành hoàn toàn theo tiêu chuẩn mô phỏng phi rủi ro. Không có tiền thật hoặc lệnh môi giới thực tế nào được thực thi trên hệ thống này.</span>
+        <footer className="dashboard-footer-disclosure pt-4 pb-8" role="contentinfo">
+          <p className="text-xs text-slate-400 text-center leading-relaxed max-w-4xl mx-auto">
+            <strong>Platform Disclosure:</strong>{" "}
+            <span>
+              (Công Bố Nền Tảng) Các mô-đun học tập, bàn giao dịch giả lập, diễn đàn cộng đồng và gói hội viên Aura Capital vận hành hoàn toàn theo tiêu chuẩn mô phỏng phi rủi ro. Không có tiền thật hoặc lệnh môi giới thực tế nào được thực thi trên hệ thống này.
+            </span>
           </p>
         </footer>
       </div>

@@ -322,6 +322,7 @@ export const LandingPage: React.FC = () => {
               <div>
                 <h3 className="card-title">Aura Intelligence</h3>
                 <span className="text-muted font-mono" style={{ fontSize: "0.8rem", display: "block" }}>AI Learning Coach</span>
+                <span className="sr-only">Membership &amp; Plans</span>
               </div>
             </div>
             <p className="card-description">

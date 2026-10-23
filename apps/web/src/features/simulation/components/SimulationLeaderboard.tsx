@@ -85,34 +85,6 @@ export const SimulationLeaderboard: React.FC<SimulationLeaderboardProps> = ({
     }
   };
 
-  const getStatusBadge = (rank: number) => {
-    switch (rank) {
-      case 1:
-      case 2:
-      case 6:
-        return (
-          <span className="inline-flex items-center gap-1.5 text-xs text-emerald-600 font-semibold">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            Đang giao dịch
-          </span>
-        );
-      case 4:
-        return (
-          <span className="inline-flex items-center gap-1.5 text-xs text-emerald-600 font-semibold">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            Trực tuyến
-          </span>
-        );
-      case 3:
-      case 5:
-      default:
-        return (
-          <span className="text-xs text-slate-400 font-medium">
-            Nghỉ phiên
-          </span>
-        );
-    }
-  };
 
   const renderDisplayName = (
     entry: { displayName: string; isCurrentUser?: boolean; rank: number },
@@ -304,7 +276,6 @@ export const SimulationLeaderboard: React.FC<SimulationLeaderboardProps> = ({
               <th className="py-3 px-3 text-center">ĐẤU TRƯỜNG</th>
               <th className="py-3 px-3 text-center">LỢI NHUẬN ROI</th>
               <th className="py-3 px-3 text-right">ĐIỂM KỶ LUẬT XP</th>
-              <th className="py-3 px-3 text-right">TRẠNG THÁI</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 font-medium">
@@ -365,11 +336,6 @@ export const SimulationLeaderboard: React.FC<SimulationLeaderboardProps> = ({
                   {/* Điểm XP */}
                   <td className="py-3.5 px-3 text-right align-middle font-mono font-bold text-slate-800">
                     {entry.xp.toLocaleString()} XP
-                  </td>
-
-                  {/* Trạng thái */}
-                  <td className="py-3.5 px-3 text-right align-middle">
-                    {getStatusBadge(entry.rank)}
                   </td>
                 </tr>
               );

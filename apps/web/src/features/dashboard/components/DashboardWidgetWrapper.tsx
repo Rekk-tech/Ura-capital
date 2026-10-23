@@ -5,6 +5,7 @@ import { AlertCircle, RotateCcw, ArrowRight } from "lucide-react";
 interface Props {
   title: string;
   displayTitle?: string;
+  subtitle?: string;
   icon: React.ReactNode;
   domainUrl: string;
   domainLabel: string;
@@ -30,6 +31,7 @@ interface Props {
 export const DashboardWidgetWrapper: React.FC<Props> = ({
   title,
   displayTitle,
+  subtitle,
   icon,
   domainUrl,
   domainLabel,
@@ -49,10 +51,15 @@ export const DashboardWidgetWrapper: React.FC<Props> = ({
           <span className="widget-icon" aria-hidden="true">
             {icon}
           </span>
-          <h2 id={`widget-title-${title.replace(/\s+/g, "-").toLowerCase()}`} className="widget-title">
-            {displayTitle || title}
-          </h2>
-          {badge && <div className="widget-badge">{badge}</div>}
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 id={`widget-title-${title.replace(/\s+/g, "-").toLowerCase()}`} className="widget-title">
+                {displayTitle || title}
+              </h2>
+              {badge && <div className="widget-badge">{badge}</div>}
+            </div>
+            {subtitle && <p className="widget-subtitle text-xs text-slate-500 mt-0.5">{subtitle}</p>}
+          </div>
         </div>
         <Link to={domainUrl} className="widget-domain-link" aria-label={`Go to ${domainLabel}`}>
           <span>{displayLabel || domainLabel}</span>
