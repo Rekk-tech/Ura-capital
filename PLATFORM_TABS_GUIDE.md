@@ -37,11 +37,13 @@ Thanh điều hướng chính của Aura Capital (`AppHeader`) được tổ ch�
 * **Đối tượng**: Mọi khách vãng lai, người học mới tìm hiểu và học viên quay trở lại.
 * **Nhiệm vụ cốt lõi**:
   - **Giới thiệu tầm nhìn & nền tảng**: Trình bày triết lý giáo dục "Thực chiến không rủi ro vốn thật", minh bạch môi trường đào tạo và hệ sinh thái tài chính.
-  - **Trưng bày 4 trụ cột giá trị**:
-    1. *Học kiến thức chuẩn quỹ*: Từ cơ bản đến chuyên sâu.
-    2. *Đấu trường tôi luyện tâm lý*: Giải quyết bẫy cảm xúc FOMO và hoảng loạn bán tháo.
-    3. *AI Cố vấn đồng hành*: Phân tích danh mục và cảnh báo vi phạm kỷ luật.
-    4. *Cộng đồng & Môi giới xác thực*: Môi trường chia sẻ tri thức sạch, không phím hàng độc hại.
+  - **Trưng bày 6 trụ cột năng lực cốt lõi (Core Capabilities)**:
+    1. *Học Viện Aura Academy*: Lộ trình bài bản, Flashcard 3D và mini-quiz tự động.
+    2. *Đấu Trường FOMO Arena (Map 1)*: 7 vòng thực chiến 45s tôi luyện tâm lý ngắn hạn.
+    3. *Phòng Đầu Tư Vĩ Mô Pro Room (Map 2)*: Phân bổ tài sản dài hạn qua 12 quý kinh tế.
+    4. *Cộng Đồng Nhà Đầu Tư*: Diễn đàn thảo luận tài chính & phản biện chiến lược.
+    5. *Bảo Mật & Minh Bạch*: Hạch toán minh bạch thời gian thực và mã hóa chuẩn Argon2id.
+    6. *Aura Intelligence*: Trợ lý AI đồng hành định hình kỷ luật giao dịch an toàn.
   - **Kêu gọi hành động (CTA)**: Nút "Bắt Đầu Ngay" dẫn tới Đăng Ký Tài Khoản hoặc Trải Nghiệm Khóa Học Miễn Phí.
 
 ---

@@ -6,7 +6,6 @@ import {
   BookOpen,
   TrendingUp,
   Users,
-  BadgeDollarSign,
   Sparkles,
   Flame,
   BrainCircuit,
@@ -179,11 +178,6 @@ export const LandingPage: React.FC = () => {
             <div className="stat-sub">Báo cáo tài chính &amp; chu kỳ kinh tế</div>
           </div>
           <div className="stat-card">
-            <div className="stat-number text-gradient">Minh Bạch</div>
-            <div className="stat-label">Tuyệt Đối (Server-Authoritative)</div>
-            <div className="stat-sub">Hạch toán số dư và khớp lệnh chính xác</div>
-          </div>
-          <div className="stat-card">
             <div className="stat-number text-gradient">7</div>
             <div className="stat-label">Vòng Đấu Nghẹt Thở (45s)</div>
             <div className="stat-sub">Rèn luyện bản lĩnh cắt lỗ &amp; chốt lời</div>
@@ -197,13 +191,13 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* ====================================================================
-          S4. CORE CAPABILITIES (4 Trụ Cột Cốt Lõi)
+          S4. CORE CAPABILITIES (6 Trụ Cột Cốt Lõi)
           ==================================================================== */}
       <section className="section-features" aria-labelledby="features-heading">
         <div className="section-header-center">
           <span className="section-tag">HỆ SINH THÁI TỔNG THỂ • ECOSYSTEM ARCHITECTURE</span>
           <h2 id="features-heading" className="section-title">
-            4 TRỤ CỘT <span className="text-gradient">CỐT LÕI (CORE CAPABILITIES)</span>
+            6 TRỤ CỘT <span className="text-gradient">CỐT LÕI (CORE CAPABILITIES)</span>
           </h2>
           <p className="section-subtitle">
             Hạ tầng toàn diện giúp người học tiến bộ từ phản xạ đầu cơ cảm tính sang đầu tư có phương pháp và kỷ luật
@@ -299,29 +293,7 @@ export const LandingPage: React.FC = () => {
             </div>
           </div>
 
-          {/* 5. Subscription Domain */}
-          <div className="card card-aura">
-            <div className="card-header">
-              <div className="card-icon-wrap bg-amber-subtle">
-                <BadgeDollarSign size={22} className="text-amber" aria-hidden="true" />
-              </div>
-              <div>
-                <h3 className="card-title">Gói Hội Viên</h3>
-                <span className="text-muted font-mono" style={{ fontSize: "0.8rem", display: "block" }}>Membership &amp; Plans</span>
-              </div>
-            </div>
-            <p className="card-description">
-              Bắt đầu hoàn toàn miễn phí. Nâng cấp khi cần công cụ phân tích danh mục chuyên sâu và mở rộng hạn ngạch giao dịch.
-            </p>
-            <div className="card-footer-action">
-              <span className="badge badge-success-subtle">Kích Hoạt</span>
-              <Link to="/subscription" className="card-action-link">
-                <span>Xem Chi Tiết Gói →</span>
-              </Link>
-            </div>
-          </div>
-
-          {/* 6. Security & Protection */}
+          {/* 5. Security & Protection */}
           <div className="card card-aura">
             <div className="card-header">
               <div className="card-icon-wrap bg-blue-subtle">
@@ -341,7 +313,7 @@ export const LandingPage: React.FC = () => {
             </div>
           </div>
 
-          {/* 7. Aura Intelligence */}
+          {/* 6. Aura Intelligence */}
           <div className="card card-aura">
             <div className="card-header">
               <div className="card-icon-wrap bg-purple-subtle">

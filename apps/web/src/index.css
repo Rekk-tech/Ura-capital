@@ -1934,6 +1934,12 @@ a {
   text-align: center;
 }
 
+@media (min-width: 992px) {
+  .stats-container {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
 .stat-card {
   display: flex;
   flex-direction: column;
@@ -2423,6 +2429,12 @@ a {
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2.5rem;
+}
+
+@media (min-width: 992px) {
+  .grid-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .card {
