@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useGamification } from "../hooks/useGamification";
 import { useAuth } from "../../auth/context/AuthContext";
-import { Trophy, Medal, TrendingUp, TrendingDown, ArrowRight } from "lucide-react";
+import { Trophy, TrendingUp, TrendingDown, ArrowRight } from "lucide-react";
 
 export interface SimulationLeaderboardProps {
   title?: string;
@@ -27,26 +27,26 @@ export const SimulationLeaderboard: React.FC<SimulationLeaderboardProps> = ({
     switch (rank) {
       case 1:
         return (
-          <div className="w-6 h-6 rounded-full bg-amber-400 text-slate-950 font-black flex items-center justify-center text-xs shadow-xs mx-auto">
-            <Trophy size={13} />
+          <div className="w-5 h-5 rounded-full bg-amber-400 text-slate-950 font-black flex items-center justify-center text-[11px] shadow-2xs mx-auto">
+            1
           </div>
         );
       case 2:
         return (
-          <div className="w-6 h-6 rounded-full bg-slate-300 text-slate-900 font-bold flex items-center justify-center text-xs shadow-xs mx-auto">
-            <Medal size={13} />
+          <div className="w-5 h-5 rounded-full bg-slate-300 text-slate-900 font-black flex items-center justify-center text-[11px] shadow-2xs mx-auto">
+            2
           </div>
         );
       case 3:
         return (
-          <div className="w-6 h-6 rounded-full bg-amber-700 text-white font-bold flex items-center justify-center text-xs shadow-xs mx-auto">
-            <Medal size={13} />
+          <div className="w-5 h-5 rounded-full bg-amber-700 text-white font-black flex items-center justify-center text-[11px] shadow-2xs mx-auto">
+            3
           </div>
         );
       default:
         return (
-          <span className="text-xs font-mono font-bold text-slate-500 block text-center">
-            #{rank}
+          <span className="text-xs font-mono font-bold text-slate-400 block text-center">
+            {rank}
           </span>
         );
     }

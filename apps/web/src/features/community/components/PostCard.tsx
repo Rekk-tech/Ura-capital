@@ -1,6 +1,16 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { MessageSquare, Trash2, Loader2, User, Flag } from "lucide-react";
+import {
+  MessageSquare,
+  Trash2,
+  Loader2,
+  Flag,
+  Share2,
+  ArrowRight,
+  TrendingUp,
+  TrendingDown,
+  MoreHorizontal,
+} from "lucide-react";
 import { CommunityPostDto } from "../types/community-ui.types";
 import { useRemovePostMutation } from "../hooks/use-community";
 import { PostLikeButton } from "./PostLikeButton";
@@ -21,6 +31,7 @@ export const PostCard: React.FC<PostCardProps> = ({
 }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isReportOpen, setIsReportOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const removeMutation = useRemovePostMutation(accessToken);
   const isRemovePending = removeMutation.isPending;
@@ -44,8 +55,16 @@ export const PostCard: React.FC<PostCardProps> = ({
     }
   };
 
+  const handleShare = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(`${window.location.origin}/community/posts/${post.id}`);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
   // Safe formatting of creation date
-  const formattedDate = new Date(post.createdAt).toLocaleDateString(undefined, {
+  const formattedDate = new Date(post.createdAt).toLocaleDateString("vi-VN", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -58,167 +77,215 @@ export const PostCard: React.FC<PostCardProps> = ({
   // Check for formatted title line (e.g. "# My Title\n\nContent")
   const hasMarkdownTitle = post.content.startsWith("# ");
   const lines = post.content.split("\n");
-  const extractedTitle = hasMarkdownTitle && lines[0] ? lines[0].replace(/^#\s*/, "").trim() : null;
-  const displayedContent = hasMarkdownTitle ? lines.slice(1).join("\n").trim() : post.content;
+  const extractedTitle =
+    hasMarkdownTitle && lines[0] ? lines[0].replace(/^#\s*/, "").trim() : null;
+  const displayedContent = hasMarkdownTitle
+    ? lines.slice(1).join("\n").trim()
+    : post.content;
+
+  // Extract author initials for avatar
+  const initials = authorName
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+  // Avatar background colors based on author
+  const getAvatarBg = (name: string) => {
+    if (name.includes("Yến") || name.includes("2")) return "#059669";
+    if (name.includes("Admin")) return "#1D6FF2";
+    if (name.includes("Dev") || name.includes("1")) return "#4F46E5";
+    return "#334155";
+  };
+
+  // Role badges matching financial hub mockup
+  const getAuthorBadge = (name: string) => {
+    if (name.includes("Yến") || name.includes("User 2")) {
+      return {
+        text: "Nhà Đầu Tư Giá Trị",
+        style: { background: "#F0FDFA", color: "#0F766E", borderColor: "#99F6E4" },
+      };
+    }
+    if (name.includes("User 1") || name.includes("Top 1")) {
+      return {
+        text: "🏆 Top 1 Đấu Lập Tuần #2",
+        style: { background: "#FEF3C7", color: "#92400E", borderColor: "#FDE68A" },
+      };
+    }
+    if (name.includes("Admin")) {
+      return {
+        text: "Hệ Thống",
+        style: { background: "#EFF6FF", color: "#1D4ED8", borderColor: "#BFDBFE" },
+      };
+    }
+    return null;
+  };
+
+  const roleBadge = getAuthorBadge(authorName);
+
+  // Auto-detect tickers like $FPT, $MWG, $HPG to display financial tag pills
+  const knownTickers: Record<string, { change: string; isUp: boolean }> = {
+    $FPT: { change: "+2.4%", isUp: true },
+    $MWG: { change: "+1.1%", isUp: true },
+    $HPG: { change: "-0.6%", isUp: false },
+    $TCB: { change: "+1.6%", isUp: true },
+    $VNM: { change: "+0.8%", isUp: true },
+    $SSI: { change: "-1.2%", isUp: false },
+  };
+
+  const detectedTickers = Object.entries(knownTickers).filter(([symbol]) =>
+    post.content.includes(symbol)
+  );
 
   return (
     <article
       className="card community-post-card"
       data-testid={`community-post-card-${post.id}`}
-      style={{
-        marginBottom: "1rem",
-        padding: "1.25rem",
-        borderRadius: "var(--radius-md)",
-      }}
     >
-      <header
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "0.75rem",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+      <header className="post-header-row">
+        {/* Author Avatar & Info */}
+        <div className="post-author-info">
           <div
-            style={{
-              width: "32px",
-              height: "32px",
-              borderRadius: "50%",
-              backgroundColor: "var(--bg-surface)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "var(--accent-primary)",
-            }}
+            className="author-circle-avatar"
+            style={{ background: getAvatarBg(authorName) }}
           >
-            <User size={18} aria-hidden="true" />
+            {initials || "AU"}
           </div>
+
           <div>
-            <span
-              style={{
-                fontWeight: 600,
-                color: "var(--text-primary)",
-                fontSize: "0.95rem",
-              }}
-            >
-              {authorName}
-            </span>
+            <div className="author-name-row">
+              <span className="post-author-name">{authorName}</span>
+              {roleBadge && (
+                <span
+                  className="author-role-badge"
+                  style={roleBadge.style}
+                >
+                  {roleBadge.text}
+                </span>
+              )}
+            </div>
+
             <time
               dateTime={post.createdAt}
-              style={{
-                display: "block",
-                fontSize: "0.8rem",
-                color: "var(--text-muted)",
-              }}
+              className="post-timestamp-sub"
+              style={{ display: "block" }}
             >
-              {formattedDate}
+              {formattedDate} • Luận điểm Vĩ mô
             </time>
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          {/* Content moderation reporting flag */}
+        {/* Action Controls */}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+          {/* Moderation Report Button */}
           <button
             type="button"
             data-testid={`post-report-btn-${post.id}`}
             aria-label="Report post"
             className="button button-ghost"
+            style={{ padding: "0.35rem", color: "#94A3B8" }}
             onClick={() => setIsReportOpen(true)}
-            style={{
-              color: "var(--text-muted)",
-              padding: "0.35rem 0.5rem",
-              fontSize: "0.85rem",
-              display: "inline-flex",
-              alignItems: "center",
-            }}
+            title="Báo cáo vi phạm"
           >
             <Flag size={14} aria-hidden="true" />
           </button>
 
-          {/* Owner-only logical removal control */}
+          {/* Owner Remove Button */}
           {post.ownedByCurrentUser && (
             <button
               type="button"
               data-testid={`post-remove-btn-${post.id}`}
               aria-label="Remove post"
               className="button button-ghost"
-              onClick={handleRemove}
-              disabled={isRemovePending}
               style={{
-                color: "var(--status-error)",
-                padding: "0.4rem 0.6rem",
-                fontSize: "0.85rem",
+                color: "#E11D48",
+                padding: "0.35rem 0.6rem",
+                fontSize: "0.75rem",
+                fontWeight: 700,
                 display: "inline-flex",
                 alignItems: "center",
-                gap: "0.35rem",
+                gap: "0.3rem",
               }}
+              onClick={handleRemove}
+              disabled={isRemovePending}
+              title="Xóa bài viết"
             >
               {isRemovePending ? (
-                <Loader2 size={16} className="spin-animation" aria-hidden="true" />
+                <Loader2 size={13} className="animate-spin" aria-hidden="true" />
               ) : (
-                <Trash2 size={16} aria-hidden="true" />
+                <Trash2 size={13} aria-hidden="true" />
               )}
               <span>Remove</span>
             </button>
           )}
+
+          <button
+            type="button"
+            className="button button-ghost"
+            style={{ padding: "0.35rem", color: "#94A3B8" }}
+            aria-label="Tùy chọn khác"
+          >
+            <MoreHorizontal size={15} />
+          </button>
         </div>
       </header>
 
-      {/* Prominently render extracted title if present */}
+      {/* Extracted Title */}
       {extractedTitle && (
         <h2
           data-testid={`post-title-${post.id}`}
-          style={{
-            fontSize: "1.15rem",
-            fontWeight: 600,
-            color: "var(--text-primary)",
-            marginBottom: "0.5rem",
-          }}
+          className="post-title-text"
         >
           {extractedTitle}
         </h2>
       )}
 
-      {/* Safe plain text content rendering — strictly prevents XSS injection */}
+      {/* Safe Plain Text Content */}
       <div
         data-testid={`post-content-${post.id}`}
-        style={{
-          color: "var(--text-primary)",
-          fontSize: "1rem",
-          lineHeight: 1.6,
-          whiteSpace: "pre-wrap",
-          wordBreak: "break-word",
-          marginBottom: "1rem",
-        }}
+        className="post-body-content"
       >
         {displayedContent}
       </div>
+
+      {/* Detected Ticker Pills */}
+      {detectedTickers.length > 0 && (
+        <div className="post-tickers-row">
+          {detectedTickers.map(([symbol, info]) => (
+            <span
+              key={symbol}
+              className={`ticker-tag-pill ${info.isUp ? "ticker-tag-up" : "ticker-tag-down"}`}
+            >
+              <span>{symbol}</span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "0.15rem", fontSize: "0.7rem" }}>
+                {info.isUp ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
+                {info.change}
+              </span>
+            </span>
+          ))}
+        </div>
+      )}
 
       {errorMessage && (
         <div
           role="alert"
           style={{
-            fontSize: "0.85rem",
-            color: "var(--status-error)",
-            marginBottom: "0.5rem",
+            fontSize: "0.75rem",
+            color: "#E11D48",
+            background: "#FEF2F2",
+            padding: "0.5rem",
+            borderRadius: "8px",
+            marginBottom: "0.75rem",
           }}
         >
           {errorMessage}
         </div>
       )}
 
-      <footer
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          borderTop: "1px solid var(--border-subtle)",
-          paddingTop: "0.75rem",
-          fontSize: "0.875rem",
-        }}
-      >
-        <div style={{ display: "flex", gap: "1.25rem", alignItems: "center" }}>
+      {/* Card Footer with Interactions */}
+      <footer className="post-interaction-footer">
+        <div className="interaction-actions-group">
           {/* Integrated PostLikeButton */}
           <PostLikeButton
             postId={post.id}
@@ -227,55 +294,53 @@ export const PostCard: React.FC<PostCardProps> = ({
             accessToken={accessToken}
           />
 
-          {/* Comment count link or indicator */}
+          {/* Comment Count */}
           {isDetailView ? (
-            <div
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.35rem",
-                color: "var(--text-secondary)",
-                padding: "0.3rem 0.6rem",
-              }}
-            >
-              <MessageSquare size={16} aria-hidden="true" />
-              <span data-testid={`post-comment-count-${post.id}`}>{post.commentCount} comments</span>
+            <div className="btn-interaction">
+              <MessageSquare size={15} aria-hidden="true" />
+              <span data-testid={`post-comment-count-${post.id}`}>
+                {post.commentCount}
+              </span>
+              <span>bình luận</span>
             </div>
           ) : (
             <Link
               to={`/community/posts/${post.id}`}
               data-testid={`post-comments-link-${post.id}`}
               aria-label={`View comments for post: ${post.commentCount} comments`}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.35rem",
-                color: "var(--text-secondary)",
-                padding: "0.3rem 0.6rem",
-                textDecoration: "none",
-              }}
+              className="btn-interaction"
             >
-              <MessageSquare size={16} aria-hidden="true" />
-              <span data-testid={`post-comment-count-${post.id}`}>{post.commentCount}</span>
+              <MessageSquare size={15} aria-hidden="true" />
+              <span data-testid={`post-comment-count-${post.id}`}>
+                {post.commentCount}
+              </span>
+              <span>bình luận</span>
             </Link>
           )}
+
+          {/* Share Button */}
+          <button
+            type="button"
+            onClick={handleShare}
+            className="btn-interaction"
+          >
+            <Share2 size={14} />
+            <span>{copied ? "Đã chép" : "Chia sẻ"}</span>
+          </button>
         </div>
 
         {!isDetailView && (
           <Link
             to={`/community/posts/${post.id}`}
-            style={{
-              color: "var(--accent-primary)",
-              fontSize: "0.85rem",
-              fontWeight: 500,
-            }}
+            className="btn-view-details-link"
           >
-            View Thread →
+            <span>Chi Tiết</span>
+            <ArrowRight size={13} />
           </Link>
         )}
       </footer>
 
-      {/* Moderation reporting modal dialog */}
+      {/* Moderation Reporting Modal Dialog */}
       <ReportDialog
         postId={post.id}
         isOpen={isReportOpen}
