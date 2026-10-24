@@ -14,6 +14,7 @@ import {
   Crown,
 } from "lucide-react";
 import { gamificationService } from "../services/gamification.service";
+import { FomoTutorialModal } from "./map1/FomoTutorialModal";
 
 interface MapSelectionViewProps {
   onEnterCockpit: (mapId: "map1-fomo" | "map2-pro") => void;
@@ -131,7 +132,7 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
           <div className="tier-connector">
             <div className="tier-line tier-line-filled" />
             <div className="tier-key-badge">
-              <span>🔑 Chìa Khóa Mở Khóa: Đạt ROI &gt; 5%</span>
+              <span>🔑 Chìa Khóa Mở Khóa: Sống sót 7 vòng + ROI &gt; 5% &amp; Kỷ luật ≥ 50</span>
             </div>
             <div className="tier-line tier-line-empty" />
           </div>
@@ -195,7 +196,7 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
                 <Target size={14} className="text-slate-400" /> Mục tiêu bắt buộc:
               </span>
               <strong className="arena-spec-value text-emerald-600">
-                Sống sót + ROI +5% đến +10%
+                Sống sót 7 vòng + ROI &gt; +5% (Kỷ luật ≥ 50)
               </strong>
             </div>
             <div className="arena-spec-row">
@@ -321,20 +322,27 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
         </div>
       </div>
 
-      {/* Briefing Modal */}
-      {briefingMap && (
+      {/* Unified Map 1 Tutorial & Rules Modal */}
+      {briefingMap === "map1-fomo" && (
+        <FomoTutorialModal
+          isOpen={true}
+          mode="lobby"
+          onClose={() => setBriefingMap(null)}
+          onProceedToScenario={() => {
+            setBriefingMap(null);
+            navigate("/simulation/map-1");
+          }}
+        />
+      )}
+
+      {/* Map 2 Pro Room Briefing Modal */}
+      {briefingMap === "map2-pro" && (
         <div className="modal-backdrop" role="dialog" aria-modal="true">
           <div className="modal-card">
             <div className="modal-header">
               <div className="modal-title-row">
-                <span className="map-chip">
-                  {briefingMap === "map1-fomo" ? "HƯỚNG DẪN MAP 1" : "HƯỚNG DẪN MAP 2"}
-                </span>
-                <h3>
-                  {briefingMap === "map1-fomo"
-                    ? "FOMO Arena: Nhiệm Vụ Thực Chiến"
-                    : "Pro Room: Chiến Lược Phân Bổ"}
-                </h3>
+                <span className="map-chip">HƯỚNG DẪN MAP 2</span>
+                <h3>Pro Room: Chiến Lược Phân Bổ</h3>
               </div>
               <button
                 type="button"
@@ -347,60 +355,29 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
             </div>
 
             <div className="modal-body">
-              {briefingMap === "map1-fomo" ? (
-                <>
-                  <p className="briefing-lead">
-                    Bạn được cấp <strong>10.000.000 ₫</strong> vốn ảo.
-                    Mục tiêu là sống sót qua 7 vòng giao dịch liên tiếp (mỗi vòng 45 giây) mà không bị cháy tài khoản.
-                  </p>
-                  <div className="briefing-rules">
-                    <div className="rule-item">
-                      <CheckCircle2 size={16} className="text-success" />
-                      <div>
-                        <strong>Cảnh Giác Bẫy Đám Đông:</strong> Tin đồn bất ngờ và các đợt bơm giá sốc được thiết kế để thử thách kỷ luật cắt lỗ.
-                      </div>
-                    </div>
-                    <div className="rule-item">
-                      <CheckCircle2 size={16} className="text-success" />
-                      <div>
-                        <strong>Cơ Chế Khớp Lệnh:</strong> Lệnh Thị trường (Market) và Giới hạn (Limit) khớp chính xác theo thanh khoản sổ lệnh.
-                      </div>
-                    </div>
-                    <div className="rule-item">
-                      <CheckCircle2 size={16} className="text-success" />
-                      <div>
-                        <strong>Tiêu Chí Đánh Giá:</strong> Bạn sẽ được xếp hạng dựa trên <em>Điểm Kháng FOMO</em> và <em>Hiệu suất PnL</em>.
-                      </div>
-                    </div>
+              <p className="briefing-lead">
+                Bạn được cấp <strong>100.000.000 ₫</strong> vốn giả lập của quỹ đầu tư tổ chức trải dài qua 12 quý kinh tế vĩ mô.
+              </p>
+              <div className="briefing-rules">
+                <div className="rule-item">
+                  <CheckCircle2 size={16} className="text-success" />
+                  <div>
+                    <strong>Phân Bổ Đa Tài Sản:</strong> Cân bằng danh mục giữa Cổ phiếu tăng trưởng, Cổ phiếu giá trị, Trái phiếu và Tiền mặt.
                   </div>
-                </>
-              ) : (
-                <>
-                  <p className="briefing-lead">
-                    Bạn được cấp <strong>100.000.000 ₫</strong> vốn giả lập của quỹ đầu tư tổ chức trải dài qua 12 quý kinh tế vĩ mô.
-                  </p>
-                  <div className="briefing-rules">
-                    <div className="rule-item">
-                      <CheckCircle2 size={16} className="text-success" />
-                      <div>
-                        <strong>Phân Bổ Đa Tài Sản:</strong> Cân bằng danh mục giữa Cổ phiếu tăng trưởng, Cổ phiếu giá trị, Trái phiếu và Tiền mặt.
-                      </div>
-                    </div>
-                    <div className="rule-item">
-                      <CheckCircle2 size={16} className="text-success" />
-                      <div>
-                        <strong>Độ Nhạy Vĩ Mô:</strong> Ứng phó trước cú sốc lạm phát, đợt tăng lãi suất ngân hàng trung ương và chu kỳ suy thoái.
-                      </div>
-                    </div>
-                    <div className="rule-item">
-                      <Lock size={16} className="text-amber" />
-                      <div>
-                        <strong>Điều Kiện Mở Khóa:</strong> Hoàn thành sống sót tại Map 1 để nhận chứng chỉ kích hoạt Pro Room.
-                      </div>
-                    </div>
+                </div>
+                <div className="rule-item">
+                  <CheckCircle2 size={16} className="text-success" />
+                  <div>
+                    <strong>Độ Nhạy Vĩ Mô:</strong> Ứng phó trước cú sốc lạm phát, đợt tăng lãi suất ngân hàng trung ương và chu kỳ suy thoái.
                   </div>
-                </>
-              )}
+                </div>
+                <div className="rule-item">
+                  <Lock size={16} className="text-amber" />
+                  <div>
+                    <strong>Điều Kiện Mở Khóa:</strong> Sống sót qua 7 vòng Map 1, ROI &gt; 5% và Kỷ luật ≥ 50 để nhận chứng chỉ kích hoạt Pro Room.
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="modal-footer">
@@ -411,29 +388,16 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
               >
                 Đóng
               </button>
-              {briefingMap === "map1-fomo" ? (
-                <button
-                  type="button"
-                  className="btn btn-primary btn-md"
-                  onClick={() => {
-                    setBriefingMap(null);
-                    navigate("/simulation/map-1");
-                  }}
-                >
-                  <span>Vào Đấu Trường FOMO Arena →</span>
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  className="btn btn-primary btn-md"
-                  onClick={() => {
-                    setBriefingMap(null);
-                    handleEnterMap2();
-                  }}
-                >
-                  <span>Vào Bàn Chiến Lược Pro Room →</span>
-                </button>
-              )}
+              <button
+                type="button"
+                className="btn btn-primary btn-md"
+                onClick={() => {
+                  setBriefingMap(null);
+                  handleEnterMap2();
+                }}
+              >
+                <span>Vào Bàn Chiến Lược Pro Room →</span>
+              </button>
             </div>
           </div>
         </div>

@@ -15,15 +15,36 @@ import {
 export interface FomoTutorialModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onStartGame: () => void;
+  onStartGame?: () => void;
+  onProceedToScenario?: () => void;
+  mode?: "lobby" | "scenario";
 }
 
 export const FomoTutorialModal: React.FC<FomoTutorialModalProps> = ({
   isOpen,
   onClose,
   onStartGame,
+  onProceedToScenario,
+  mode = "lobby",
 }) => {
   if (!isOpen) return null;
+
+  const handlePrimaryAction = () => {
+    onClose();
+    if (mode === "scenario") {
+      if (onProceedToScenario) {
+        onProceedToScenario();
+      } else if (onStartGame) {
+        onStartGame();
+      }
+    } else {
+      if (onProceedToScenario) {
+        onProceedToScenario();
+      } else if (onStartGame) {
+        onStartGame();
+      }
+    }
+  };
 
   return (
     <div
@@ -57,10 +78,10 @@ export const FomoTutorialModal: React.FC<FomoTutorialModalProps> = ({
         style={{
           position: "relative",
           width: "100%",
-          maxWidth: "48rem",
-          borderRadius: "1rem",
+          maxWidth: "50rem",
+          borderRadius: "1.25rem",
           backgroundColor: "#ffffff",
-          boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+          boxShadow: "0 25px 50px -12px rgba(15, 23, 42, 0.25)",
           border: "1px solid #f1f5f9",
           maxHeight: "90vh",
           overflowY: "auto",
@@ -92,14 +113,14 @@ export const FomoTutorialModal: React.FC<FomoTutorialModalProps> = ({
         </button>
 
         {/* Phần Header */}
-        <div style={{ marginBottom: "1.5rem" }}>
+        <div style={{ marginBottom: "1.25rem" }}>
           <span
             className="inline-block px-3 py-1 text-xs font-semibold uppercase tracking-wider text-blue-600 bg-blue-50 rounded-full mb-2"
             style={{
               display: "inline-block",
               padding: "0.25rem 0.75rem",
               fontSize: "0.75rem",
-              fontWeight: 600,
+              fontWeight: 700,
               textTransform: "uppercase",
               letterSpacing: "0.05em",
               color: "#2563eb",
@@ -114,8 +135,8 @@ export const FomoTutorialModal: React.FC<FomoTutorialModalProps> = ({
             id="fomo-rules-title"
             className="text-xl md:text-2xl font-bold text-slate-900 flex items-center gap-2"
             style={{
-              fontSize: "1.5rem",
-              fontWeight: 700,
+              fontSize: "1.45rem",
+              fontWeight: 800,
               color: "#0f172a",
               display: "flex",
               alignItems: "center",
@@ -125,6 +146,102 @@ export const FomoTutorialModal: React.FC<FomoTutorialModalProps> = ({
           >
             🎮 LUẬT CHƠI &amp; QUY TẮC SINH TỒN — ĐẤU TRƯỜNG FOMO
           </h2>
+        </div>
+
+        {/* Khối Nhiệm Vụ Thực Chiến & Tiêu Điểm Tâm Lý (Hợp nhất từ Modal Hình 2) */}
+        <div
+          style={{
+            backgroundColor: "#f8fafc",
+            border: "1px solid #e2e8f0",
+            borderRadius: "0.875rem",
+            padding: "1rem 1.25rem",
+            marginBottom: "1.25rem",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.45rem" }}>
+            <span
+              style={{
+                fontSize: "0.725rem",
+                fontWeight: 800,
+                textTransform: "uppercase",
+                color: "#1d4ed8",
+                backgroundColor: "#dbeafe",
+                padding: "0.15rem 0.5rem",
+                borderRadius: "0.25rem",
+                letterSpacing: "0.03em",
+              }}
+            >
+              Nhiệm Vụ Thực Chiến
+            </span>
+          </div>
+
+          <p
+            style={{
+              fontSize: "0.85rem",
+              color: "#334155",
+              lineHeight: 1.55,
+              margin: "0 0 0.75rem 0",
+              fontWeight: 500,
+            }}
+          >
+            Bạn được cấp <strong style={{ color: "#0f172a" }}>10.000.000 ₫</strong> vốn ảo. Mục tiêu cốt lõi là sống sót qua 7 vòng giao dịch liên tiếp (mỗi vòng 45 giây) trước các đợt biến động sốc, bẫy tâm lý đám đông mà không bị cháy tài khoản.
+          </p>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
+              gap: "0.65rem",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: "0.5rem",
+                fontSize: "0.775rem",
+                color: "#475569",
+                lineHeight: 1.4,
+              }}
+            >
+              <CheckCircle2 size={15} style={{ color: "#16a34a", flexShrink: 0, marginTop: "2px" }} />
+              <div>
+                <strong style={{ color: "#0f172a" }}>Cảnh Giác Bẫy Đám Đông:</strong> Tin đồn bất ngờ và các đợt bơm giá sốc được thiết kế để thử thách kỷ luật cắt lỗ.
+              </div>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: "0.5rem",
+                fontSize: "0.775rem",
+                color: "#475569",
+                lineHeight: 1.4,
+              }}
+            >
+              <CheckCircle2 size={15} style={{ color: "#16a34a", flexShrink: 0, marginTop: "2px" }} />
+              <div>
+                <strong style={{ color: "#0f172a" }}>Cơ Chế Khớp Lệnh:</strong> Lệnh Thị trường (Market) và Giới hạn (Limit) khớp chính xác theo thanh khoản sổ lệnh.
+              </div>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: "0.5rem",
+                fontSize: "0.775rem",
+                color: "#475569",
+                lineHeight: 1.4,
+              }}
+            >
+              <CheckCircle2 size={15} style={{ color: "#16a34a", flexShrink: 0, marginTop: "2px" }} />
+              <div>
+                <strong style={{ color: "#0f172a" }}>Tiêu Chí Đánh Giá:</strong> Bạn sẽ được xếp hạng dựa trên <em>Điểm Kháng FOMO</em> và <em>Hiệu suất PnL</em>.
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* 4 Thẻ Nội Dung (Grid 2 cột) */}
@@ -422,7 +539,7 @@ export const FomoTutorialModal: React.FC<FomoTutorialModalProps> = ({
                 🏆 Điều Kiện Mở Khóa Map 2 (Pro Room)
               </h3>
               <p style={{ color: "#78350f", lineHeight: 1.5, margin: 0, fontSize: "0.8125rem" }}>
-                Sống sót qua toàn bộ 7 vòng, Điểm Kỷ luật ≥ <strong>50/100</strong>, Nhận huy hiệu <strong>"Sống sót qua bão FOMO"</strong>.
+                Đồng thời thỏa mãn: Sống sót qua <strong>toàn bộ 7 vòng</strong> + Lợi nhuận <strong>ROI &gt; +5%</strong> + Điểm Kỷ luật ≥ <strong>50/100</strong>. Nhận huy hiệu <strong>"Sống sót qua bão FOMO"</strong>.
               </p>
             </div>
 
@@ -453,7 +570,7 @@ export const FomoTutorialModal: React.FC<FomoTutorialModalProps> = ({
             justifyContent: "flex-end",
             gap: "0.75rem",
             paddingTop: "1rem",
-            marginTop: "1.5rem",
+            marginTop: "1.25rem",
             borderTop: "1px solid #f1f5f9",
           }}
         >
@@ -468,21 +585,18 @@ export const FomoTutorialModal: React.FC<FomoTutorialModalProps> = ({
               border: "1px solid #cbd5e1",
               backgroundColor: "#ffffff",
               color: "#334155",
-              fontWeight: 500,
+              fontWeight: 600,
               fontSize: "0.875rem",
               cursor: "pointer",
             }}
           >
-            Đóng để xem lại sau
+            {mode === "scenario" ? "Đóng / Quay lại chọn kịch bản" : "Đóng để xem lại sau"}
           </button>
 
           {/* Nút Chính (Primary CTA) */}
           <button
             type="button"
-            onClick={() => {
-              onClose();
-              onStartGame();
-            }}
+            onClick={handlePrimaryAction}
             className="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-semibold shadow-md shadow-blue-500/20 hover:bg-blue-700 active:scale-[0.98] transition-all text-sm flex items-center gap-2"
             style={{
               padding: "0.625rem 1.5rem",
@@ -490,7 +604,7 @@ export const FomoTutorialModal: React.FC<FomoTutorialModalProps> = ({
               border: "none",
               backgroundColor: "#2563eb",
               color: "#ffffff",
-              fontWeight: 600,
+              fontWeight: 700,
               fontSize: "0.875rem",
               boxShadow: "0 4px 14px 0 rgba(37, 99, 235, 0.25)",
               display: "flex",
@@ -499,7 +613,11 @@ export const FomoTutorialModal: React.FC<FomoTutorialModalProps> = ({
               cursor: "pointer",
             }}
           >
-            <span>ĐÃ HIỂU LUẬT — VÀO TRẬN NGAY 🚀</span>
+            <span>
+              {mode === "scenario"
+                ? "ĐÃ HIỂU LUẬT — TIẾP TỤC CHỌN KỊCH BẢN 🚀"
+                : "ĐÃ HIỂU LUẬT — CHỌN KỊCH BẢN MÔ PHỎNG 🚀"}
+            </span>
             <ArrowRight size={16} />
           </button>
         </div>
@@ -510,3 +628,4 @@ export const FomoTutorialModal: React.FC<FomoTutorialModalProps> = ({
 
 // Backwards compatibility alias for FomoRulesModal
 export const FomoRulesModal = FomoTutorialModal;
+

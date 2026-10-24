@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useAuth } from "../../auth/context/AuthContext";
 import { useMap1Game } from "../hooks/use-map-game";
 import { SimulationDisclosureBanner } from "../components/SimulationDisclosureBanner";
@@ -22,7 +22,6 @@ export const FomoArenaPage: React.FC = () => {
     isLoading,
     isSubmittingOrder,
     error,
-    tutorialCompleted,
     startNewGame,
     submitOrder,
     submitTrap,
@@ -31,17 +30,10 @@ export const FomoArenaPage: React.FC = () => {
     resetGame,
   } = useMap1Game(accessToken);
 
-  const [showTutorial, setShowTutorial] = useState(!tutorialCompleted);
+  const [showTutorial, setShowTutorial] = useState(false);
   const [activeTrapQuizClosedForRound, setActiveTrapQuizClosedForRound] = useState<number | null>(null);
   const [liveTickPrice, setLiveTickPrice] = useState<number | null>(null);
   const [selectedScenarioKey, setSelectedScenarioKey] = useState<string>("vix_pump");
-
-  // Trigger tutorial on initial view if not completed
-  useEffect(() => {
-    if (!tutorialCompleted && !sessionId) {
-      setShowTutorial(true);
-    }
-  }, [tutorialCompleted, sessionId]);
 
   // Determine if trap/quiz modal should pop up
   const isTrapOrQuizPhase = state?.phase === "trap_or_quiz";
@@ -236,7 +228,7 @@ export const FomoArenaPage: React.FC = () => {
                 minHeight: "44px",
               }}
             >
-              <span>Xem Luật Chơi</span>
+              <span>Xem Lại Luật Chơi</span>
             </button>
           </div>
         </div>
@@ -320,13 +312,14 @@ export const FomoArenaPage: React.FC = () => {
       {/* Interactive Modals */}
       <FomoTutorialModal
         isOpen={showTutorial}
-        onClose={() => setShowTutorial(false)}
-        onStartGame={() => {
-          completeTutorial();
+        mode="scenario"
+        onClose={() => {
           setShowTutorial(false);
-          if (!sessionId) {
-            startNewGame();
-          }
+          completeTutorial();
+        }}
+        onProceedToScenario={() => {
+          setShowTutorial(false);
+          completeTutorial();
         }}
       />
 
