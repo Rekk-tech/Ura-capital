@@ -31,7 +31,7 @@ const WORKSPACE_OPTIONS: WorkspaceOption[] = [
     id: "learner",
     title: "Không Gian Học Viên F0",
     badge: "LEARNER",
-    icon: <GraduationCap size={24} className="text-blue-400" />,
+    icon: <GraduationCap size={24} className="text-blue-600" />,
     path: "/dashboard",
     description: "Học viện Aura Academy, thi đấu Map 1 FOMO Arena & Map 2 Pro Room, quản trị danh mục cá nhân.",
     allowedRoles: ["LEARNER", "USER", "BROKER", "MODERATOR", "SYSTEM_ADMIN", "ADMIN"],
@@ -51,7 +51,7 @@ const WORKSPACE_OPTIONS: WorkspaceOption[] = [
     id: "broker",
     title: "Phòng Độc Quyền Của Broker",
     badge: "BROKER",
-    icon: <Award size={24} className="text-emerald-400" />,
+    icon: <Award size={24} className="text-emerald-600" />,
     path: "/broker-hub",
     description: "Quản trị Exclusive Room, đăng tín hiệu tư vấn, gắn mã CCHN UBCKNN và tương tác với học viên.",
     allowedRoles: ["BROKER", "SYSTEM_ADMIN", "ADMIN"],
@@ -71,7 +71,7 @@ const WORKSPACE_OPTIONS: WorkspaceOption[] = [
     id: "moderator",
     title: "Trung Tâm Kiểm Duyệt Nội Dung",
     badge: "MODERATOR",
-    icon: <Shield size={24} className="text-cyan-400" />,
+    icon: <Shield size={24} className="text-cyan-600" />,
     path: "/admin",
     description: "Biên tập giáo trình Academy, kiểm duyệt bài viết cộng đồng và tạm khóa người dùng vi phạm.",
     allowedRoles: ["MODERATOR", "SYSTEM_ADMIN", "ADMIN"],
@@ -91,7 +91,7 @@ const WORKSPACE_OPTIONS: WorkspaceOption[] = [
     id: "admin",
     title: "Admin Console Tối Cao",
     badge: "SYSTEM_ADMIN",
-    icon: <ShieldAlert size={24} className="text-rose-400" />,
+    icon: <ShieldAlert size={24} className="text-rose-600" />,
     path: "/admin",
     description: "Toàn quyền quản trị hệ thống, thẩm định CCHN Broker, phân quyền SoD và kiểm toán bảo mật bất biến.",
     allowedRoles: ["SYSTEM_ADMIN", "ADMIN"],
@@ -151,6 +151,13 @@ export const RoleGatewayPage: React.FC = () => {
     navigate("/login", { replace: true });
   };
 
+  const getUserRoleTagClass = () => {
+    if (currentRole === "SYSTEM_ADMIN" || currentRole === "ADMIN") return "role-tag-admin";
+    if (currentRole === "MODERATOR") return "role-tag-moderator";
+    if (currentRole === "BROKER") return "role-tag-broker";
+    return "role-tag-learner";
+  };
+
   return (
     <main className="role-gateway-container" id="main-content" data-testid="role-gateway-page">
       <div className="role-gateway-wrapper">
@@ -175,7 +182,7 @@ export const RoleGatewayPage: React.FC = () => {
             <div className="user-meta-info">
               <div className="user-name-row">
                 <span className="user-display-name">{user.displayName || "Thành viên Aura"}</span>
-                <span className={`role-tag-pill ${selectedWorkspace.tagClass}`}>
+                <span className={`role-tag-pill ${getUserRoleTagClass()}`}>
                   {currentRole}
                 </span>
               </div>
@@ -229,7 +236,7 @@ export const RoleGatewayPage: React.FC = () => {
                   <div className="workspace-card-footer">
                     {isPermitted ? (
                       <span className="access-status granted">
-                        <CheckCircle2 size={14} /> Có Quyền Truy Cập
+                        <CheckCircle2 size={14} /> {isSelected ? "✓ Đang Chọn" : "Có Quyền Truy Cập"}
                       </span>
                     ) : (
                       <span className="access-status locked">

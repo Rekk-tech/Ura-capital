@@ -237,16 +237,18 @@ export const AppHeader: React.FC = () => {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "6px",
-                padding: "0.3rem 0.75rem",
+                padding: "0.35rem 0.75rem",
                 borderRadius: "9999px",
                 fontSize: "0.75rem",
                 fontWeight: 700,
                 letterSpacing: "0.03em",
-                background: "linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.1))",
-                color: "#f87171",
-                border: "1px solid rgba(239, 68, 68, 0.4)",
+                background: "#FEF2F2",
+                color: "#DC2626",
+                border: "1px solid #FECACA",
                 textDecoration: "none",
                 textTransform: "uppercase",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
               }}
             >
               <ShieldCheck size={14} aria-hidden="true" />
@@ -263,16 +265,18 @@ export const AppHeader: React.FC = () => {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "6px",
-                padding: "0.3rem 0.75rem",
+                padding: "0.35rem 0.75rem",
                 borderRadius: "9999px",
                 fontSize: "0.75rem",
                 fontWeight: 700,
                 letterSpacing: "0.03em",
-                background: "linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(8, 145, 178, 0.1))",
-                color: "#38bdf8",
-                border: "1px solid rgba(6, 182, 212, 0.4)",
+                background: "#ECFEFF",
+                color: "#0891B2",
+                border: "1px solid #A5F3FC",
                 textDecoration: "none",
                 textTransform: "uppercase",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
               }}
             >
               <ShieldCheck size={14} aria-hidden="true" />
@@ -289,16 +293,18 @@ export const AppHeader: React.FC = () => {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "6px",
-                padding: "0.3rem 0.75rem",
+                padding: "0.35rem 0.75rem",
                 borderRadius: "9999px",
                 fontSize: "0.75rem",
                 fontWeight: 700,
                 letterSpacing: "0.03em",
-                background: "linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(22, 163, 74, 0.1))",
-                color: "#4ade80",
-                border: "1px solid rgba(34, 197, 94, 0.4)",
+                background: "#F0FDF4",
+                color: "#15803D",
+                border: "1.5px solid #86EFAC",
                 textDecoration: "none",
                 textTransform: "uppercase",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
               }}
             >
               <Award size={14} aria-hidden="true" />
@@ -310,6 +316,7 @@ export const AppHeader: React.FC = () => {
               className="upgrade-pill-btn"
               title="View Membership & Pricing Plans"
               aria-label="View Subscription Plans"
+              style={{ whiteSpace: "nowrap", flexShrink: 0 }}
             >
               <Sparkles size={13} className="upgrade-pill-icon" aria-hidden="true" />
               <span>Upgrade</span>
@@ -323,14 +330,14 @@ export const AppHeader: React.FC = () => {
             className="lang-pill"
             title={`Ngôn ngữ: ${currentLang === "VI" ? "Tiếng Việt" : "English"} (Bấm để chuyển đổi)`}
             aria-label="Toggle language"
-            style={{ cursor: "pointer", border: "none", background: "transparent" }}
+            style={{ cursor: "pointer", border: "none", background: "transparent", flexShrink: 0 }}
           >
             {currentLang}
           </button>
 
           {isAuthenticated && user ? (
             /* Authenticated User Menu Dropdown */
-            <div className="user-menu-container" ref={userMenuRef}>
+            <div className="user-menu-container" ref={userMenuRef} style={{ flexShrink: 1, minWidth: 0 }}>
               <button
                 type="button"
                 className="user-avatar-btn"
@@ -338,10 +345,13 @@ export const AppHeader: React.FC = () => {
                 aria-expanded={isUserMenuOpen}
                 aria-haspopup="true"
                 aria-label={`User menu for ${user.email}`}
+                style={{ flexShrink: 1, minWidth: 0 }}
               >
-                <div className="avatar-circle">{userInitials}</div>
-                <span className="user-email-chip">{user.displayName || user.email}</span>
-                <ChevronDown size={14} className={`chevron-icon ${isUserMenuOpen ? "rotate-180" : ""}`} />
+                <div className="avatar-circle" style={{ flexShrink: 0 }}>{userInitials}</div>
+                <span className="user-email-chip" style={{ maxWidth: "130px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {user.displayName || user.email}
+                </span>
+                <ChevronDown size={14} className={`chevron-icon ${isUserMenuOpen ? "rotate-180" : ""}`} style={{ flexShrink: 0 }} />
               </button>
 
               {isUserMenuOpen && (
