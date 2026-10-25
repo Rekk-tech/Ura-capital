@@ -59,8 +59,17 @@ export const defaultRoleAssignmentRepoFactory: RoleAssignmentRepoFactory = (clie
   };
 };
 
+const ROLE_DESCRIPTIONS: Record<RoleCode, string> = {
+  SYSTEM_ADMIN: "Supreme platform and audit administrator with full system privileges",
+  ADMIN: "Administrator with full system privileges (legacy canonical role)",
+  MODERATOR: "Academic curriculum editor and content moderation guardian",
+  BROKER: "State-verified financial creator and exclusive room operator",
+  LEARNER: "Standard authenticated learner and retail investor",
+  USER: "Standard platform user (legacy canonical role)",
+};
+
 /**
- * Idempotently seeds canonical roles (USER, ADMIN) into PostgreSQL.
+ * Idempotently seeds canonical roles into PostgreSQL.
  * Safe to run repeatedly across test, CI, development, and production environments.
  * Strictly creates roles only: creates NO users, NO credentials, and NO default admin assignments.
  */
@@ -70,7 +79,7 @@ export async function seedCanonicalRoles(
   const seededRoles: RoleEntity[] = [];
 
   for (const roleCode of CANONICAL_ROLES) {
-    const description = roleCode === "ADMIN" ? "Administrator with full system privileges" : "Standard platform user";
+    const description = ROLE_DESCRIPTIONS[roleCode] || "Canonical platform role";
     const role = await roleRepo.ensureRoleExists(roleCode, description);
     seededRoles.push(role);
   }

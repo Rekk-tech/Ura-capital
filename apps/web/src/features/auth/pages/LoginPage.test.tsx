@@ -34,6 +34,7 @@ describe("LoginPage (FEAT-071: AC-001..AC-006)", () => {
           <MemoryRouter initialEntries={initialEntries}>
             <Routes>
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/auth/role-gateway" element={<div>Role Gateway Target Page</div>} />
               <Route path="/account" element={<div>Account Target Page</div>} />
               <Route path="/simulation" element={<div>Simulation Target Page</div>} />
               <Route path="/admin" element={<div>Admin Target Page</div>} />
@@ -286,7 +287,7 @@ describe("LoginPage (FEAT-071: AC-001..AC-006)", () => {
     fireEvent.click(screen.getByRole("button", { name: /sign in/i }));
 
     await waitFor(() => {
-      expect(screen.getByText("Account Target Page")).toBeDefined();
+      expect(screen.getByText("Role Gateway Target Page")).toBeDefined();
     });
 
     // Invariant verification: ADR-004 zero browser storage persistence
@@ -304,7 +305,7 @@ describe("LoginPage (FEAT-071: AC-001..AC-006)", () => {
     expect(screen.getByText("Simulation Target Page")).toBeDefined();
   });
 
-  it("redirects admin user directly to /admin when no returnTo query is specified (FEAT-083 / US-2)", async () => {
+  it("redirects user to /auth/role-gateway when no returnTo query is specified (FEAT-088 / FR-007)", async () => {
     vi.spyOn(authApi, "login").mockResolvedValue({
       accessToken: "mock-admin-token",
       tokenType: "Bearer",
@@ -329,7 +330,7 @@ describe("LoginPage (FEAT-071: AC-001..AC-006)", () => {
     fireEvent.click(screen.getByRole("button", { name: /sign in/i }));
 
     await waitFor(() => {
-      expect(screen.getByText("Admin Target Page")).toBeDefined();
+      expect(screen.getByText("Role Gateway Target Page")).toBeDefined();
     });
   });
 });

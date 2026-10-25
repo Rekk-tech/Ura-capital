@@ -1,4 +1,4 @@
-﻿# Implementation Plan: FEAT-088 Aura Broker Hub & Verified Creator Marketplace
+# Implementation Plan: FEAT-088 Aura Broker Hub & Verified Creator Marketplace
 
 ## 1. Technical Architecture & Component Tree
 
@@ -45,3 +45,29 @@ apps/web/src/
 - Thẻ tín nhiệm (Broker Credibility Passport): Gắn huy hiệu vàng rực rỡ, hiển thị rõ số CCHN UBCKNN được bọc trong khung bảo chứng.
 - Tuyên bố miễn trừ trách nhiệm pháp lý (Disclaimer): Luôn hiển thị ở chân trang mỗi phòng học để bảo đảm tuân thủ luật pháp Việt Nam.
 - Responsive 100%: Hoạt động mượt mà trên cả Mobile, Tablet, và Desktop.
+
+---
+
+## 4. 5-Role RBAC Architecture & Segregation of Duties Extension
+
+### 4.1. Core Role Enum & Backward Compatibility
+- **GUEST**: Unauthenticated visitor (handled client-side / public route guards).
+- **LEARNER**: Standard authenticated investor (default after OTP; backward-compatible alias `USER`).
+- **BROKER**: State-verified creator with UBCKNN license (admin approved).
+- **MODERATOR**: Academic curator & content moderation guardian (24h temporary mute, official course editing).
+- **SYSTEM_ADMIN**: Supreme platform & audit administrator (backward-compatible alias `ADMIN`).
+
+### 4.2. Backend Authorization Middleware & Governance
+- `apps/api/src/modules/auth/authorization.constants.ts`: Expand `ROLES` to include `LEARNER`, `BROKER`, `MODERATOR`, `SYSTEM_ADMIN` alongside `USER` and `ADMIN`. Add role helper predicates (`isSystemAdmin`, `isModerator`, `isBroker`, `isLearner`).
+- `apps/api/src/modules/auth/role.seed.ts`: Idempotently seed descriptions for all 5 canonical roles in PostgreSQL.
+- `apps/api/src/modules/admin/admin.service.ts`: Enforce invariant preventing `SYSTEM_ADMIN` self-suspension and self-demotion.
+- `apps/api/tests/unit/authorization.middleware.test.ts`: Add comprehensive test suite covering the 5-role matrix, multiple-role matching, and fail-closed security.
+
+### 4.3. Frontend UI Guards & Natural Role-Aware UX (ui-styling & ui-ux-pro-max)
+- `apps/web/src/features/auth/components/RoleGuard.tsx`: Reusable role gate component displaying natural fallback or redirect with accessible visual hierarchy.
+- `apps/web/src/features/admin/components/AdminRouteGuard.tsx`: Updated to admit `SYSTEM_ADMIN`, `ADMIN`, and `MODERATOR` (with scoped tabs).
+- `apps/web/src/app/shell/AppHeader.tsx`:
+  - Natural, elegant role pill on header: Red shield for `SYSTEM_ADMIN`, Cyan shield for `MODERATOR`, Emerald badge for `BROKER`, Upgrade pill for `LEARNER`.
+  - In User Dropdown: Dedicated role badge with subtle glassmorphic background, semantic color borders, and descriptive Vietnamese label.
+  - Quick action links contextualized by role: "Phòng Của Tôi" for Brokers, "Kiểm Duyệt Học Thuật" for Moderators, "Admin Console" for Admins.
+

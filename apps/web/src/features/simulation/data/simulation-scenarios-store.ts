@@ -6,16 +6,30 @@
 export interface FomoScenarioDefinition {
   key: string;
   ticker: string;
+  codeTag: string;
   name: string;
   category: "PENNY_SPECULATION" | "REAL_ESTATE_DEBT" | "TECH_BLUECHIP";
   badge: string;
   badgeColor: string;
   difficulty: "Trung Bình" | "Khốc Liệt" | "Nâng Cao";
   difficultyColor: string;
+  featureSubtitle: string;
   description: string;
   historicalContext: string;
   initialPrice: number;
   expectedVolatility: string;
+  metricPills: Array<{ label: string; value: string; isDanger?: boolean; isSuccess?: boolean }>;
+  chartMeta: {
+    modelName: string;
+    performanceStat: string;
+    statColor: "orange" | "red" | "green";
+    annotation: string;
+    annotationPos: { x: number; y: number };
+    pathD: string;
+    areaD: string;
+    strokeColor: string;
+    fillGradient: { id: string; stopColor: string };
+  };
   roundNarratives: Record<
     number,
     {
@@ -35,16 +49,34 @@ export const FOMO_SCENARIOS: Record<string, FomoScenarioDefinition> = {
   vix_pump: {
     key: "vix_pump",
     ticker: "$VIX_PUMP",
+    codeTag: "SVIX_PUMP",
     name: "Sóng Đầu Cơ Penny & Bẫy Kéo Xả ATO",
     category: "PENNY_SPECULATION",
     badge: "Bẫy Thanh Khoản",
     badgeColor: "amber",
     difficulty: "Trung Bình",
     difficultyColor: "amber",
-    description: "Thao túng tâm lý F0 đua lệnh trần ATO, đội lái kích hoạt bẫy margin x2 tại đỉnh rồi xả hàng tắt thanh khoản.",
+    featureSubtitle: "• Bẫy Margin Call x2",
+    description: "Thao túng tâm lý F0 đua lệnh trần ATO, đội lái kích hoạt bẫy margin x2 tại đỉnh rồi xả hàng tắt thanh khoản. Thử thách phản xạ cắt lỗ ngay trong 3 vòng đầu!",
     historicalContext: "Mô phỏng đợt sóng đầu cơ penny và các đội nhóm hô hào kéo xả kinh điển trên thị trường chứng khoán Việt Nam.",
     initialPrice: 10000,
     expectedVolatility: "Biên độ ±7% kịch trần kịch sàn",
+    metricPills: [
+      { label: "Biên độ", value: "±7% kịch trần kịch sàn" },
+      { label: "Rung lắc", value: "Cực Cao" },
+      { label: "Đòn bẩy", value: "Max 1:2" },
+    ],
+    chartMeta: {
+      modelName: "Mô hình nến: Bơm - Xả",
+      performanceStat: "+18.4% -> -24%",
+      statColor: "orange",
+      annotation: "Bẫy đỉnh Vòng 4",
+      annotationPos: { x: 138, y: 14 },
+      pathD: "M 10 46 C 45 46, 75 38, 105 28 C 120 22, 130 14, 138 14 C 146 14, 155 30, 168 45 C 176 52, 185 54, 195 54",
+      areaD: "M 10 46 C 45 46, 75 38, 105 28 C 120 22, 130 14, 138 14 C 146 14, 155 30, 168 45 C 176 52, 185 54, 195 54 L 195 62 L 10 62 Z",
+      strokeColor: "#2563eb",
+      fillGradient: { id: "grad_vix", stopColor: "#3b82f6" },
+    },
     roundNarratives: {
       1: {
         roundName: "Khởi Động Tích Luỹ",
@@ -150,16 +182,34 @@ export const FOMO_SCENARIOS: Record<string, FomoScenarioDefinition> = {
   nvl_crash: {
     key: "nvl_crash",
     ticker: "$NVL_CRASH",
+    codeTag: "SNVL_CRASH",
     name: "Đóng Băng Thanh Khoản BĐS & Khủng Hoảng Nợ",
     category: "REAL_ESTATE_DEBT",
     badge: "Khủng Hoảng Nợ",
     badgeColor: "rose",
     difficulty: "Khốc Liệt",
     difficultyColor: "rose",
-    description: "Khủng hoảng dòng tiền trái phiếu đáo hạn, bán giải chấp chéo call margin toàn thị trường, chuỗi sàn liên hoàn.",
+    featureSubtitle: "• Bán Tháo Chuỗi Sàn",
+    description: "Khủng hoảng dòng tiền trái phiếu đáo hạn, bán giải chấp chéo call margin toàn thị trường, chuỗi sàn liên hoàn. Kiểm tra kỷ luật \"tuyệt đối không bắt dao rơi\".",
     historicalContext: "Mô phỏng đợt khủng hoảng đóng băng thanh khoản bất động sản và sụp đổ đòn bẩy tài chính cuối năm 2022.",
     initialPrice: 75000,
     expectedVolatility: "Chuỗi 5 phiên sàn liên tiếp, call margin chéo",
+    metricPills: [
+      { label: "Quy mô", value: "Chuỗi 5 phiên sàn liên tiếp" },
+      { label: "Rủi ro", value: "Call margin chéo" },
+      { label: "Thanh khoản", value: "Tắt hẳn", isDanger: true },
+    ],
+    chartMeta: {
+      modelName: "Mô hình: Rơi tự do",
+      performanceStat: "-48.5%",
+      statColor: "red",
+      annotation: "Bẫy hồi Bull-trap tại Vòng 3",
+      annotationPos: { x: 105, y: 40 },
+      pathD: "M 10 18 C 30 20, 55 28, 75 44 C 85 50, 95 44, 105 40 C 115 36, 125 45, 140 52 C 160 58, 180 58, 195 58",
+      areaD: "M 10 18 C 30 20, 55 28, 75 44 C 85 50, 95 44, 105 40 C 115 36, 125 45, 140 52 C 160 58, 180 58, 195 58 L 195 62 L 10 62 Z",
+      strokeColor: "#ef4444",
+      fillGradient: { id: "grad_nvl", stopColor: "#ef4444" },
+    },
     roundNarratives: {
       1: {
         roundName: "Vết Rạn Dòng Tiền",
@@ -256,16 +306,34 @@ export const FOMO_SCENARIOS: Record<string, FomoScenarioDefinition> = {
   fpt_exp: {
     key: "fpt_exp",
     ticker: "$FPT_EXP",
+    codeTag: "SFPT_EXP",
     name: "Siêu Cổ Phiếu Vượt Đỉnh ATH & Shakeout",
     category: "TECH_BLUECHIP",
     badge: "Bluechip Công Nghệ",
     badgeColor: "teal",
     difficulty: "Nâng Cao",
     difficultyColor: "teal",
-    description: "Hành trình tăng trưởng bền vững: Vượt qua cú rũ cung shakeout dữ dội trước khi bứt phá đỉnh lịch sử nhờ hợp đồng AI.",
+    featureSubtitle: "• Breakout All-Time-High",
+    description: "Hành trình tăng trưởng bền vững: Vượt qua cú rũ cung shakeout dữ dội trước khi bứt phá đỉnh lịch sử nhờ hợp đồng AI. Luyện kỹ năng gồng lãi (Trend Following).",
     historicalContext: "Mô phỏng hành trình tăng trưởng bền vững của các tập đoàn công nghệ hàng đầu VN30 khi bước vào kỷ nguyên số.",
     initialPrice: 95000,
     expectedVolatility: "Biến động tích lũy chặt chẽ, bứt phá xu hướng lớn",
+    metricPills: [
+      { label: "Chiến lược", value: "Tích lũy nền giá chặt" },
+      { label: "Xu hướng", value: "Bứt phá xu hướng lớn" },
+      { label: "Vol bùng nổ", value: "", isSuccess: true },
+    ],
+    chartMeta: {
+      modelName: "Mô hình: Shakeout & Run",
+      performanceStat: "+32.8%",
+      statColor: "green",
+      annotation: "Shakeout đáy rũ Vòng 3",
+      annotationPos: { x: 90, y: 50 },
+      pathD: "M 10 40 C 35 40, 55 42, 75 47 C 83 49, 90 51, 98 48 C 110 42, 130 28, 155 18 C 170 14, 185 14, 195 14",
+      areaD: "M 10 40 C 35 40, 55 42, 75 47 C 83 49, 90 51, 98 48 C 110 42, 130 28, 155 18 C 170 14, 185 14, 195 14 L 195 62 L 10 62 Z",
+      strokeColor: "#10b981",
+      fillGradient: { id: "grad_fpt", stopColor: "#10b981" },
+    },
     roundNarratives: {
       1: {
         roundName: "Nền Tích Luỹ Chặt Chẽ",

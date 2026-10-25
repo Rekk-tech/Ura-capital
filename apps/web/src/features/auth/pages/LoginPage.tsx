@@ -17,7 +17,7 @@ import { AuthApiError } from "../../../api/auth.api";
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { login, isAuthenticated, user } = useAuth();
+  const { login, isAuthenticated } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,30 +28,16 @@ export const LoginPage: React.FC = () => {
   const rawReturnTo = searchParams.get("returnTo");
   const safeReturnUrl = getSafeReturnUrl(rawReturnTo, "/account");
 
-  const isUserAdmin = (
-    testUser?: { role?: string; roles?: string[]; email?: string } | null,
-    emailCandidate?: string,
-  ): boolean => {
-    const candidateEmail = (emailCandidate || testUser?.email || "").toLowerCase();
-    return Boolean(
-      testUser?.role === "ADMIN" ||
-      testUser?.roles?.includes?.("ADMIN") ||
-      candidateEmail.startsWith("admin.") ||
-      candidateEmail === "admin@aura.internal" ||
-      candidateEmail === "admin@auracapital.io"
-    );
-  };
-
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      if (!rawReturnTo && isUserAdmin(user)) {
-        navigate("/admin", { replace: true });
-      } else {
+      if (rawReturnTo) {
         navigate(safeReturnUrl, { replace: true });
+      } else {
+        navigate("/auth/role-gateway", { replace: true });
       }
     }
-  }, [isAuthenticated, navigate, safeReturnUrl, rawReturnTo, user]);
+  }, [isAuthenticated, navigate, safeReturnUrl, rawReturnTo]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,12 +56,12 @@ export const LoginPage: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      const loggedInUser = await login(normalizedEmail, password);
-      // Navigate to /admin directly if Admin and no explicit returnTo specified
-      if (!rawReturnTo && isUserAdmin(loggedInUser, normalizedEmail)) {
-        navigate("/admin", { replace: true });
+      await login(normalizedEmail, password);
+      // Navigate to /auth/role-gateway for role confirmation & workspace selection
+      if (rawReturnTo) {
+        navigate(`/auth/role-gateway?returnTo=${encodeURIComponent(safeReturnUrl)}`, { replace: true });
       } else {
-        navigate(safeReturnUrl, { replace: true });
+        navigate("/auth/role-gateway", { replace: true });
       }
     } catch (err: unknown) {
       if (err instanceof AuthApiError) {
@@ -173,6 +159,7 @@ export const LoginPage: React.FC = () => {
             type="submit"
             className="btn btn-primary btn-block"
             disabled={isSubmitting}
+            id="login-submit-btn"
           >
             {isSubmitting ? (
               <span>Signing in...</span>

@@ -8,6 +8,7 @@ import { NotFoundPage } from "../components/NotFoundPage";
 import { LandingPage } from "../pages/LandingPage";
 import { LoginPage } from "../../features/auth/pages/LoginPage";
 import { RegisterPage } from "../../features/auth/pages/RegisterPage";
+import { RoleGatewayPage } from "../../features/auth/pages/RoleGatewayPage";
 import { AccountPage } from "../../features/auth/pages/AccountPage";
 import { DashboardPage } from "../../features/dashboard/pages/DashboardPage";
 import { AcademyRoutes } from "../router/academy-routes";
@@ -88,6 +89,7 @@ export const AppShell: React.FC = () => {
             />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/auth/role-gateway" element={<RoleGatewayPage />} />
 
             {/* Authenticated Dashboard (FEAT-072) */}
             <Route path="/dashboard" element={<DashboardPage />} />

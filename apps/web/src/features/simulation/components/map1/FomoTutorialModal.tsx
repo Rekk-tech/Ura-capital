@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Clock,
   Coins,
@@ -6,10 +6,10 @@ import {
   Trophy,
   ArrowRight,
   X,
-  TrendingUp,
   Percent,
   CheckCircle2,
-  ShieldAlert,
+  Gamepad2,
+  Zap,
 } from "lucide-react";
 
 export interface FomoTutorialModalProps {
@@ -27,46 +27,28 @@ export const FomoTutorialModal: React.FC<FomoTutorialModalProps> = ({
   onProceedToScenario,
   mode = "lobby",
 }) => {
+  const [rememberRules, setRememberRules] = useState(true);
+
   if (!isOpen) return null;
 
   const handlePrimaryAction = () => {
     onClose();
-    if (mode === "scenario") {
-      if (onProceedToScenario) {
-        onProceedToScenario();
-      } else if (onStartGame) {
-        onStartGame();
-      }
-    } else {
-      if (onProceedToScenario) {
-        onProceedToScenario();
-      } else if (onStartGame) {
-        onStartGame();
-      }
+    if (onProceedToScenario) {
+      onProceedToScenario();
+    } else if (onStartGame) {
+      onStartGame();
     }
   };
+
+  const secondaryBtnLabel =
+    mode === "scenario" ? "Đóng / Quay lại chọn kịch bản" : "Đóng để xem lại sau";
 
   return (
     <div
       role="dialog"
       aria-modal="true"
       aria-labelledby="fomo-rules-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm"
-      style={{
-        position: "fixed",
-        top: 0,
-        right: 0,
-        bottom: 0,
-        left: 0,
-        zIndex: 9999,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "1rem",
-        backgroundColor: "rgba(2, 6, 23, 0.75)",
-        backdropFilter: "blur(8px)",
-        WebkitBackdropFilter: "blur(8px)",
-      }}
+      className="fomo-rules-backdrop"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           onClose();
@@ -74,552 +56,230 @@ export const FomoTutorialModal: React.FC<FomoTutorialModalProps> = ({
       }}
     >
       <div
-        className="relative w-full max-w-3xl rounded-2xl bg-white shadow-2xl border border-slate-100 p-6 md:p-8 max-h-[90vh] overflow-y-auto"
-        style={{
-          position: "relative",
-          width: "100%",
-          maxWidth: "50rem",
-          borderRadius: "1.25rem",
-          backgroundColor: "#ffffff",
-          boxShadow: "0 25px 50px -12px rgba(15, 23, 42, 0.25)",
-          border: "1px solid #f1f5f9",
-          maxHeight: "90vh",
-          overflowY: "auto",
-        }}
+        className="fomo-rules-modal-box"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Nút đóng (Close Button) ở góc trên bên phải */}
+        {/* Nút đóng (Close Button) */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
-          style={{
-            position: "absolute",
-            top: "1.25rem",
-            right: "1.25rem",
-            background: "transparent",
-            border: "none",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: "9999px",
-            padding: "0.5rem",
-            color: "#94a3b8",
-          }}
+          className="fomo-rules-close-btn"
           aria-label="Đóng hướng dẫn"
         >
           <X size={20} />
         </button>
 
-        {/* Phần Header */}
-        <div style={{ marginBottom: "1.25rem" }}>
-          <span
-            className="inline-block px-3 py-1 text-xs font-semibold uppercase tracking-wider text-blue-600 bg-blue-50 rounded-full mb-2"
-            style={{
-              display: "inline-block",
-              padding: "0.25rem 0.75rem",
-              fontSize: "0.75rem",
-              fontWeight: 700,
-              textTransform: "uppercase",
-              letterSpacing: "0.05em",
-              color: "#2563eb",
-              backgroundColor: "#eff6ff",
-              borderRadius: "9999px",
-              marginBottom: "0.5rem",
-            }}
-          >
-            QUY TẮC SINH TỒN • VÒNG 0 · 7 VÒNG THỬ THÁCH TÂM LÝ
-          </span>
-          <h2
-            id="fomo-rules-title"
-            className="text-xl md:text-2xl font-bold text-slate-900 flex items-center gap-2"
-            style={{
-              fontSize: "1.45rem",
-              fontWeight: 800,
-              color: "#0f172a",
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              margin: 0,
-            }}
-          >
-            🎮 LUẬT CHƠI &amp; QUY TẮC SINH TỒN — ĐẤU TRƯỜNG FOMO
-          </h2>
-        </div>
-
-        {/* Khối Nhiệm Vụ Thực Chiến & Tiêu Điểm Tâm Lý (Hợp nhất từ Modal Hình 2) */}
-        <div
-          style={{
-            backgroundColor: "#f8fafc",
-            border: "1px solid #e2e8f0",
-            borderRadius: "0.875rem",
-            padding: "1rem 1.25rem",
-            marginBottom: "1.25rem",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.45rem" }}>
-            <span
-              style={{
-                fontSize: "0.725rem",
-                fontWeight: 800,
-                textTransform: "uppercase",
-                color: "#1d4ed8",
-                backgroundColor: "#dbeafe",
-                padding: "0.15rem 0.5rem",
-                borderRadius: "0.25rem",
-                letterSpacing: "0.03em",
-              }}
-            >
-              Nhiệm Vụ Thực Chiến
-            </span>
+        {/* 1. Phần Header: Pill & Title */}
+        <div className="fomo-rules-header">
+          <div className="fomo-rules-top-pill">
+            <span className="fomo-rules-dot" />
+            <span>QUY TẮC SINH TỒN • VÒNG 0 · 7 VÒNG THỬ THÁCH TÂM LÝ</span>
           </div>
 
-          <p
-            style={{
-              fontSize: "0.85rem",
-              color: "#334155",
-              lineHeight: 1.55,
-              margin: "0 0 0.75rem 0",
-              fontWeight: 500,
-            }}
-          >
-            Bạn được cấp <strong style={{ color: "#0f172a" }}>10.000.000 ₫</strong> vốn ảo. Mục tiêu cốt lõi là sống sót qua 7 vòng giao dịch liên tiếp (mỗi vòng 45 giây) trước các đợt biến động sốc, bẫy tâm lý đám đông mà không bị cháy tài khoản.
+          <div className="fomo-rules-title-row">
+            <div className="fomo-rules-gamepad-icon">
+              <Gamepad2 size={24} />
+            </div>
+            <div>
+              <h2 id="fomo-rules-title" className="fomo-rules-main-title">
+                LUẬT CHƠI &amp; QUY TẮC SINH TỒN — ĐẤU TRƯỜNG FOMO
+              </h2>
+              <p className="fomo-rules-sub-title">
+                Hướng dẫn thực chiến và điều kiện quản trị danh mục trước khi bước vào phiên giao dịch giả lập thời gian thực.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* 2. Khối Nhiệm Vụ Thực Chiến */}
+        <div className="fomo-rules-mission-card">
+          <div className="fomo-rules-mission-badge">
+            <Zap size={13} fill="currentColor" />
+            <span>NHIỆM VỤ THỰC CHIẾN</span>
+          </div>
+
+          <p className="fomo-rules-mission-desc">
+            Bạn được cấp <span className="fomo-rules-capital-pill">10.000.000 đ</span> vốn ảo. Mục tiêu cốt lõi là <strong>sống sót qua 7 vòng giao dịch liên tiếp</strong> (mỗi vòng 45 giây) trước các đợt biến động sốc, bẫy tâm lý đám đông mà không bị cháy tài khoản.
           </p>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
-              gap: "0.65rem",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "flex-start",
-                gap: "0.5rem",
-                fontSize: "0.775rem",
-                color: "#475569",
-                lineHeight: 1.4,
-              }}
-            >
-              <CheckCircle2 size={15} style={{ color: "#16a34a", flexShrink: 0, marginTop: "2px" }} />
-              <div>
-                <strong style={{ color: "#0f172a" }}>Cảnh Giác Bẫy Đám Đông:</strong> Tin đồn bất ngờ và các đợt bơm giá sốc được thiết kế để thử thách kỷ luật cắt lỗ.
+          <div className="fomo-rules-pillars-grid">
+            <div className="fomo-rules-pillar-item">
+              <div className="fomo-rules-pillar-title-row">
+                <CheckCircle2 size={16} className="text-emerald-500 flex-shrink-0" />
+                <span className="fomo-rules-pillar-title">Cảnh Giác Bẫy Đám Đông</span>
+                <span className="sr-only">Cảnh Giác Bẫy Đám Đông:</span>
               </div>
+              <p className="fomo-rules-pillar-text">
+                Tin đồn bất ngờ và các đợt bơm giá sốc được thiết kế để thử thách kỷ luật cắt lỗ.
+              </p>
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                alignItems: "flex-start",
-                gap: "0.5rem",
-                fontSize: "0.775rem",
-                color: "#475569",
-                lineHeight: 1.4,
-              }}
-            >
-              <CheckCircle2 size={15} style={{ color: "#16a34a", flexShrink: 0, marginTop: "2px" }} />
-              <div>
-                <strong style={{ color: "#0f172a" }}>Cơ Chế Khớp Lệnh:</strong> Lệnh Thị trường (Market) và Giới hạn (Limit) khớp chính xác theo thanh khoản sổ lệnh.
+            <div className="fomo-rules-pillar-item">
+              <div className="fomo-rules-pillar-title-row">
+                <CheckCircle2 size={16} className="text-emerald-500 flex-shrink-0" />
+                <span className="fomo-rules-pillar-title">Cơ Chế Khớp Lệnh</span>
+                <span className="sr-only">Cơ Chế Khớp Lệnh:</span>
               </div>
+              <p className="fomo-rules-pillar-text">
+                Lệnh Thị trường (Market) và Giới hạn (Limit) khớp chính xác theo thanh khoản sổ lệnh.
+              </p>
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                alignItems: "flex-start",
-                gap: "0.5rem",
-                fontSize: "0.775rem",
-                color: "#475569",
-                lineHeight: 1.4,
-              }}
-            >
-              <CheckCircle2 size={15} style={{ color: "#16a34a", flexShrink: 0, marginTop: "2px" }} />
-              <div>
-                <strong style={{ color: "#0f172a" }}>Tiêu Chí Đánh Giá:</strong> Bạn sẽ được xếp hạng dựa trên <em>Điểm Kháng FOMO</em> và <em>Hiệu suất PnL</em>.
+            <div className="fomo-rules-pillar-item">
+              <div className="fomo-rules-pillar-title-row">
+                <CheckCircle2 size={16} className="text-emerald-500 flex-shrink-0" />
+                <span className="fomo-rules-pillar-title">Tiêu Chí Đánh Giá</span>
+                <span className="sr-only">Tiêu Chí Đánh Giá:</span>
               </div>
+              <p className="fomo-rules-pillar-text">
+                Bạn sẽ được xếp hạng dựa trên <em>Điểm Kháng FOMO</em> và <em>Hiệu suất PnL</em>.
+              </p>
             </div>
           </div>
         </div>
 
-        {/* 4 Thẻ Nội Dung (Grid 2 cột) */}
-        <div
-          className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm"
-          style={{
-            display: "grid",
-            gap: "1rem",
-            fontSize: "0.875rem",
-          }}
-        >
-          {/* Bước 1: 7 Vòng Đấu Sinh Tử */}
-          <div
-            className="p-4 rounded-xl bg-slate-50 border border-slate-200/80"
-            style={{
-              padding: "1rem",
-              borderRadius: "0.75rem",
-              backgroundColor: "#f8fafc",
-              border: "1px solid rgba(226, 232, 240, 0.85)",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              gap: "0.75rem",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <span
-                style={{
-                  fontSize: "0.75rem",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  color: "#1d4ed8",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.35rem",
-                }}
-              >
-                <Clock size={15} className="text-blue-600" />
-                BƯỚC 1
+        {/* 3. 4 Thẻ Nội Dung (Grid 2x2) */}
+        <div className="fomo-rules-quad-grid">
+          {/* BƯỚC 1: 7 Vòng Đấu Sinh Tử */}
+          <div className="fomo-rules-step-card fomo-rules-card-blue">
+            <div className="fomo-rules-step-header">
+              <span className="fomo-rules-step-tag fomo-rules-tag-blue">
+                <Clock size={14} />
+                <span>BƯỚC 1</span>
               </span>
-              <span
-                className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-medium"
-                style={{
-                  fontSize: "0.75rem",
-                  backgroundColor: "#dbeafe",
-                  color: "#1d4ed8",
-                  padding: "0.125rem 0.5rem",
-                  borderRadius: "0.25rem",
-                  fontWeight: 600,
-                }}
-              >
+              <span className="fomo-rules-badge-pill fomo-rules-pill-blue">
                 45s/vòng
               </span>
             </div>
 
             <div>
-              <h3
-                style={{
-                  fontSize: "0.95rem",
-                  fontWeight: 700,
-                  color: "#0f172a",
-                  margin: "0 0 0.35rem 0",
-                }}
-              >
+              <h3 className="fomo-rules-step-title">
                 ⏱️ 7 Vòng Đấu Sinh Tử
               </h3>
-              <p style={{ color: "#475569", lineHeight: 1.5, margin: 0, fontSize: "0.8125rem" }}>
+              <p className="fomo-rules-step-desc">
                 Hành trình tâm lý: <strong>Tích lũy → Đỉnh FOMO → Bẫy Margin → Bull-trap → Tắt thanh khoản → Bắt đáy → Phân hóa</strong>.
               </p>
             </div>
 
-            <div
-              style={{
-                fontSize: "0.75rem",
-                color: "#64748b",
-                paddingTop: "0.5rem",
-                borderTop: "1px solid #e2e8f0",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.35rem",
-              }}
-            >
-              <CheckCircle2 size={13} style={{ color: "#2563eb", flexShrink: 0 }} />
-              <span>4 pha: Đọc tin 10s → Đặt lệnh 20s → Né bẫy 10s → Khớp sàn 5s.</span>
+            <div className="fomo-rules-sub-box">
+              <Clock size={14} className="text-blue-600 flex-shrink-0" />
+              <span>
+                <strong>4 pha:</strong> Đọc tin 10s → Đặt lệnh 20s → Né bẫy 10s → Khớp sàn 5s.
+              </span>
             </div>
           </div>
 
-          {/* Bước 2: Quản Lý Vốn 10.000.000 VND Ảo */}
-          <div
-            className="p-4 rounded-xl bg-slate-50 border border-slate-200/80"
-            style={{
-              padding: "1rem",
-              borderRadius: "0.75rem",
-              backgroundColor: "#f8fafc",
-              border: "1px solid rgba(226, 232, 240, 0.85)",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              gap: "0.75rem",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <span
-                style={{
-                  fontSize: "0.75rem",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  color: "#047857",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.35rem",
-                }}
-              >
-                <Coins size={15} className="text-emerald-600" />
-                BƯỚC 2
+          {/* BƯỚC 2: Quản Lý Vốn 10.000.000 VND Ảo */}
+          <div className="fomo-rules-step-card fomo-rules-card-emerald">
+            <div className="fomo-rules-step-header">
+              <span className="fomo-rules-step-tag fomo-rules-tag-emerald">
+                <Coins size={14} />
+                <span>BƯỚC 2</span>
               </span>
-              <span
-                className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded font-semibold"
-                style={{
-                  fontSize: "0.75rem",
-                  backgroundColor: "#d1fae5",
-                  color: "#047857",
-                  padding: "0.125rem 0.5rem",
-                  borderRadius: "0.25rem",
-                  fontWeight: 700,
-                }}
-              >
+              <span className="fomo-rules-badge-pill fomo-rules-pill-emerald font-mono">
                 10.000.000 đ
               </span>
             </div>
 
             <div>
-              <h3
-                style={{
-                  fontSize: "0.95rem",
-                  fontWeight: 700,
-                  color: "#0f172a",
-                  margin: "0 0 0.35rem 0",
-                }}
-              >
+              <h3 className="fomo-rules-step-title">
                 💵 Quản Lý Vốn 10.000.000 VND Ảo
               </h3>
-              <p style={{ color: "#475569", lineHeight: 1.5, margin: 0, fontSize: "0.8125rem" }}>
+              <p className="fomo-rules-step-desc">
                 Phí giao dịch thực tế <strong>0.15%/lệnh</strong>, Lãi vay margin <strong>0.1%/vòng</strong> (mở từ Vòng 3).
               </p>
             </div>
 
-            <div
-              style={{
-                fontSize: "0.75rem",
-                color: "#64748b",
-                paddingTop: "0.5rem",
-                borderTop: "1px solid #e2e8f0",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.35rem",
-              }}
-            >
-              <Percent size={13} style={{ color: "#059669", flexShrink: 0 }} />
-              <span>Phím tắt Quick Buy: 25%, 50%, 100% ALL-IN để tối ưu tốc độ.</span>
+            <div className="fomo-rules-sub-box">
+              <Percent size={14} className="text-emerald-600 flex-shrink-0" />
+              <span>
+                Phím tắt Quick Buy: 25%, 50%, 100% ALL-IN để tối ưu tốc độ.
+              </span>
             </div>
           </div>
 
-          {/* Bước 3: Ranh Giới Cháy Tài Khoản (Stop-Out) */}
-          <div
-            className="p-4 rounded-xl bg-rose-50/70 border border-rose-200"
-            style={{
-              padding: "1rem",
-              borderRadius: "0.75rem",
-              backgroundColor: "rgba(255, 241, 242, 0.75)",
-              border: "1px solid #fecdd3",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              gap: "0.75rem",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <span
-                style={{
-                  fontSize: "0.75rem",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  color: "#be123c",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.35rem",
-                }}
-              >
-                <AlertTriangle size={15} className="text-rose-600" />
-                BƯỚC 3
+          {/* BƯỚC 3: Ranh Giới Cháy Tài Khoản (Stop-Out) */}
+          <div className="fomo-rules-step-card fomo-rules-card-rose">
+            <div className="fomo-rules-step-header">
+              <span className="fomo-rules-step-tag fomo-rules-tag-rose">
+                <AlertTriangle size={14} />
+                <span>BƯỚC 3</span>
               </span>
-              <span
-                className="text-xs bg-rose-100 text-rose-700 px-2 py-0.5 rounded font-bold uppercase"
-                style={{
-                  fontSize: "0.75rem",
-                  backgroundColor: "#ffe4e6",
-                  color: "#be123c",
-                  padding: "0.125rem 0.5rem",
-                  borderRadius: "0.25rem",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                }}
-              >
-                Báo động đỏ
+              <span className="fomo-rules-badge-pill fomo-rules-pill-rose">
+                BÁO ĐỘNG ĐỎ
               </span>
             </div>
 
             <div>
-              <h3
-                style={{
-                  fontSize: "0.95rem",
-                  fontWeight: 700,
-                  color: "#9f1239",
-                  margin: "0 0 0.35rem 0",
-                }}
-              >
+              <h3 className="fomo-rules-step-title text-rose-900">
                 ⚠️ Ranh Giới Cháy Tài Khoản (Stop-Out)
               </h3>
-              <p style={{ color: "#881337", lineHeight: 1.5, margin: 0, fontSize: "0.8125rem" }}>
-                Kích hoạt Call Margin &amp; Cắt lỗ cưỡng bức khi <strong>NAV ≤ 5.000.000 VND</strong> (-50% vốn) hoặc <strong>Equity &lt; 20%</strong> tổng tài sản.
+              <p className="fomo-rules-step-desc text-rose-950">
+                Kích hoạt Call Margin &amp; Cắt lỗ cưỡng bức khi <strong className="text-rose-700">NAV ≤ 5.000.000 VND</strong> (-50% vốn) hoặc <strong className="text-rose-700">Equity &lt; 20%</strong> tổng tài sản.
               </p>
-            </div>
-
-            <div
-              style={{
-                fontSize: "0.75rem",
-                color: "#be123c",
-                fontWeight: 600,
-                paddingTop: "0.5rem",
-                borderTop: "1px solid #fecdd3",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.35rem",
-              }}
-            >
-              <ShieldAlert size={13} style={{ color: "#e11d48", flexShrink: 0 }} />
-              <span>Chạm ngưỡng Stop-Out → Buộc dừng cuộc chơi ngay (GAME OVER)!</span>
             </div>
           </div>
 
-          {/* Bước 4: Điều Kiện Mở Khóa Map 2 (Pro Room) */}
-          <div
-            className="p-4 rounded-xl bg-amber-50/70 border border-amber-200"
-            style={{
-              padding: "1rem",
-              borderRadius: "0.75rem",
-              backgroundColor: "rgba(255, 251, 235, 0.75)",
-              border: "1px solid #fde68a",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              gap: "0.75rem",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <span
-                style={{
-                  fontSize: "0.75rem",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  color: "#92400e",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.35rem",
-                }}
-              >
-                <Trophy size={15} className="text-amber-600" />
-                BƯỚC 4
+          {/* BƯỚC 4: Điều Kiện Mở Khóa Map 2 (Pro Room) */}
+          <div className="fomo-rules-step-card fomo-rules-card-amber">
+            <div className="fomo-rules-step-header">
+              <span className="fomo-rules-step-tag fomo-rules-tag-amber">
+                <Trophy size={14} />
+                <span>BƯỚC 4</span>
               </span>
-              <span
-                className="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-medium"
-                style={{
-                  fontSize: "0.75rem",
-                  backgroundColor: "#fef3c7",
-                  color: "#92400e",
-                  padding: "0.125rem 0.5rem",
-                  borderRadius: "0.25rem",
-                  fontWeight: 600,
-                }}
-              >
+              <span className="fomo-rules-badge-pill fomo-rules-pill-amber">
                 Vinh danh
               </span>
             </div>
 
             <div>
-              <h3
-                style={{
-                  fontSize: "0.95rem",
-                  fontWeight: 700,
-                  color: "#78350f",
-                  margin: "0 0 0.35rem 0",
-                }}
-              >
+              <h3 className="fomo-rules-step-title text-amber-950">
                 🏆 Điều Kiện Mở Khóa Map 2 (Pro Room)
               </h3>
-              <p style={{ color: "#78350f", lineHeight: 1.5, margin: 0, fontSize: "0.8125rem" }}>
-                Đồng thời thỏa mãn: Sống sót qua <strong>toàn bộ 7 vòng</strong> + Lợi nhuận <strong>ROI &gt; +5%</strong> + Điểm Kỷ luật ≥ <strong>50/100</strong>. Nhận huy hiệu <strong>"Sống sót qua bão FOMO"</strong>.
+              <p className="fomo-rules-step-desc text-amber-900">
+                Đồng thời thỏa mãn: Sống sót qua <strong>toàn bộ 7 vòng</strong> + Lợi nhuận <strong className="text-emerald-700">ROI &gt; +5%</strong> + Điểm Kỷ luật <strong>≥ 50/100</strong>. Nhận huy hiệu <strong>“Sống sót qua bão FOMO”</strong>.
               </p>
-            </div>
-
-            <div
-              style={{
-                fontSize: "0.75rem",
-                color: "#92400e",
-                fontWeight: 600,
-                paddingTop: "0.5rem",
-                borderTop: "1px solid #fde68a",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.35rem",
-              }}
-            >
-              <TrendingUp size={13} style={{ color: "#d97706", flexShrink: 0 }} />
-              <span>Chính thức mở khóa Map 2: Chu kỳ kinh tế vĩ mô 12 Quý.</span>
             </div>
           </div>
         </div>
 
-        {/* Footer Nút Bấm Hành Động */}
-        <div
-          className="flex items-center justify-end gap-3 pt-4 mt-6 border-t border-slate-100"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-end",
-            gap: "0.75rem",
-            paddingTop: "1rem",
-            marginTop: "1.25rem",
-            borderTop: "1px solid #f1f5f9",
-          }}
-        >
-          {/* Nút Thứ Cấp (Secondary) */}
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-medium hover:bg-slate-50 transition-colors text-sm"
-            style={{
-              padding: "0.625rem 1.25rem",
-              borderRadius: "0.75rem",
-              border: "1px solid #cbd5e1",
-              backgroundColor: "#ffffff",
-              color: "#334155",
-              fontWeight: 600,
-              fontSize: "0.875rem",
-              cursor: "pointer",
-            }}
-          >
-            {mode === "scenario" ? "Đóng / Quay lại chọn kịch bản" : "Đóng để xem lại sau"}
-          </button>
+        {/* 4. Footer Nút Bấm Hành Động */}
+        <div className="fomo-rules-footer">
+          {/* Checkbox Ghi Nhớ Bên Trái */}
+          <label className="fomo-rules-remember-label">
+            <input
+              type="checkbox"
+              checked={rememberRules}
+              onChange={(e) => setRememberRules(e.target.checked)}
+              className="fomo-rules-checkbox"
+            />
+            <span>Ghi nhớ quy tắc này cho các phiên sau</span>
+          </label>
 
-          {/* Nút Chính (Primary CTA) */}
-          <button
-            type="button"
-            onClick={handlePrimaryAction}
-            className="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-semibold shadow-md shadow-blue-500/20 hover:bg-blue-700 active:scale-[0.98] transition-all text-sm flex items-center gap-2"
-            style={{
-              padding: "0.625rem 1.5rem",
-              borderRadius: "0.75rem",
-              border: "none",
-              backgroundColor: "#2563eb",
-              color: "#ffffff",
-              fontWeight: 700,
-              fontSize: "0.875rem",
-              boxShadow: "0 4px 14px 0 rgba(37, 99, 235, 0.25)",
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              cursor: "pointer",
-            }}
-          >
-            <span>
-              {mode === "scenario"
-                ? "ĐÃ HIỂU LUẬT — TIẾP TỤC CHỌN KỊCH BẢN 🚀"
-                : "ĐÃ HIỂU LUẬT — CHỌN KỊCH BẢN MÔ PHỎNG 🚀"}
-            </span>
-            <ArrowRight size={16} />
-          </button>
+          {/* Nút Hành Động Bên Phải */}
+          <div className="fomo-rules-actions-right">
+            <button
+              type="button"
+              onClick={onClose}
+              className="fomo-rules-secondary-btn"
+              aria-label={secondaryBtnLabel}
+            >
+              {secondaryBtnLabel}
+            </button>
+
+            <button
+              type="button"
+              onClick={handlePrimaryAction}
+              className="fomo-rules-primary-btn"
+            >
+              <span>
+                {mode === "scenario"
+                  ? "ĐÃ HIỂU LUẬT — TIẾP TỤC CHỌN KỊCH BẢN 🚀"
+                  : "ĐÃ HIỂU LUẬT — CHỌN KỊCH BẢN MÔ PHỎNG 🚀"}
+              </span>
+              <ArrowRight size={16} />
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -628,4 +288,3 @@ export const FomoTutorialModal: React.FC<FomoTutorialModalProps> = ({
 
 // Backwards compatibility alias for FomoRulesModal
 export const FomoRulesModal = FomoTutorialModal;
-

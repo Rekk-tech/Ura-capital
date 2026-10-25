@@ -50,16 +50,17 @@ export class AdminService {
   }
 
   /**
-   * Updates user role between LEARNER and ADMIN.
+   * Updates user role among canonical roles (LEARNER, BROKER, MODERATOR, SYSTEM_ADMIN, ADMIN, USER).
    * Dual-layer Self-Demotion Guard: Rejects any attempt where actorId === targetUserId
-   * from removing their own ADMIN role.
+   * from removing their own administrative role.
    */
   async updateUserRole(
     actorId: string,
     targetUserId: string,
-    roleName: "LEARNER" | "ADMIN",
+    roleName: "LEARNER" | "BROKER" | "MODERATOR" | "SYSTEM_ADMIN" | "ADMIN" | "USER",
   ) {
-    if (roleName !== "ADMIN" && actorId === targetUserId) {
+    const isTargetAdminRole = roleName === "SYSTEM_ADMIN" || roleName === "ADMIN";
+    if (!isTargetAdminRole && actorId === targetUserId) {
       throw new AppError(
         "Administrators cannot revoke their own administrator role.",
         "CANNOT_DEMOTE_SELF" as unknown as ErrorCode,

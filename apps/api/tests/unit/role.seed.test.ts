@@ -29,14 +29,15 @@ describe("Role Seed & Operational Provisioning (Unit)", () => {
     };
 
     const result1 = await seedCanonicalRoles(mockRoleRepo);
-    expect(result1.roles).toHaveLength(2);
+    expect(result1.roles).toHaveLength(6);
     expect(result1.roles.map((r) => r.name)).toContain(ROLES.USER);
     expect(result1.roles.map((r) => r.name)).toContain(ROLES.ADMIN);
+    expect(result1.roles.map((r) => r.name)).toContain(ROLES.BROKER);
 
     // Repeated call should succeed idempotently
     const result2 = await seedCanonicalRoles(mockRoleRepo);
-    expect(result2.roles).toHaveLength(2);
-    expect(mockRoleRepo.ensureRoleExists).toHaveBeenCalledTimes(4); // 2 per run
+    expect(result2.roles).toHaveLength(6);
+    expect(mockRoleRepo.ensureRoleExists).toHaveBeenCalledTimes(12); // 6 per run
   });
 
   it("operational provisioning assigns canonical role to existing user", async () => {

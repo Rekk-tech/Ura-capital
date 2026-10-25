@@ -43,9 +43,12 @@ export const AdminRouteGuard: React.FC<AdminRouteGuardProps> = ({ children }) =>
     return <Navigate to={`/login?returnTo=${returnTo}`} replace />;
   }
 
-  // Authoritative check against user role - only durable ADMIN role is admitted
-  const isAdmin = user?.role === "ADMIN";
-  if (!isAdmin) {
+  // Authoritative check against user role - admits SYSTEM_ADMIN, ADMIN, and MODERATOR
+  const isAuthorized =
+    user?.role === "SYSTEM_ADMIN" ||
+    user?.role === "ADMIN" ||
+    user?.role === "MODERATOR";
+  if (!isAuthorized) {
     return (
       <main
         className="auth-guard-container"

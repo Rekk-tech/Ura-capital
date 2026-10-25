@@ -180,11 +180,78 @@ Thanh điều hướng chính của Aura Capital (`AppHeader`) được tổ ch�
 | **Trợ Lý AI Aura Coach** | Nút tròn nổi góc phải dưới màn hình (`AiCoachFab`) & `/ai` | Giải đáp thắc mắc tài chính, phản biện ý tưởng đầu tư, phân tích rủi ro danh mục 24/7. |
 | **Hồ Sơ Cá Nhân (`/profile`)** | Menu Avatar góc trên bên phải | Cập nhật thông tin nhà đầu tư, trường phái đầu tư, tiến trình danh hiệu và kinh nghiệm XP. |
 | **Cài Đặt Tài Khoản (`/account`)** | Menu Avatar góc trên bên phải | Quản lý thông tin đăng nhập, đổi mật khẩu mã hóa Argon2id và các phiên hoạt động. |
-| **Bàn Quản Trị Hệ Thống (`/admin`)** | Hiển thị riêng cho tài khoản có quyền `ADMIN` | Quản lý học viên, duyệt hồ sơ Broker, kiểm duyệt nội dung cộng đồng và kiểm tra Audit Log. |
+| **Bàn Quản Trị Hệ Thống (`/admin`)** | Dành cho `MODERATOR` (kiểm duyệt) & `SYSTEM_ADMIN` (toàn quyền) | Quản lý người dùng, duyệt CCHN Broker, kiểm duyệt nội dung, quản trị phiên giả lập và tra cứu Audit Log. |
 
 ---
 
-## 5. Nhận Diện Thương Hiệu & Logo Mới (Brand Identity)
+## 5. Kiến Trúc 5 Vai Trò & Ma Trận Phân Quyền (RBAC & Segregation of Duties)
+
+Để hệ sinh thái Aura Capital (bao gồm cả dịch vụ Broker Hub mới) vận hành chặt chẽ, minh bạch và không bị chồng chéo quyền hạn, hệ thống được phân chia thành **5 Vai trò (Roles)** theo nguyên tắc **Phân tách trách nhiệm (Segregation of Duties - SoD)**:
+
+### 5.1. Định Nghĩa 5 Vai Trò Trong Hệ Sinh Thái
+
+1. **GUEST (Khách vãng lai — Chưa đăng nhập)**:
+   - Xem trang chủ, đọc giới thiệu danh mục khóa học, xem bảng tin cộng đồng ở chế độ chỉ đọc (Read-only), và xem danh sách hồ sơ uy tín của các Broker để tham khảo trước khi tạo tài khoản. Không có quyền ghi hoặc tích lũy dữ liệu.
+2. **LEARNER (Học viên / Nhà đầu tư F0 — Mặc định sau khi xác thực OTP)**:
+   - Học các khóa học trên Aura Academy, thi đấu giả lập tại Map 1 (FOMO Arena) và Map 2 (Pro Room), quản lý danh mục ảo, thảo luận trên Cộng đồng, đăng ký tham gia vào các Phòng tư vấn (Broker Room) và đánh giá (Review) chất lượng Broker.
+3. **BROKER (Chuyên gia / Môi giới đã xác thực — Verified Creator)**:
+   - Kế thừa toàn bộ quyền của LEARNER, đồng thời được cấp quyền mở và quản trị Phòng Đầu Tư Độc Quyền (Broker Room) của riêng mình trên Broker Hub.
+   - Chỉ được đăng khóa học, tài liệu và bài nhận định bên trong phạm vi Room của chính mình (tuyệt đối không được sửa đổi các khóa học gốc trên Aura Academy của hệ thống). Được phép tạo kịch bản thực chiến riêng cho thành viên trong Room.
+4. **MODERATOR (Biên tập viên Học thuật & Kiểm duyệt viên Nội dung)**:
+   - Chịu trách nhiệm quản lý chất lượng chuyên môn: Soạn thảo và cập nhật các khóa học chính thống trên Aura Academy, xử lý các bài viết/bình luận bị gắn cờ báo cáo trên Cộng đồng, và kiểm duyệt nội dung bài giảng của Broker (chặn hành vi phím hàng rác, cam kết lợi nhuận sai quy định). Được quyền tạm khóa (mute) người dùng vi phạm tối đa 24h.
+5. **SYSTEM_ADMIN (Quản trị viên Hệ thống Tối cao)**:
+   - Nắm quyền quản trị vận hành, tài khoản, phân quyền vai trò (`LEARNER` ↔ `BROKER` ↔ `MODERATOR`), duyệt hồ sơ chứng chỉ hành nghề UBCKNN để cấp tích xanh cho BROKER, giám sát máy chủ giả lập, quản trị biểu phí gói cước sàn và tra cứu Nhật ký kiểm toán bất biến (Immutable Audit Logs).
+
+---
+
+### 5.2. Ma Trận Phân Quyền Chi Tiết Theo Từng Phân Hệ (RBAC Matrix)
+
+| Nghiệp Vụ / Chức Năng Cụ Thể | GUEST | LEARNER | BROKER | MODERATOR | SYSTEM_ADMIN |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **1. Học Viện Chính Thống (`Aura Academy`)** | | | | | |
+| Xem danh mục khóa học & đọc bài mở đầu | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Học toàn bộ bài, lật Flashcard, làm Quiz nhận XP | ❌ | ✅ | ✅ | ✅ | ✅ |
+| Đăng mới / Chỉnh sửa khóa học gốc của hệ thống | ❌ | ❌ | ❌ | ✅ *(Chính)* | ✅ |
+| **2. Phòng Chuyên Gia (`Broker Hub`)** | | | | | |
+| Xem Hồ sơ tín nhiệm & Chứng chỉ của Broker | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Nộp hồ sơ (Chứng chỉ UBCKNN + eKYC) xin lên Broker | ❌ | ✅ | ➖ | ❌ | ❌ |
+| Duyệt hồ sơ & Cấp tích xanh mở quyền BROKER | ❌ | ❌ | ❌ | ❌ | ✅ *(Duy nhất)* |
+| Tạo Room riêng, đăng khóa học/nhận định trong Room | ❌ | ❌ | ✅ *(Room mình)* | ❌ | ❌ |
+| Mua vé vào Room của Broker & chấm điểm Review | ❌ | ✅ | ✅ | ❌ | ❌ |
+| Kiểm duyệt / Gỡ bài giảng Broker vi phạm quy chế | ❌ | ❌ | ❌ | ✅ *(Chính)* | ✅ |
+| **3. Đấu Trường Giả Lập (`Map 1 & Map 2`)** | | | | | |
+| Tham gia thi đấu Map 1 & mở khóa Map 2 | ❌ | ✅ | ✅ | ✅ | ✅ |
+| Tạo kịch bản bài tập thực chiến cho học viên trong Room | ❌ | ❌ | ✅ | ✅ | ✅ |
+| Giám sát phiên lỗi & Reset phiên bị treo (`/admin`) | ❌ | ❌ | ❌ | ❌ | ✅ *(Duy nhất)* |
+| **4. Diễn Đàn Cộng Đồng (`/community`)** | | | | | |
+| Xem bài thảo luận & Bảng xếp hạng | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Đăng bài viết, bình luận, thả tim & báo cáo (Report) | ❌ | ✅ | ✅ | ✅ | ✅ |
+| Xử lý hàng đợi báo cáo, ẩn bài/bình luận vi phạm | ❌ | ❌ | *(Chỉ trong Room mình)* | ✅ *(Toàn sàn)* | ✅ |
+| **5. Quản Lý Tài Khoản & Hệ Thống (`/admin`)** | | | | | |
+| Khóa / Mở khóa (Suspend / Activate) người dùng | ❌ | ❌ | ❌ | *(Tạm khóa 24h)* | ✅ *(Toàn quyền)* |
+| Thay đổi Role (`LEARNER` ↔ `BROKER` ↔ `MODERATOR`) | ❌ | ❌ | ❌ | ❌ | ✅ *(Duy nhất)* |
+| Quản lý gói cước, phí duy trì Room & đối soát doanh thu | ❌ | ❌ | *(Xem doanh thu Room)* | ❌ | ✅ *(Duy nhất)* |
+| Xem Nhật ký Kiểm toán bất biến (`Immutable Audit Logs`) | ❌ | ❌ | ❌ | ❌ | ✅ *(Duy nhất)* |
+
+---
+
+## 6. Bốn Nguyên Tắc Logic Cốt Lõi Vận Hành Hệ Thống
+
+1. **Tách Biệt Rạch Ròi 2 Luồng "Đăng Khóa Học"**:
+   - **Khóa học tại tab Khóa Học (`/academy`)**: Giáo trình học thuật chuẩn mực của Aura Capital $\rightarrow$ Chỉ có `MODERATOR` và `SYSTEM_ADMIN` mới có quyền tạo/sửa.
+   - **Khóa học tại tab Broker Hub (`/broker-hub`)**: Tài liệu, video và chiến lược riêng của từng chuyên gia $\rightarrow$ `BROKER` tự đăng trong Room của mình, chịu sự hậu kiểm của `MODERATOR`.
+2. **Quy Trình 2 Chốt Chặn Đối Với BROKER (Chống "Lùa Gà")**:
+   - **Chốt chặn 1 (Đầu vào — do `SYSTEM_ADMIN` nắm)**: Người dùng muốn mở Room thu phí bắt buộc phải nộp ảnh chụp Chứng chỉ hành nghề UBCKNN và giấy tờ tùy thân (eKYC). Chỉ khi `SYSTEM_ADMIN` duyệt thì tài khoản mới chuyển từ `LEARNER` sang `BROKER`.
+   - **Chốt chặn 2 (Vận hành — do `MODERATOR` nắm)**: Mọi bài đăng, khóa học trong Room nếu bị học viên báo cáo vi phạm hoặc quét thấy từ khóa cam kết lãi 100%, lôi kéo nạp tiền ngoài luồng sẽ lập tức chuyển về tab Kiểm Duyệt của `MODERATOR` để xử lý ẩn bài hoặc đề xuất khóa Room.
+3. **Quy Tắc Bảo Vệ Chéo Trong Quản Lý Tài Khoản (Account Governance)**:
+   - `SYSTEM_ADMIN` không thể tự khóa (Suspend) hoặc tự hạ quyền của chính mình (chống self-lockout).
+   - `MODERATOR` chỉ được quyền ẩn bài viết rác hoặc tạm khóa/cấm ngôn (mute) tài khoản spam tối đa 24 giờ, tuyệt đối không được can thiệp vào số dư danh mục hay phân quyền vai trò hệ thống.
+4. **Mọi Thao Tác Quyền Lực Đều Phải Lưu Vết (Audit Log)**:
+   - Bất kỳ khi nào `SYSTEM_ADMIN` duyệt một Broker mới, thay đổi trạng thái tài khoản, hoặc `MODERATOR` ẩn bài viết/khóa học, hệ thống tự động ghi 1 dòng bất biến vào bảng `AuditLog` (*Ai làm, làm lúc nào, tài nguyên nào, lý do là gì*).
+
+---
+
+## 7. Nhận Diện Thương Hiệu & Logo Mới (Brand Identity)
 
 - **Biểu tượng Monogram AC**:
   - Chữ **A** (Aura Blue `#1D6FF2`): Biểu trưng cho sự vững chắc, chuẩn mực định chế, độ chính xác và tính bảo mật của nền tảng.
@@ -193,7 +260,7 @@ Thanh điều hướng chính của Aura Capital (`AppHeader`) được tổ ch�
 
 ---
 
-## 6. Tiêu Chuẩn Sản Phẩm Production (Production Standards)
+## 8. Tiêu Chuẩn Sản Phẩm Production (Production Standards)
 
 1. **Loại bỏ nhãn thử nghiệm (MVP-free)**:
    - Toàn bộ nhãn `v0.9.0-mvp` được nâng cấp chính thức lên `Phiên bản v1.0.0 · Production`.
@@ -202,3 +269,4 @@ Thanh điều hướng chính của Aura Capital (`AppHeader`) được tổ ch�
    - `100%` TypeScript type-safety (0 compilation error).
    - `154+` bài kiểm thử tự động (Unit & Integration tests) luôn vượt qua `100%`.
    - Kiến trúc responsive mượt mà trên mọi kích thước màn hình từ điện thoại đến màn hình siêu rộng (Ultra-wide).
+

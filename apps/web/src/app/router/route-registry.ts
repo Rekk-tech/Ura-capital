@@ -62,6 +62,7 @@ export const CANONICAL_ROUTES = {
   SETTINGS: "/settings",
   LOGIN: "/login",
   REGISTER: "/register",
+  ROLE_GATEWAY: "/auth/role-gateway",
   ADMIN: "/admin",
   ADMIN_USERS: "/admin/users",
   ADMIN_MODERATION: "/admin/moderation",
@@ -89,6 +90,7 @@ export type RouteKey =
   | "settings"
   | "login"
   | "register"
+  | "roleGateway"
   | "admin"
   | "adminUsers"
   | "adminModeration"
@@ -299,6 +301,18 @@ export const ROUTE_REGISTRY: Record<RouteKey, RouteMetadata> = {
     isNavVisible: false,
     section: "account",
     owningFeature: "FEAT-071",
+  },
+  roleGateway: {
+    id: "roleGateway",
+    path: CANONICAL_ROUTES.ROLE_GATEWAY,
+    title: "Xác Nhận Vai Trò & Phân Quyền",
+    description: "Cổng xác nhận vai trò và lựa chọn không gian làm việc theo nguyên tắc SoD.",
+    navLabel: "Role Gateway",
+    status: "AVAILABLE",
+    requiresAuth: true,
+    isNavVisible: false,
+    section: "account",
+    owningFeature: "FEAT-088",
   },
   admin: {
     id: "admin",

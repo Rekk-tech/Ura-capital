@@ -32,6 +32,7 @@ describe("Route Registry (FEAT-070 / AC-001)", () => {
     expect(paths).toContain("/ai");
     expect(paths).toContain("/broker-hub");
     expect(paths).toContain("/broker-hub/rooms/:roomId");
+    expect(paths).toContain("/auth/role-gateway");
   });
 
   it("identifies primary navigation routes accurately", () => {

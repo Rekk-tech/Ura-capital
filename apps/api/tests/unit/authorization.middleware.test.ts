@@ -123,4 +123,83 @@ describe("Authorization Middleware Primitives (Unit)", () => {
       [ROLES.ADMIN, ROLES.USER],
     );
   });
+
+  describe("5-Role Ecosystem Segregation of Duties Matrix", () => {
+    it("enforces MODERATOR role for content review gates", async () => {
+      const mockAuthService: IAuthorizationService = {
+        getUserRoles: vi.fn().mockResolvedValue([ROLES.MODERATOR]),
+        buildAuthorizationContext: vi.fn().mockResolvedValue({
+          user: sampleUser,
+          roles: [ROLES.MODERATOR],
+        }),
+        hasRole: vi.fn().mockReturnValue(true),
+        hasAnyRole: vi.fn(),
+      };
+
+      const middleware = requireRole(ROLES.MODERATOR, mockAuthService);
+      const req = { user: sampleUser } as AuthorizedRequest;
+      const next = vi.fn();
+
+      await middleware(req, mockRes, next);
+      expect(next).toHaveBeenCalledWith();
+    });
+
+    it("enforces BROKER role for exclusive room content operations", async () => {
+      const mockAuthService: IAuthorizationService = {
+        getUserRoles: vi.fn().mockResolvedValue([ROLES.BROKER]),
+        buildAuthorizationContext: vi.fn().mockResolvedValue({
+          user: sampleUser,
+          roles: [ROLES.BROKER],
+        }),
+        hasRole: vi.fn().mockReturnValue(true),
+        hasAnyRole: vi.fn(),
+      };
+
+      const middleware = requireRole(ROLES.BROKER, mockAuthService);
+      const req = { user: sampleUser } as AuthorizedRequest;
+      const next = vi.fn();
+
+      await middleware(req, mockRes, next);
+      expect(next).toHaveBeenCalledWith();
+    });
+
+    it("enforces SYSTEM_ADMIN role for credential approvals", async () => {
+      const mockAuthService: IAuthorizationService = {
+        getUserRoles: vi.fn().mockResolvedValue([ROLES.SYSTEM_ADMIN]),
+        buildAuthorizationContext: vi.fn().mockResolvedValue({
+          user: sampleUser,
+          roles: [ROLES.SYSTEM_ADMIN],
+        }),
+        hasRole: vi.fn().mockReturnValue(true),
+        hasAnyRole: vi.fn(),
+      };
+
+      const middleware = requireRole(ROLES.SYSTEM_ADMIN, mockAuthService);
+      const req = { user: sampleUser } as AuthorizedRequest;
+      const next = vi.fn();
+
+      await middleware(req, mockRes, next);
+      expect(next).toHaveBeenCalledWith();
+    });
+
+    it("allows both MODERATOR and SYSTEM_ADMIN for Academy course publishing", async () => {
+      const mockAuthService: IAuthorizationService = {
+        getUserRoles: vi.fn().mockResolvedValue([ROLES.MODERATOR]),
+        buildAuthorizationContext: vi.fn().mockResolvedValue({
+          user: sampleUser,
+          roles: [ROLES.MODERATOR],
+        }),
+        hasRole: vi.fn(),
+        hasAnyRole: vi.fn().mockReturnValue(true),
+      };
+
+      const middleware = requireAnyRole([ROLES.MODERATOR, ROLES.SYSTEM_ADMIN], mockAuthService);
+      const req = { user: sampleUser } as AuthorizedRequest;
+      const next = vi.fn();
+
+      await middleware(req, mockRes, next);
+      expect(next).toHaveBeenCalledWith();
+    });
+  });
 });
+

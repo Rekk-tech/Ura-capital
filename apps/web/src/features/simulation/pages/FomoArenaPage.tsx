@@ -9,9 +9,9 @@ import { FomoOrderTicket } from "../components/map1/FomoOrderTicket";
 import { FomoTrapQuizModal } from "../components/map1/FomoTrapQuizModal";
 import { FomoTutorialModal } from "../components/map1/FomoTutorialModal";
 import { FomoDebriefView } from "../components/map1/FomoDebriefView";
-import { Play, ArrowLeft, RefreshCw, AlertTriangle } from "lucide-react";
+import { Play, ArrowLeft, RefreshCw, AlertTriangle, Check, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
-import { FOMO_SCENARIOS } from "../data/simulation-scenarios-store";
+import { FOMO_SCENARIOS, FomoScenarioDefinition } from "../data/simulation-scenarios-store";
 
 export const FomoArenaPage: React.FC = () => {
   const { accessToken } = useAuth();
@@ -34,6 +34,15 @@ export const FomoArenaPage: React.FC = () => {
   const [activeTrapQuizClosedForRound, setActiveTrapQuizClosedForRound] = useState<number | null>(null);
   const [liveTickPrice, setLiveTickPrice] = useState<number | null>(null);
   const [selectedScenarioKey, setSelectedScenarioKey] = useState<string>("vix_pump");
+  const [difficultyFilter, setDifficultyFilter] = useState<string>("ALL");
+
+  const selectedScenario: FomoScenarioDefinition =
+    FOMO_SCENARIOS[selectedScenarioKey] ??
+    (Object.values(FOMO_SCENARIOS)[0] as FomoScenarioDefinition);
+  const filteredScenarios = Object.values(FOMO_SCENARIOS).filter((scen) => {
+    if (difficultyFilter === "ALL") return true;
+    return scen.difficulty === difficultyFilter;
+  });
 
   // Determine if trap/quiz modal should pop up
   const isTrapOrQuizPhase = state?.phase === "trap_or_quiz";
@@ -48,8 +57,8 @@ export const FomoArenaPage: React.FC = () => {
         <div className="fixed inset-0 pointer-events-none z-30 fomo-vignette-active" aria-hidden="true" />
       )}
 
-      {/* 1. Nút Quay lại: Đặt riêng ở hàng trên cùng góc trái */}
-      <div className="flex items-center">
+      {/* 1. Top Navigation Bar: Breadcrumb & Room ID Pill */}
+      <div className="fomo-top-nav-row">
         <Link
           to="/simulation"
           className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors"
@@ -57,11 +66,14 @@ export const FomoArenaPage: React.FC = () => {
           <ArrowLeft size={16} />
           <span>Về Sảnh Giả Lập</span>
         </Link>
+        <div className="fomo-room-pill">
+          ROOM_ID: ARENA-VN30-SIM-07
+        </div>
       </div>
 
-      {/* 2. Banner Cảnh Báo (Disclaimer Card): Chỉ hiện ở sảnh chờ, ẩn hoàn toàn khi vào game */}
+      {/* 2. Banner Cảnh Báo (Academic Sandbox Disclaimer): Chỉ hiện ở sảnh chờ, ẩn khi vào game */}
       {(!sessionId || !state) && (
-        <div className="w-full mb-6">
+        <div className="w-full">
           <SimulationDisclosureBanner />
         </div>
       )}
@@ -106,130 +118,330 @@ export const FomoArenaPage: React.FC = () => {
 
       {/* 4. Thẻ Đấu Trường FOMO Arena (Empty State before starting game with Scenario Selector) */}
       {!isLoading && !debrief && !sessionId && (
-        <div className="w-full bg-white rounded-2xl border border-slate-200 p-6 md:p-8 shadow-sm flex flex-col gap-6">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="badge badge-primary text-xs font-bold uppercase tracking-wider">Mô Phỏng Thực Chiến 7 Vòng</span>
-              <span className="text-xs text-slate-500">• 100% Thị Trường Thật</span>
+        <div className="w-full flex flex-col gap-6">
+          {/* Hero Section */}
+          <div className="fomo-arena-hero-wrap">
+            <div className="fomo-arena-badges-row">
+              <span className="fomo-badge-thunder">
+                ⚡ MÔ PHỎNG THỰC CHIẾN 7 VÒNG
+              </span>
+              <span className="fomo-badge-real-market">
+                100% Thị Trường Thật
+              </span>
             </div>
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight whitespace-nowrap">
-              Đấu Trường Tâm Lý — FOMO Arena
+            <h2 className="fomo-arena-title" aria-label="Đấu Trường Tâm Lý — FOMO Arena">
+              <span className="sr-only">Đấu Trường Tâm Lý — FOMO Arena</span>
+              <span aria-hidden="true">Đấu Trường Tâm Lý — </span>
+              <span aria-hidden="true" className="fomo-title-cyan">FOMO Arena</span>
             </h2>
-            <p className="text-slate-600 max-w-3xl leading-relaxed text-sm md:text-base mt-1">
-              Trải nghiệm cảm xúc mua đỉnh bán đáy trong 7 Vòng sinh tử đầy biến động. Học cách giữ vững kỷ luật, né bẫy Bull-trap và bảo toàn vốn sống sót.
+            <p className="fomo-arena-desc">
+              Trải nghiệm cảm xúc mua đỉnh bán đáy trong 7 Vòng sinh tử đầy biến động. Rèn luyện phản xạ cắt lỗ, giữ vững kỷ luật tâm lý trước bẫy Bull-trap và bảo toàn vốn sống sót.
             </p>
           </div>
 
-          {/* Scenario Selection Grid */}
-          <div className="flex flex-col gap-3">
-            <label className="text-xs font-bold uppercase tracking-wider text-slate-500">
-              Chọn Kịch Bản Thị Trường Mô Phỏng:
-            </label>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {Object.values(FOMO_SCENARIOS).map((scen) => {
-                const isSelected = selectedScenarioKey === scen.key;
-                return (
-                  <div
-                    key={scen.key}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => setSelectedScenarioKey(scen.key)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        setSelectedScenarioKey(scen.key);
-                      }
-                    }}
-                    className={`p-4 rounded-xl border text-left cursor-pointer transition-all duration-200 flex flex-col justify-between gap-3 ${
-                      isSelected
-                        ? "border-blue-600 bg-blue-50/50 shadow-sm ring-2 ring-blue-500/20"
-                        : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50"
-                    }`}
-                  >
-                    <div>
-                      <div className="flex items-center justify-between gap-2 mb-1.5">
-                        <span className="font-mono text-xs font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded">
-                          {scen.ticker}
-                        </span>
-                        <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                            scen.difficulty === "Khốc Liệt"
-                              ? "bg-rose-100 text-rose-700"
-                              : scen.difficulty === "Nâng Cao"
-                              ? "bg-teal-100 text-teal-700"
-                              : "bg-amber-100 text-amber-700"
-                          }`}
-                        >
-                          {scen.difficulty}
-                        </span>
-                      </div>
-                      <h4 className="font-bold text-slate-900 text-sm">{scen.name}</h4>
-                      <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
-                        {scen.description}
-                      </p>
-                    </div>
+          {/* 4 Stat Metric Cards */}
+          <div className="fomo-metrics-quad">
+            <div className="fomo-metric-box">
+              <span className="fomo-metric-header">VỐN CẤP KHỞI ĐIỂM</span>
+              <div className="fomo-metric-main">
+                <span>10.000.000</span>
+                <span className="fomo-metric-unit">VND</span>
+              </div>
+            </div>
 
-                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
-                      <span>{scen.expectedVolatility}</span>
-                      <span className={`font-semibold ${isSelected ? "text-blue-600 font-bold" : "text-slate-400"}`}>
-                        {isSelected ? "✓ Đang chọn" : "Chọn kịch bản"}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="fomo-metric-box">
+              <span className="fomo-metric-header">THỜI LƯỢNG MỖI VÒNG</span>
+              <div className="fomo-metric-main">
+                <span>7 Vòng × 45 Giây</span>
+              </div>
+            </div>
+
+            <div className="fomo-metric-box">
+              <span className="fomo-metric-header">CHỈ TIÊU VƯỢT ẢI</span>
+              <div className="fomo-metric-main fomo-metric-green">
+                <span>ROI ≥ +5.0%</span>
+              </div>
+            </div>
+
+            <div className="fomo-metric-box">
+              <span className="fomo-metric-header">TỶ LỆ SỐNG SÓT F0</span>
+              <div className="fomo-metric-main fomo-metric-red">
+                <span>34.2%</span>
+                <span className="fomo-metric-unit">toàn hệ thống</span>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 pt-2">
-            <button
-              type="button"
-              onClick={startNewGame}
-              className="fomo-start-game-btn"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "0.5rem",
-                padding: "0.75rem 1.75rem",
-                backgroundColor: "#2563eb",
-                color: "#ffffff",
-                fontSize: "0.95rem",
-                fontWeight: 700,
-                borderRadius: "0.875rem",
-                border: "none",
-                boxShadow: "0 4px 12px 0 rgba(37, 99, 235, 0.3)",
-                cursor: "pointer",
-                whiteSpace: "nowrap",
-                minHeight: "44px",
-              }}
-            >
-              <Play size={16} fill="currentColor" />
-              <span>Bắt Đầu Vòng 1 Ngay</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowTutorial(true)}
-              className="fomo-view-rules-btn"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "0.5rem",
-                padding: "0.75rem 1.5rem",
-                backgroundColor: "#ffffff",
-                color: "#334155",
-                fontSize: "0.95rem",
-                fontWeight: 600,
-                borderRadius: "0.875rem",
-                border: "1.5px solid #cbd5e1",
-                cursor: "pointer",
-                whiteSpace: "nowrap",
-                minHeight: "44px",
-              }}
-            >
-              <span>Xem Lại Luật Chơi</span>
-            </button>
+          {/* Scenario Selector Header & Filters */}
+          <div className="fomo-scenario-selector-head">
+            <div>
+              <h3 className="fomo-scenario-head-title">
+                CHỌN KỊCH BẢN THỊ TRƯỜNG MÔ PHỎNG:
+              </h3>
+              <p className="fomo-scenario-head-sub">
+                Mỗi kịch bản đại diện cho một mô hình bẫy giá kinh điển của thị trường tài chính
+              </p>
+            </div>
+
+            <div className="fomo-filter-tabs">
+              <button
+                type="button"
+                onClick={() => setDifficultyFilter("ALL")}
+                className={`fomo-filter-tab-btn ${
+                  difficultyFilter === "ALL"
+                    ? "fomo-filter-tab-active"
+                    : "fomo-filter-tab-inactive"
+                }`}
+              >
+                Tất Cả (3)
+              </button>
+              <button
+                type="button"
+                onClick={() => setDifficultyFilter("Trung Bình")}
+                className={`fomo-filter-tab-btn ${
+                  difficultyFilter === "Trung Bình"
+                    ? "fomo-filter-tab-active"
+                    : "fomo-filter-tab-inactive"
+                }`}
+              >
+                Độ Khó: Trung Bình
+              </button>
+              <button
+                type="button"
+                onClick={() => setDifficultyFilter("Khốc Liệt")}
+                className={`fomo-filter-tab-btn ${
+                  difficultyFilter === "Khốc Liệt"
+                    ? "fomo-filter-tab-active"
+                    : "fomo-filter-tab-inactive"
+                }`}
+              >
+                Khốc Liệt
+              </button>
+              <button
+                type="button"
+                onClick={() => setDifficultyFilter("Nâng Cao")}
+                className={`fomo-filter-tab-btn ${
+                  difficultyFilter === "Nâng Cao"
+                    ? "fomo-filter-tab-active"
+                    : "fomo-filter-tab-inactive"
+                }`}
+              >
+                Nâng Cao
+              </button>
+            </div>
+          </div>
+
+          {/* 3 Horizontal Scenario Cards */}
+          <div className="fomo-scenario-cards-list">
+            {filteredScenarios.map((scen) => {
+              const isSelected = selectedScenarioKey === scen.key;
+              const diffColorClass =
+                scen.difficulty === "Khốc Liệt"
+                  ? "fomo-diff-rose"
+                  : scen.difficulty === "Nâng Cao"
+                  ? "fomo-diff-purple"
+                  : "fomo-diff-amber";
+
+              const statColorClass =
+                scen.chartMeta.statColor === "red"
+                  ? "fomo-chart-stat-red"
+                  : scen.chartMeta.statColor === "green"
+                  ? "fomo-chart-stat-green"
+                  : "fomo-chart-stat-orange";
+
+              return (
+                <div
+                  key={scen.key}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setSelectedScenarioKey(scen.key)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setSelectedScenarioKey(scen.key);
+                    }
+                  }}
+                  className={`fomo-scenario-card ${isSelected ? "fomo-scenario-card-active" : ""}`}
+                >
+                  {isSelected && (
+                    <div className="fomo-selected-corner-badge">
+                      <Check size={12} strokeWidth={3} />
+                      <span>KỊCH BẢN ĐANG CHỌN</span>
+                    </div>
+                  )}
+
+                  {/* Left: Info Column */}
+                  <div className="fomo-card-left-info">
+                    <div>
+                      <div className="fomo-card-meta-row mb-1.5">
+                        <span className="fomo-card-code-pill">{scen.codeTag}</span>
+                        <span className={`fomo-card-difficulty-tag ${diffColorClass}`}>
+                          {scen.difficulty}
+                        </span>
+                        <span className="fomo-card-feature-subtitle">
+                          {scen.featureSubtitle}
+                        </span>
+                      </div>
+                      <h4 className="fomo-card-title">{scen.name}</h4>
+                      <p className="fomo-card-description mt-1">{scen.description}</p>
+                    </div>
+
+                    <div className="fomo-card-pills-row">
+                      {scen.metricPills.map((pill, idx) => (
+                        <span
+                          key={idx}
+                          className={`fomo-card-pill ${
+                            pill.isDanger
+                              ? "fomo-card-pill-danger"
+                              : pill.isSuccess
+                              ? "fomo-card-pill-success"
+                              : ""
+                          }`}
+                        >
+                          {pill.label}: {pill.value}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Center: Sparkline Mini Box */}
+                  <div className="fomo-card-center-chart">
+                    <div className="fomo-chart-header">
+                      <span className="fomo-chart-model-label">
+                        {scen.chartMeta.modelName}
+                      </span>
+                      <span className={statColorClass}>
+                        {scen.chartMeta.performanceStat}
+                      </span>
+                    </div>
+
+                    <div className="fomo-sparkline-svg-wrap">
+                      <svg
+                        className="fomo-sparkline-svg"
+                        viewBox="0 0 200 65"
+                        preserveAspectRatio="none"
+                      >
+                        <defs>
+                          <linearGradient
+                            id={scen.chartMeta.fillGradient.id}
+                            x1="0%"
+                            y1="0%"
+                            x2="0%"
+                            y2="100%"
+                          >
+                            <stop
+                              offset="0%"
+                              stopColor={scen.chartMeta.fillGradient.stopColor}
+                              stopOpacity="0.25"
+                            />
+                            <stop
+                              offset="100%"
+                              stopColor={scen.chartMeta.fillGradient.stopColor}
+                              stopOpacity="0.0"
+                            />
+                          </linearGradient>
+                        </defs>
+                        <path
+                          d={scen.chartMeta.areaD}
+                          fill={`url(#${scen.chartMeta.fillGradient.id})`}
+                        />
+                        <path
+                          d={scen.chartMeta.pathD}
+                          fill="none"
+                          stroke={scen.chartMeta.strokeColor}
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                        />
+                        <circle
+                          cx={scen.chartMeta.annotationPos.x}
+                          cy={scen.chartMeta.annotationPos.y}
+                          r="3.5"
+                          fill="#ffffff"
+                          stroke={scen.chartMeta.strokeColor}
+                          strokeWidth="2"
+                        />
+                      </svg>
+                    </div>
+
+                    <div className="fomo-chart-annotation-label">
+                      {scen.chartMeta.annotation}
+                    </div>
+                  </div>
+
+                  {/* Right: Action Column */}
+                  <div className="fomo-card-right-action">
+                    <span className="fomo-action-status-label">
+                      {isSelected ? "Tình trạng" : "Sẵn sàng"}
+                    </span>
+                    <span className="fomo-action-status-val">
+                      {isSelected ? "✓ Đã Kích Hoạt" : "Chưa chọn"}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedScenarioKey(scen.key);
+                      }}
+                      className={
+                        isSelected
+                          ? "fomo-select-btn-active"
+                          : "fomo-select-btn-inactive"
+                      }
+                    >
+                      {isSelected ? (
+                        <>
+                          <Check size={13} strokeWidth={2.5} />
+                          <span>Đang chọn</span>
+                        </>
+                      ) : (
+                        <span>Chọn kịch bản</span>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Docked Bottom Battleground Action Bar */}
+          <div className="fomo-docked-action-bar">
+            <div className="fomo-docked-left">
+              <div className="fomo-docked-status-tag">
+                SẴN SÀNG THAM CHIẾN • VÒNG 1/7
+              </div>
+              <div className="fomo-docked-title-row">
+                <span>Kịch bản:</span>
+                <span className="fomo-docked-scenario-name">
+                  {selectedScenario.name}
+                </span>
+              </div>
+              <div className="fomo-docked-meta-sub">
+                <span>⏱️ Thời gian mỗi vòng: 45s</span>
+                <span>•</span>
+                <span>💰 Vốn ban đầu: 10.000.000 đ</span>
+                <span>•</span>
+                <span>🎯 Chỉ tiêu: ROI &gt; 5%</span>
+              </div>
+            </div>
+
+            <div className="fomo-docked-right-actions">
+              <button
+                type="button"
+                onClick={() => setShowTutorial(true)}
+                className="fomo-docked-rules-btn"
+              >
+                <BookOpen size={16} />
+                <span>Xem Luật Chơi &amp; Tâm Lý</span>
+              </button>
+              <button
+                type="button"
+                onClick={startNewGame}
+                className="fomo-docked-start-btn"
+              >
+                <Play size={16} fill="currentColor" />
+                <span>Bắt Đầu Vòng 1 Ngay</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -312,7 +524,7 @@ export const FomoArenaPage: React.FC = () => {
       {/* Interactive Modals */}
       <FomoTutorialModal
         isOpen={showTutorial}
-        mode="scenario"
+        mode="lobby"
         onClose={() => {
           setShowTutorial(false);
           completeTutorial();

@@ -116,7 +116,7 @@ describe("AdminDashboardPage (FEAT-077 / AC-003, AC-008)", () => {
       expect(tablist).toBeDefined();
 
       const tabs = screen.getAllByRole("tab");
-      expect(tabs).toHaveLength(4);
+      expect(tabs).toHaveLength(5);
       expect(tabs[0]?.getAttribute("aria-selected")).toBe("true");
       expect(tabs[1]?.getAttribute("aria-selected")).toBe("false");
     });

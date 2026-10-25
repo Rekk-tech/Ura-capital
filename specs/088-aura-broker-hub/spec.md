@@ -1,10 +1,18 @@
-﻿# Feature Specification: FEAT-088 Aura Broker Hub & Verified Creator Marketplace
+# Feature Specification: FEAT-088 Aura Broker Hub & Verified Creator Marketplace
 
 **Feature ID**: `FEAT-088`  
 **Created**: 2026-10-23  
 **Status**: APPROVED  
 **Target Delivery**: Phase 9 Production Hardening  
 **Constitution Ref**: v1.1.0 (Principles VI, VII, VIII)
+
+---
+
+## Clarifications
+
+### Session 2026-10-25
+- Q: Làm thế nào để hệ sinh thái Aura Capital (bao gồm Broker Hub) vận hành chặt chẽ, không chồng chéo quyền hạn và bảo vệ người học? → A: Áp dụng triệt để nguyên tắc Phân tách trách nhiệm (Segregation of Duties - SoD) với 5 Vai trò chuẩn (`GUEST`, `LEARNER`, `BROKER`, `MODERATOR`, `SYSTEM_ADMIN`) và 4 Nguyên tắc Logic cốt lõi (Tách biệt 2 luồng khóa học, 2 chốt chặn Broker, Bảo vệ chéo tài khoản, và Nhật ký kiểm toán bất biến).
+- Q: Luồng trải nghiệm sau khi đăng nhập thành công (Post-Login) nên hiển thị bước xác nhận vai trò và phân quyền theo hình thức nào? → A: Màn hình riêng Role Gateway (/auth/role-gateway): Đăng nhập xong sẽ sang màn hình trang nhã hiển thị vai trò được cấp, ma trận quyền hạn SoD và nút chọn Không gian làm việc tương ứng (Học viên / Broker / Kiểm duyệt / Quản trị viên). Bỏ hoàn toàn bảng chọn vai trò gắn liền ở trang đăng nhập (Hình số 2) để trang login hoàn toàn sạch sẽ.
 
 ---
 

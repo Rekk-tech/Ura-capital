@@ -79,14 +79,49 @@ export const AppHeader: React.FC = () => {
     }
   };
 
-  const isAdmin = Boolean(
+  const isSystemAdmin = Boolean(
     user &&
-    (user.role === "ADMIN" ||
+    (user.role === "SYSTEM_ADMIN" ||
+     user.role === "ADMIN" ||
      user.email === "admin@aura.internal" ||
      user.email?.startsWith("admin.") ||
      user.displayName?.toLowerCase().includes("administrator") ||
      user.displayName?.toLowerCase().includes("admin"))
   );
+  const isModerator = Boolean(user && user.role === "MODERATOR");
+  const isBroker = Boolean(user && user.role === "BROKER");
+  const isAdmin = isSystemAdmin;
+
+  const getRoleBadge = () => {
+    if (isSystemAdmin) {
+      return {
+        label: currentLang === "VI" ? "Quản Trị Viên" : "Admin",
+        tagClass: "role-tag-admin",
+        icon: <ShieldCheck size={12} aria-hidden="true" />,
+      };
+    }
+    if (isModerator) {
+      return {
+        label: currentLang === "VI" ? "Kiểm Duyệt Viên" : "Moderator",
+        tagClass: "role-tag-moderator",
+        icon: <ShieldCheck size={12} aria-hidden="true" />,
+      };
+    }
+    if (isBroker) {
+      return {
+        label: currentLang === "VI" ? "Broker Xác Thực" : "Verified Broker",
+        tagClass: "role-tag-broker",
+        icon: <Award size={12} aria-hidden="true" />,
+      };
+    }
+    return {
+      label: currentLang === "VI" ? "Học Viên F0" : "Learner",
+      tagClass: "role-tag-learner",
+      icon: <Sparkles size={12} aria-hidden="true" />,
+    };
+  };
+
+  const roleBadge = getRoleBadge();
 
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const mobileNavRef = useRef<HTMLDivElement>(null);
@@ -190,8 +225,8 @@ export const AppHeader: React.FC = () => {
 
         {/* Header Right Actions */}
         <div className="header-actions">
-          {/* Upgrade / Admin Action Pill */}
-          {isAdmin ? (
+          {/* Upgrade / Role Action Pill */}
+          {isSystemAdmin ? (
             <Link
               to="/admin"
               className="admin-badge-pill"
@@ -216,6 +251,58 @@ export const AppHeader: React.FC = () => {
             >
               <ShieldCheck size={14} aria-hidden="true" />
               <span>Admin Console</span>
+            </Link>
+          ) : isModerator ? (
+            <Link
+              to="/admin"
+              className="moderator-badge-pill"
+              title="Bàn Kiểm Duyệt Học Thuật & Nội Dung"
+              aria-label="Open Moderator Console"
+              data-testid="header-moderator-console-btn"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "0.3rem 0.75rem",
+                borderRadius: "9999px",
+                fontSize: "0.75rem",
+                fontWeight: 700,
+                letterSpacing: "0.03em",
+                background: "linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(8, 145, 178, 0.1))",
+                color: "#38bdf8",
+                border: "1px solid rgba(6, 182, 212, 0.4)",
+                textDecoration: "none",
+                textTransform: "uppercase",
+              }}
+            >
+              <ShieldCheck size={14} aria-hidden="true" />
+              <span>Kiểm Duyệt</span>
+            </Link>
+          ) : isBroker ? (
+            <Link
+              to="/broker-hub"
+              className="broker-badge-pill"
+              title="Quản Trị Phòng Chuyên Gia Của Tôi"
+              aria-label="Open Broker Room"
+              data-testid="header-broker-room-btn"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "0.3rem 0.75rem",
+                borderRadius: "9999px",
+                fontSize: "0.75rem",
+                fontWeight: 700,
+                letterSpacing: "0.03em",
+                background: "linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(22, 163, 74, 0.1))",
+                color: "#4ade80",
+                border: "1px solid rgba(34, 197, 94, 0.4)",
+                textDecoration: "none",
+                textTransform: "uppercase",
+              }}
+            >
+              <Award size={14} aria-hidden="true" />
+              <span>Phòng Của Tôi</span>
             </Link>
           ) : (
             <Link
@@ -260,10 +347,16 @@ export const AppHeader: React.FC = () => {
               {isUserMenuOpen && (
                 <div className="user-dropdown-menu" role="menu">
                   <div className="user-dropdown-header">
-                    <span className="dropdown-user-name">{user.displayName || "Learner"}</span>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px", marginBottom: "4px" }}>
+                      <span className="dropdown-user-name">{user.displayName || "Learner"}</span>
+                      <span className={`user-role-badge ${roleBadge.tagClass}`} style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "0.7rem", padding: "2px 8px", borderRadius: "9999px", fontWeight: 600 }}>
+                        {roleBadge.icon}
+                        <span>{roleBadge.label}</span>
+                      </span>
+                    </div>
                     <span className="dropdown-user-email">{user.email}</span>
                   </div>
-                  {isAdmin && (
+                  {isSystemAdmin && (
                     <>
                       <div className="dropdown-divider" />
                       <Link
@@ -274,7 +367,37 @@ export const AppHeader: React.FC = () => {
                         style={{ color: "#f87171", fontWeight: 600 }}
                       >
                         <ShieldCheck size={15} />
-                        <span>Admin Console</span>
+                        <span>Admin Console (Toàn Quyền)</span>
+                      </Link>
+                    </>
+                  )}
+                  {isModerator && (
+                    <>
+                      <div className="dropdown-divider" />
+                      <Link
+                        to="/admin"
+                        className="dropdown-item moderator-item"
+                        role="menuitem"
+                        onClick={() => setIsUserMenuOpen(false)}
+                        style={{ color: "#38bdf8", fontWeight: 600 }}
+                      >
+                        <ShieldCheck size={15} />
+                        <span>Bàn Kiểm Duyệt Nội Dung</span>
+                      </Link>
+                    </>
+                  )}
+                  {isBroker && (
+                    <>
+                      <div className="dropdown-divider" />
+                      <Link
+                        to="/broker-hub"
+                        className="dropdown-item broker-item"
+                        role="menuitem"
+                        onClick={() => setIsUserMenuOpen(false)}
+                        style={{ color: "#4ade80", fontWeight: 600 }}
+                      >
+                        <Award size={15} />
+                        <span>Quản Trị Phòng Của Tôi</span>
                       </Link>
                     </>
                   )}

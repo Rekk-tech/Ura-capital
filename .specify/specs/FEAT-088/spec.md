@@ -1,10 +1,18 @@
-﻿# Feature Specification: FEAT-088 Aura Broker Hub & Verified Creator Marketplace
+# Feature Specification: FEAT-088 Aura Broker Hub & Verified Creator Marketplace
 
 **Feature ID**: `FEAT-088`  
 **Created**: 2026-10-23  
 **Status**: APPROVED  
 **Target Delivery**: Phase 9 Production Hardening  
-**Constitution Ref**: v1.1.0 (Principles VI, VII, VIII)
+**Constitution Ref**: v1.2.0 (Principles VI, VII, VIII, IX, X)
+
+---
+
+## Clarifications
+
+### Session 2026-10-25
+- Q: Làm thế nào để hệ sinh thái Aura Capital (bao gồm Broker Hub) vận hành chặt chẽ, không chồng chéo quyền hạn và bảo vệ người học? → A: Áp dụng triệt để nguyên tắc Phân tách trách nhiệm (Segregation of Duties - SoD) với 5 Vai trò chuẩn (`GUEST`, `LEARNER`, `BROKER`, `MODERATOR`, `SYSTEM_ADMIN`) và 4 Nguyên tắc Logic cốt lõi (Tách biệt 2 luồng khóa học, 2 chốt chặn Broker, Bảo vệ chéo tài khoản, và Nhật ký kiểm toán bất biến).
+- Q: Luồng trải nghiệm sau khi đăng nhập thành công (Post-Login) nên hiển thị bước xác nhận vai trò và phân quyền theo hình thức nào? → A: Màn hình riêng Role Gateway (/auth/role-gateway): Đăng nhập xong sẽ sang màn hình trang nhã hiển thị vai trò được cấp, ma trận quyền hạn SoD và nút chọn Không gian làm việc tương ứng (Học viên / Broker / Kiểm duyệt / Quản trị viên). Bỏ hoàn toàn bảng chọn vai trò gắn liền ở trang đăng nhập (Hình số 2) để trang login hoàn toàn sạch sẽ.
 
 ---
 
@@ -20,13 +28,16 @@
 
 ---
 
-## 2. User Roles & Authority Matrix
+## 2. User Roles & Authority Matrix (5-Role Segregation of Duties)
 
-| Role | Định danh | Trách nhiệm & Quyền hạn cốt lõi |
-|---|---|---|
-| `LEARNER` | Nhà Đầu Tư F0 | Khám phá Broker Hub, kiểm tra số CCHN UBCKNN & CTCK trực thuộc, thanh toán phí gia nhập 1 lần (One-Time Entrance Fee), học tập tài liệu độc quyền, bình luận chiến lược, làm bài tập mô phỏng, để lại đánh giá tín nhiệm (Verified Review). |
-| `BROKER` | Chuyên Gia Xác Thực | Xuất bản Exclusive Room, phân phối bài giảng/tài liệu bài bản, nhận định thị trường, tạo kịch bản thực chiến mô phỏng, nhận 85%–90% doanh thu vé vào phòng. Trả phí SaaS hàng tháng theo bậc thang (Starter, Pro, Master). |
-| `ADMIN` | Quản Trị / Tuân Thủ | Thẩm định hồ sơ Broker (kiểm tra đối chiếu số CCHN UBCKNN), quản lý tham số phí sàn (10%–15%) và gói SaaS, xử lý cảnh báo từ khóa vi phạm tuân thủ, đình chỉ phòng gian lận, ghi nhật ký kiểm toán bất biến. |
+| Role | Định danh | Trách nhiệm & Quyền hạn cốt lõi | Ràng buộc bảo mật & Tuân thủ |
+|---|---|---|---|
+| `GUEST` | Khách vãng lai | Xem trang chủ, xem danh mục khóa học, xem bảng tin cộng đồng (Read-only), xem hồ sơ tín nhiệm & CCHN của Broker. | Tuyệt đối không có quyền ghi; không thể tham gia học, đấu trường hoặc bình luận. |
+| `LEARNER` | Nhà Đầu Tư F0 | Học khóa học Academy, thi đấu giả lập Map 1 & Map 2, quản lý danh mục ảo, đăng bài/bình luận/thả tim/báo cáo tại Diễn đàn, mua vé vào Broker Room và chấm điểm Review xác thực. | Mặc định sau khi xác thực OTP. Không được tạo phòng, không được phím hàng hay lôi kéo nạp tiền. |
+| `BROKER` | Chuyên Gia Xác Thực | Kế thừa quyền LEARNER; tạo và quản trị Room riêng tại `/broker-hub`, xuất bản bài giảng/nhận định/chiến lược trong Room, tạo kịch bản thực chiến cho học viên Room, xem đối soát doanh thu Room. | Bắt buộc có CCHN UBCKNN + eKYC do SYSTEM_ADMIN duyệt; trả phí SaaS hàng tháng; chịu hậu kiểm của MODERATOR. Tuyệt đối không được sửa khóa học gốc `/academy`. |
+| `MODERATOR` | Biên Tập & Kiểm Duyệt | Soạn thảo & cập nhật khóa học chính thống trên `/academy`; xử lý hàng đợi báo cáo cộng đồng; kiểm duyệt/gỡ bài giảng Broker vi phạm cam kết lợi nhuận; tạm khóa (mute) người dùng vi phạm tối đa 24h. | Không được thay đổi Role người dùng, không được can thiệp biểu phí gói cước sàn, không can thiệp số dư danh mục. |
+| `SYSTEM_ADMIN` | Quản Trị Hệ Thống Tối Cao | Duyệt hồ sơ CCHN UBCKNN & cấp tích xanh BROKER; phân quyền Role (`LEARNER` ↔ `BROKER` ↔ `MODERATOR`); khóa/mở khóa toàn quyền tài khoản; giám sát & reset phiên giả lập treo; quản lý biểu phí sàn & SaaS; tra cứu Audit Log bất biến. | Không thể tự khóa (Suspend) hoặc tự hạ quyền của chính mình; mọi thao tác đều ghi log kiểm toán bất biến. |
+
 
 ---
 
@@ -78,6 +89,17 @@
   - Bảng duyệt hồ sơ đăng ký Broker: Xem số CCHN, CTCK, bằng cấp, nút Phê duyệt / Từ chối.
   - Bảng quản lý phòng và doanh thu Marketplace (tổng phí thu, phần trăm chia sẻ).
   - Bảng xử lý cảnh báo tuân thủ: Cảnh cáo, hạ bậc huy hiệu hoặc phong tỏa phòng vi phạm.
+
+### FR-007: Clean Authentication & Post-Login Role Gateway Screen
+- **Trang Đăng Nhập (`/login`)**:
+  - Giao diện form chuẩn mực tối giản: chỉ gồm trường nhập Email, Mật khẩu, hiển thị/ẩn mật khẩu, và nút Đăng Nhập.
+  - Tuyệt đối không gắn các khối thẻ dev/seed role dày đặc gây tràn viền hoặc phá vỡ cấu trúc thẩm mỹ (đã loại bỏ hoàn toàn khối Hình số 2).
+- **Màn hình Cổng Xác Nhận Vai Trò & Phân Quyền (`/auth/role-gateway`)**:
+  - Sau khi đăng nhập thành công với tài khoản và mật khẩu thông thường, người dùng được điều hướng tới màn hình trung gian trang nhã này trước khi vào phân vùng chuyên biệt.
+  - Hiển thị danh tính: Avatar, Email, Tên người dùng và Huy hiệu vai trò chính thống được cấp phát (`LEARNER`, `BROKER`, `MODERATOR`, `SYSTEM_ADMIN`).
+  - Ma trận SoD & Giới hạn quyền hạn: Trình bày súc tích các phân vùng ĐƯỢC PHÉP và BỊ GIỚI HẠN trong phiên làm việc để người dùng nắm rõ trách nhiệm.
+  - Bộ chọn Không gian làm việc (Workspace Selector): Đối với tài khoản có nhiều quyền hoặc tài khoản kiểm thử/quản trị, cho phép lựa chọn không gian đích muốn làm việc (Không gian Học viên F0, Phòng Broker Độc Quyền, Trung tâm Kiểm duyệt, Admin Console).
+  - Nút bấm xác nhận mượt mà: "Vào Không Gian Làm Việc" đưa người dùng đến đúng URL đích tương ứng.
 
 ---
 

@@ -195,4 +195,74 @@ describe("FomoArenaPage", () => {
     expect(screen.getByText(/MUA \(BUY\)/i)).toBeDefined();
     expect(screen.getByText(/BÁN \(SELL\)/i)).toBeDefined();
   });
+
+  it("renders FEAT-089 scenario selector with 3 cards, metrics, filters, and switches active scenario", () => {
+    vi.spyOn(useMapGameModule, "useMap1Game").mockReturnValue({
+      sessionId: null,
+      state: null,
+      debrief: null,
+      isLoading: false,
+      isSubmittingOrder: false,
+      error: null,
+      tutorialCompleted: true,
+      startNewGame: vi.fn(),
+      submitOrder: vi.fn(),
+      submitTrap: vi.fn(),
+      submitQuiz: vi.fn(),
+      completeTutorial: vi.fn(),
+      finishGame: vi.fn(),
+      resetGame: vi.fn(),
+    });
+
+    render(
+      <BrowserRouter>
+        <FomoArenaPage />
+      </BrowserRouter>
+    );
+
+    // Verify top room id
+    expect(screen.getByText("ROOM_ID: ARENA-VN30-SIM-07")).toBeDefined();
+
+    // Verify 4 metric cards
+    expect(screen.getByText("VỐN CẤP KHỞI ĐIỂM")).toBeDefined();
+    expect(screen.getByText("10.000.000")).toBeDefined();
+    expect(screen.getByText("THỜI LƯỢNG MỖI VÒNG")).toBeDefined();
+    expect(screen.getByText("7 Vòng × 45 Giây")).toBeDefined();
+    expect(screen.getByText("CHỈ TIÊU VƯỢT ẢI")).toBeDefined();
+    expect(screen.getByText("ROI ≥ +5.0%")).toBeDefined();
+    expect(screen.getByText("TỶ LỆ SỐNG SÓT F0")).toBeDefined();
+    expect(screen.getByText("34.2%")).toBeDefined();
+
+    // Verify 3 code tags
+    expect(screen.getByText("SVIX_PUMP")).toBeDefined();
+    expect(screen.getByText("SNVL_CRASH")).toBeDefined();
+    expect(screen.getByText("SFPT_EXP")).toBeDefined();
+
+    // Verify initial active scenario in bottom bar
+    expect(screen.getByText("KỊCH BẢN ĐANG CHỌN")).toBeDefined();
+    expect(screen.getAllByText("Sóng Đầu Cơ Penny & Bẫy Kéo Xả ATO").length).toBeGreaterThanOrEqual(1);
+
+    // Click on SNVL_CRASH card to select it
+    const nvlCard = screen.getByText("Đóng Băng Thanh Khoản BĐS & Khủng Hoảng Nợ");
+    fireEvent.click(nvlCard);
+
+    // Now bottom action bar should display SNVL_CRASH scenario name
+    expect(screen.getAllByText("Đóng Băng Thanh Khoản BĐS & Khủng Hoảng Nợ").length).toBeGreaterThanOrEqual(2);
+
+    // Test difficulty filter tabs
+    const hardFilterBtn = screen.getByRole("button", { name: "Khốc Liệt" });
+    fireEvent.click(hardFilterBtn);
+
+    // In Khốc Liệt filter, only SNVL_CRASH is rendered
+    expect(screen.getByText("SNVL_CRASH")).toBeDefined();
+    expect(screen.queryByText("SVIX_PUMP")).toBeNull();
+    expect(screen.queryByText("SFPT_EXP")).toBeNull();
+
+    // Switch back to Tất Cả
+    const allFilterBtn = screen.getByRole("button", { name: "Tất Cả (3)" });
+    fireEvent.click(allFilterBtn);
+    expect(screen.getByText("SVIX_PUMP")).toBeDefined();
+    expect(screen.getByText("SNVL_CRASH")).toBeDefined();
+    expect(screen.getByText("SFPT_EXP")).toBeDefined();
+  });
 });
