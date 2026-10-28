@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "../../auth/context/AuthContext";
@@ -64,10 +64,12 @@ const renderWithProviders = (
 
 describe("CommunityFeedPage (Component & State - AC-001..AC-028)", () => {
   beforeEach(() => {
+    cleanup();
     vi.restoreAllMocks();
   });
 
   afterEach(() => {
+    cleanup();
     vi.clearAllMocks();
   });
 

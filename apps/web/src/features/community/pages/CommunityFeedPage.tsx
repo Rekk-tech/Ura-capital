@@ -17,7 +17,7 @@ import {
   CommunityEmptyState,
   CommunityErrorCard,
 } from "../components/CommunityStates";
-import { SimulationLeaderboard } from "../../simulation/components/SimulationLeaderboard";
+import { TrendingTopicsWidget } from "../components/TrendingTopicsWidget";
 import {
   CommunityStreamNav,
   StreamCategoryId,
@@ -294,13 +294,8 @@ export const CommunityFeedPage: React.FC = () => {
             {/* 1. CrediFin AI Advisor Box */}
             <CrediFinAdvisorCard />
 
-            {/* 2. Top 5 Nhà Đầu Tư Leaderboard */}
-            <SimulationLeaderboard
-              variant="sidebar"
-              limit={5}
-              title="Top 5 Nhà Đầu Tư"
-              subtitle="Hiệu suất sinh lời cao nhất"
-            />
+            {/* 2. Trending Topics Widget */}
+            <TrendingTopicsWidget />
 
             {/* 3. Ticker Tags Card */}
             <TrendingTickersWidget />

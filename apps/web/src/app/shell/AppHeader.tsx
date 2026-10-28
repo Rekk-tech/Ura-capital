@@ -202,9 +202,9 @@ export const AppHeader: React.FC = () => {
           </Link>
         </div>
 
-        {/* Desktop Navigation Links (Single-Row Core Tabs) */}
+        {/* Desktop Navigation Links (Single-Row Core Tabs, AI accessible via ubiquitous Floating Coach FAB) */}
         <nav className="header-nav desktop-nav" aria-label="Primary Navigation">
-          {navRoutes.filter((route) => route.path !== "/subscription").map((route) => {
+          {navRoutes.filter((route) => route.path !== "/subscription" && route.path !== "/ai").map((route) => {
             const active = isRouteActive(location.pathname, route.path);
             const englishLabel = route.navLabel || route.title;
             const displayLabel = currentLang === "VI" ? (VI_NAV_LABELS[route.path] || englishLabel) : englishLabel;

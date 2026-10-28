@@ -82,5 +82,9 @@ Thumbs.db
 # Test reports & temp scratch
 playwright-report/
 test-results/
-accoun_admin.txt
+scratch/
+*.vault
+.env.vault
+account*.txt
+accoun*.txt
 

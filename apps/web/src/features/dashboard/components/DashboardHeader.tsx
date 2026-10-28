@@ -8,7 +8,6 @@ import {
   Award,
   TrendingUp,
   Crown,
-  Lock,
   ArrowRight,
 } from "lucide-react";
 import { useAuth } from "../../auth/context/AuthContext";
@@ -128,13 +127,13 @@ export const DashboardHeader: React.FC = () => {
         <div className="overview-level-col">
           <div className="overview-level-top">
             <div style={{ display: "flex", alignItems: "center" }}>
-              <span className="overview-level-tag">Level 2</span>
+              <span className="overview-level-tag">Level {gamificationState.level || 1}</span>
               <span className="overview-level-title">
                 {gamificationState.levelTitle || "Trader Kỷ Luật"}
               </span>
             </div>
             <span className="overview-xp-text">
-              200 / 500 XP (40%)
+              {gamificationState.xp} / {gamificationState.nextLevelXp} XP ({gamificationState.progressPct}%)
             </span>
           </div>
 
@@ -142,28 +141,34 @@ export const DashboardHeader: React.FC = () => {
           <div
             className="overview-progress-bar-wrap"
             role="progressbar"
-            aria-valuenow={40}
+            aria-valuenow={gamificationState.progressPct}
             aria-valuemin={0}
             aria-valuemax={100}
           >
             <div
               className="overview-progress-fill"
-              style={{ width: "40%" }}
+              style={{ width: `${Math.min(100, Math.max(0, gamificationState.progressPct))}%` }}
             />
           </div>
 
           <div className="overview-level-sub-row">
             <span className="overview-sub-gray">Tiến độ cấp bậc mô phỏng</span>
-            <span className="overview-sub-slate">Còn 300 XP để thăng hạng Level 3</span>
+            <span className="overview-sub-slate">
+              {gamificationState.nextLevelXp > gamificationState.xp
+                ? `Còn ${gamificationState.nextLevelXp - gamificationState.xp} XP để thăng hạng Level ${(gamificationState.level || 1) + 1}`
+                : "Đạt cấp bậc tối đa"}
+            </span>
           </div>
         </div>
 
         <div className="overview-col-separator" />
 
-        {/* Right Sub-section: 4 Badge Cards */}
+        {/* Right Sub-section: Badge Collection */}
         <div className="overview-badges-col">
           <div className="overview-badges-header">
-            <span>BỘ SƯU TẬP HUY HIỆU (1/4)</span>
+            <span>
+              BỘ SƯU TẬP HUY HIỆU ({gamificationState.badges.filter((b) => b.isUnlocked).length}/{gamificationState.badges.length})
+            </span>
             <Link
               to="/simulation"
               className="overview-badges-link"
@@ -174,49 +179,33 @@ export const DashboardHeader: React.FC = () => {
           </div>
 
           <div className="overview-badges-grid">
-            {/* Badge 1: Học Giả Aura */}
-            <div className="overview-badge-card unlocked">
-              <div className="badge-card-icon" style={{ color: "#D97706" }}>
-                <Award size={18} />
-              </div>
-              <span className="badge-card-name">Học Giả Aura</span>
-              <span className="badge-pill-status open">
-                Đã mở
-              </span>
-            </div>
+            {gamificationState.badges.map((badge) => {
+              const isUnlocked = badge.isUnlocked;
+              let cardClass = isUnlocked ? "overview-badge-card unlocked" : "overview-badge-card locked";
+              if (badge.id === "VIP_PATRON" && isUnlocked) cardClass = "overview-badge-card vip";
 
-            {/* Badge 2: Sinh Tồn Arena */}
-            <div className="overview-badge-card locked">
-              <div className="badge-card-icon" style={{ color: "#94A3B8" }}>
-                <Lock size={16} />
-              </div>
-              <span className="badge-card-name">Sinh Tồn Arena</span>
-              <span className="badge-pill-status locked">
-                Chưa mở
-              </span>
-            </div>
-
-            {/* Badge 3: Chiến Lược Vĩ Mô */}
-            <div className="overview-badge-card in-progress">
-              <div className="badge-card-icon" style={{ color: "#1D4ED8" }}>
-                <TrendingUp size={16} />
-              </div>
-              <span className="badge-card-name">Chiến Lược Vĩ Mô</span>
-              <span className="badge-pill-status progress">
-                Tiến độ 2/5
-              </span>
-            </div>
-
-            {/* Badge 4: Hội Viên Ưu Tú */}
-            <div className="overview-badge-card vip">
-              <div className="badge-card-icon" style={{ color: "#B45309" }}>
-                <Crown size={16} />
-              </div>
-              <span className="badge-card-name">Hội Viên Ưu Tú</span>
-              <span className="badge-pill-status vip">
-                Gói VIP
-              </span>
-            </div>
+              return (
+                <div key={badge.id} className={cardClass}>
+                  <div className="badge-card-icon" style={{ color: isUnlocked ? "#D97706" : "#94A3B8" }}>
+                    {badge.id === "VIP_PATRON" ? (
+                      <Crown size={18} />
+                    ) : badge.id === "MACRO_TACTICIAN" ? (
+                      <TrendingUp size={18} />
+                    ) : badge.id === "SURVIVOR" ? (
+                      <ShieldCheck size={18} />
+                    ) : (
+                      <Award size={18} />
+                    )}
+                  </div>
+                  <span className="badge-card-name" title={badge.name}>
+                    {badge.name}
+                  </span>
+                  <span className={`badge-pill-status ${isUnlocked ? "open" : "locked"}`}>
+                    {isUnlocked ? "Đã mở" : "Chưa mở"}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

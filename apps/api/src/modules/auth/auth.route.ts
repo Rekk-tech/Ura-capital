@@ -20,7 +20,12 @@ const loginRateLimiter = createLoginRateLimiter();
 const registerRateLimiter = createRegisterRateLimiter();
 const refreshRateLimiter = createRefreshRateLimiter();
 
-// FEAT-003 Registration Endpoints (with FEAT-010A rate limiting)
+// FEAT-003 & FEAT-090 Registration Endpoints (with FEAT-010A rate limiting)
+router.post("/auth/register/request-otp", registerRateLimiter, (req, res, next) => registrationController.requestOtp(req, res, next));
+router.post("/api/auth/register/request-otp", registerRateLimiter, (req, res, next) => registrationController.requestOtp(req, res, next));
+router.post("/auth/register/verify-otp", registerRateLimiter, (req, res, next) => registrationController.verifyOtp(req, res, next));
+router.post("/api/auth/register/verify-otp", registerRateLimiter, (req, res, next) => registrationController.verifyOtp(req, res, next));
+
 router.post("/auth/register", registerRateLimiter, (req, res, next) => registrationController.register(req, res, next));
 router.post("/api/auth/register", registerRateLimiter, (req, res, next) => registrationController.register(req, res, next));
 

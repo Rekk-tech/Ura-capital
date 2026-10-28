@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "../../auth/context/AuthContext";
@@ -22,6 +22,7 @@ describe("DashboardPage (FEAT-072: AC-001..AC-008)", () => {
   };
 
   beforeEach(() => {
+    cleanup();
     queryClient = new QueryClient({
       defaultOptions: {
         queries: { retry: false },
@@ -34,6 +35,7 @@ describe("DashboardPage (FEAT-072: AC-001..AC-008)", () => {
   });
 
   afterEach(() => {
+    cleanup();
     localStorage.clear();
     sessionStorage.clear();
     vi.restoreAllMocks();

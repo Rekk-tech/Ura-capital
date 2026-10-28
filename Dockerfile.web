@@ -1,0 +1,34 @@
+# ==========================================
+# Dockerfile.web - Aura Capital Web App (Vite React)
+# Builds static production bundle into dist
+# ==========================================
+
+FROM node:22-alpine AS builder
+
+WORKDIR /app
+
+# Copy root monorepo manifests
+COPY package.json package-lock.json* ./
+COPY packages/shared/package.json ./packages/shared/
+COPY apps/web/package.json ./apps/web/
+
+# Install dependencies
+RUN npm install
+
+# Copy source trees
+COPY packages/shared ./packages/shared
+COPY apps/web ./apps/web
+
+# Build Shared Package
+RUN npm run build:shared
+
+# Build Web Bundle
+WORKDIR /app/apps/web
+RUN npm run build
+
+# Copy build to lightweight output image for volume mounting
+FROM alpine:3.20 AS runner
+WORKDIR /dist
+COPY --from=builder /app/apps/web/dist ./
+CMD ["sh", "-c", "cp -rn /dist/* /target/ 2>/dev/null || cp -r /dist/* /target/"]
+

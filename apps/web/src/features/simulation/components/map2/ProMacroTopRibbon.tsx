@@ -211,11 +211,11 @@ export const ProMacroTopRibbon: React.FC<ProMacroTopRibbonProps> = ({
             </span>
             <TrendingUp size={16} style={{ color: "#059669" }} />
           </div>
-          <div style={{ fontSize: "1.45rem", fontWeight: 900, fontFamily: "var(--font-mono)", color: "#059669", margin: "0.2rem 0" }}>
-            {alpha >= 0 ? `+${alpha.toFixed(2)}%` : `${alpha.toFixed(2)}%`}
+          <div style={{ fontSize: "1.45rem", fontWeight: 900, fontFamily: "var(--font-mono)", color: currentQuarter === 1 ? "#475569" : (alpha >= 0 ? "#059669" : "#e11d48"), margin: "0.2rem 0" }}>
+            {currentQuarter === 1 ? "0.00%" : (alpha >= 0 ? `+${alpha.toFixed(2)}%` : `${alpha.toFixed(2)}%`)}
           </div>
-          <div style={{ fontSize: "0.72rem", color: "#059669", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.3rem" }}>
-            <span>✓ Top 5% Cohort Performance</span>
+          <div style={{ fontSize: "0.72rem", color: currentQuarter === 1 ? "#64748b" : (alpha >= 0 ? "#059669" : "#e11d48"), fontWeight: 600, display: "flex", alignItems: "center", gap: "0.3rem" }}>
+            <span>{currentQuarter === 1 ? "Đang chờ phân bổ Quý 1" : (alpha >= 0 ? "✓ Top 5% Cohort Performance" : "Dưới mức kỳ vọng Cohort")}</span>
           </div>
         </div>
 

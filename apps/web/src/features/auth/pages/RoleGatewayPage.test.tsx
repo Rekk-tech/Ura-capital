@@ -33,6 +33,8 @@ describe("RoleGatewayPage (FEAT-088 / FR-007)", () => {
       isLoading: false,
       login: vi.fn(),
       register: vi.fn(),
+      requestOtp: vi.fn(),
+      verifyOtp: vi.fn(),
       logout: vi.fn(),
       refreshSession: vi.fn(),
       setAuthSession: vi.fn(),

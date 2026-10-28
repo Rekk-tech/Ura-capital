@@ -93,6 +93,21 @@ interface StreamedChatMessage extends Map1ChatMessage {
   addedAt?: number;
 }
 
+// Dynamic crowd message pool tailored by market tone
+const DYNAMIC_CROWD_REACTIONS = [
+  { sender: "Cá Mập VN30", badge: "Tay To", badgeColor: "bg-purple-100 text-purple-800", avatarBg: "bg-purple-600 text-white", message: "Cầu gom hàng đang vào rất dứt khoát, tay to không bao giờ bán ở vùng này." },
+  { sender: "Bò Tót F0", badge: "F0", badgeColor: "bg-emerald-100 text-emerald-800", avatarBg: "bg-emerald-600 text-white", message: "Múc mạnh anh em ơi! Giá này không mua đợi vượt đỉnh mới mua à?" },
+  { sender: "Thánh Lướt Sóng", badge: "Scalper", badgeColor: "bg-blue-100 text-blue-800", avatarBg: "bg-blue-600 text-white", message: "Thủng hỗ trợ ngắn hạn rồi, anh em cẩn thận bull trap đấy!" },
+  { sender: "Sói Già Phố Wall", badge: "VIP 5", badgeColor: "bg-amber-100 text-amber-800", avatarBg: "bg-amber-600 text-white", message: "Lái đang kê lệnh kéo xả đấy, đừng có tham mà đu đỉnh." },
+  { sender: "Nữ Hoàng Margin", badge: "Full Margin", badgeColor: "bg-rose-100 text-rose-800", avatarBg: "bg-rose-600 text-white", message: "Vào lệnh full margin luôn, sợ gì không all-in lúc thị trường đỏ lửa!" },
+  { sender: "Anh Ba Đầu Tư", badge: "Giá Trị", badgeColor: "bg-slate-100 text-slate-800", avatarBg: "bg-slate-700 text-white", message: "Tin ra là bán, nguyên tắc muôn thuở. Giữ tiền mặt quan sát thêm." },
+  { sender: "Pro_Trader_99", badge: "KOL", badgeColor: "bg-indigo-100 text-indigo-800", avatarBg: "bg-indigo-600 text-white", message: "Khối ngoại đang quay lại gom ròng, dòng tiền lớn đã nhập cuộc." },
+  { sender: "Thợ Bắt Đáy", badge: "Bắt Đáy", badgeColor: "bg-teal-100 text-teal-800", avatarBg: "bg-teal-600 text-white", message: "Bắt đáy nhịp 1 thành công! Tín hiệu MACD phân kỳ dương rồi." },
+  { sender: "Trader_Shark88", badge: "VIP 5", badgeColor: "bg-amber-100 text-amber-800", avatarBg: "bg-amber-500 text-white", message: "Khớp lệnh ầm ầm, bên bán bắt đầu mất kiên nhẫn bán tháo rồi kìa." },
+  { sender: "Hùng_Broker_HN", badge: "Broker", badgeColor: "bg-sky-100 text-sky-800", avatarBg: "bg-sky-600 text-white", message: "Anh chị em giữ chặt hàng! Không nhả cổ nào cho đội lái gom rẻ." },
+  { sender: "Tâm Lý Thép", badge: "Kỷ Luật", badgeColor: "bg-zinc-100 text-zinc-800", avatarBg: "bg-zinc-700 text-white", message: "Đặt sẵn Stop-Loss đúng kế hoạch, không để cảm xúc điều khiển." },
+];
+
 interface FomoHypeRoomProps {
   botChat?: Array<{ sender: string; message: string }>;
   round?: number;
@@ -139,55 +154,50 @@ export const FomoHypeRoom: React.FC<FomoHypeRoomProps> = ({ botChat, round = 1 }
     addedAt: addedAt || Date.now(),
   });
 
-  // Dynamic message streaming engine (2 initial messages + new message every 3-6s)
+  // Dynamic continuous message streaming engine (Interval 2.5s - 4s)
   useEffect(() => {
-    const feed = roundData?.hypeRoomFeed || [];
-    if (feed.length === 0) return;
-
-    // Start with first 2 messages
+    const scenarioFeed = roundData?.hypeRoomFeed || [];
+    const pool = [...scenarioFeed, ...DYNAMIC_CROWD_REACTIONS];
     const now = Date.now();
-    const initialMsgs: StreamedChatMessage[] = feed.slice(0, 2).map((item, idx) =>
-      normalizeChatMessage(item, "Vừa xong", now - (2 - idx) * 12000)
+
+    // Initial seed messages
+    const initialMsgs: StreamedChatMessage[] = pool.slice(0, 3).map((item, idx) =>
+      normalizeChatMessage(item, "Vừa xong", now - (3 - idx) * 8000)
     );
     setStreamedMessages(initialMsgs);
     setUserMessages([]);
 
-    let nextIndex = 2;
-    let timeoutId: NodeJS.Timeout;
+    let currentIndex = 3;
+    let timerId: NodeJS.Timeout;
 
-    const streamNext = () => {
-      // 3 to 6 seconds random interval
-      const delay = Math.floor(Math.random() * 3000) + 3000;
-      timeoutId = setTimeout(() => {
-        if (nextIndex < feed.length) {
-          const rawItem = feed[nextIndex];
-          if (rawItem) {
-            const nextItem = normalizeChatMessage(rawItem, "Vừa xong", Date.now());
-            setStreamedMessages((prev) => [...prev, nextItem]);
-          }
-          nextIndex++;
-        } else {
-          // Loop or pick random message from the pool
-          const randomItem = feed[Math.floor(Math.random() * feed.length)];
-          if (randomItem) {
-            const nextItem = normalizeChatMessage(randomItem, "Vừa xong", Date.now());
-            setStreamedMessages((prev) => [
-              ...prev,
-              {
-                ...nextItem,
-                id: `rep-${Date.now()}`,
-              },
-            ]);
-          }
+    const pushNextMessage = () => {
+      // 2.5 to 4.5 seconds realistic jitter
+      const nextDelay = Math.floor(Math.random() * 2000) + 2500;
+      timerId = setTimeout(() => {
+        let candidate = pool[currentIndex % pool.length];
+        currentIndex++;
+
+        if (candidate) {
+          const newMsg: StreamedChatMessage = {
+            ...normalizeChatMessage(candidate, "Vừa xong", Date.now()),
+            id: `stream-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          };
+
+          setStreamedMessages((prev) => {
+            const nextList = [...prev, newMsg];
+            // Keep up to 50 messages to prevent memory bloat
+            return nextList.length > 50 ? nextList.slice(nextList.length - 50) : nextList;
+          });
         }
-        streamNext();
-      }, delay);
+
+        pushNextMessage();
+      }, nextDelay);
     };
 
-    streamNext();
+    pushNextMessage();
 
-    return () => clearTimeout(timeoutId);
-  }, [round, roundData?.hypeRoomFeed]);
+    return () => clearTimeout(timerId);
+  }, [round]);
 
   // Auto-scroll strictly inside the chat container without touching window scroll
   useEffect(() => {

@@ -177,7 +177,7 @@ export const FomoTrapQuizModal: React.FC<FomoTrapQuizModalProps> = ({
       aria-labelledby="fomo-trap-quiz-title"
       className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
     >
-      <div className="fomo-quiz-dialog w-full max-w-xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col">
+      <div className="fomo-quiz-dialog w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col">
         {/* Top 10-second countdown bar */}
         <div className="fomo-quiz-progress-track w-full h-2 bg-slate-100">
           <div
@@ -219,7 +219,7 @@ export const FomoTrapQuizModal: React.FC<FomoTrapQuizModalProps> = ({
 
         {/* Modal Body */}
         <div className="p-6 flex flex-col gap-4">
-          <p className="text-sm sm:text-base text-slate-800 leading-relaxed font-semibold">
+          <p className="text-base sm:text-lg text-slate-900 leading-relaxed font-bold">
             {modalPrompt}
           </p>
 
@@ -274,11 +274,11 @@ export const FomoTrapQuizModal: React.FC<FomoTrapQuizModalProps> = ({
                   >
                     {opt.letter}
                   </span>
-                  <span className="text-xs sm:text-sm font-semibold flex-1 leading-snug">
+                  <span className="text-sm sm:text-base font-semibold text-slate-900 flex-1 leading-snug">
                     {opt.text}
                   </span>
-                  <kbd className="text-[10px] text-slate-400 font-mono px-2 py-0.5 rounded bg-white border border-slate-200 flex-shrink-0">
-                    Phím {opt.letter} / {opt.shortcutKey}
+                  <kbd className="text-xs text-slate-500 font-mono font-bold px-2.5 py-1 rounded-md bg-white border border-slate-300 shadow-sm flex-shrink-0">
+                    Phím [{opt.shortcutKey}] / [{opt.letter}]
                   </kbd>
                 </button>
               );

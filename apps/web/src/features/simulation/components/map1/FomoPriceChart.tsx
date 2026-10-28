@@ -38,23 +38,34 @@ export const FomoPriceChart: React.FC<FomoPriceChartProps> = ({
   const tickSeries = roundData?.tickSeries || [];
 
   const [tickIndex, setTickIndex] = useState(0);
+  const [microJitter, setMicroJitter] = useState(0);
 
   // Reset tick index when round changes
   useEffect(() => {
     setTickIndex(0);
+    setMicroJitter(0);
   }, [round]);
 
-  // Dynamic 1.5s tick simulation loop
+  // Dynamic 1.5s live tick simulation loop with realistic micro-jitter
   useEffect(() => {
-    if (!tickSeries.length) return;
     const interval = setInterval(() => {
-      setTickIndex((prev) => (prev < tickSeries.length - 1 ? prev + 1 : prev));
+      setTickIndex((prev) => {
+        if (!tickSeries.length) return prev;
+        if (prev < tickSeries.length - 1) {
+          return prev + 1;
+        }
+        // When at end of scenario data, maintain dynamic micro-jitter
+        const randomDelta = Math.round((Math.random() - 0.5) * 80);
+        setMicroJitter(randomDelta);
+        return prev;
+      });
     }, 1500);
     return () => clearInterval(interval);
   }, [tickSeries.length, round]);
 
   const activeTick = tickSeries[tickIndex] || tickSeries[0];
-  const activePrice = activeTick?.price || currentPrice || 46350;
+  const basePrice = activeTick?.price || currentPrice || 46350;
+  const activePrice = Math.max(38000, Math.min(52000, basePrice + microJitter));
 
   // Sync price change to parent if callback provided
   useEffect(() => {
@@ -425,6 +436,34 @@ export const FomoPriceChart: React.FC<FomoPriceChartProps> = ({
             stroke="#06B6D4"
             strokeDasharray="4 4"
             strokeWidth="1.2"
+          />
+
+          {/* Live Price Horizontal Tracking Laser Line */}
+          <line
+            x1={padLeft}
+            y1={scaleY(activePrice)}
+            x2={chartWidth - padRight}
+            y2={scaleY(activePrice)}
+            stroke={activePrice >= refPrice ? "#10B981" : "#EF4444"}
+            strokeDasharray="2 2"
+            strokeWidth="1.2"
+            opacity="0.85"
+          />
+          {/* Live pulsing coordinate indicator */}
+          <circle
+            cx={padLeft + (candles.length - 1) * candleSlotWidth + candleSlotWidth / 2}
+            cy={scaleY(activePrice)}
+            r="5"
+            fill={activePrice >= refPrice ? "#10B981" : "#EF4444"}
+            opacity="0.4"
+          />
+          <circle
+            cx={padLeft + (candles.length - 1) * candleSlotWidth + candleSlotWidth / 2}
+            cy={scaleY(activePrice)}
+            r="2.5"
+            fill="#FFFFFF"
+            stroke={activePrice >= refPrice ? "#10B981" : "#EF4444"}
+            strokeWidth="1.5"
           />
 
           {/* Soft accumulation area glow under candles */}

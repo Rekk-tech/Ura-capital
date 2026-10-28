@@ -1,8 +1,11 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi, afterEach } from "vitest";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { FomoOrderTicket } from "./FomoOrderTicket";
 
 describe("FomoOrderTicket", () => {
+  afterEach(() => {
+    cleanup();
+  });
   const defaultProps = {
     phase: "trading_window" as const,
     round: 1,

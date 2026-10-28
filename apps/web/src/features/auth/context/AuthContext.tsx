@@ -46,6 +46,8 @@ export interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<AuthUser>;
   register: (email: string, password: string, displayName?: string) => Promise<AuthUser>;
+  requestOtp: (email: string, password: string, displayName?: string) => Promise<{ success: boolean; message: string; email: string }>;
+  verifyOtp: (email: string, otp: string) => Promise<AuthUser>;
   logout: () => Promise<void>;
   refreshSession: () => Promise<void>;
   setAuthSession: (token: string, user: AuthUser) => void;
@@ -154,6 +156,25 @@ export const AuthProvider: React.FC<{
     }
   }, []);
 
+  const requestOtp = useCallback(async (email: string, password: string, displayName?: string) => {
+    setIsLoading(true);
+    try {
+      return await authApi.requestOtp({ email, password, displayName });
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const verifyOtp = useCallback(async (email: string, otp: string) => {
+    setIsLoading(true);
+    try {
+      const res = await authApi.verifyOtp(email, otp);
+      return res.user;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   const logout = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -188,6 +209,8 @@ export const AuthProvider: React.FC<{
     isLoading,
     login,
     register,
+    requestOtp,
+    verifyOtp,
     logout,
     refreshSession,
     setAuthSession,
@@ -207,6 +230,8 @@ export function useAuth(): AuthContextType {
       isLoading: false,
       login: async () => ({ id: "", email: "" }),
       register: async () => ({ id: "", email: "", status: "ACTIVE", createdAt: "" }),
+      requestOtp: async () => ({ success: true, message: "", email: "" }),
+      verifyOtp: async () => ({ id: "", email: "", role: "TRADER" as const, status: "ACTIVE" }),
       logout: async () => {},
       refreshSession: async () => {},
       setAuthSession: () => {},

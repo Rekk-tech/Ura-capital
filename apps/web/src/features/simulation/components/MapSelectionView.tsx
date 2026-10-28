@@ -36,7 +36,9 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
   const navigate = useNavigate();
   const [briefingMap, setBriefingMap] = useState<"map1-fomo" | "map2-pro" | null>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [showPrereqModal, setShowPrereqModal] = useState(false);
 
+  const hasCompletedMap1 = gamificationService.hasCompletedMap1();
   const isVipBadge = gamificationService
     .getState()
     .badges.some((b) => b.id === "VIP_PATRON" && b.isUnlocked);
@@ -44,6 +46,10 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
   const quota = gamificationService.canPlayMap2(isPremium ? "PREMIUM" : "FREE");
 
   const handleEnterMap2 = () => {
+    if (!hasCompletedMap1) {
+      setShowPrereqModal(true);
+      return;
+    }
     if (!isPremium && !quota.allowed) {
       setShowUpgradeModal(true);
       return;
@@ -292,16 +298,20 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
           <div className="arena-card-actions">
             <button
               type="button"
-              className="btn btn-dark btn-block btn-lg arena-cta-btn arena-dark-btn"
+              className={`btn btn-block btn-lg arena-cta-btn ${hasCompletedMap1 ? "btn-dark arena-dark-btn" : "btn-outline border-amber-300 text-amber-800 bg-amber-50/50 hover:bg-amber-100/60"}`}
               onClick={handleEnterMap2}
               data-testid="enter-pro-room-button"
             >
               <Lock size={16} style={{ display: "inline", verticalAlign: "middle", marginRight: "6px" }} />
-              <span>Vào Bàn Chiến Lược Map 2 (Pro Room)</span>
+              <span>{hasCompletedMap1 ? "Vào Bàn Chiến Lược Map 2 (Pro Room)" : "Mở Khóa Pro Room (Cần Vượt Map 1)"}</span>
               <span className="sr-only">Start Map 2 (Pro Room)</span>
             </button>
             <div className="quota-indicator">
-              {isPremium ? (
+              {!hasCompletedMap1 ? (
+                <span className="text-amber-700 font-bold flex items-center justify-center gap-1 text-xs mt-1.5">
+                  <Lock size={12} className="text-amber-600" /> Yêu cầu: Hoàn thành 7 vòng tại Map 1
+                </span>
+              ) : isPremium ? (
                 <span className="text-emerald-600 font-bold flex items-center justify-center gap-1 text-xs mt-1.5">
                   <Crown size={13} className="text-amber-500" /> Không giới hạn phiên (Premium VIP)
                 </span>
@@ -393,10 +403,59 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
                 className="btn btn-primary btn-md"
                 onClick={() => {
                   setBriefingMap(null);
-                  handleEnterMap2();
+                  if (!hasCompletedMap1) {
+                    navigate("/simulation/fomo");
+                  } else {
+                    handleEnterMap2();
+                  }
                 }}
               >
-                <span>Vào Bàn Chiến Lược Pro Room →</span>
+                <span>{hasCompletedMap1 ? "Vào Bàn Chiến Lược Pro Room →" : "Chinh Phục Map 1 Để Mở Khóa →"}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Map 1 Prerequisite Gate Modal */}
+      {showPrereqModal && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true" data-testid="map2-prereq-modal">
+          <div className="modal-card" style={{ maxWidth: "500px" }}>
+            <div className="modal-header">
+              <div className="modal-title-row" style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                <div style={{ padding: "0.5rem", borderRadius: "10px", background: "rgba(245, 158, 11, 0.15)", color: "#f59e0b" }}>
+                  <Lock size={24} />
+                </div>
+                <div>
+                  <span className="badge badge-warning-subtle text-[11px]" style={{ display: "inline-block", marginBottom: "0.25rem" }}>
+                    YÊU CẦU ĐIỀU KIỆN TIÊN QUYẾT
+                  </span>
+                  <h3 className="modal-title text-lg font-bold" style={{ margin: 0 }}>Chưa Đủ Điều Kiện Vào Map 2</h3>
+                </div>
+              </div>
+            </div>
+            <div className="modal-body" style={{ padding: "1.25rem 0" }}>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                Để bảo vệ tài khoản thực chiến và rèn luyện tâm lý đúng chuẩn, nhà đầu tư cần vượt qua 7 vòng tại <strong>Đấu Trường FOMO (Map 1)</strong> trước khi tiếp cận Bàn Chiến Lược Vĩ Mô (Map 2).
+              </p>
+            </div>
+            <div className="modal-footer" style={{ display: "flex", gap: "0.75rem", justifyContent: "flex-end" }}>
+              <button
+                type="button"
+                className="btn btn-outline btn-md"
+                onClick={() => setShowPrereqModal(false)}
+              >
+                Đóng
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary btn-md"
+                onClick={() => {
+                  setShowPrereqModal(false);
+                  navigate("/simulation/fomo");
+                }}
+              >
+                Chinh Phục Map 1 Ngay →
               </button>
             </div>
           </div>

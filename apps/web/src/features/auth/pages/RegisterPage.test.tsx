@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "../context/AuthContext";
@@ -10,20 +10,22 @@ describe("RegisterPage (FEAT-071: AC-001..AC-006)", () => {
   let queryClient: QueryClient;
 
   beforeEach(() => {
+    cleanup();
     queryClient = new QueryClient({
       defaultOptions: {
         queries: { retry: false },
         mutations: { retry: false },
       },
     });
-    localStorage.clear();
-    sessionStorage.clear();
+    if (typeof localStorage !== "undefined") localStorage.clear();
+    if (typeof sessionStorage !== "undefined") sessionStorage.clear();
     vi.restoreAllMocks();
   });
 
   afterEach(() => {
-    localStorage.clear();
-    sessionStorage.clear();
+    cleanup();
+    if (typeof localStorage !== "undefined") localStorage.clear();
+    if (typeof sessionStorage !== "undefined") sessionStorage.clear();
     vi.restoreAllMocks();
   });
 

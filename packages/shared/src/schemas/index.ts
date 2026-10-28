@@ -335,6 +335,25 @@ export const RegisterResponseSchema = z.object({
   user: SafeUserSchema,
 });
 
+// FEAT-090 OTP 2-Step Registration Schemas
+export const RequestOtpRequestSchema = RegisterRequestSchema;
+
+export const VerifyOtpRequestSchema = z.object({
+  email: z
+    .string({ required_error: "Email is required" })
+    .trim()
+    .min(1, "Email is required")
+    .email("Invalid email format")
+    .toLowerCase(),
+  otp: z
+    .string({ required_error: "OTP code is required" })
+    .trim()
+    .length(6, "Mã OTP phải gồm đúng 6 chữ số"),
+});
+
+export type RequestOtpRequest = z.infer<typeof RequestOtpRequestSchema>;
+export type VerifyOtpRequest = z.infer<typeof VerifyOtpRequestSchema>;
+
 // FEAT-004 Login & Access Token Schemas
 export const LoginRequestSchema = z.object({
   email: z

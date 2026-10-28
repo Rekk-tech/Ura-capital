@@ -12,12 +12,15 @@ import { ProRoomAiAdvisor } from "../components/map2/ProRoomAiAdvisor";
 import { MacroExplanationModal } from "../components/map2/MacroExplanationModal";
 import { ProQuizDialog } from "../components/map2/ProQuizDialog";
 import { ProRoomReportView } from "../components/map2/ProRoomReportView";
-import { BrainCircuit, Play, ArrowLeft, RefreshCw, AlertTriangle } from "lucide-react";
-import { Link } from "react-router-dom";
+import { BrainCircuit, Play, ArrowLeft, RefreshCw, AlertTriangle, Lock } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { PRO_MACRO_REGIMES } from "../data/simulation-scenarios-store";
+import { gamificationService } from "../services/gamification.service";
 
 export const ProRoomPage: React.FC = () => {
+  const navigate = useNavigate();
   const { accessToken } = useAuth();
+  const hasCompletedMap1 = gamificationService.hasCompletedMap1();
   const {
     sessionId,
     session,
@@ -117,6 +120,46 @@ export const ProRoomPage: React.FC = () => {
 
   const currentQuiz = quizzesMap[currentQ] ?? null;
   const showQuiz = Boolean(currentQuiz && activeQuizClosedForQuarter !== currentQ);
+
+  if (!hasCompletedMap1) {
+    return (
+      <div className="pro-room-page min-h-screen bg-slate-50/80 p-4 sm:p-6 lg:p-8 flex items-center justify-center">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl border border-slate-200 p-6 sm:p-8 text-center flex flex-col items-center gap-4 animate-in fade-in duration-200">
+          <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center shadow-xs">
+            <Lock size={28} />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[11px] font-black uppercase tracking-wider text-amber-600">
+              YÊU CẦU ĐIỀU KIỆN TIÊN QUYẾT
+            </span>
+            <h2 className="text-xl font-black text-slate-900 tracking-tight">
+              Phòng Chiến Lược Vĩ Mô Đang Khóa
+            </h2>
+          </div>
+          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Để bảo toàn tính thực chiến và kỷ luật đầu tư, Aura Capital yêu cầu nhà đầu tư chứng minh năng lực kiểm soát tâm lý thị trường bằng cách hoàn thành 7 vòng tại <strong>Đấu Trường FOMO (Map 1)</strong> trước khi mở khóa Bàn Chiến Lược Vĩ Mô.
+          </p>
+          <div className="flex flex-col w-full gap-2.5 pt-2">
+            <button
+              type="button"
+              onClick={() => navigate("/simulation/fomo")}
+              className="btn btn-primary btn-block py-2.5 rounded-xl font-bold text-sm shadow-sm flex items-center justify-center gap-2"
+            >
+              <Play size={16} />
+              <span>Chinh Phục Đấu Trường FOMO (Map 1)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate("/simulation")}
+              className="btn btn-outline btn-block py-2 rounded-xl font-semibold text-xs text-slate-600 hover:text-slate-900"
+            >
+              Về Sảnh Giả Lập
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="pro-room-page min-h-screen bg-slate-50/70 p-4 md:p-6 lg:p-8 flex flex-col gap-5">
@@ -267,7 +310,7 @@ export const ProRoomPage: React.FC = () => {
             unallocatedPercent={draftAllocation.cash}
             alpha={
               session.currentQuarter === 1
-                ? 1.85
+                ? 0.0
                 : session.currentQuarter <= 3
                 ? 1.85
                 : session.currentQuarter <= 6

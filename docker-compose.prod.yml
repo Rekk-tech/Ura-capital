@@ -1,0 +1,106 @@
+# ========================================================
+# docker-compose.prod.yml - Production Stack
+# Aura Capital Self-Hosted VPS Deployment
+# Services: PostgreSQL (Persistent), Redis, Express API, Vite Web, Caddy (Auto HTTPS)
+# ========================================================
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: aura-postgres-prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgrespassword}
+      POSTGRES_DB: ${POSTGRES_DB:-aura_capital_prod}
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - aura-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: aura-redis-prod
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_prod_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - aura-network
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: aura-api-prod
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgrespassword}@postgres:5432/${POSTGRES_DB:-aura_capital_prod}?schema=public
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    expose:
+      - "3000"
+    networks:
+      - aura-network
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    container_name: aura-web-builder
+    restart: "no"
+    volumes:
+      - web_dist:/target
+    networks:
+      - aura-network
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: aura-caddy-prod
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - web_dist:/srv:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+      - web
+    networks:
+      - aura-network
+
+volumes:
+  postgres_prod_data:
+  redis_prod_data:
+  web_dist:
+  caddy_data:
+  caddy_config:
+
+networks:
+  aura-network:
+    driver: bridge
+

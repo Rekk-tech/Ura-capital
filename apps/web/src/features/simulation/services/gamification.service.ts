@@ -498,6 +498,14 @@ class GamificationService {
     }).length;
   }
 
+  public hasCompletedMap1(): boolean {
+    const state = this.getState();
+    return (
+      state.history.some((r) => r.map === "MAP1") ||
+      state.badges.some((b) => b.id === "SURVIVOR" && b.isUnlocked)
+    );
+  }
+
   public canPlayMap2(planKey: string = "FREE"): {
     allowed: boolean;
     runsUsed: number;

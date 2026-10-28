@@ -41,6 +41,8 @@ export class AuthApiError extends Error {
 export interface IAuthApiClient {
   login(email: string, password: string): Promise<LoginResponse>;
   register(payload: RegisterPayload): Promise<RegisterResponse>;
+  requestOtp(payload: RegisterPayload): Promise<{ success: boolean; message: string; email: string }>;
+  verifyOtp(email: string, otp: string): Promise<RegisterResponse>;
   refresh(): Promise<LoginResponse>;
   logout(): Promise<{ success: boolean }>;
   getMe(accessToken: string): Promise<{ user: AuthUser }>;
@@ -51,6 +53,67 @@ export class AuthApiClient implements IAuthApiClient {
 
   constructor(baseUrl = `${getApiBaseUrl()}/api/auth`) {
     this.baseUrl = baseUrl;
+  }
+
+  async requestOtp(payload: RegisterPayload): Promise<{ success: boolean; message: string; email: string }> {
+    const res = await fetch(`${this.baseUrl}/register/request-otp`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        email: payload.email.trim().toLowerCase(),
+        password: payload.password,
+        ...(payload.displayName?.trim() ? { displayName: payload.displayName.trim() } : {}),
+      }),
+    });
+
+    if (!res.ok) {
+      let message = "Yêu cầu gửi mã OTP thất bại";
+      let code: string | undefined;
+      try {
+        const errorData = await res.json();
+        message = errorData?.error?.message ?? message;
+        code = errorData?.error?.code;
+      } catch {
+        // use default
+      }
+      throw new AuthApiError(message, res.status, code);
+    }
+
+    return (await res.json()) as { success: boolean; message: string; email: string };
+  }
+
+  async verifyOtp(email: string, otp: string): Promise<RegisterResponse> {
+    const res = await fetch(`${this.baseUrl}/register/verify-otp`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        email: email.trim().toLowerCase(),
+        otp: otp.trim(),
+      }),
+    });
+
+    if (!res.ok) {
+      let message = "Xác thực mã OTP thất bại";
+      let code: string | undefined;
+      try {
+        const errorData = await res.json();
+        message = errorData?.error?.message ?? message;
+        code = errorData?.error?.code;
+      } catch {
+        // use default
+      }
+      throw new AuthApiError(message, res.status, code);
+    }
+
+    return (await res.json()) as RegisterResponse;
   }
 
   async login(email: string, password: string): Promise<LoginResponse> {

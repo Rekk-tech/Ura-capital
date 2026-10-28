@@ -1,11 +1,15 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { render, screen, fireEvent, waitFor, act, cleanup } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { AiCoachModal } from "./AiCoachModal";
 import { AiCoachFab } from "./AiCoachFab";
 import { AiCoachWidget } from "./AiCoachWidget";
 import { openAiCoach } from "../events";
 import * as aiApiModule from "../../../api/ai.api";
+
+afterEach(() => {
+  cleanup();
+});
 
 // Configurable mock states
 let mockAuthState: {
@@ -47,6 +51,7 @@ const renderWithRouter = (ui: React.ReactElement) => {
 
 describe("AiCoachModal (Unit Tests)", () => {
   beforeEach(() => {
+    cleanup();
     vi.restoreAllMocks();
     mockAuthState = {
       user: { id: "user-1", email: "admin@aura.internal", role: "ADMIN" },
@@ -64,6 +69,10 @@ describe("AiCoachModal (Unit Tests)", () => {
     };
     // Scroll mock
     window.HTMLElement.prototype.scrollIntoView = vi.fn();
+  });
+
+  afterEach(() => {
+    cleanup();
   });
 
   it("does not render dialog when isOpen is false", () => {
