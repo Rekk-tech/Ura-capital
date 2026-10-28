@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   CalendarClock,
   Check,
@@ -46,19 +47,42 @@ function formatPeriodDate(value: string | null): string | null {
 export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({
   commandEnvironment = import.meta.env.MODE,
 }) => {
+  const navigate = useNavigate();
   const { accessToken, user, isAuthenticated, isLoading: authLoading } = useAuth();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [announcement, setAnnouncement] = useState("");
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("yearly");
 
   const plansQuery = useSubscriptionPlansQuery(accessToken ?? undefined);
-  const currentQuery = useCurrentSubscriptionQuery(accessToken ?? undefined, user?.id);
+  const currentQuery = useCurrentSubscriptionQuery(accessToken ?? undefined, user?.id, isAuthenticated);
   const cancelMutation = useCancelSubscriptionMutation(accessToken ?? undefined);
+
+  const fallbackPlans = useMemo(
+    () => [
+      {
+        planKey: "FREE",
+        name: "Standard Free",
+        description: "Foundational learning and simulation access",
+        entitlements: [],
+      },
+      {
+        planKey: "PREMIUM",
+        name: "Premium VIP",
+        description: "Advanced platform capabilities and unrestricted simulation access",
+        entitlements: ["PREMIUM_ACCESS"],
+      },
+    ],
+    [],
+  );
+
+  const availablePlans = plansQuery.data?.data && plansQuery.data.data.length > 0
+    ? plansQuery.data.data
+    : fallbackPlans;
 
   const current = currentQuery.data?.data;
   const currentPlan = useMemo(
-    () => plansQuery.data?.data.find((plan) => plan.planKey === current?.planKey),
-    [current?.planKey, plansQuery.data?.data],
+    () => availablePlans.find((plan) => plan.planKey === current?.planKey) ?? availablePlans[0],
+    [current?.planKey, availablePlans],
   );
 
   const refetchAuthoritativeState = useCallback(async () => {
@@ -97,32 +121,23 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({
 
   if (authLoading) {
     return (
-      <main className="subscription-page">
+      <main className="subscription-page" data-testid="subscription-page">
         <SubscriptionLoadingState />
       </main>
     );
   }
 
-  if (!isAuthenticated || !accessToken || !user) {
+  if (plansQuery.isLoading || (isAuthenticated && currentQuery.isLoading)) {
     return (
-      <main className="subscription-page">
-        <SubscriptionPageHeader />
-        <SubscriptionAuthRequired />
-      </main>
-    );
-  }
-
-  if (plansQuery.isLoading || currentQuery.isLoading) {
-    return (
-      <main className="subscription-page">
+      <main className="subscription-page" data-testid="subscription-page">
         <SubscriptionPageHeader />
         <SubscriptionLoadingState />
       </main>
     );
   }
 
-  const queryError = currentQuery.error ?? plansQuery.error;
-  if (queryError) {
+  const queryError = isAuthenticated ? currentQuery.error ?? plansQuery.error : plansQuery.error;
+  if (queryError && isAuthenticated) {
     const apiError = queryError instanceof SubscriptionApiError ? queryError : null;
     const kind =
       apiError?.status === 401
@@ -136,7 +151,7 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({
               : "generic";
 
     return (
-      <main className="subscription-page">
+      <main className="subscription-page" data-testid="subscription-page">
         <SubscriptionPageHeader />
         {kind === "auth" ? (
           <SubscriptionAuthRequired />
@@ -151,35 +166,30 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({
     );
   }
 
-  if (!current || !currentPlan) {
-    return (
-      <main className="subscription-page">
-        <SubscriptionPageHeader />
-        <SubscriptionErrorState onRetry={() => void refetchAuthoritativeState()} />
-      </main>
-    );
-  }
-
-  const periodEnd = formatPeriodDate(current.currentPeriodEnd);
-  const periodStart = formatPeriodDate(current.currentPeriodStart);
-  const isFree = current.planKey === "FREE" || current.status === "NONE";
-  const isCancellationPending =
-    current.status === "ACTIVE" && current.cancelAtPeriodEnd && current.isEntitled;
-  const hasPremiumAccess =
-    current.planKey === "PREMIUM" && current.status === "ACTIVE" && current.isEntitled;
+  const periodEnd = current ? formatPeriodDate(current.currentPeriodEnd) : null;
+  const periodStart = current ? formatPeriodDate(current.currentPeriodStart) : null;
+  const isFree = current ? (current.planKey === "FREE" || current.status === "NONE") : true;
+  const isCancellationPending = Boolean(
+    current && current.status === "ACTIVE" && current.cancelAtPeriodEnd && current.isEntitled,
+  );
+  const hasPremiumAccess = Boolean(
+    current && current.planKey === "PREMIUM" && current.status === "ACTIVE" && current.isEntitled,
+  );
   const canCancel =
     isSubscriptionCommandUiEnabled(commandEnvironment) &&
     hasPremiumAccess &&
-    !current.cancelAtPeriodEnd;
+    Boolean(current && !current.cancelAtPeriodEnd);
   const mutationError =
     cancelMutation.error instanceof SubscriptionApiError ? cancelMutation.error : null;
 
-  const state = isFree
+  const state = !isAuthenticated || isFree
     ? {
         label: "Free",
         tone: "neutral",
-        title: "Your Free plan is active",
-        body: "You have access to Aura Capital's foundational learning and simulation tools.",
+        title: isAuthenticated ? "Your Free plan is active" : "Trải nghiệm Đẳng cấp Aura VIP",
+        body: isAuthenticated
+          ? "You have access to Aura Capital's foundational learning and simulation tools."
+          : "Khám phá bảng giá và các đặc quyền hội viên dành cho nhà đầu tư tài chính.",
       }
     : isCancellationPending
       ? {
@@ -197,21 +207,21 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({
             title: "Premium access is active",
             body: "Your effective Premium entitlement is confirmed by the server.",
           }
-        : current.status === "PAST_DUE"
+        : current?.status === "PAST_DUE"
           ? {
               label: "Past due",
               tone: "danger",
               title: "Premium access is paused",
               body: "This account is not currently entitled to Premium access.",
             }
-          : current.status === "CANCELLED"
+          : current?.status === "CANCELLED"
             ? {
                 label: "Cancelled",
                 tone: "neutral",
                 title: "Subscription cancelled",
                 body: "Premium access is not active for this account.",
               }
-            : current.status === "EXPIRED"
+            : current?.status === "EXPIRED"
               ? {
                   label: "Expired",
                   tone: "neutral",
@@ -230,103 +240,139 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({
       <SubscriptionPageHeader />
 
       <div className="subscription-layout">
-        <section className="subscription-status-card" aria-labelledby="subscription-state-title">
-          <div className="subscription-status-topline">
-            <span className={`subscription-status-badge subscription-status-${state.tone}`}>
-              {state.label}
-            </span>
-            <button
-              type="button"
-              className="subscription-refresh-button"
-              onClick={() => void refetchAuthoritativeState()}
-              disabled={currentQuery.isFetching || plansQuery.isFetching}
-              aria-label="Refresh subscription status"
-            >
-              <RefreshCw
-                size={17}
-                className={currentQuery.isFetching ? "subscription-spin" : undefined}
-                aria-hidden="true"
-              />
-              Refresh
-            </button>
-          </div>
+        {isAuthenticated && current && currentPlan ? (
+          <>
+            <section className="subscription-status-card" aria-labelledby="subscription-state-title">
+              <div className="subscription-status-topline">
+                <span className={`subscription-status-badge subscription-status-${state.tone}`}>
+                  {state.label}
+                </span>
+                <button
+                  type="button"
+                  className="subscription-refresh-button"
+                  onClick={() => void refetchAuthoritativeState()}
+                  disabled={currentQuery.isFetching || plansQuery.isFetching}
+                  aria-label="Refresh subscription status"
+                >
+                  <RefreshCw
+                    size={17}
+                    className={currentQuery.isFetching ? "subscription-spin" : undefined}
+                    aria-hidden="true"
+                  />
+                  Refresh
+                </button>
+              </div>
 
-          <div className="subscription-plan-mark" aria-hidden="true">
-            {hasPremiumAccess || isCancellationPending ? (
+              <div className="subscription-plan-mark" aria-hidden="true">
+                {hasPremiumAccess || isCancellationPending ? (
+                  <Sparkles size={26} />
+                ) : (
+                  <CircleDollarSign size={26} />
+                )}
+              </div>
+              <p className="subscription-eyebrow">Current plan</p>
+              <h2 id="subscription-state-title">{state.title}</h2>
+              <p className="subscription-state-copy">{state.body}</p>
+
+              <dl className="subscription-facts">
+                <div>
+                  <dt>Plan</dt>
+                  <dd>{currentPlan.name}</dd>
+                </div>
+                <div>
+                  <dt>Status</dt>
+                  <dd>{current.status === "NONE" ? "No paid subscription" : current.status.replace("_", " ")}</dd>
+                </div>
+                <div>
+                  <dt>Premium access</dt>
+                  <dd>{current.isEntitled ? "Enabled by server" : "Not enabled"}</dd>
+                </div>
+                <div>
+                  <dt>Period start</dt>
+                  <dd>{periodStart ?? "Not applicable"}</dd>
+                </div>
+                <div>
+                  <dt>Period end</dt>
+                  <dd>{periodEnd ?? "Not applicable"}</dd>
+                </div>
+              </dl>
+
+              {canCancel && (
+                <button
+                  type="button"
+                  className="btn btn-outline subscription-cancel-button"
+                  onClick={() => setDialogOpen(true)}
+                >
+                  <CalendarClock size={18} aria-hidden="true" />
+                  Schedule cancellation
+                </button>
+              )}
+            </section>
+
+            <section className="subscription-benefits" aria-labelledby="subscription-benefits-title">
+              <div className="subscription-section-heading">
+                <ShieldCheck size={22} aria-hidden="true" />
+                <div>
+                  <p className="subscription-eyebrow">Included access</p>
+                  <h2 id="subscription-benefits-title">{currentPlan.name}</h2>
+                </div>
+              </div>
+              <p className="subscription-plan-description">{currentPlan.description}</p>
+              <ul className="subscription-benefit-list">
+                {currentPlan.entitlements.length > 0 ? (
+                  currentPlan.entitlements.map((entitlement) => (
+                    <li key={entitlement}>
+                      <Check size={18} aria-hidden="true" />
+                      <span>
+                        {entitlement === "PREMIUM_ACCESS"
+                          ? "Advanced platform capabilities"
+                          : "Approved plan access"}
+                      </span>
+                    </li>
+                  ))
+                ) : (
+                  <li>
+                    <Check size={18} aria-hidden="true" />
+                    <span>Foundational learning and simulation access</span>
+                  </li>
+                )}
+              </ul>
+              {!isSubscriptionCommandUiEnabled(commandEnvironment) && <SubscriptionReadOnlyNotice />}
+            </section>
+          </>
+        ) : (
+          <section className="subscription-status-card" aria-labelledby="subscription-guest-title" style={{ gridColumn: "1 / -1" }}>
+            <div className="subscription-status-topline">
+              <span className="subscription-status-badge subscription-status-neutral">
+                Trải Nghiệm Miễn Phí
+              </span>
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={() => navigate("/register?returnTo=/subscription")}
+                >
+                  Đăng Ký Miễn Phí
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-outline btn-sm"
+                  onClick={() => navigate("/login?returnTo=/subscription")}
+                >
+                  Đăng Nhập
+                </button>
+              </div>
+            </div>
+            <div className="subscription-plan-mark" aria-hidden="true">
               <Sparkles size={26} />
-            ) : (
-              <CircleDollarSign size={26} />
-            )}
-          </div>
-          <p className="subscription-eyebrow">Current plan</p>
-          <h2 id="subscription-state-title">{state.title}</h2>
-          <p className="subscription-state-copy">{state.body}</p>
-
-          <dl className="subscription-facts">
-            <div>
-              <dt>Plan</dt>
-              <dd>{currentPlan.name}</dd>
             </div>
-            <div>
-              <dt>Status</dt>
-              <dd>{current.status === "NONE" ? "No paid subscription" : current.status.replace("_", " ")}</dd>
-            </div>
-            <div>
-              <dt>Premium access</dt>
-              <dd>{current.isEntitled ? "Enabled by server" : "Not enabled"}</dd>
-            </div>
-            <div>
-              <dt>Period start</dt>
-              <dd>{periodStart ?? "Not applicable"}</dd>
-            </div>
-            <div>
-              <dt>Period end</dt>
-              <dd>{periodEnd ?? "Not applicable"}</dd>
-            </div>
-          </dl>
-
-          {canCancel && (
-            <button
-              type="button"
-              className="btn btn-outline subscription-cancel-button"
-              onClick={() => setDialogOpen(true)}
-            >
-              <CalendarClock size={18} aria-hidden="true" />
-              Schedule cancellation
-            </button>
-          )}
-        </section>
-
-        <section className="subscription-benefits" aria-labelledby="subscription-benefits-title">
-          <div className="subscription-section-heading">
-            <ShieldCheck size={22} aria-hidden="true" />
-            <div>
-              <p className="subscription-eyebrow">Included access</p>
-              <h2 id="subscription-benefits-title">{currentPlan.name}</h2>
-            </div>
-          </div>
-          <p className="subscription-plan-description">{currentPlan.description}</p>
-          <ul className="subscription-benefit-list">
-            {currentPlan.entitlements.length > 0 ? (
-              currentPlan.entitlements.map((entitlement) => (
-                <li key={entitlement}>
-                  <Check size={18} aria-hidden="true" />
-                  <span>
-                    {entitlement === "PREMIUM_ACCESS"
-                      ? "Advanced platform capabilities"
-                      : "Approved plan access"}
-                  </span>
-                </li>
-              ))
-            ) : (
-              <li>
-                <Check size={18} aria-hidden="true" />
-                <span>Foundational learning and simulation access</span>
-              </li>
-            )}
-          </ul>
-          {!isSubscriptionCommandUiEnabled(commandEnvironment) && <SubscriptionReadOnlyNotice />}
-        </section>
+            <p className="subscription-eyebrow">Aura Capital Membership</p>
+            <h2 id="subscription-guest-title">Bảng Giá &amp; Quyền Lợi Hội Viên</h2>
+            <p className="subscription-state-copy">
+              Khám phá toàn diện các gói hội viên và đặc quyền rèn luyện đầu tư chuẩn tổ chức. Đăng ký tài khoản ngay để nhận 100.000.000 ₫ vốn giả lập thực chiến tại Đấu trường FOMO Arena và Học viện Aura Academy.
+            </p>
+          </section>
+        )}
       </div>
 
       {/* ================================================================ */}
@@ -407,11 +453,18 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({
             <div className="pricing-card-actions">
               <button
                 type="button"
-                disabled
+                disabled={isAuthenticated}
                 className="btn btn-outline"
                 style={{ width: "100%", justifyContent: "center" }}
+                onClick={() => {
+                  if (!isAuthenticated) navigate("/register?returnTo=/subscription");
+                }}
               >
-                {isFree ? "Gói Đang Sử Dụng" : "Gói Mặc Định"}
+                {!isAuthenticated
+                  ? "Bắt Đầu Miễn Phí (Đăng Ký)"
+                  : isFree
+                    ? "Gói Đang Sử Dụng"
+                    : "Gói Mặc Định"}
               </button>
             </div>
           </div>
@@ -503,16 +556,24 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({
                   fontSize: "0.95rem",
                   fontWeight: 700,
                 }}
-                onClick={() => void handleUpgrade()}
-                disabled={isUpgrading || hasPremiumAccess}
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    navigate("/register?returnTo=/subscription");
+                  } else {
+                    void handleUpgrade();
+                  }
+                }}
+                disabled={isAuthenticated && (isUpgrading || hasPremiumAccess)}
               >
                 <Sparkles size={18} />
                 <span>
-                  {hasPremiumAccess
-                    ? "Gói Đang Sử Dụng (Premium VIP)"
-                    : isUpgrading
-                      ? "Processing upgrade..."
-                      : "Nâng Cấp Gói Premium VIP"}
+                  {!isAuthenticated
+                    ? "Đăng Ký Gói Premium VIP"
+                    : hasPremiumAccess
+                      ? "Gói Đang Sử Dụng (Premium VIP)"
+                      : isUpgrading
+                        ? "Đang kích hoạt..."
+                        : "Nâng Cấp Gói Premium VIP"}
                 </span>
               </button>
             </div>
@@ -623,8 +684,10 @@ export const SubscriptionPage: React.FC<SubscriptionPageProps> = ({
 
 const SubscriptionPageHeader: React.FC = () => (
   <header className="subscription-page-header">
-    <p className="subscription-eyebrow">Membership</p>
-    <h1>Subscription</h1>
-    <p>Review your server-confirmed plan, access, and billing-period status.</p>
+    <p className="subscription-eyebrow">Hội Viên &amp; Đặc Quyền</p>
+    <h1>
+      Gói Dịch Vụ &amp; Bảng Giá <span className="sr-only">Subscription</span>
+    </h1>
+    <p>Minh bạch mọi đặc quyền, hạn mức thi đấu giả lập và công cụ AI hỗ trợ đầu tư tài chính.</p>
   </header>
 );

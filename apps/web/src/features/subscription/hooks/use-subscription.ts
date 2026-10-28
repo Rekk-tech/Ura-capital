@@ -11,8 +11,8 @@ export const subscriptionQueryKeys = {
 export function useSubscriptionPlansQuery(accessToken?: string) {
   return useQuery({
     queryKey: subscriptionQueryKeys.plans,
-    queryFn: ({ signal }) => subscriptionApi.getPlans(accessToken!, { signal }),
-    enabled: Boolean(accessToken),
+    queryFn: ({ signal }) => subscriptionApi.getPlans(accessToken, { signal }),
+    enabled: true,
   });
 }
 export function useCurrentSubscriptionQuery(

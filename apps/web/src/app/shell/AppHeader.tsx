@@ -115,7 +115,7 @@ export const AppHeader: React.FC = () => {
       };
     }
     return {
-      label: currentLang === "VI" ? "Học Viên F0" : "Learner",
+      label: currentLang === "VI" ? "Nhà Đầu Tư (User)" : "Investor (User)",
       tagClass: "role-tag-learner",
       icon: <Sparkles size={12} aria-hidden="true" />,
     };

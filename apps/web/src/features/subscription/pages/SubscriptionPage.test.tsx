@@ -1,5 +1,6 @@
+// @vitest-environment jsdom
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, cleanup } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { subscriptionApi } from "../../../api/subscription.api";
@@ -79,6 +80,7 @@ describe("SubscriptionPage", () => {
   });
 
   afterEach(() => {
+    cleanup();
     vi.restoreAllMocks();
   });
 
@@ -91,11 +93,11 @@ describe("SubscriptionPage", () => {
     expect(isSubscriptionCommandUiEnabled("")).toBe(false);
   });
 
-  it("renders auth required and sends zero subscription requests without a token", async () => {
+  it("renders public pricing and guest banner without requiring sign in to view", async () => {
     renderPage({ token: null, authUser: null });
 
-    await waitFor(() => expect(screen.getByTestId("subscription-auth-required")).toBeDefined());
-    expect(subscriptionApi.getPlans).not.toHaveBeenCalled();
+    await waitFor(() => expect(screen.getByText("Bảng Giá & Quyền Lợi Hội Viên")).toBeDefined());
+    expect(screen.getByText("Lựa Chọn Gói Phù Hợp Với Bạn")).toBeDefined();
     expect(subscriptionApi.getCurrent).not.toHaveBeenCalled();
   });
 

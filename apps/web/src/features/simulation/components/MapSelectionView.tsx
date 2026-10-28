@@ -15,8 +15,9 @@ import {
 } from "lucide-react";
 import { gamificationService } from "../services/gamification.service";
 import { FomoTutorialModal } from "./map1/FomoTutorialModal";
+import { useAuth } from "../../auth/context/AuthContext";
 
-interface MapSelectionViewProps {
+export interface MapSelectionViewProps {
   onEnterCockpit: (mapId: "map1-fomo" | "map2-pro") => void;
   hasActiveSession: boolean;
   activeSessionCycle?: number;
@@ -34,15 +35,17 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
   isPremium: propIsPremium,
 }) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [briefingMap, setBriefingMap] = useState<"map1-fomo" | "map2-pro" | null>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [showPrereqModal, setShowPrereqModal] = useState(false);
 
-  const hasCompletedMap1 = gamificationService.hasCompletedMap1();
-  const isVipBadge = gamificationService
+  const isElevatedRole = user?.role === "SYSTEM_ADMIN" || user?.role === "ADMIN" || user?.role === "MODERATOR";
+  const hasCompletedMap1 = isElevatedRole || gamificationService.hasCompletedMap1();
+  const isVipBadge = isElevatedRole || gamificationService
     .getState()
     .badges.some((b) => b.id === "VIP_PATRON" && b.isUnlocked);
-  const isPremium = propIsPremium ?? (userPlan === "PREMIUM" || isVipBadge);
+  const isPremium = isElevatedRole || propIsPremium || (userPlan === "PREMIUM" || isVipBadge);
   const quota = gamificationService.canPlayMap2(isPremium ? "PREMIUM" : "FREE");
 
   const handleEnterMap2 = () => {
@@ -242,10 +245,20 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
               <BrainCircuit size={14} className="text-teal-600" />
               <span>MAP 2 • PHÂN BỔ DANH MỤC VĨ MÔ</span>
             </div>
-            <div className="arena-status-badge arena-status-gray">
-              <Lock size={12} className="text-slate-500" />
-              <span>YÊU CẦU ĐẠT CHỈ SỐ</span>
-              <span className="sr-only">Locked until Map 1 is survived</span>
+            <div className={`arena-status-badge ${hasCompletedMap1 ? "arena-status-emerald" : "arena-status-gray"}`}>
+              {hasCompletedMap1 ? (
+                <>
+                  <Sparkles size={12} className="text-emerald-500" />
+                  <span>{isElevatedRole ? "ĐẶC QUYỀN ADMIN • SẴN SÀNG" : "ĐÃ MỞ KHÓA • SẴN SÀNG"}</span>
+                  <span className="sr-only">Locked until Map 1 is survived</span>
+                </>
+              ) : (
+                <>
+                  <Lock size={12} className="text-slate-500" />
+                  <span>YÊU CẦU ĐẠT CHỈ SỐ</span>
+                  <span className="sr-only">Locked until Map 1 is survived</span>
+                </>
+              )}
             </div>
           </div>
 
@@ -302,12 +315,18 @@ export const MapSelectionView: React.FC<MapSelectionViewProps> = ({
               onClick={handleEnterMap2}
               data-testid="enter-pro-room-button"
             >
-              <Lock size={16} style={{ display: "inline", verticalAlign: "middle", marginRight: "6px" }} />
+              {!hasCompletedMap1 && (
+                <Lock size={16} style={{ display: "inline", verticalAlign: "middle", marginRight: "6px" }} />
+              )}
               <span>{hasCompletedMap1 ? "Vào Bàn Chiến Lược Map 2 (Pro Room)" : "Mở Khóa Pro Room (Cần Vượt Map 1)"}</span>
               <span className="sr-only">Start Map 2 (Pro Room)</span>
             </button>
             <div className="quota-indicator">
-              {!hasCompletedMap1 ? (
+              {isElevatedRole ? (
+                <span className="text-blue-600 font-bold flex items-center justify-center gap-1 text-xs mt-1.5">
+                  <Crown size={13} className="text-blue-500" /> Đặc quyền Quản trị viên (Bypass Map 1)
+                </span>
+              ) : !hasCompletedMap1 ? (
                 <span className="text-amber-700 font-bold flex items-center justify-center gap-1 text-xs mt-1.5">
                   <Lock size={12} className="text-amber-600" /> Yêu cầu: Hoàn thành 7 vòng tại Map 1
                 </span>

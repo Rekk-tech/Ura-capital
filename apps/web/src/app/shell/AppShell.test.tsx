@@ -1,5 +1,6 @@
+// @vitest-environment jsdom
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "../../features/auth/context/AuthContext";
@@ -45,6 +46,7 @@ describe("AppShell & Route Governance (FEAT-070 / AC-001..AC-008)", () => {
   });
 
   afterEach(() => {
+    cleanup();
     localStorage.clear();
     sessionStorage.clear();
     vi.restoreAllMocks();
@@ -152,8 +154,8 @@ describe("AppShell & Route Governance (FEAT-070 / AC-001..AC-008)", () => {
 
     it("renders subscription center for /subscription", () => {
       renderShell("/subscription");
-      expect(screen.getByRole("heading", { name: "Subscription" })).toBeDefined();
-      expect(screen.getByText(/Sign in to view your subscription/i)).toBeDefined();
+      expect(screen.getByTestId("subscription-page")).toBeDefined();
+      expect(screen.getByRole("heading", { name: /Gói Dịch Vụ & Bảng Giá|Subscription/i })).toBeDefined();
     });
 
     it("renders live AI studio route for /ai with auth enforcement", () => {

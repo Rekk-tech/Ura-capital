@@ -56,6 +56,24 @@ async function main() {
         },
       });
 
+      const moderatorRole = await tx.role.upsert({
+        where: { name: "MODERATOR" },
+        update: {},
+        create: {
+          name: "MODERATOR",
+          description: "Academic curator and community content moderation guardian",
+        },
+      });
+
+      const brokerRole = await tx.role.upsert({
+        where: { name: "BROKER" },
+        update: {},
+        create: {
+          name: "BROKER",
+          description: "Verified institutional broker holding State Securities Commission (UBCKNN) credentials",
+        },
+      });
+
       // 2. Demo & Development Accounts
       const userFixtures = [
         {
@@ -67,6 +85,31 @@ async function main() {
           email: "admin.aura2026@aura.internal",
           displayName: "Aura System Admin",
           roleId: adminRole.id,
+        },
+        {
+          email: "admin@aura.internal",
+          displayName: "Aura Super Admin",
+          roleId: adminRole.id,
+        },
+        {
+          email: "moderator.aura2026@aura.internal",
+          displayName: "Aura Content Moderator",
+          roleId: moderatorRole.id,
+        },
+        {
+          email: "moderator@aura.internal",
+          displayName: "Aura Content Moderator",
+          roleId: moderatorRole.id,
+        },
+        {
+          email: "broker.aura2026@aura.internal",
+          displayName: "Nguyễn Hoàng Nam (SSI Broker)",
+          roleId: brokerRole.id,
+        },
+        {
+          email: "broker@aura.internal",
+          displayName: "Nguyễn Hoàng Nam (SSI Broker)",
+          roleId: brokerRole.id,
         },
         {
           email: "dev.user1@aura.internal",

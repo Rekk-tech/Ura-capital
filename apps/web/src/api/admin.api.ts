@@ -28,7 +28,7 @@ export interface AdminSystemMetrics {
   lastAuditTimestamp: string;
 }
 
-export type UserRole = "LEARNER" | "ADMIN";
+export type UserRole = "USER" | "LEARNER" | "BROKER" | "MODERATOR" | "SYSTEM_ADMIN" | "ADMIN";
 export type UserStatus = "ACTIVE" | "SUSPENDED";
 
 export interface AdminUserItem {

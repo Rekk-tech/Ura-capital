@@ -14,15 +14,15 @@ async function enrichUserRole(baseUser: AuthUser, token: string): Promise<AuthUs
       defaultRole = "MODERATOR";
     } else if (emailLower === "broker@aura.internal" || emailLower.startsWith("broker.")) {
       defaultRole = "BROKER";
-    } else if (emailLower === "learner@aura.internal" || emailLower.startsWith("learner.")) {
-      defaultRole = "LEARNER";
+    } else {
+      defaultRole = "USER";
     }
   }
 
   try {
     const profile = await profileApi.getProfile(token);
     if (profile?.roles && profile.roles.length > 0) {
-      const priorityOrder = ["SYSTEM_ADMIN", "ADMIN", "MODERATOR", "BROKER", "LEARNER", "USER"];
+      const priorityOrder = ["SYSTEM_ADMIN", "ADMIN", "MODERATOR", "BROKER", "USER", "LEARNER"];
       const resolved = priorityOrder.find((r) => profile.roles.includes(r)) || profile.roles[0];
       return {
         ...baseUser,
@@ -35,7 +35,7 @@ async function enrichUserRole(baseUser: AuthUser, token: string): Promise<AuthUs
 
   return {
     ...baseUser,
-    role: defaultRole || "LEARNER",
+    role: defaultRole || "USER",
   };
 }
 

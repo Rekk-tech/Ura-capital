@@ -19,8 +19,9 @@ import { gamificationService } from "../services/gamification.service";
 
 export const ProRoomPage: React.FC = () => {
   const navigate = useNavigate();
-  const { accessToken } = useAuth();
-  const hasCompletedMap1 = gamificationService.hasCompletedMap1();
+  const { accessToken, user } = useAuth();
+  const isElevatedRole = user?.role === "SYSTEM_ADMIN" || user?.role === "ADMIN" || user?.role === "MODERATOR";
+  const hasCompletedMap1 = isElevatedRole || gamificationService.hasCompletedMap1();
   const {
     sessionId,
     session,

@@ -16,7 +16,7 @@ export interface SubscriptionRequestOptions {
 
 export interface ISubscriptionApiClient {
   getPlans(
-    accessToken: string,
+    accessToken?: string,
     options?: SubscriptionRequestOptions,
   ): Promise<SubscriptionPlansResponse>;
   getCurrent(
@@ -104,7 +104,7 @@ export class SubscriptionApiClient implements ISubscriptionApiClient {
   }
 
   async getPlans(
-    accessToken: string,
+    accessToken?: string,
     options?: SubscriptionRequestOptions,
   ): Promise<SubscriptionPlansResponse> {
     const response = await fetch(`${this.baseUrl}/plans`, {
@@ -158,11 +158,14 @@ export class SubscriptionApiClient implements ISubscriptionApiClient {
     }
   }
 
-  private authHeaders(accessToken: string): Record<string, string> {
-    return {
+  private authHeaders(accessToken?: string): Record<string, string> {
+    const headers: Record<string, string> = {
       Accept: "application/json",
-      Authorization: `Bearer ${accessToken}`,
     };
+    if (accessToken) {
+      headers.Authorization = `Bearer ${accessToken}`;
+    }
+    return headers;
   }
 
   private async readJson(response: Response): Promise<unknown> {
