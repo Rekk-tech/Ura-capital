@@ -174,7 +174,7 @@ export const FomoHypeRoom: React.FC<FomoHypeRoomProps> = ({ botChat, round = 1 }
       // 2.5 to 4.5 seconds realistic jitter
       const nextDelay = Math.floor(Math.random() * 2000) + 2500;
       timerId = setTimeout(() => {
-        let candidate = pool[currentIndex % pool.length];
+        const candidate = pool[currentIndex % pool.length];
         currentIndex++;
 
         if (candidate) {

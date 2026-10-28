@@ -1,9 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+// @vitest-environment jsdom
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { ProRoomPage } from "./ProRoomPage";
 import * as useMapGameModule from "../hooks/use-map-game";
 import type { Map2FinalReport } from "../types/map-game.types";
+import { gamificationService } from "../services/gamification.service";
 
 vi.mock("../hooks/use-map-game");
 vi.mock("../../auth/context/AuthContext", () => ({
@@ -17,6 +19,11 @@ vi.mock("../../auth/context/AuthContext", () => ({
 describe("ProRoomPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(gamificationService, "hasCompletedMap1").mockReturnValue(true);
+  });
+
+  afterEach(() => {
+    cleanup();
   });
 
   it("renders empty state with Start Room CTA and Disclosure banner", () => {

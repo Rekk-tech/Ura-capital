@@ -23,7 +23,7 @@ export function createAiEntitlementMiddleware(
 ) {
   return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
     try {
-      const user = (req as any).user;
+      const user = (req as unknown as { user?: { id?: string; role?: string; roles?: string[] } }).user;
       if (!user || !user.id) {
         throw new AppError(
           "Yêu cầu xác thực tài khoản để truy cập Cố vấn AI",

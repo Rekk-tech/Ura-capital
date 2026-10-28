@@ -83,8 +83,9 @@ brokerRouter.post(
         roomId
       );
       res.status(200).json({ success: true, data: result });
-    } catch (err: any) {
-      res.status(400).json({ success: false, error: { message: err?.message || "Lỗi ghi danh" } });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Lỗi ghi danh";
+      res.status(400).json({ success: false, error: { message } });
     }
   }
 );
@@ -108,8 +109,9 @@ brokerRouter.post(
 
       const result = brokerService.addRoomResource(userId, roomId, payload);
       res.status(201).json({ success: true, data: result });
-    } catch (err: any) {
-      res.status(400).json({ success: false, error: { message: err?.message || "Lỗi xuất bản" } });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Lỗi xuất bản";
+      res.status(400).json({ success: false, error: { message } });
     }
   }
 );
@@ -138,8 +140,9 @@ brokerRouter.post(
       const payload = req.body;
       const result = brokerService.verifyBroker(adminUserId, brokerId, payload);
       res.json({ success: true, data: result });
-    } catch (err: any) {
-      res.status(400).json({ success: false, error: { message: err?.message || "Lỗi thẩm định" } });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Lỗi thẩm định";
+      res.status(400).json({ success: false, error: { message } });
     }
   }
 );

@@ -48,7 +48,7 @@ describe("AICoachService & AICoachController (Unit Tests)", () => {
     await controller.consultCoach(req, res, next);
 
     expect(next).toHaveBeenCalled();
-    const error = (next as unknown as { mock: { calls: Array<[any]> } }).mock.calls[0][0];
+    const error = (next as unknown as { mock: { calls: Array<[Error & { statusCode?: number }]> } }).mock.calls[0][0];
     expect(error.statusCode).toBe(400);
     expect(error.message).toContain("Query is required");
   });
@@ -57,12 +57,12 @@ describe("AICoachService & AICoachController (Unit Tests)", () => {
     const controller = new AICoachController();
     const req = { body: { query: "Giải thích lạm phát CPI và lãi suất" } } as Request;
     let responseStatus = 0;
-    let responseBody: any = null;
+    let responseBody: unknown = null;
     const res = {
       status: (code: number) => {
         responseStatus = code;
         return {
-          json: (body: any) => {
+          json: (body: unknown) => {
             responseBody = body;
           },
         };

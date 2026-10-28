@@ -64,8 +64,8 @@ export const BrokerRegisterModal: React.FC<BrokerRegisterModalProps> = ({
       setTimeout(() => {
         onSuccess();
       }, 1800);
-    } catch (err: any) {
-      setErrorMessage(err?.message || "Đăng ký thất bại, vui lòng thử lại.");
+    } catch (err: unknown) {
+      setErrorMessage(err instanceof Error ? err.message : "Đăng ký thất bại, vui lòng thử lại.");
     } finally {
       setIsLoading(false);
     }

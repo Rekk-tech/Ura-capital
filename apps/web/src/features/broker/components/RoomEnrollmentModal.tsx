@@ -35,8 +35,8 @@ export const RoomEnrollmentModal: React.FC<RoomEnrollmentModalProps> = ({
       setTimeout(() => {
         onSuccess();
       }, 1500);
-    } catch (err: any) {
-      setErrorMessage(err?.message || "Thanh toán tham gia phòng thất bại.");
+    } catch (err: unknown) {
+      setErrorMessage(err instanceof Error ? err.message : "Thanh toán tham gia phòng thất bại.");
     } finally {
       setIsLoading(false);
     }

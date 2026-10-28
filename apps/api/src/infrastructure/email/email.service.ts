@@ -57,7 +57,6 @@ export class EmailService implements IEmailService {
       ].join("\n");
 
       // Print to stdout for developer convenience
-      // eslint-disable-next-line no-console
       console.log(banner);
 
       logger.info("OTP dispatched via local dev logger", { to, otp: "******" });

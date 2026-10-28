@@ -6,7 +6,7 @@ import { aiRateLimiter, AIRateLimiter } from "./ai-rate-limiter.js";
 export function createAiRateLimitMiddleware(limiter: AIRateLimiter = aiRateLimiter) {
   return (req: Request, res: Response, next: NextFunction): void => {
     try {
-      const user = (req as any).user;
+      const user = (req as unknown as { user?: { id?: string; role?: string } }).user;
       const userId = user?.id || req.ip || "anonymous";
       const role = user?.role || "LEARNER";
 

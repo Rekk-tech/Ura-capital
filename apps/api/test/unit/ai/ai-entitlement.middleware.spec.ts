@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
+import type { Request, Response } from "express";
 import { createAiEntitlementMiddleware } from "../../../src/modules/ai/http/ai-entitlement.middleware.js";
 import { ERROR_CODES, HTTP_STATUS } from "@aura/shared";
 import type { IEntitlementResolver } from "../../../src/modules/subscription/subscription-entitlement.types.js";
@@ -6,8 +7,8 @@ import type { IEntitlementResolver } from "../../../src/modules/subscription/sub
 describe("requireAiEntitlement Middleware Unit Tests", () => {
   it("rejects unauthenticated requests with 401 UNAUTHENTICATED", async () => {
     const middleware = createAiEntitlementMiddleware(() => ({} as IEntitlementResolver));
-    const req = {} as any;
-    const res = {} as any;
+    const req = {} as unknown as Request;
+    const res = {} as unknown as Response;
     const next = vi.fn();
 
     await middleware(req, res, next);
@@ -23,8 +24,8 @@ describe("requireAiEntitlement Middleware Unit Tests", () => {
       resolveUserEntitlement: vi.fn(),
     };
     const middleware = createAiEntitlementMiddleware(() => mockResolver);
-    const req = { user: { id: "admin-1", role: "ADMIN" } } as any;
-    const res = {} as any;
+    const req = { user: { id: "admin-1", role: "ADMIN" } } as unknown as Request;
+    const res = {} as unknown as Response;
     const next = vi.fn();
 
     await middleware(req, res, next);
@@ -38,8 +39,8 @@ describe("requireAiEntitlement Middleware Unit Tests", () => {
       resolveUserEntitlement: vi.fn(),
     };
     const middleware = createAiEntitlementMiddleware(() => mockResolver);
-    const req = { user: { id: "admin-2", roles: ["ADMIN", "LEARNER"] } } as any;
-    const res = {} as any;
+    const req = { user: { id: "admin-2", roles: ["ADMIN", "LEARNER"] } } as unknown as Request;
+    const res = {} as unknown as Response;
     const next = vi.fn();
 
     await middleware(req, res, next);
@@ -58,8 +59,8 @@ describe("requireAiEntitlement Middleware Unit Tests", () => {
       }),
     };
     const middleware = createAiEntitlementMiddleware(() => mockResolver);
-    const req = { user: { id: "free-user-1", role: "LEARNER" } } as any;
-    const res = {} as any;
+    const req = { user: { id: "free-user-1", role: "LEARNER" } } as unknown as Request;
+    const res = {} as unknown as Response;
     const next = vi.fn();
 
     await middleware(req, res, next);
@@ -81,8 +82,8 @@ describe("requireAiEntitlement Middleware Unit Tests", () => {
       }),
     };
     const middleware = createAiEntitlementMiddleware(() => mockResolver);
-    const req = { user: { id: "premium-user-1", role: "LEARNER" } } as any;
-    const res = {} as any;
+    const req = { user: { id: "premium-user-1", role: "LEARNER" } } as unknown as Request;
+    const res = {} as unknown as Response;
     const next = vi.fn();
 
     await middleware(req, res, next);

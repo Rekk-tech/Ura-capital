@@ -1,7 +1,9 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+// @vitest-environment jsdom
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { MapSelectionView } from "./MapSelectionView";
+import { gamificationService } from "../services/gamification.service";
 
 const mockNavigate = vi.fn();
 
@@ -14,6 +16,14 @@ vi.mock("react-router-dom", async () => {
 });
 
 describe("MapSelectionView", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.spyOn(gamificationService, "hasCompletedMap1").mockReturnValue(true);
+  });
+
+  afterEach(() => {
+    cleanup();
+  });
   it("renders Map 1 and Map 2 cards with required specs and navigation buttons", () => {
     render(
       <BrowserRouter>

@@ -35,8 +35,8 @@ export const AdminBrokerVerificationTable: React.FC = () => {
       setActionSuccessMessage("Đã phê duyệt thành công và cấp quyền ROLE: BROKER!");
       loadData();
       setTimeout(() => setActionSuccessMessage(null), 3000);
-    } catch (err: any) {
-      alert(err?.message || "Lỗi phê duyệt hồ sơ");
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Lỗi phê duyệt hồ sơ");
     }
   };
 
@@ -48,8 +48,8 @@ export const AdminBrokerVerificationTable: React.FC = () => {
       setActionSuccessMessage("Đã từ chối hồ sơ đối tác.");
       loadData();
       setTimeout(() => setActionSuccessMessage(null), 3000);
-    } catch (err: any) {
-      alert(err?.message || "Lỗi từ chối hồ sơ");
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Lỗi từ chối hồ sơ");
     }
   };
 
