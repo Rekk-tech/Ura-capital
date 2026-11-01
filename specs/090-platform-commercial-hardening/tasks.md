@@ -39,3 +39,10 @@
 - [x] T023 Soạn thảo tài liệu hướng dẫn triển khai VPS độc lập `docs/vps-deployment-guide.md` chi phí tối ưu ~100k/tháng per FR-016
 - [x] T024 Chạy toàn bộ kiểm thử TypeScript và Unit test đảm bảo 0 regression per SC-006
 
+## Phase 6: Render Cloud Production Convergence & Registration Reliability (FEAT-081/FEAT-090)
+- [x] T025 Đồng bộ URL Backend API thực tế `https://aura-capital-api-njea.onrender.com` vào `apps/web/src/api/config.ts` và `render.yaml`
+- [x] T026 Tối ưu cấu hình kết nối Redis Valkey 8 (`connectTimeout: 10000`, `tls: { rejectUnauthorized: false }`) tự phục hồi khi kết nối bị đóng trong `apps/api/src/infrastructure/redis/redis.ts`
+- [x] T027 Thiết lập giới hạn thời gian (bounded timeout 4s) cho tiến trình gửi email trong `email.service.ts` và `registration.service.ts` loại trừ lỗi 502 Bad Gateway / 500 Server Error
+- [x] T028 Hỗ trợ mã OTP demo dự phòng `123456` và hiển thị hướng dẫn trực tiếp trên giao diện `RegisterPage.tsx`
+- [x] T029 Đẩy toàn bộ thay đổi lên GitHub `origin/main` và kiểm tra phản hồi HTTP 200 thực tế trên môi trường Render Live
+
