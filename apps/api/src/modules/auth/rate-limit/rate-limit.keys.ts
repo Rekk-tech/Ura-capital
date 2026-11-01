@@ -6,7 +6,7 @@ import { buildStandardRedisKey } from "../../../infrastructure/redis/redis-keys.
  * Key namespace feature and version for FEAT-010A / FEAT-015.
  */
 const FEATURE_NAME = "rl";
-const FEATURE_VERSION = "v1";
+const FEATURE_VERSION = "v2";
 
 /**
  * Rate-limit key scopes.

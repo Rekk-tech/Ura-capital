@@ -59,6 +59,8 @@ services:
         generateValue: true
       - key: AUTH_RATE_LIMIT_KEY_SECRET
         generateValue: true
+      - key: AUTH_RATE_LIMIT_TRUST_PROXY
+        value: "true"
       - key: COMMUNITY_RATE_LIMIT_KEY_SECRET
         generateValue: true
 

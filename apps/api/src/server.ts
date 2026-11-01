@@ -23,6 +23,7 @@ export function createApp(): Express {
   const env = getEnv();
 
   const app = express();
+  app.set("trust proxy", 1);
 
   // Core Security & Utilities Middleware
   const configuredOrigins = env.CORS_ORIGIN.split(",").map((o) => o.trim());
