@@ -5,8 +5,16 @@ import { ERROR_CODES, HTTP_STATUS } from "@aura/shared";
 import type { IUserRepository, UserEntity } from "../../src/modules/users/user.repository.js";
 import type { IPasswordHashingService } from "../../src/modules/auth/password-hashing.service.js";
 import type { IOtpService, PendingRegistrationPayload } from "../../src/modules/auth/otp.service.js";
+import { OtpService } from "../../src/modules/auth/otp.service.js";
 import type { IEmailService } from "../../src/infrastructure/email/email.service.js";
 import type { ITransactionRunner, TransactionContext } from "../../src/infrastructure/database/transaction-runner.js";
+
+// Mock Redis client to instantly fall back to memory store without connection retry delays
+vi.mock("../../src/infrastructure/redis/redis.js", () => ({
+  getRedisClient: vi.fn().mockImplementation(() => {
+    throw new Error("Redis offline in unit test");
+  }),
+}));
 
 describe("FEAT-090: Registration 2-Step OTP Verification Unit Tests", () => {
   let mockUserRepo: IUserRepository;
@@ -46,6 +54,7 @@ describe("FEAT-090: Registration 2-Step OTP Verification Unit Tests", () => {
     };
 
     mockEmailService = {
+      isConfigured: true,
       sendOtpEmail: vi.fn().mockResolvedValue(true),
     };
 
@@ -148,6 +157,34 @@ describe("FEAT-090: Registration 2-Step OTP Verification Unit Tests", () => {
 
       expect(mockOtpService.storeRegistrationOtp).not.toHaveBeenCalled();
     });
+
+    it("fails closed with 503 Service Unavailable when SMTP transport dispatch fails", async () => {
+      mockEmailService = {
+        isConfigured: true,
+        sendOtpEmail: vi.fn().mockResolvedValue(false),
+      };
+      const serviceWithFailingEmail = new RegistrationService(
+        mockUserRepo,
+        mockTxRunner,
+        mockHashingService,
+        mockOtpService,
+        mockEmailService,
+      );
+
+      await expect(
+        serviceWithFailingEmail.requestOtp({
+          email: validEmail,
+          password: validPassword,
+          displayName: validDisplayName,
+        }),
+      ).rejects.toMatchObject({
+        code: ERROR_CODES.INTERNAL_ERROR,
+        statusCode: HTTP_STATUS.SERVICE_UNAVAILABLE,
+      });
+
+      // Verifies OTP was cleared so no orphaned record remains
+      expect(mockOtpService.clearRegistrationOtp).toHaveBeenCalledWith(validEmail);
+    });
   });
 
   describe("Step 2: verifyOtp()", () => {
@@ -191,6 +228,43 @@ describe("FEAT-090: Registration 2-Step OTP Verification Unit Tests", () => {
       });
 
       expect(mockTxRunner.run).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Strict Zero-Mock OtpService Verification", () => {
+    it("stores and verifies exact OTP, strictly rejecting mock codes (123456, 999999)", async () => {
+      const otpService = new OtpService(300);
+      const testEmail = "strict.test@example.com";
+      const hash = "$argon2id$mock";
+
+      // 1. Store OTP
+      const actualOtp = await otpService.storeRegistrationOtp(testEmail, hash, "Strict Tester");
+      expect(actualOtp).toHaveLength(6);
+      expect(/^\d{6}$/.test(actualOtp)).toBe(true);
+
+      // 2. Attempt verification with mock codes (must fail!)
+      if (actualOtp !== "123456") {
+        const mockAttempt = await otpService.verifyAndConsumeRegistrationOtp(testEmail, "123456");
+        expect(mockAttempt).toBeNull();
+      }
+      if (actualOtp !== "999999") {
+        const mockAttempt2 = await otpService.verifyAndConsumeRegistrationOtp(testEmail, "999999");
+        expect(mockAttempt2).toBeNull();
+      }
+
+      // 3. Attempt verification with arbitrary wrong OTP (must fail!)
+      const wrongAttempt = await otpService.verifyAndConsumeRegistrationOtp(testEmail, "000000");
+      expect(wrongAttempt).toBeNull();
+
+      // 4. Verify with actual generated OTP (must succeed and atomically consume)
+      const validAttempt = await otpService.verifyAndConsumeRegistrationOtp(testEmail, actualOtp);
+      expect(validAttempt).not.toBeNull();
+      expect(validAttempt?.email).toBe(testEmail);
+      expect(validAttempt?.otp).toBe(actualOtp);
+
+      // 5. Subsequent attempt with same OTP must fail (single-use consumption)
+      const replayAttempt = await otpService.verifyAndConsumeRegistrationOtp(testEmail, actualOtp);
+      expect(replayAttempt).toBeNull();
     });
   });
 });

@@ -380,7 +380,7 @@ export const RegisterPage: React.FC = () => {
                   disabled={isSubmitting}
                 />
                 <div style={{ fontSize: "0.8rem", color: "#64748B", marginTop: "8px", textAlign: "center", lineHeight: "1.4" }}>
-                  💡 <em>Nếu chưa cấu hình máy chủ gửi mail SMTP, bạn có thể nhập mã OTP demo mặc định: <strong style={{ color: "#1D6FF2" }}>123456</strong></em>
+                  📬 <em>Vui lòng mở hộp thư email (và mục thư rác/spam) để lấy mã xác thực 6 chữ số.</em>
                 </div>
               </div>
 

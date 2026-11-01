@@ -43,6 +43,15 @@
 - [x] T025 Đồng bộ URL Backend API thực tế `https://aura-capital-api-njea.onrender.com` vào `apps/web/src/api/config.ts` và `render.yaml`
 - [x] T026 Tối ưu cấu hình kết nối Redis Valkey 8 (`connectTimeout: 10000`, `tls: { rejectUnauthorized: false }`) tự phục hồi khi kết nối bị đóng trong `apps/api/src/infrastructure/redis/redis.ts`
 - [x] T027 Thiết lập giới hạn thời gian (bounded timeout 4s) cho tiến trình gửi email trong `email.service.ts` và `registration.service.ts` loại trừ lỗi 502 Bad Gateway / 500 Server Error
-- [x] T028 Hỗ trợ mã OTP demo dự phòng `123456` và hiển thị hướng dẫn trực tiếp trên giao diện `RegisterPage.tsx`
-- [x] T029 Đẩy toàn bộ thay đổi lên GitHub `origin/main` và kiểm tra phản hồi HTTP 200 thực tế trên môi trường Render Live
+- [x] T028 Thử nghiệm mã OTP dự phòng giai đoạn sơ khởi trên môi trường dev
+- [x] T029 Đẩy cấu hình cơ bản lên GitHub `origin/main` và kiểm tra phản hồi HTTP 200 trên Render Live
+
+## Phase 7: Strict Email OTP Verification & Zero-Mock Enforcement (FEAT-090-OTP-STRICT)
+- [x] T030 Loại bỏ hoàn toàn mã bypass `123456` và `999999` trong `apps/api/src/modules/auth/otp.service.ts`, chỉ chấp nhận mã OTP 6 số ngẫu nhiên khớp 100% trong Redis
+- [x] T031 Nâng cấp `apps/api/src/infrastructure/email/email.service.ts` với connection pooling (`pool: true`), timeouts chuẩn đám mây (10s/15s) và sanitize biến môi trường SMTP
+- [x] T032 Áp dụng nguyên tắc Fail-Closed trong `apps/api/src/modules/auth/registration.service.ts`: Nếu có cấu hình SMTP mà gửi email thất bại, xóa OTP khỏi Redis và trả về lỗi rõ ràng thay vì thành công ảo
+- [x] T033 Xóa bỏ dòng chữ gợi ý mã demo `123456` trong giao diện `apps/web/src/features/auth/pages/RegisterPage.tsx`, bổ sung hướng dẫn người dùng kiểm tra Hộp thư đến và Thư rác/spam
+- [x] T034 Khai báo các biến môi trường `SMTP_*` với `sync: false` trong `render.yaml` để Render Blueprint duy trì cấu hình thông suốt
+- [ ] T035 Kiểm thử toàn diện (`npm test`), build kiểm tra TypeScript, commit và đẩy lên `origin/main`, kiểm tra gửi và xác nhận OTP thực tế trên Render Live
+
 

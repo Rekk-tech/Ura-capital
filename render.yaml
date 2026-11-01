@@ -91,6 +91,18 @@ services:
       - key: GEMINI_API_KEY
         value: ""
 
+      # Production SMTP Transport Configuration
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: SMTP_FROM
+        sync: false
+
   # ---------------------------------------------------------------------------
   # 3. Frontend React 19 SPA (Render Static Site Fallback / Direct Hosting)
   # ---------------------------------------------------------------------------

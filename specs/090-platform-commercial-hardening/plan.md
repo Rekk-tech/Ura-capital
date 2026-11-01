@@ -59,6 +59,19 @@
   - `caddy`: Image `caddy:alpine`, volume `caddy_data` và `caddy_config`, tự động cấp phát SSL qua Let's Encrypt và reverse proxy đến API và static Web.
 - File `scripts/backup-db.sh`: Script cronjob tự động sao lưu Postgres hàng ngày.
 
+### 1.5 Strict Email OTP Verification & Zero-Mock Architecture (FEAT-090-OTP-STRICT)
+- **Elimination of Mock Codes**:
+  - Xóa bỏ hoàn toàn mã demo `123456` và `999999` khỏi `otp.service.ts`.
+  - Mọi yêu cầu xác minh OTP phải khớp 100% với mã số ngẫu nhiên lưu trong Redis (`parsed.otp === trimmedOtp`).
+  - Gỡ bỏ hoàn toàn dòng chữ gợi ý mã demo `123456` khỏi giao diện `RegisterPage.tsx`.
+- **Cloud-Resilient SMTP Transport**:
+  - Cấu hình Nodemailer Transport với `pool: true`, `maxConnections: 3`, `maxMessages: 100` để duy trì kết nối SSL/TLS sẵn sàng, giảm độ trễ gửi email.
+  - Tăng timeout gửi thư lên chuẩn điện toán đám mây (`connectionTimeout: 10000`, `greetingTimeout: 10000`, `socketTimeout: 15000`) nhằm loại bỏ triệt để lỗi timeout sớm trên Render.
+  - Chuẩn hóa việc đọc biến môi trường SMTP (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`) loại trừ khoảng trắng hoặc dấu nháy thừa.
+  - Áp dụng nguyên tắc **Fail-Closed**: Trong môi trường có cấu hình SMTP thực tế, nếu gửi email thất bại, hệ thống lập tức xóa bản ghi tạm trong Redis và trả về HTTP 503 thông báo lỗi cụ thể cho người dùng, tuyệt đối không tạo trạng thái thành công ảo.
+- **Render Cloud Blueprint Alignment**:
+  - Khai báo các biến `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` với thuộc tính `sync: false` trong `render.yaml` để Blueprint quản lý đồng bộ mà không ghi đè credential.
+
 ---
 
 ## 2. Phased Rollout Plan
@@ -68,4 +81,6 @@
 - **Phase 3**: Simulation Game Polish (Map 1 Live Ticks, Hype Room, Trap Modal, Map 2 Access Guard & Q1 Alpha)
 - **Phase 4**: Overview Dashboard, Header & Community Sidebar Polish
 - **Phase 5**: VPS Docker Compose Orchestration, Automated Backup & Documentation
+- **Phase 6**: Render Cloud Production Convergence & Registration Reliability
+- **Phase 7**: Strict Email OTP Verification & Zero-Mock Enforcement (FEAT-090-OTP-STRICT)
 

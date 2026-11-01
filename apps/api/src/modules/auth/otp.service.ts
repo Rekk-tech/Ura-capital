@@ -81,11 +81,8 @@ export class OtpService implements IOtpService {
       rawData = await redis.get(key);
       if (rawData) {
         const parsed = JSON.parse(rawData) as PendingRegistrationPayload;
-        if (
-          parsed.otp === trimmedOtp ||
-          trimmedOtp === "123456" ||
-          trimmedOtp === "999999"
-        ) {
+        // Strict verification: only the actual generated OTP matching Redis entry is valid
+        if (parsed.otp === trimmedOtp) {
           // Atomic consume: delete OTP key so it cannot be replayed
           await redis.del(key);
           return parsed;
@@ -103,11 +100,7 @@ export class OtpService implements IOtpService {
         this.memoryStore.delete(key);
         return null;
       }
-      if (
-        memEntry.payload.otp === trimmedOtp ||
-        trimmedOtp === "123456" ||
-        trimmedOtp === "999999"
-      ) {
+      if (memEntry.payload.otp === trimmedOtp) {
         this.memoryStore.delete(key);
         return memEntry.payload;
       }

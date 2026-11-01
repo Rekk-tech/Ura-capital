@@ -114,26 +114,33 @@ export class RegistrationService implements IRegistrationService {
     );
 
     // 5. Send OTP email (SMTP if configured, Console log fallback in Dev)
-    // Non-blocking best-effort dispatch with 4s safety ceiling
+    let emailDispatched = false;
     try {
-      await Promise.race([
-        this.emailService.sendOtpEmail({
-          to: normalizedEmail,
-          otp,
-          displayName: request.displayName,
-        }),
-        new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 4000)),
-      ]);
+      emailDispatched = await this.emailService.sendOtpEmail({
+        to: normalizedEmail,
+        otp,
+        displayName: request.displayName,
+      });
     } catch (emailErr) {
-      logger.warn("Non-fatal email dispatch error in requestOtp", {
+      logger.error("Exception occurred during OTP email dispatch", {
         email: normalizedEmail,
         error: emailErr instanceof Error ? emailErr.message : String(emailErr),
       });
     }
 
-    const message = process.env.SMTP_HOST
+    // Fail-Closed: In production with SMTP configured, if email failed to dispatch, do not report false success!
+    if (this.emailService.isConfigured && !emailDispatched) {
+      await this.otpService.clearRegistrationOtp(normalizedEmail);
+      throw new AppError(
+        "Hệ thống không thể gửi email chứa mã OTP đến địa chỉ này vào lúc này. Vui lòng kiểm tra lại hòm thư hoặc thử lại sau.",
+        ERROR_CODES.INTERNAL_ERROR,
+        HTTP_STATUS.SERVICE_UNAVAILABLE,
+      );
+    }
+
+    const message = this.emailService.isConfigured
       ? "Mã OTP 6 chữ số đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư (hoặc thư rác)."
-      : "Mã OTP đã được ghi nhận. Trong chế độ Dev/Demo, mã OTP được in trong Server Log hoặc bạn có thể nhập 123456.";
+      : "Mã OTP đã được ghi nhận. Trong chế độ Dev, vui lòng kiểm tra mã OTP trong Server Console Log.";
 
     return {
       success: true,

@@ -47,18 +47,24 @@ Hệ thống Aura Capital hiện đang ở ranh giới giữa Bản thử nghi�
   - `scripts/export-secrets.ps1` (và `.sh`): Mã hóa file `.env` thành `.env.vault` với mật khẩu cá nhân.
   - `scripts/setup-machine.ps1` (và `.sh`): Giải mã `.env` và tự động cài đặt toàn bộ môi trường (npm install, prisma generate, migration, seed) chỉ với 1 lệnh duy nhất.
 
-### Nhóm 2: Xác Thực & Chống Tài Khoản Ảo (2-Step Registration with OTP)
-- **FR-005 (Yêu cầu mã OTP)**: Bổ sung endpoint `POST /api/auth/register/request-otp` nhận `{ email, password, displayName }`.
+### Nhóm 2: Xác Thực & Chống Tài Khoản Ảo (2-Step Registration with Strict Email OTP)
+- **FR-005 (Yêu cầu mã OTP qua Email Thực tế)**: Bổ sung endpoint `POST /api/auth/register/request-otp` nhận `{ email, password, displayName }`.
   - Validate email format và mật khẩu theo chính sách bảo mật (Argon2id policy).
   - Kiểm tra email đã tồn tại trong database hay chưa; nếu đã có thì trả về lỗi 409 Conflict.
   - Sinh mã OTP 6 chữ số ngẫu nhiên có độ entropy cao (`crypto.randomInt(100000, 999999)`).
-  - Lưu mã OTP cùng thông tin đăng ký (hoặc hash mật khẩu) tạm thời vào Redis với key `auth:otp:register:<normalizedEmail>` và TTL chính xác **300 giây (5 phút)**.
+  - Lưu mã OTP cùng thông tin đăng ký (hash mật khẩu) tạm thời vào Redis với key `auth:otp:register:<normalizedEmail>` và TTL chính xác **300 giây (5 phút)**.
   - Tuyệt đối KHÔNG ghi bất kỳ bản ghi nào vào PostgreSQL ở bước này (nguyên tắc Zero DB Pollution).
-  - Gửi email chứa OTP qua SMTP service (nếu có cấu hình SMTP) hoặc in ra Console/Logger ở môi trường Local/Dev.
-- **FR-006 (Xác thực OTP & Hoàn tất Đăng Ký)**: Bổ sung endpoint `POST /api/auth/register/verify-otp` nhận `{ email, otp }`.
+  - Gửi email chứa OTP qua SMTP service (kết nối Gmail SMTP bền bỉ với connection pooling và timeout 10-15s).
+  - **Nguyên tắc Fail-Closed Bảo Mật**: Trong môi trường Production có cấu hình SMTP, nếu tiến trình gửi email thất bại, hệ thống PHẢI trả về lỗi 503 ("Không thể gửi mã OTP đến email..."), xóa bản ghi tạm trong Redis và KHÔNG báo thành công ảo.
+- **FR-006 (Xác thực OTP Nghiêm Ngặt & Hoàn tất Đăng Ký)**: Bổ sung endpoint `POST /api/auth/register/verify-otp` nhận `{ email, otp }`.
   - Đọc dữ liệu từ Redis theo key `auth:otp:register:<normalizedEmail>`. Nếu không có hoặc hết hạn, trả về lỗi 400 Bad Request ("Mã OTP không hợp lệ hoặc đã hết hạn").
-  - Nếu mã OTP khớp: Mở database transaction runner, tạo mới bản ghi User + Credential + Audit Log thành công, xóa key OTP khỏi Redis, và phát hành Access/Refresh Token trả về cho client.
-- **FR-007 (Frontend OTP Form)**: Giao diện Đăng ký (`RegisterPage.tsx`) chuyển đổi mượt mà sang bước 2: nhập mã 6 số (6 ô input riêng biệt hoặc 1 ô định dạng số to rõ, có đồng hồ đếm ngược 5:00 và nút "Gửi lại mã").
+  - **LOẠI BỎ TOÀN BỘ MÃ MẶC ĐỊNH**: Nghiêm cấm hoàn toàn các mã demo như `123456` hay `999999`. Hệ thống CHỈ chấp nhận mã OTP thực tế khớp 100% với mã đã tạo và gửi vào email của người dùng.
+  - Tiêu thụ mã 1 lần (Single-Use Atomic Consumption): Xóa ngay key khỏi Redis khi xác thực thành công để chống tấn công phát lại (Replay Attack).
+  - Mở database transaction runner, tạo mới bản ghi User + Credential + Audit Log thành công, và phát hành Access/Refresh Token trả về cho client.
+- **FR-007 (Frontend OTP Form & Xóa Gợi Ý Demo)**: Giao diện Đăng ký (`RegisterPage.tsx`):
+  - Chuyển đổi mượt mà sang bước 2: nhập mã 6 số to rõ, có đồng hồ đếm ngược 5:00 và nút "Gửi lại mã".
+  - **LOẠI BỎ HOÀN TOÀN dòng chữ gợi ý mã mặc định 123456** trên giao diện người dùng.
+  - Hiển thị thông báo hướng dẫn rõ ràng: *"Vui lòng mở hộp thư email (và mục thư rác/spam) để lấy mã xác thực 6 chữ số."*
 
 ### Nhóm 3: Trải Nghiệm Sản Phẩm & Giao Diện (UI/UX & Simulation)
 - **FR-008 (Map 1 Live Ticking)**: Nâng cấp `FomoPriceChart.tsx` với hiệu ứng micro-tick sống động:

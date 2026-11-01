@@ -8,19 +8,27 @@ export interface SendOtpOptions {
 }
 
 export interface IEmailService {
+  readonly isConfigured: boolean;
   sendOtpEmail(options: SendOtpOptions): Promise<boolean>;
 }
 
+const cleanEnv = (val?: string): string | undefined => {
+  if (!val) return undefined;
+  const trimmed = val.trim();
+  // Strip enclosing quotes if user supplied them in Render or .env
+  return trimmed.replace(/^["']|["']$/g, "").trim();
+};
+
 export class EmailService implements IEmailService {
   private transporter: Transporter | null = null;
-  private readonly isConfigured: boolean;
+  readonly isConfigured: boolean;
 
   constructor() {
-    const host = process.env.SMTP_HOST;
-    const user = process.env.SMTP_USER;
-    const pass = process.env.SMTP_PASS;
-    const port = Number(process.env.SMTP_PORT || 587);
-    const secure = process.env.SMTP_SECURE === "true";
+    const host = cleanEnv(process.env.SMTP_HOST);
+    const user = cleanEnv(process.env.SMTP_USER);
+    const pass = cleanEnv(process.env.SMTP_PASS);
+    const port = Number(cleanEnv(process.env.SMTP_PORT) || 587);
+    const secure = process.env.SMTP_SECURE === "true" || port === 465;
 
     if (host && user && pass) {
       this.isConfigured = true;
@@ -29,11 +37,16 @@ export class EmailService implements IEmailService {
         port,
         secure,
         auth: { user, pass },
-        connectionTimeout: 4000,
-        greetingTimeout: 4000,
-        socketTimeout: 5000,
+        pool: true,
+        maxConnections: 3,
+        maxMessages: 100,
+        rateDelta: 1000,
+        rateLimit: 5,
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 15000,
       });
-      logger.info("SMTP email transport configured successfully", { host, port });
+      logger.info("SMTP email transport configured successfully with pool", { host, port, secure });
     } else {
       this.isConfigured = false;
       logger.info("SMTP credentials not provided; email service running in Local/Dev console mode");
