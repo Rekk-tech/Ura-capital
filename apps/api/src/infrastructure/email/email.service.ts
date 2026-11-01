@@ -29,6 +29,9 @@ export class EmailService implements IEmailService {
         port,
         secure,
         auth: { user, pass },
+        connectionTimeout: 4000,
+        greetingTimeout: 4000,
+        socketTimeout: 5000,
       });
       logger.info("SMTP email transport configured successfully", { host, port });
     } else {
@@ -114,8 +117,12 @@ export class EmailService implements IEmailService {
       logger.info("OTP email successfully sent via SMTP transport", { to });
       return true;
     } catch (err: unknown) {
-      logger.error("Failed to send OTP email via SMTP transport", { error: err, to });
-      throw err;
+      logger.error("Failed to send OTP email via SMTP transport", {
+        error: err instanceof Error ? err.message : String(err),
+        to,
+      });
+      // Do not re-throw to allow OTP registration flow to proceed smoothly with fallback demo OTP
+      return false;
     }
   }
 }

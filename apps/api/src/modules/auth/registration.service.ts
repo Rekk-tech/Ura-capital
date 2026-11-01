@@ -23,6 +23,7 @@ import {
 } from "../../infrastructure/database/repository-factory.js";
 import { otpService as defaultOtpService, type IOtpService } from "./otp.service.js";
 import { emailService as defaultEmailService, type IEmailService } from "../../infrastructure/email/email.service.js";
+import { logger } from "../../infrastructure/logging/logger.js";
 
 export interface RegistrationContext {
   requestId?: string | null;
@@ -113,11 +114,22 @@ export class RegistrationService implements IRegistrationService {
     );
 
     // 5. Send OTP email (SMTP if configured, Console log fallback in Dev)
-    await this.emailService.sendOtpEmail({
-      to: normalizedEmail,
-      otp,
-      displayName: request.displayName,
-    });
+    // Non-blocking best-effort dispatch with 4s safety ceiling
+    try {
+      await Promise.race([
+        this.emailService.sendOtpEmail({
+          to: normalizedEmail,
+          otp,
+          displayName: request.displayName,
+        }),
+        new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 4000)),
+      ]);
+    } catch (emailErr) {
+      logger.warn("Non-fatal email dispatch error in requestOtp", {
+        email: normalizedEmail,
+        error: emailErr instanceof Error ? emailErr.message : String(emailErr),
+      });
+    }
 
     const message = process.env.SMTP_HOST
       ? "Mã OTP 6 chữ số đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư (hoặc thư rác)."

@@ -28,6 +28,13 @@ export function errorHandlerMiddleware(
     return;
   }
 
+  if (err instanceof SyntaxError && "body" in err) {
+    res.status(HTTP_STATUS.BAD_REQUEST).json(
+      createErrorEnvelope("Invalid JSON payload in request body", ERROR_CODES.VALIDATION_ERROR, requestId),
+    );
+    return;
+  }
+
   if (err instanceof ZodError) {
     const details = err.errors.reduce(
       (acc, curr) => {
