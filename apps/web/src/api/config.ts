@@ -18,9 +18,12 @@ export function getApiBaseUrl(): string {
     return raw.replace(/\/+$/, "");
   }
 
-  // Automatic Fallback for Cloudflare Pages (*.pages.dev) edge deployments
-  if (typeof window !== "undefined" && window.location?.hostname?.endsWith(".pages.dev")) {
-    return "https://aura-capital-api.onrender.com";
+  // Automatic Fallback for Cloudflare Pages (*.pages.dev) and Render Web (*.onrender.com)
+  if (typeof window !== "undefined") {
+    const host = window.location?.hostname || "";
+    if (host.endsWith(".pages.dev") || (host.endsWith(".onrender.com") && !host.includes("-api"))) {
+      return "https://aura-capital-api.onrender.com";
+    }
   }
 
   return "";

@@ -305,7 +305,7 @@ export const RegisterPage: React.FC = () => {
                 disabled={isSubmitting || !isPasswordLongEnough}
               >
                 {isSubmitting ? (
-                  <span>Creating account...</span>
+                  <span>Đang kết nối &amp; tạo tài khoản...</span>
                 ) : (
                   <>
                     <span>Create Account</span>
@@ -313,6 +313,11 @@ export const RegisterPage: React.FC = () => {
                   </>
                 )}
               </button>
+              {isSubmitting && (
+                <p style={{ fontSize: "0.78rem", color: "#64748B", textAlign: "center", marginTop: "8px" }}>
+                  ⏳ Hệ thống đang gửi mã xác thực. Nếu máy chủ vừa thức dậy từ chế độ nghỉ (cold start), vui lòng đợi trong giây lát...
+                </p>
+              )}
             </form>
 
             <div className="auth-card-footer">
