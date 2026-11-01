@@ -79,7 +79,7 @@ services:
       # Cross-Origin Resource Sharing (CORS)
       # Updated with Cloudflare Pages or Render Static Site URL
       - key: CORS_ORIGIN
-        value: "https://aura-capital-web.onrender.com"
+        value: "https://aura-capital-web-o3v5.onrender.com"
 
       # Feature Flags & Modes
       - key: SUBSCRIPTION_PROVIDER_MODE
@@ -103,4 +103,4 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        value: "https://aura-capital-api.onrender.com"
+        value: "https://aura-capital-api-njea.onrender.com"

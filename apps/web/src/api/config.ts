@@ -22,7 +22,7 @@ export function getApiBaseUrl(): string {
   if (typeof window !== "undefined") {
     const host = window.location?.hostname || "";
     if (host.endsWith(".pages.dev") || (host.endsWith(".onrender.com") && !host.includes("-api"))) {
-      return "https://aura-capital-api.onrender.com";
+      return "https://aura-capital-api-njea.onrender.com";
     }
   }
 

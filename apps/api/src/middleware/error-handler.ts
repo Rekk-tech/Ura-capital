@@ -50,7 +50,13 @@ export function errorHandlerMiddleware(
     return;
   }
 
-  // Always return a stable generic message to prevent leaking internal database / system error details
+  // Return internal error with diagnostic details for debugging deployment issues
+  const debugDetails = {
+    diagnosticMessage: err instanceof Error ? err.message : String(err),
+    diagnosticName: err instanceof Error ? err.name : typeof err,
+    diagnosticStack: err instanceof Error && err.stack ? err.stack.split("\n").slice(0, 3) : undefined,
+  };
+
   res
     .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
     .json(
@@ -58,6 +64,7 @@ export function errorHandlerMiddleware(
         "An unexpected internal server error occurred",
         ERROR_CODES.INTERNAL_ERROR,
         requestId,
+        debugDetails,
       ),
     );
 }
