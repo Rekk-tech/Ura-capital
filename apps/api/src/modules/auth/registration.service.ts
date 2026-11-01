@@ -119,9 +119,13 @@ export class RegistrationService implements IRegistrationService {
       displayName: request.displayName,
     });
 
+    const message = process.env.SMTP_HOST
+      ? "Mã OTP 6 chữ số đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư (hoặc thư rác)."
+      : "Mã OTP đã được ghi nhận. Trong chế độ Dev/Demo, mã OTP được in trong Server Log hoặc bạn có thể nhập 123456.";
+
     return {
       success: true,
-      message: "Mã OTP 6 chữ số đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư (hoặc thư rác).",
+      message,
       email: normalizedEmail,
     };
   }
