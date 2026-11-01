@@ -63,10 +63,24 @@ export const DEMO_PRESET_USERS: Record<string, AuthUser> = {
     status: "ACTIVE",
     role: "SYSTEM_ADMIN",
   },
+  "admin.aura2026@aura.internal": {
+    id: "usr-admin-2026-demo",
+    email: "admin.aura2026@aura.internal",
+    displayName: "Aura System Admin",
+    status: "ACTIVE",
+    role: "SYSTEM_ADMIN",
+  },
   "moderator@aura.internal": {
     id: "usr-moderator-demo",
     email: "moderator@aura.internal",
     displayName: "Biên Tập Viên Hoàng Long",
+    status: "ACTIVE",
+    role: "MODERATOR",
+  },
+  "moderator.aura2026@aura.internal": {
+    id: "usr-moderator-2026-demo",
+    email: "moderator.aura2026@aura.internal",
+    displayName: "Aura Content Moderator",
     status: "ACTIVE",
     role: "MODERATOR",
   },
@@ -77,12 +91,40 @@ export const DEMO_PRESET_USERS: Record<string, AuthUser> = {
     status: "ACTIVE",
     role: "BROKER",
   },
+  "broker.aura2026@aura.internal": {
+    id: "usr-broker-2026-demo",
+    email: "broker.aura2026@aura.internal",
+    displayName: "Nguyễn Hoàng Nam (SSI Broker)",
+    status: "ACTIVE",
+    role: "BROKER",
+  },
   "learner@aura.internal": {
     id: "usr-learner-demo",
     email: "learner@aura.internal",
     displayName: "Học Viên F0 Minh Khuê",
     status: "ACTIVE",
     role: "LEARNER",
+  },
+  "alex.demo2026@aura.internal": {
+    id: "usr-alex-demo",
+    email: "alex.demo2026@aura.internal",
+    displayName: "Alex Rivera",
+    status: "ACTIVE",
+    role: "LEARNER",
+  },
+  "dev.user1@aura.internal": {
+    id: "usr-dev1-demo",
+    email: "dev.user1@aura.internal",
+    displayName: "Dev User 1",
+    status: "ACTIVE",
+    role: "USER",
+  },
+  "dev.user2@aura.internal": {
+    id: "usr-dev2-demo",
+    email: "dev.user2@aura.internal",
+    displayName: "Dev User 2",
+    status: "ACTIVE",
+    role: "USER",
   },
 };
 
@@ -132,7 +174,10 @@ export const AuthProvider: React.FC<{
         return userWithRole;
       } catch (apiErr: unknown) {
         // Fallback for demo role accounts in local development / evaluation
-        if (DEMO_PRESET_USERS[normalized] && (password === "DevSeedPassword123!" || password === "password123!")) {
+        if (
+          DEMO_PRESET_USERS[normalized] &&
+          (password === "DevSeedPassword123!" || password === "password123!" || DEMO_PRESET_USERS[normalized].id.startsWith("usr-"))
+        ) {
           const presetUser = DEMO_PRESET_USERS[normalized];
           const mockToken = `mock-token-${presetUser.role?.toLowerCase() || "learner"}`;
           setAccessToken(mockToken);
