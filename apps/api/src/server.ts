@@ -34,7 +34,8 @@ export function createApp(): Express {
           !origin ||
           configuredOrigins.includes(origin) ||
           configuredOrigins.includes("*") ||
-          /^https:\/\/[a-zA-Z0-9-]+\.pages\.dev$/.test(origin)
+          /^https:\/\/[a-zA-Z0-9-]+\.pages\.dev$/.test(origin) ||
+          /^https:\/\/[a-zA-Z0-9-]+\.onrender\.com$/.test(origin)
         ) {
           callback(null, true);
         } else {
