@@ -91,7 +91,11 @@ services:
       - key: GEMINI_API_KEY
         value: ""
 
-      # Production SMTP Transport Configuration
+      # Email Dispatch Configuration (Resend HTTPS API or SMTP Transport)
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM
+        sync: false
       - key: SMTP_HOST
         sync: false
       - key: SMTP_PORT
