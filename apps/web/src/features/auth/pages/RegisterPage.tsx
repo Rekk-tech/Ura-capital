@@ -374,6 +374,9 @@ export const RegisterPage: React.FC = () => {
                   autoFocus
                   disabled={isSubmitting}
                 />
+                <div style={{ fontSize: "0.8rem", color: "#64748B", marginTop: "8px", textAlign: "center", lineHeight: "1.4" }}>
+                  💡 <em>Nếu chưa cấu hình máy chủ gửi mail SMTP, bạn có thể nhập mã OTP demo mặc định: <strong style={{ color: "#1D6FF2" }}>123456</strong></em>
+                </div>
               </div>
 
               <button

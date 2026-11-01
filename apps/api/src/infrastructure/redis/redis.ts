@@ -19,15 +19,18 @@ export function createIsolatedRedisClient(customUrl?: string, customOptions?: Re
     }
   }
 
+  const isTls = redisUrl.startsWith("rediss://");
+
   const client = new Redis(redisUrl, {
-    maxRetriesPerRequest: 1,
+    maxRetriesPerRequest: 3,
     lazyConnect: false,
-    connectTimeout: 5000,
-    commandTimeout: 3000,
+    connectTimeout: 10000,
+    commandTimeout: 5000,
     retryStrategy(times: number) {
-      if (times > 3) return null; // Stop retrying after 3 attempts
-      return Math.min(times * 200, 1000);
+      if (times > 5) return null; // Stop retrying after 5 attempts
+      return Math.min(times * 300, 2000);
     },
+    ...(isTls ? { tls: { rejectUnauthorized: false } } : {}),
     ...customOptions,
   });
 
@@ -45,7 +48,7 @@ export function createIsolatedRedisClient(customUrl?: string, customOptions?: Re
  * Returns a connected Redis client singleton.
  */
 export function getRedisClient(): Redis {
-  if (!redisInstance || redisInstance.status === "end") {
+  if (!redisInstance || redisInstance.status === "end" || redisInstance.status === "close") {
     redisInstance = createIsolatedRedisClient();
   }
 
