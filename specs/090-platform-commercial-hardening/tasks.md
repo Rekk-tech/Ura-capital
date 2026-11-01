@@ -52,6 +52,6 @@
 - [x] T032 Áp dụng nguyên tắc Fail-Closed trong `apps/api/src/modules/auth/registration.service.ts`: Nếu có cấu hình SMTP mà gửi email thất bại, xóa OTP khỏi Redis và trả về lỗi rõ ràng thay vì thành công ảo
 - [x] T033 Xóa bỏ dòng chữ gợi ý mã demo `123456` trong giao diện `apps/web/src/features/auth/pages/RegisterPage.tsx`, bổ sung hướng dẫn người dùng kiểm tra Hộp thư đến và Thư rác/spam
 - [x] T034 Khai báo các biến môi trường `SMTP_*` với `sync: false` trong `render.yaml` để Render Blueprint duy trì cấu hình thông suốt
-- [ ] T035 Kiểm thử toàn diện (`npm test`), build kiểm tra TypeScript, commit và đẩy lên `origin/main`, kiểm tra gửi và xác nhận OTP thực tế trên Render Live
+- [x] T035 Kiểm thử toàn diện (`npm test`), build kiểm tra TypeScript, commit và đẩy lên `origin/main`, kiểm tra gửi và xác nhận OTP thực tế trên Render Live
 
 
