@@ -173,8 +173,9 @@ export const AuthProvider: React.FC<{
         setUser(userWithRole);
         return userWithRole;
       } catch (apiErr: unknown) {
-        // Fallback for demo role accounts in local development / evaluation
+        // Fallback for demo role accounts ONLY in test environments
         if (
+          process.env.NODE_ENV === "test" &&
           DEMO_PRESET_USERS[normalized] &&
           (password === "DevSeedPassword123!" || password === "password123!" || DEMO_PRESET_USERS[normalized].id.startsWith("usr-"))
         ) {

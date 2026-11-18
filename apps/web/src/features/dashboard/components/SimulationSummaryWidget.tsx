@@ -55,8 +55,7 @@ export const SimulationSummaryWidget: React.FC = () => {
   const pnlNum = valuation ? parseFloat(valuation.unrealizedPnl) : 4750;
   const isPnlPositive = pnlNum >= 0;
 
-  const isTestEmpty = process.env.NODE_ENV === "test" && sessionsQuery.data && sessionsQuery.data.data.length === 0;
-  const isSimulationEmpty = !activeSession && isTestEmpty;
+  const isSimulationEmpty = !isLoading && !isError && !activeSession;
 
   return (
     <DashboardWidgetWrapper
